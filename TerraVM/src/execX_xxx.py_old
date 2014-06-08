@@ -1,0 +1,338 @@
+#!/usr/bin/python
+
+import sys
+from TOSSIM import *
+import pygame
+from pygame.locals import *
+from collections import deque
+
+BLACK = (  0,   0,   0)
+WHITE = (255, 255, 255)
+BLUE =  (  100,   100, 200)
+GREEN = (  0, 255,   0)
+RED =   (255,   0,   0)
+BACKGROUND = (250, 250, 250)
+
+nodeSize = 30
+nodeDist = 80
+eraseTime = 400
+
+gNodes=[0 for x in xrange(100)]
+eraseQueue = deque()
+
+class gNode:
+    def __init__(self,id):
+        self.x = int(id/10)
+        self.y = id%10
+        self.xx = nodeDist*self.x
+        self.yy = nodeDist*self.y
+        self.id = id
+        self.idStr = str(id)
+        rect = [self.xx ,self.yy,nodeSize,nodeSize]
+        self.node = pygame.draw.rect(screen,BLUE,rect,1)
+        font = pygame.font.Font(None, 20)
+        text = font.render(self.idStr, 1, (10, 10, 10))
+        screen.blit(text, [self.xx+4,self.yy+4])
+        self.setLeds(0)
+        pygame.display.update(rect)
+    def setLeds(self,val):
+        self.color0 = BLACK
+        self.color1 = BLACK
+        self.color2 = BLACK
+        self.fill0 = 1
+        self.fill1 = 1
+        self.fill2 = 1
+        if (val & 1):
+            self.color0,self.fill0 = (RED,0)
+        if (val & 2):
+            self.color1,self.fill1 = (BLUE,0)
+        if (val & 4):
+            self.color2,self.fill2 = (GREEN,0)
+        self.led0 = pygame.draw.circle(screen,BACKGROUND,[self.xx+6,self.yy+nodeSize-6],3,0)
+        self.led1 = pygame.draw.circle(screen,BACKGROUND,[self.xx+12,self.yy+nodeSize-6],3,0)
+        self.led2 = pygame.draw.circle(screen,BACKGROUND,[self.xx+18,self.yy+nodeSize-6],3,0)
+        self.led0 = pygame.draw.circle(screen,self.color0,[self.xx+6,self.yy+nodeSize-6],3,self.fill0)
+        self.led1 = pygame.draw.circle(screen,self.color1,[self.xx+12,self.yy+nodeSize-6],3,self.fill1)
+        self.led2 = pygame.draw.circle(screen,self.color2,[self.xx+18,self.yy+nodeSize-6],3,self.fill2)
+        pygame.display.update([self.xx,self.yy-9,self.xx+3,self.yy-6])
+    def getLinePoints(self,target):
+        targetx = int(target/10);
+        targety = target%10;
+        if (self.y == targety):
+            startx = self.xx + (targetx-self.x+1)*(nodeSize/2) + (targetx-self.x)*1
+            stop1x  = self.xx + (targetx-self.x+1)*(nodeSize/2) + (targetx-self.x)*nodeDist - (targetx-self.x)*(nodeSize) - (targetx-self.x)*1
+            starty = self.yy + (nodeSize/2) + (targetx-self.x)*2
+            stop1y = self.yy + (nodeSize/2) + (targetx-self.x)*2
+            stop2x = stop1x - (targetx-self.x)*4
+            stop2y = stop1y + (targetx-self.x)*4
+        else:
+            startx = self.xx + (nodeSize/2) + (targety-self.y)*2
+            stop1x  = self.xx + (nodeSize/2) + (targety-self.y)*2
+            starty = self.yy + (targety-self.y+1)*(nodeSize/2) + (targety-self.y)*1
+            stop1y  = self.yy + (targety-self.y+1)*(nodeSize/2) + (targety-self.y)*nodeDist - (targety-self.y)*(nodeSize) - (targety-self.y)*1
+            stop2x = stop1x + (targety-self.y)*4
+            stop2y = stop1y - (targety-self.y)*4
+        return [[startx,starty],[stop1x,stop1y],[stop2x,stop2y]]
+    def radioSendTo(self,target):
+        points = self.getLinePoints(target)
+        pygame.display.update(pygame.draw.lines(screen,BLUE,False,points,1))
+        eraseQueue.append((pygame.time.get_ticks()+eraseTime,points))
+    def radioSendAll(self):
+        points = self.getLinePoints(self.id-1)
+        pygame.display.update(pygame.draw.lines(screen,BLUE,False,points,1))
+        eraseQueue.append((pygame.time.get_ticks()+eraseTime,points))
+        points = self.getLinePoints(self.id-10)
+        pygame.display.update(pygame.draw.lines(screen,BLUE,False,points,1))
+        eraseQueue.append((pygame.time.get_ticks()+eraseTime,points))
+        points = self.getLinePoints(self.id+1)
+        pygame.display.update(pygame.draw.lines(screen,BLUE,False,points,1))
+        eraseQueue.append((pygame.time.get_ticks()+eraseTime,points))
+        points = self.getLinePoints(self.id+10)
+        pygame.display.update(pygame.draw.lines(screen,BLUE,False,points,1))
+        eraseQueue.append((pygame.time.get_ticks()+eraseTime,points))
+  
+if not pygame.font: print 'Warning, fonts disabled'
+if not pygame.mixer: print 'Warning, sound disabled'
+pygame.init()
+screen = pygame.display.set_mode((468, 468))
+pygame.display.set_caption('Terra Simulation Viewer')
+pygame.mouse.set_visible(0)
+background = pygame.Surface(screen.get_size())
+background = background.convert()
+background.fill(BACKGROUND)
+if pygame.font:
+    font = pygame.font.Font(None, 36)
+    text = font.render("Simulating n x n matrix", 1, (10, 10, 10))
+    textpos = text.get_rect(centerx=background.get_width()/2)
+    background.blit(text, textpos)
+screen.blit(background, (0, 0))
+pygame.display.flip()
+#pygame.display.flip()
+#pygame.display.update()
+
+# Create components
+t = Tossim([])
+m = t.mac()
+r = t.radio()
+
+sfFlag=True;
+liveFlag= True;
+#liveFlag= False;
+
+try:
+    sf = SerialForwarder(9002)
+except NameError:
+    sfFlag=False;
+    print "Executando sem o SerialForward!"
+
+if (sfFlag and liveFlag):
+    throttle = Throttle(t, 10)
+
+##t.addChannel("AM", sys.stdout);
+##t.addChannel("Acks", sys.stdout);
+##t.addChannel("Packet", sys.stdout);
+##t.addChannel("Serial", sys.stdout);
+##t.addChannel("QueueC", sys.stdout);
+##t.addChannel("Scheduler", sys.stdout);
+t.addChannel("terra", sys.stdout);
+
+
+
+# Create message list
+Group = list();
+QtdGeral=0;
+
+# Parameters
+QtdMaxMotes =100;
+QtdMotes = 100;
+MaiorMoteId=100;
+MoteInic = 0;
+IntervaloColeta = 30;
+TempoPasso = 500.0;     # step time duration for log
+BSConnectMote = 1;
+
+#--------------------------------------------
+def inicGroup(Qtd,Group):
+    """Mote list"""
+    Group = list();
+    for i in range(0, Qtd):
+        Group.append(MoteInic+i+1);
+    return Group;
+
+def inicNoise(QtdMaxMotes):
+    """Noise initialization"""
+    noise = open("meyer-heavy_short.txt", "r")
+    lines = noise.readlines()
+    for line in lines:
+        str = line.strip()
+        if (str != ""):
+            val = int(str);
+            for i in range(1, QtdMaxMotes+1):
+                t.getNode(MoteInic+i).addNoiseTraceReading(val)
+    for i in range(1, QtdMaxMotes+1):
+        print "Creating noise model for ",MoteInic+i;
+        t.getNode(MoteInic+i).createNoiseModel()
+
+
+
+def inicMote1():
+    """Switch-on a mote"""
+    t.getNode(1).bootAtTime(t.time());
+    print "Script: Started mote: 1";
+    
+def inicMote(mote):
+    """Switch-on a mote"""
+    t.getNode(MoteInic+mote).bootAtTime(t.time());
+    gNodes[MoteInic+mote]=gNode(MoteInic+mote)
+
+    Gain = 85.0;
+    if ((mote==BSConnectMote)):
+        r.add(1,MoteInic+mote,Gain);
+        r.add(MoteInic+mote,1,Gain);
+
+    r.add(MoteInic+mote,MoteInic+mote+1,Gain);
+    r.add(MoteInic+mote+1,MoteInic+mote,Gain);
+
+    r.add(MoteInic+mote,MoteInic+mote+9,Gain);
+    r.add(MoteInic+mote+9,MoteInic+mote,Gain);
+
+    r.add(MoteInic+mote,MoteInic+mote+10,Gain);
+    r.add(MoteInic+mote+10,MoteInic+mote,Gain);
+
+    r.add(MoteInic+mote,MoteInic+mote+11,Gain);
+    r.add(MoteInic+mote+11,MoteInic+mote,Gain);
+
+    print "Script: Started mote:",MoteInic+mote;
+
+
+def stopMote(mote):
+    """Switch-off a mote"""
+    t.getNode(MoteInic+mote).turnOff();
+    for i in range (1,QtdMotes+1):
+        r.remove(MoteInic+i,MoteInic+mote); 
+    print "Script: Stoped mote:",MoteInic+mote
+
+
+def execPassos(passos):
+    """Execute x steps"""
+    if (sfFlag and liveFlag):
+        throttle.checkThrottle();
+    t.runNextEvent();
+    if (sfFlag):
+        sf.process();
+    time = t.time()
+    while (time + passos > t.time()):
+        t.runNextEvent()
+        while ((len(eraseQueue)> 0) and (pygame.time.get_ticks() > eraseQueue[0][0])):
+            time,points = eraseQueue.popleft()
+            pygame.display.update(pygame.draw.lines(screen,BACKGROUND,False,points,1))
+
+
+def execTempo(TempoTotal,QtdGeral):
+    """Execute a while"""
+    Qtd1sec = t.ticksPerSecond()
+    TExec=Qtd1sec*TempoPasso/1000;
+    Rodadas=TempoTotal*1000/TempoPasso;
+    qtd=0.0;
+    while (qtd < (Rodadas)):
+        qtd=qtd+1;
+        time = t.time();
+        while (time + TExec > t.time()):
+            if (sfFlag and liveFlag):
+                throttle.checkThrottle();
+            t.runNextEvent();
+            while ((len(eraseQueue)> 0) and (pygame.time.get_ticks() > eraseQueue[0][0])):
+                time,points = eraseQueue.popleft()
+                pygame.display.update(pygame.draw.lines(screen,BACKGROUND,False,points,1))
+            if (sfFlag):
+                sf.process();
+        print "second:%.1f" % ((QtdGeral+qtd)*TempoPasso/1000);
+        sys.stdout.flush();
+    QtdGeral=QtdGeral+qtd;
+    return QtdGeral;
+
+#----------------------------------------------------------
+
+
+#
+# 1. Initialize test environment - Create noise
+# 
+# (the component creation is at the beginning of file)
+inicNoise(MaiorMoteId);
+if (sfFlag):
+    sf.process();
+if (sfFlag and liveFlag):
+    throttle.initialize();
+# 
+# 2. Test condition 01
+# 
+print "******************************************************";
+print "*             Test Condition 01                      *";
+print "******************************************************";
+MoteInic=10;
+QtdMotes = 100;
+Group=inicGroup(QtdMotes,Group);
+inicMote1();
+execPassos(1);
+#QtdGeral=execTempo(100,QtdGeral);
+
+widthA=4; 
+LinesA=3;
+LinesB=3;
+
+for i in range (0,LinesA):
+    for x in range (1,widthA+1):
+        inicMote((i*10)+x);
+        execPassos(1);
+#        QtdGeral=execTempo(20,QtdGeral);
+
+gNodes[22].setLeds(1)
+QtdGeral=execTempo(1,QtdGeral);
+gNodes[22].setLeds(2)
+QtdGeral=execTempo(1,QtdGeral);
+gNodes[22].radioSendTo(21);
+QtdGeral=execTempo(1,QtdGeral);
+gNodes[12].setLeds(3)
+gNodes[21].radioSendTo(22);
+QtdGeral=execTempo(1,QtdGeral);
+gNodes[12].setLeds(4)
+gNodes[22].radioSendTo(23);
+QtdGeral=execTempo(1,QtdGeral);
+gNodes[12].setLeds(5)
+gNodes[23].radioSendTo(22);
+QtdGeral=execTempo(1,QtdGeral);
+gNodes[12].setLeds(6)
+gNodes[22].radioSendTo(32);
+QtdGeral=execTempo(1,QtdGeral);
+gNodes[12].setLeds(7)
+gNodes[32].radioSendTo(22);
+QtdGeral=execTempo(1,QtdGeral);
+gNodes[12].setLeds(8)
+gNodes[22].radioSendTo(12);
+QtdGeral=execTempo(1,QtdGeral);
+gNodes[12].radioSendTo(22);
+gNodes[23].radioSendAll();
+
+QtdGeral=execTempo(77,QtdGeral);
+for i in range (LinesA,LinesA+LinesB):
+    for x in range (1,widthA+1):
+        inicMote((i*10)+x);
+        execPassos(1);
+#        QtdGeral=execTempo(20,QtdGeral);
+QtdGeral=execTempo(20,QtdGeral);
+#QtdGeral=execTempo(100,QtdGeral);
+#QtdGeral=execTempo(120,QtdGeral);
+# 20min + Inicializacao do teste que eh 750 seg.
+Resto = (1200+750) - (QtdGeral*TempoPasso/1000)
+QtdGeral=execTempo(Resto,QtdGeral);
+#execPassos(1000);
+#
+print "******************************************************";
+print "*          Final do Script                           *";
+print "******************************************************";
+
+#--------------------------------------------------------
+
+
+
+

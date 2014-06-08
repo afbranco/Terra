@@ -1,0 +1,786 @@
+second:0.5
+second:1.0
+second:1.5
+second:2.0
+second:2.5
+second:3.0
+second:3.5
+second:4.0
+second:4.5
+second:5.0
+second:5.5
+second:6.0
+DEBUG (11): VM:: clear clock/gate entry.
+DEBUG (11): VM:: possible await EVENT for label 1
+DEBUG (11): VM:: possible await EVENT for label 1
+DEBUG (11): VM:: possible await EVENT for label 1
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (0 + 1) = 1 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:6.5
+second:7.0
+second:7.5
+second:8.0
+second:8.5
+second:9.0
+second:9.5
+second:10.0
+second:10.5
+second:11.0
+second:11.5
+second:12.0
+second:12.5
+second:13.0
+second:13.5
+second:14.0
+second:14.5
+second:15.0
+second:15.5
+second:16.0
+second:16.5
+second:17.0
+second:17.5
+second:18.0
+second:18.5
+second:19.0
+DEBUG (11): VM:: timer fired for label 29
+DEBUG (11): VM:: executing trail: label=14.
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (1 + 1) = 2 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:19.5
+second:20.0
+second:20.5
+second:21.0
+second:21.5
+second:22.0
+second:22.5
+second:23.0
+second:23.5
+second:24.0
+second:24.5
+second:25.0
+second:25.5
+second:26.0
+second:26.5
+second:27.0
+second:27.5
+second:28.0
+second:28.5
+second:29.0
+second:29.5
+second:30.0
+second:30.5
+second:31.0
+second:31.5
+second:32.0
+DEBUG (11): VM:: timer fired for label 29
+DEBUG (11): VM:: executing trail: label=14.
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (2 + 1) = 3 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:32.5
+second:33.0
+second:33.5
+second:34.0
+second:34.5
+second:35.0
+second:35.5
+second:36.0
+second:36.5
+second:37.0
+second:37.5
+second:38.0
+second:38.5
+second:39.0
+second:39.5
+second:40.0
+second:40.5
+second:41.0
+second:41.5
+second:42.0
+second:42.5
+second:43.0
+second:43.5
+second:44.0
+second:44.5
+second:45.0
+DEBUG (11): VM:: timer fired for label 29
+DEBUG (11): VM:: executing trail: label=14.
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (3 + 1) = 4 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:45.5
+second:46.0
+second:46.5
+second:47.0
+second:47.5
+second:48.0
+second:48.5
+second:49.0
+second:49.5
+second:50.0
+second:50.5
+second:51.0
+second:51.5
+second:52.0
+second:52.5
+second:53.0
+second:53.5
+second:54.0
+second:54.5
+second:55.0
+second:55.5
+second:56.0
+second:56.5
+second:57.0
+second:57.5
+second:58.0
+DEBUG (11): VM:: timer fired for label 29
+DEBUG (11): VM:: executing trail: label=14.
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (4 + 1) = 5 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:58.5
+second:59.0
+second:59.5
+second:60.0
+second:60.5
+second:61.0
+second:61.5
+second:62.0
+second:62.5
+second:63.0
+second:63.5
+second:64.0
+second:64.5
+second:65.0
+second:65.5
+second:66.0
+second:66.5
+second:67.0
+second:67.5
+second:68.0
+second:68.5
+second:69.0
+second:69.5
+second:70.0
+second:70.5
+second:71.0
+DEBUG (11): VM:: timer fired for label 29
+DEBUG (11): VM:: executing trail: label=14.
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (5 + 1) = 6 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:71.5
+second:72.0
+second:72.5
+second:73.0
+second:73.5
+second:74.0
+second:74.5
+second:75.0
+second:75.5
+second:76.0
+second:76.5
+second:77.0
+second:77.5
+second:78.0
+second:78.5
+second:79.0
+second:79.5
+second:80.0
+second:80.5
+second:81.0
+second:81.5
+second:82.0
+second:82.5
+second:83.0
+second:83.5
+second:84.0
+DEBUG (11): VM:: timer fired for label 29
+DEBUG (11): VM:: executing trail: label=14.
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (6 + 1) = 7 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:84.5
+second:85.0
+second:85.5
+second:86.0
+second:86.5
+second:87.0
+second:87.5
+second:88.0
+second:88.5
+second:89.0
+second:89.5
+second:90.0
+second:90.5
+second:91.0
+second:91.5
+second:92.0
+second:92.5
+second:93.0
+second:93.5
+second:94.0
+second:94.5
+second:95.0
+second:95.5
+second:96.0
+second:96.5
+second:97.0
+DEBUG (11): VM:: timer fired for label 29
+DEBUG (11): VM:: executing trail: label=14.
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (7 + 1) = 8 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:97.5
+second:98.0
+second:98.5
+second:99.0
+second:99.5
+second:100.0
+second:100.5
+second:101.0
+second:101.5
+second:102.0
+second:102.5
+second:103.0
+second:103.5
+second:104.0
+second:104.5
+second:105.0
+second:105.5
+second:106.0
+second:106.5
+second:107.0
+second:107.5
+second:108.0
+second:108.5
+second:109.0
+second:109.5
+second:110.0
+DEBUG (11): VM:: timer fired for label 29
+DEBUG (11): VM:: executing trail: label=14.
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (8 + 1) = 9 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:110.5
+second:111.0
+second:111.5
+second:112.0
+second:112.5
+second:113.0
+second:113.5
+second:114.0
+second:114.5
+second:115.0
+second:115.5
+second:116.0
+second:116.5
+second:117.0
+second:117.5
+second:118.0
+second:118.5
+second:119.0
+second:119.5
+second:120.0
+second:120.5
+second:121.0
+second:121.5
+second:122.0
+second:122.5
+second:123.0
+DEBUG (11): VM:: timer fired for label 29
+DEBUG (11): VM:: executing trail: label=14.
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (9 + 1) = 10 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:123.5
+second:124.0
+second:124.5
+second:125.0
+second:125.5
+second:126.0
+second:126.5
+second:127.0
+second:127.5
+second:128.0
+second:128.5
+second:129.0
+second:129.5
+second:130.0
+second:130.5
+second:131.0
+second:131.5
+second:132.0
+second:132.5
+second:133.0
+second:133.5
+second:134.0
+second:134.5
+second:135.0
+second:135.5
+second:136.0
+DEBUG (11): VM:: timer fired for label 29
+DEBUG (11): VM:: executing trail: label=14.
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (10 + 1) = 11 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:136.5
+second:137.0
+second:137.5
+second:138.0
+second:138.5
+second:139.0
+second:139.5
+second:140.0
+second:140.5
+second:141.0
+second:141.5
+second:142.0
+second:142.5
+second:143.0
+second:143.5
+second:144.0
+second:144.5
+second:145.0
+second:145.5
+second:146.0
+second:146.5
+second:147.0
+second:147.5
+second:148.0
+second:148.5
+second:149.0
+DEBUG (11): VM:: timer fired for label 29
+DEBUG (11): VM:: executing trail: label=14.
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+second:149.5
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (11 + 1) = 12 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:150.0
+second:150.5
+second:151.0
+second:151.5
+second:152.0
+second:152.5
+second:153.0
+second:153.5
+second:154.0
+second:154.5
+second:155.0
+second:155.5
+second:156.0
+second:156.5
+second:157.0
+second:157.5
+second:158.0
+second:158.5
+second:159.0
+second:159.5
+second:160.0
+second:160.5
+second:161.0
+second:161.5
+second:162.0
+second:162.5
+DEBUG (11): VM:: timer fired for label 29
+DEBUG (11): VM:: executing trail: label=14.
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (12 + 1) = 13 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:163.0
+second:163.5
+second:164.0
+second:164.5
+second:165.0
+second:165.5
+second:166.0
+second:166.5
+second:167.0
+second:167.5
+second:168.0
+second:168.5
+second:169.0
+second:169.5
+second:170.0
+second:170.5
+second:171.0
+second:171.5
+second:172.0
+second:172.5
+second:173.0
+second:173.5
+second:174.0
+second:174.5
+second:175.0
+second:175.5
+DEBUG (11): VM:: timer fired for label 29
+DEBUG (11): VM:: executing trail: label=14.
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (13 + 1) = 14 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:176.0
+second:176.5
+second:177.0
+second:177.5
+second:178.0
+second:178.5
+second:179.0
+second:179.5
+second:180.0
+second:180.5
+second:181.0
+second:181.5
+second:182.0
+second:182.5
+second:183.0
+second:183.5
+second:184.0
+second:184.5
+second:185.0
+second:185.5
+second:186.0
+second:186.5
+second:187.0
+second:187.5
+second:188.0
+second:188.5
+DEBUG (11): VM:: timer fired for label 29
+DEBUG (11): VM:: executing trail: label=14.
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (14 + 1) = 15 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:189.0
+second:189.5
+second:190.0
+second:190.5
+second:191.0
+second:191.5
+second:192.0
+second:192.5
+second:193.0
+second:193.5
+second:194.0
+second:194.5
+second:195.0
+second:195.5
+second:196.0
+second:196.5
+second:197.0
+second:197.5
+second:198.0
+second:198.5
+second:199.0
+second:199.5
+second:200.0
+second:200.5
+second:201.0
+second:201.5
+DEBUG (11): VM:: timer fired for label 29
+DEBUG (11): VM:: executing trail: label=14.
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (15 + 1) = 16 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:202.0
+second:202.5
+second:203.0
+second:203.5
+second:204.0
+second:204.5
+second:205.0
+second:205.5
+second:206.0
+second:206.5
+second:207.0
+second:207.5
+second:208.0
+second:208.5
+second:209.0
+second:209.5
+second:210.0
+second:210.5
+second:211.0
+second:211.5
+second:212.0
+second:212.5
+second:213.0
+second:213.5
+second:214.0
+second:214.5
+DEBUG (11): VM:: timer fired for label 29
+DEBUG (11): VM:: executing trail: label=14.
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (16 + 1) = 17 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:215.0
+second:215.5
+second:216.0
+second:216.5
+second:217.0
+second:217.5
+second:218.0
+second:218.5
+second:219.0
+second:219.5
+second:220.0
+second:220.5
+second:221.0
+second:221.5
+second:222.0
+second:222.5
+second:223.0
+second:223.5
+second:224.0
+second:224.5
+second:225.0
+second:225.5
+second:226.0
+second:226.5
+second:227.0
+second:227.5
+DEBUG (11): VM:: timer fired for label 29
+DEBUG (11): VM:: executing trail: label=14.
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (17 + 1) = 18 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:228.0
+second:228.5
+second:229.0
+second:229.5
+second:230.0
+second:230.5
+second:231.0
+second:231.5
+second:232.0
+second:232.5
+second:233.0
+second:233.5
+second:234.0
+second:234.5
+second:235.0
+second:235.5
+second:236.0
+second:236.5
+second:237.0
+second:237.5
+second:238.0
+second:238.5
+second:239.0
+second:239.5
+second:240.0
+second:240.5
+DEBUG (11): VM:: timer fired for label 29
+DEBUG (11): VM:: executing trail: label=14.
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (18 + 1) = 19 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:241.0
+second:241.5
+second:242.0
+second:242.5
+second:243.0
+second:243.5
+second:244.0
+second:244.5
+second:245.0
+second:245.5
+second:246.0
+second:246.5
+second:247.0
+second:247.5
+second:248.0
+second:248.5
+second:249.0
+second:249.5
+second:250.0
+second:250.5
+second:251.0
+second:251.5
+second:252.0
+second:252.5
+second:253.0
+second:253.5
+DEBUG (11): VM:: timer fired for label 29
+DEBUG (11): VM:: executing trail: label=14.
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (19 + 1) = 20 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:254.0
+second:254.5
+second:255.0
+second:255.5
+second:256.0
+second:256.5
+second:257.0
+second:257.5
+second:258.0
+second:258.5
+second:259.0
+second:259.5
+second:260.0
+second:260.5
+second:261.0
+second:261.5
+second:262.0
+second:262.5
+second:263.0
+second:263.5
+second:264.0
+second:264.5
+second:265.0
+second:265.5
+second:266.0
+second:266.5
+DEBUG (11): VM:: timer fired for label 29
+DEBUG (11): VM:: executing trail: label=14.
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (20 + 1) = 21 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:267.0
+second:267.5
+second:268.0
+second:268.5
+second:269.0
+second:269.5
+second:270.0
+second:270.5
+second:271.0
+second:271.5
+second:272.0
+second:272.5
+second:273.0
+second:273.5
+second:274.0
+second:274.5
+second:275.0
+second:275.5
+second:276.0
+second:276.5
+second:277.0
+second:277.5
+second:278.0
+second:278.5
+second:279.0
+second:279.5
+DEBUG (11): VM:: timer fired for label 29
+DEBUG (11): VM:: executing trail: label=14.
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (21 + 1) = 22 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:280.0
+second:280.5
+second:281.0
+second:281.5
+second:282.0
+second:282.5
+second:283.0
+second:283.5
+second:284.0
+second:284.5
+second:285.0
+second:285.5
+second:286.0
+second:286.5
+second:287.0
+second:287.5
+second:288.0
+second:288.5
+second:289.0
+second:289.5
+second:290.0
+second:290.5
+second:291.0
+second:291.5
+second:292.0
+second:292.5
+DEBUG (11): VM:: timer fired for label 29
+DEBUG (11): VM:: executing trail: label=14.
+DEBUG (11): Radio:: Sending user msg to 1
+DEBUG (11): VM:: possible await EVENT for label 21
+DEBUG (11): VM:: reading input event data.
+DEBUG (11): Actuator:: LED0 = 1
+DEBUG (11): VM:: add operation: (22 + 1) = 23 
+DEBUG (11): VM:: await timer 15000 for label 29
+second:293.0
+second:293.5
+second:294.0
+second:294.5
+second:295.0
+second:295.5
+second:296.0
+second:296.5
+second:297.0
+second:297.5
+second:298.0
+second:298.5
+second:299.0
+second:299.5
+second:300.0

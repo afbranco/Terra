@@ -1,0 +1,1075 @@
+DEBUG (1): BS::TOSBoot.booted().
+DEBUG (1): BS::inicCtlData().
+DEBUG (1): BS::RadioControl.startDone().
+DEBUG (11): BS::TOSBoot.booted().
+DEBUG (11): BS::inicCtlData().
+DEBUG (1): BS::SerialControl.startDone():
+DEBUG (11): BS::RadioControl.startDone().
+DEBUG (11): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (11): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (12): BS::TOSBoot.booted().
+DEBUG (12): BS::inicCtlData().
+DEBUG (11): BS::outQ.dataReady().
+DEBUG (12): BS::RadioControl.startDone().
+DEBUG (12): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (12): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (13): BS::TOSBoot.booted().
+DEBUG (13): BS::inicCtlData().
+DEBUG (12): BS::outQ.dataReady().
+DEBUG (14): BS::TOSBoot.booted().
+DEBUG (14): BS::inicCtlData().
+DEBUG (13): BS::RadioControl.startDone().
+DEBUG (13): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (13): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (14): BS::RadioControl.startDone().
+DEBUG (14): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (14): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (13): BS::outQ.dataReady().
+DEBUG (21): BS::TOSBoot.booted().
+DEBUG (21): BS::inicCtlData().
+DEBUG (14): BS::outQ.dataReady().
+DEBUG (21): BS::RadioControl.startDone().
+DEBUG (21): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (21): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (22): BS::TOSBoot.booted().
+DEBUG (22): BS::inicCtlData().
+DEBUG (21): BS::outQ.dataReady().
+DEBUG (22): BS::RadioControl.startDone().
+DEBUG (22): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (22): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::TOSBoot.booted().
+DEBUG (23): BS::inicCtlData().
+DEBUG (23): BS::RadioControl.startDone().
+DEBUG (23): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (23): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (22): BS::outQ.dataReady().
+DEBUG (24): BS::TOSBoot.booted().
+DEBUG (24): BS::inicCtlData().
+DEBUG (23): BS::outQ.dataReady().
+DEBUG (24): BS::RadioControl.startDone().
+DEBUG (24): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (24): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (31): BS::TOSBoot.booted().
+DEBUG (31): BS::inicCtlData().
+DEBUG (24): BS::outQ.dataReady().
+DEBUG (31): BS::RadioControl.startDone().
+DEBUG (31): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (31): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (32): BS::TOSBoot.booted().
+DEBUG (32): BS::inicCtlData().
+DEBUG (31): BS::outQ.dataReady().
+DEBUG (32): BS::RadioControl.startDone().
+DEBUG (32): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (32): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (33): BS::TOSBoot.booted().
+DEBUG (33): BS::inicCtlData().
+DEBUG (32): BS::outQ.dataReady().
+DEBUG (33): BS::RadioControl.startDone().
+DEBUG (33): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (33): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (34): BS::TOSBoot.booted().
+DEBUG (34): BS::inicCtlData().
+DEBUG (33): BS::outQ.dataReady().
+DEBUG (34): BS::RadioControl.startDone().
+DEBUG (34): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (34): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (34): BS::outQ.dataReady().
+DEBUG (31): BS::sendTimer.fired(): 
+DEBUG (31): BS::sendNextMsg(): 
+DEBUG (31): dataQ[3]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (31): BS::sendMessage():AM=162, senToMote=255.
+DEBUG (31): BS::sendRadioN(): AM=162 to 255, reqAck=FALSE
+DEBUG (22): BS::sendTimer.fired(): 
+DEBUG (22): BS::sendNextMsg(): 
+DEBUG (22): dataQ[3]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (22): BS::sendMessage():AM=162, senToMote=255.
+DEBUG (22): BS::sendRadioN(): AM=162 to 255, reqAck=FALSE
+DEBUG (22): BS::RadioReceiver.receive(). AM=162 from 31
+DEBUG (22): BS::recReqProgBlockNet_receive().
+DEBUG (22): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (21): BS::RadioReceiver.receive(). AM=162 from 31
+DEBUG (21): BS::recReqProgBlockNet_receive().
+DEBUG (21): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (32): BS::RadioReceiver.receive(). AM=162 from 31
+DEBUG (32): BS::recReqProgBlockNet_receive().
+DEBUG (32): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (22): BS::inQ.dataReady().
+DEBUG (21): BS::inQ.dataReady().
+DEBUG (32): BS::inQ.dataReady().
+DEBUG (22): BS::procInputEvent().
+DEBUG (22): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (22): dataQ[2]::get(b6e27b76[33]). Size and FlagFree before 1 : FALSE
+DEBUG (22): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (22): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (22): BS::procInputEvent(): nextMessage.
+DEBUG (22): dataQ[2]::get(b6e27b76[33]). Size and FlagFree before 0 : TRUE
+DEBUG (21): BS::procInputEvent().
+DEBUG (21): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (21): dataQ[2]::get(b6e27b55[33]). Size and FlagFree before 1 : FALSE
+DEBUG (21): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (21): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (21): BS::procInputEvent(): nextMessage.
+DEBUG (21): dataQ[2]::get(b6e27b55[33]). Size and FlagFree before 0 : TRUE
+DEBUG (32): BS::procInputEvent().
+DEBUG (32): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (32): dataQ[2]::get(b6e27cc0[33]). Size and FlagFree before 1 : FALSE
+DEBUG (32): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (32): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (32): BS::procInputEvent(): nextMessage.
+DEBUG (32): dataQ[2]::get(b6e27cc0[33]). Size and FlagFree before 0 : TRUE
+DEBUG (22): BS::procInputEvent().
+DEBUG (22): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (22): dataQ[2]::get(b6e27b76[33]). Size and FlagFree before 0 : TRUE
+DEBUG (22): BS::procInputEvent(): inQueue is empty!
+DEBUG (21): BS::procInputEvent().
+DEBUG (21): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (21): dataQ[2]::get(b6e27b55[33]). Size and FlagFree before 0 : TRUE
+DEBUG (21): BS::procInputEvent(): inQueue is empty!
+DEBUG (32): BS::procInputEvent().
+DEBUG (32): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (32): dataQ[2]::get(b6e27cc0[33]). Size and FlagFree before 0 : TRUE
+DEBUG (32): BS::procInputEvent(): inQueue is empty!
+DEBUG (31): BS::sendDone(): SUCCESS SendCounter=1
+DEBUG (31): dataQ[3]::get(b6e152ff[33]). Size and FlagFree before 1 : FALSE
+DEBUG (33): BS::RadioReceiver.receive(). AM=162 from 22
+DEBUG (33): BS::recReqProgBlockNet_receive().
+DEBUG (33): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (21): BS::RadioReceiver.receive(). AM=162 from 22
+DEBUG (21): BS::recReqProgBlockNet_receive().
+DEBUG (21): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (13): BS::RadioReceiver.receive(). AM=162 from 22
+DEBUG (13): BS::recReqProgBlockNet_receive().
+DEBUG (13): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (12): BS::RadioReceiver.receive(). AM=162 from 22
+DEBUG (12): BS::recReqProgBlockNet_receive().
+DEBUG (12): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (11): BS::RadioReceiver.receive(). AM=162 from 22
+DEBUG (11): BS::recReqProgBlockNet_receive().
+DEBUG (11): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (32): BS::RadioReceiver.receive(). AM=162 from 22
+DEBUG (32): BS::recReqProgBlockNet_receive().
+DEBUG (32): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (31): BS::RadioReceiver.receive(). AM=162 from 22
+DEBUG (31): BS::recReqProgBlockNet_receive().
+DEBUG (31): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::RadioReceiver.receive(). AM=162 from 22
+DEBUG (23): BS::recReqProgBlockNet_receive().
+DEBUG (23): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (31): BS::inQ.dataReady().
+DEBUG (23): BS::inQ.dataReady().
+DEBUG (33): BS::inQ.dataReady().
+DEBUG (21): BS::inQ.dataReady().
+DEBUG (13): BS::inQ.dataReady().
+DEBUG (12): BS::inQ.dataReady().
+DEBUG (32): BS::inQ.dataReady().
+DEBUG (11): BS::inQ.dataReady().
+DEBUG (32): BS::procInputEvent().
+DEBUG (32): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (32): dataQ[2]::get(b6e27cc0[33]). Size and FlagFree before 1 : FALSE
+DEBUG (32): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (32): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (32): BS::procInputEvent(): nextMessage.
+DEBUG (32): dataQ[2]::get(b6e27cc0[33]). Size and FlagFree before 0 : TRUE
+DEBUG (11): BS::procInputEvent().
+DEBUG (11): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (11): dataQ[2]::get(b6e27a0b[33]). Size and FlagFree before 1 : FALSE
+DEBUG (11): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (11): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (11): BS::procInputEvent(): nextMessage.
+DEBUG (11): dataQ[2]::get(b6e27a0b[33]). Size and FlagFree before 0 : TRUE
+DEBUG (21): BS::procInputEvent().
+DEBUG (21): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (21): dataQ[2]::get(b6e27b55[33]). Size and FlagFree before 1 : FALSE
+DEBUG (21): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (21): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (21): BS::procInputEvent(): nextMessage.
+DEBUG (21): dataQ[2]::get(b6e27b55[33]). Size and FlagFree before 0 : TRUE
+DEBUG (33): BS::procInputEvent().
+DEBUG (33): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (33): dataQ[2]::get(b6e27ce1[33]). Size and FlagFree before 1 : FALSE
+DEBUG (33): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (33): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (33): BS::procInputEvent(): nextMessage.
+DEBUG (33): dataQ[2]::get(b6e27ce1[33]). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::procInputEvent().
+DEBUG (23): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (23): dataQ[2]::get(b6e27b97[33]). Size and FlagFree before 1 : FALSE
+DEBUG (23): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (23): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (23): BS::procInputEvent(): nextMessage.
+DEBUG (23): dataQ[2]::get(b6e27b97[33]). Size and FlagFree before 0 : TRUE
+DEBUG (31): BS::procInputEvent().
+DEBUG (31): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (31): dataQ[2]::get(b6e27c9f[33]). Size and FlagFree before 1 : FALSE
+DEBUG (31): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (31): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (31): BS::procInputEvent(): nextMessage.
+DEBUG (31): dataQ[2]::get(b6e27c9f[33]). Size and FlagFree before 0 : TRUE
+DEBUG (12): BS::procInputEvent().
+DEBUG (12): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (12): dataQ[2]::get(b6e27a2c[33]). Size and FlagFree before 1 : FALSE
+DEBUG (12): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (12): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (12): BS::procInputEvent(): nextMessage.
+DEBUG (12): dataQ[2]::get(b6e27a2c[33]). Size and FlagFree before 0 : TRUE
+DEBUG (13): BS::procInputEvent().
+DEBUG (13): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (13): dataQ[2]::get(b6e27a4d[33]). Size and FlagFree before 1 : FALSE
+DEBUG (13): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (13): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (13): BS::procInputEvent(): nextMessage.
+DEBUG (13): dataQ[2]::get(b6e27a4d[33]). Size and FlagFree before 0 : TRUE
+DEBUG (12): BS::procInputEvent().
+DEBUG (12): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (12): dataQ[2]::get(b6e27a2c[33]). Size and FlagFree before 0 : TRUE
+DEBUG (12): BS::procInputEvent(): inQueue is empty!
+DEBUG (13): BS::procInputEvent().
+DEBUG (13): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (13): dataQ[2]::get(b6e27a4d[33]). Size and FlagFree before 0 : TRUE
+DEBUG (13): BS::procInputEvent(): inQueue is empty!
+DEBUG (33): BS::procInputEvent().
+DEBUG (33): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (33): dataQ[2]::get(b6e27ce1[33]). Size and FlagFree before 0 : TRUE
+DEBUG (33): BS::procInputEvent(): inQueue is empty!
+DEBUG (21): BS::procInputEvent().
+DEBUG (21): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (21): dataQ[2]::get(b6e27b55[33]). Size and FlagFree before 0 : TRUE
+DEBUG (21): BS::procInputEvent(): inQueue is empty!
+DEBUG (11): BS::procInputEvent().
+DEBUG (11): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (11): dataQ[2]::get(b6e27a0b[33]). Size and FlagFree before 0 : TRUE
+DEBUG (11): BS::procInputEvent(): inQueue is empty!
+DEBUG (32): BS::procInputEvent().
+DEBUG (32): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (32): dataQ[2]::get(b6e27cc0[33]). Size and FlagFree before 0 : TRUE
+DEBUG (32): BS::procInputEvent(): inQueue is empty!
+DEBUG (31): BS::procInputEvent().
+DEBUG (31): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (31): dataQ[2]::get(b6e27c9f[33]). Size and FlagFree before 0 : TRUE
+DEBUG (31): BS::procInputEvent(): inQueue is empty!
+DEBUG (23): BS::procInputEvent().
+DEBUG (23): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (23): dataQ[2]::get(b6e27b97[33]). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::procInputEvent(): inQueue is empty!
+DEBUG (13): BS::sendTimer.fired(): 
+DEBUG (13): BS::sendNextMsg(): 
+DEBUG (13): dataQ[3]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (13): BS::sendMessage():AM=162, senToMote=255.
+DEBUG (13): BS::sendRadioN(): AM=162 to 255, reqAck=FALSE
+DEBUG (22): BS::sendDone(): SUCCESS SendCounter=1
+DEBUG (22): dataQ[3]::get(b6e151d6[33]). Size and FlagFree before 1 : FALSE
+DEBUG (24): BS::RadioReceiver.receive(). AM=162 from 13
+DEBUG (24): BS::recReqProgBlockNet_receive().
+DEBUG (24): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::RadioReceiver.receive(). AM=162 from 13
+DEBUG (23): BS::recReqProgBlockNet_receive().
+DEBUG (23): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (22): BS::RadioReceiver.receive(). AM=162 from 13
+DEBUG (22): BS::recReqProgBlockNet_receive().
+DEBUG (22): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (14): BS::RadioReceiver.receive(). AM=162 from 13
+DEBUG (14): BS::recReqProgBlockNet_receive().
+DEBUG (14): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (12): BS::RadioReceiver.receive(). AM=162 from 13
+DEBUG (12): BS::recReqProgBlockNet_receive().
+DEBUG (12): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (24): BS::inQ.dataReady().
+DEBUG (23): BS::inQ.dataReady().
+DEBUG (22): BS::inQ.dataReady().
+DEBUG (14): BS::inQ.dataReady().
+DEBUG (12): BS::inQ.dataReady().
+DEBUG (24): BS::procInputEvent().
+DEBUG (24): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (24): dataQ[2]::get(b6e27bb8[33]). Size and FlagFree before 1 : FALSE
+DEBUG (24): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (24): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (24): BS::procInputEvent(): nextMessage.
+DEBUG (24): dataQ[2]::get(b6e27bb8[33]). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::procInputEvent().
+DEBUG (23): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (23): dataQ[2]::get(b6e27b97[33]). Size and FlagFree before 1 : FALSE
+DEBUG (23): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (23): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (23): BS::procInputEvent(): nextMessage.
+DEBUG (23): dataQ[2]::get(b6e27b97[33]). Size and FlagFree before 0 : TRUE
+DEBUG (22): BS::procInputEvent().
+DEBUG (22): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (22): dataQ[2]::get(b6e27b76[33]). Size and FlagFree before 1 : FALSE
+DEBUG (22): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (22): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (22): BS::procInputEvent(): nextMessage.
+DEBUG (22): dataQ[2]::get(b6e27b76[33]). Size and FlagFree before 0 : TRUE
+DEBUG (14): BS::procInputEvent().
+DEBUG (14): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (14): dataQ[2]::get(b6e27a6e[33]). Size and FlagFree before 1 : FALSE
+DEBUG (14): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (14): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (14): BS::procInputEvent(): nextMessage.
+DEBUG (14): dataQ[2]::get(b6e27a6e[33]). Size and FlagFree before 0 : TRUE
+DEBUG (12): BS::procInputEvent().
+DEBUG (12): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (12): dataQ[2]::get(b6e27a2c[33]). Size and FlagFree before 1 : FALSE
+DEBUG (12): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (12): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (12): BS::procInputEvent(): nextMessage.
+DEBUG (12): dataQ[2]::get(b6e27a2c[33]). Size and FlagFree before 0 : TRUE
+DEBUG (24): BS::procInputEvent().
+DEBUG (24): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (24): dataQ[2]::get(b6e27bb8[33]). Size and FlagFree before 0 : TRUE
+DEBUG (24): BS::procInputEvent(): inQueue is empty!
+DEBUG (23): BS::procInputEvent().
+DEBUG (23): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (23): dataQ[2]::get(b6e27b97[33]). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::procInputEvent(): inQueue is empty!
+DEBUG (22): BS::procInputEvent().
+DEBUG (22): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (22): dataQ[2]::get(b6e27b76[33]). Size and FlagFree before 0 : TRUE
+DEBUG (22): BS::procInputEvent(): inQueue is empty!
+DEBUG (14): BS::procInputEvent().
+DEBUG (14): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (14): dataQ[2]::get(b6e27a6e[33]). Size and FlagFree before 0 : TRUE
+DEBUG (14): BS::procInputEvent(): inQueue is empty!
+DEBUG (12): BS::procInputEvent().
+DEBUG (12): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (12): dataQ[2]::get(b6e27a2c[33]). Size and FlagFree before 0 : TRUE
+DEBUG (12): BS::procInputEvent(): inQueue is empty!
+DEBUG (13): BS::sendDone(): SUCCESS SendCounter=1
+DEBUG (13): dataQ[3]::get(b6e150ad[33]). Size and FlagFree before 1 : FALSE
+DEBUG (11): BS::sendTimer.fired(): 
+DEBUG (11): BS::sendNextMsg(): 
+DEBUG (11): dataQ[3]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (11): BS::sendMessage():AM=162, senToMote=255.
+DEBUG (11): BS::sendRadioN(): AM=162 to 255, reqAck=FALSE
+DEBUG (22): BS::RadioReceiver.receive(). AM=162 from 11
+DEBUG (22): BS::recReqProgBlockNet_receive().
+DEBUG (22): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (21): BS::RadioReceiver.receive(). AM=162 from 11
+DEBUG (21): BS::recReqProgBlockNet_receive().
+DEBUG (21): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (12): BS::RadioReceiver.receive(). AM=162 from 11
+DEBUG (12): BS::recReqProgBlockNet_receive().
+DEBUG (12): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (1): BS::RadioReceiver.receive(). AM=162 from 11
+DEBUG (1): BS::recReqProgBlockNet_receive().
+DEBUG (1): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (22): BS::inQ.dataReady().
+DEBUG (21): BS::inQ.dataReady().
+DEBUG (12): BS::inQ.dataReady().
+DEBUG (1): BS::inQ.dataReady().
+DEBUG (22): BS::procInputEvent().
+DEBUG (22): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (22): dataQ[2]::get(b6e27b76[33]). Size and FlagFree before 1 : FALSE
+DEBUG (22): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (22): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (22): BS::procInputEvent(): nextMessage.
+DEBUG (22): dataQ[2]::get(b6e27b76[33]). Size and FlagFree before 0 : TRUE
+DEBUG (21): BS::procInputEvent().
+DEBUG (21): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (21): dataQ[2]::get(b6e27b55[33]). Size and FlagFree before 1 : FALSE
+DEBUG (21): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (21): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (21): BS::procInputEvent(): nextMessage.
+DEBUG (21): dataQ[2]::get(b6e27b55[33]). Size and FlagFree before 0 : TRUE
+DEBUG (12): BS::procInputEvent().
+DEBUG (12): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (12): dataQ[2]::get(b6e27a2c[33]). Size and FlagFree before 1 : FALSE
+DEBUG (12): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (12): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (12): BS::procInputEvent(): nextMessage.
+DEBUG (12): dataQ[2]::get(b6e27a2c[33]). Size and FlagFree before 0 : TRUE
+DEBUG (1): BS::procInputEvent().
+DEBUG (1): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (1): dataQ[2]::get(b6e278c1[33]). Size and FlagFree before 1 : FALSE
+DEBUG (1): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (1): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (1): BS::procInputEvent(): nextMessage.
+DEBUG (1): dataQ[2]::get(b6e278c1[33]). Size and FlagFree before 0 : TRUE
+DEBUG (22): BS::procInputEvent().
+DEBUG (22): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (22): dataQ[2]::get(b6e27b76[33]). Size and FlagFree before 0 : TRUE
+DEBUG (22): BS::procInputEvent(): inQueue is empty!
+DEBUG (21): BS::procInputEvent().
+DEBUG (21): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (21): dataQ[2]::get(b6e27b55[33]). Size and FlagFree before 0 : TRUE
+DEBUG (21): BS::procInputEvent(): inQueue is empty!
+DEBUG (12): BS::procInputEvent().
+DEBUG (12): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (12): dataQ[2]::get(b6e27a2c[33]). Size and FlagFree before 0 : TRUE
+DEBUG (12): BS::procInputEvent(): inQueue is empty!
+DEBUG (1): BS::procInputEvent().
+DEBUG (1): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (1): dataQ[2]::get(b6e278c1[33]). Size and FlagFree before 0 : TRUE
+DEBUG (1): BS::procInputEvent(): inQueue is empty!
+DEBUG (11): BS::sendDone(): SUCCESS SendCounter=1
+DEBUG (11): dataQ[3]::get(b6e1506b[33]). Size and FlagFree before 1 : FALSE
+DEBUG (34): BS::sendTimer.fired(): 
+DEBUG (34): BS::sendNextMsg(): 
+DEBUG (34): dataQ[3]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (34): BS::sendMessage():AM=162, senToMote=255.
+DEBUG (34): BS::sendRadioN(): AM=162 to 255, reqAck=FALSE
+DEBUG (31): BS::sendTimer.fired(): 
+DEBUG (31): BS::sendNextMsg(): 
+DEBUG (31): dataQ[3]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (31): dataQ[3]::get(b6e152ff[33]). Size and FlagFree before 0 : TRUE
+DEBUG (31): BS::sendMessage(): outQueue is empty!
+DEBUG (33): BS::RadioReceiver.receive(). AM=162 from 34
+DEBUG (33): BS::recReqProgBlockNet_receive().
+DEBUG (33): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (24): BS::RadioReceiver.receive(). AM=162 from 34
+DEBUG (24): BS::recReqProgBlockNet_receive().
+DEBUG (24): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::RadioReceiver.receive(). AM=162 from 34
+DEBUG (23): BS::recReqProgBlockNet_receive().
+DEBUG (23): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (33): BS::inQ.dataReady().
+DEBUG (24): BS::inQ.dataReady().
+DEBUG (23): BS::inQ.dataReady().
+DEBUG (33): BS::procInputEvent().
+DEBUG (33): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (33): dataQ[2]::get(b6e27ce1[33]). Size and FlagFree before 1 : FALSE
+DEBUG (33): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (33): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (33): BS::procInputEvent(): nextMessage.
+DEBUG (33): dataQ[2]::get(b6e27ce1[33]). Size and FlagFree before 0 : TRUE
+DEBUG (24): BS::procInputEvent().
+DEBUG (24): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (24): dataQ[2]::get(b6e27bb8[33]). Size and FlagFree before 1 : FALSE
+DEBUG (24): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (24): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (24): BS::procInputEvent(): nextMessage.
+DEBUG (24): dataQ[2]::get(b6e27bb8[33]). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::procInputEvent().
+DEBUG (23): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (23): dataQ[2]::get(b6e27b97[33]). Size and FlagFree before 1 : FALSE
+DEBUG (23): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (23): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (23): BS::procInputEvent(): nextMessage.
+DEBUG (23): dataQ[2]::get(b6e27b97[33]). Size and FlagFree before 0 : TRUE
+DEBUG (33): BS::procInputEvent().
+DEBUG (33): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (33): dataQ[2]::get(b6e27ce1[33]). Size and FlagFree before 0 : TRUE
+DEBUG (33): BS::procInputEvent(): inQueue is empty!
+DEBUG (24): BS::procInputEvent().
+DEBUG (24): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (24): dataQ[2]::get(b6e27bb8[33]). Size and FlagFree before 0 : TRUE
+DEBUG (24): BS::procInputEvent(): inQueue is empty!
+DEBUG (23): BS::procInputEvent().
+DEBUG (23): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (23): dataQ[2]::get(b6e27b97[33]). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::procInputEvent(): inQueue is empty!
+DEBUG (34): BS::sendDone(): SUCCESS SendCounter=1
+DEBUG (34): dataQ[3]::get(b6e15362[33]). Size and FlagFree before 1 : FALSE
+DEBUG (22): BS::sendTimer.fired(): 
+DEBUG (22): BS::sendNextMsg(): 
+DEBUG (22): dataQ[3]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (22): dataQ[3]::get(b6e151d6[33]). Size and FlagFree before 0 : TRUE
+DEBUG (22): BS::sendMessage(): outQueue is empty!
+DEBUG (32): BS::sendTimer.fired(): 
+DEBUG (32): BS::sendNextMsg(): 
+DEBUG (32): dataQ[3]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (32): BS::sendMessage():AM=162, senToMote=255.
+DEBUG (32): BS::sendRadioN(): AM=162 to 255, reqAck=FALSE
+DEBUG (23): BS::sendTimer.fired(): 
+DEBUG (23): BS::sendNextMsg(): 
+DEBUG (23): dataQ[3]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (23): BS::sendMessage():AM=162, senToMote=255.
+DEBUG (23): BS::sendRadioN(): AM=162 to 255, reqAck=FALSE
+DEBUG (31): BS::RadioReceiver.receive(). AM=162 from 32
+DEBUG (31): BS::recReqProgBlockNet_receive().
+DEBUG (31): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (21): BS::RadioReceiver.receive(). AM=162 from 32
+DEBUG (21): BS::recReqProgBlockNet_receive().
+DEBUG (21): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (31): BS::inQ.dataReady().
+DEBUG (21): BS::inQ.dataReady().
+DEBUG (31): BS::procInputEvent().
+DEBUG (31): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (31): dataQ[2]::get(b6e27c9f[33]). Size and FlagFree before 1 : FALSE
+DEBUG (31): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (31): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (31): BS::procInputEvent(): nextMessage.
+DEBUG (31): dataQ[2]::get(b6e27c9f[33]). Size and FlagFree before 0 : TRUE
+DEBUG (21): BS::procInputEvent().
+DEBUG (21): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (21): dataQ[2]::get(b6e27b55[33]). Size and FlagFree before 1 : FALSE
+DEBUG (21): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (21): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (21): BS::procInputEvent(): nextMessage.
+DEBUG (21): dataQ[2]::get(b6e27b55[33]). Size and FlagFree before 0 : TRUE
+DEBUG (31): BS::procInputEvent().
+DEBUG (31): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (31): dataQ[2]::get(b6e27c9f[33]). Size and FlagFree before 0 : TRUE
+DEBUG (31): BS::procInputEvent(): inQueue is empty!
+DEBUG (21): BS::procInputEvent().
+DEBUG (21): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (21): dataQ[2]::get(b6e27b55[33]). Size and FlagFree before 0 : TRUE
+DEBUG (21): BS::procInputEvent(): inQueue is empty!
+DEBUG (12): BS::RadioReceiver.receive(). AM=162 from 23
+DEBUG (12): BS::recReqProgBlockNet_receive().
+DEBUG (12): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (24): BS::RadioReceiver.receive(). AM=162 from 23
+DEBUG (24): BS::recReqProgBlockNet_receive().
+DEBUG (24): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (14): BS::RadioReceiver.receive(). AM=162 from 23
+DEBUG (14): BS::recReqProgBlockNet_receive().
+DEBUG (14): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (13): BS::RadioReceiver.receive(). AM=162 from 23
+DEBUG (13): BS::recReqProgBlockNet_receive().
+DEBUG (13): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (34): BS::RadioReceiver.receive(). AM=162 from 23
+DEBUG (34): BS::recReqProgBlockNet_receive().
+DEBUG (34): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (12): BS::inQ.dataReady().
+DEBUG (24): BS::inQ.dataReady().
+DEBUG (14): BS::inQ.dataReady().
+DEBUG (13): BS::inQ.dataReady().
+DEBUG (34): BS::inQ.dataReady().
+DEBUG (12): BS::procInputEvent().
+DEBUG (12): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (12): dataQ[2]::get(b6e27a2c[33]). Size and FlagFree before 1 : FALSE
+DEBUG (12): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (12): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (12): BS::procInputEvent(): nextMessage.
+DEBUG (12): dataQ[2]::get(b6e27a2c[33]). Size and FlagFree before 0 : TRUE
+DEBUG (24): BS::procInputEvent().
+DEBUG (24): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (24): dataQ[2]::get(b6e27bb8[33]). Size and FlagFree before 1 : FALSE
+DEBUG (24): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (24): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (24): BS::procInputEvent(): nextMessage.
+DEBUG (24): dataQ[2]::get(b6e27bb8[33]). Size and FlagFree before 0 : TRUE
+DEBUG (14): BS::procInputEvent().
+DEBUG (14): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (14): dataQ[2]::get(b6e27a6e[33]). Size and FlagFree before 1 : FALSE
+DEBUG (14): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (14): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (14): BS::procInputEvent(): nextMessage.
+DEBUG (14): dataQ[2]::get(b6e27a6e[33]). Size and FlagFree before 0 : TRUE
+DEBUG (13): BS::procInputEvent().
+DEBUG (13): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (13): dataQ[2]::get(b6e27a4d[33]). Size and FlagFree before 1 : FALSE
+DEBUG (13): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (13): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (13): BS::procInputEvent(): nextMessage.
+DEBUG (13): dataQ[2]::get(b6e27a4d[33]). Size and FlagFree before 0 : TRUE
+DEBUG (34): BS::procInputEvent().
+DEBUG (34): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (34): dataQ[2]::get(b6e27d02[33]). Size and FlagFree before 1 : FALSE
+DEBUG (34): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (34): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (34): BS::procInputEvent(): nextMessage.
+DEBUG (34): dataQ[2]::get(b6e27d02[33]). Size and FlagFree before 0 : TRUE
+DEBUG (12): BS::procInputEvent().
+DEBUG (12): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (12): dataQ[2]::get(b6e27a2c[33]). Size and FlagFree before 0 : TRUE
+DEBUG (12): BS::procInputEvent(): inQueue is empty!
+DEBUG (24): BS::procInputEvent().
+DEBUG (24): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (24): dataQ[2]::get(b6e27bb8[33]). Size and FlagFree before 0 : TRUE
+DEBUG (24): BS::procInputEvent(): inQueue is empty!
+DEBUG (14): BS::procInputEvent().
+DEBUG (14): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (14): dataQ[2]::get(b6e27a6e[33]). Size and FlagFree before 0 : TRUE
+DEBUG (14): BS::procInputEvent(): inQueue is empty!
+DEBUG (13): BS::procInputEvent().
+DEBUG (13): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (13): dataQ[2]::get(b6e27a4d[33]). Size and FlagFree before 0 : TRUE
+DEBUG (13): BS::procInputEvent(): inQueue is empty!
+DEBUG (34): BS::procInputEvent().
+DEBUG (34): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (34): dataQ[2]::get(b6e27d02[33]). Size and FlagFree before 0 : TRUE
+DEBUG (34): BS::procInputEvent(): inQueue is empty!
+DEBUG (32): BS::sendDone(): SUCCESS SendCounter=1
+DEBUG (32): dataQ[3]::get(b6e15320[33]). Size and FlagFree before 1 : FALSE
+DEBUG (23): BS::sendDone(): SUCCESS SendCounter=1
+DEBUG (23): dataQ[3]::get(b6e151f7[33]). Size and FlagFree before 1 : FALSE
+DEBUG (14): BS::sendTimer.fired(): 
+DEBUG (14): BS::sendNextMsg(): 
+DEBUG (14): dataQ[3]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (14): BS::sendMessage():AM=162, senToMote=255.
+DEBUG (14): BS::sendRadioN(): AM=162 to 255, reqAck=FALSE
+DEBUG (13): BS::sendTimer.fired(): 
+DEBUG (13): BS::sendNextMsg(): 
+DEBUG (13): dataQ[3]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (13): dataQ[3]::get(b6e150ad[33]). Size and FlagFree before 0 : TRUE
+DEBUG (13): BS::sendMessage(): outQueue is empty!
+DEBUG (21): BS::sendTimer.fired(): 
+DEBUG (21): BS::sendNextMsg(): 
+DEBUG (21): dataQ[3]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (21): BS::sendMessage():AM=162, senToMote=255.
+DEBUG (21): BS::sendRadioN(): AM=162 to 255, reqAck=FALSE
+DEBUG (24): BS::RadioReceiver.receive(). AM=162 from 14
+DEBUG (24): BS::recReqProgBlockNet_receive().
+DEBUG (24): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (13): BS::RadioReceiver.receive(). AM=162 from 14
+DEBUG (13): BS::recReqProgBlockNet_receive().
+DEBUG (13): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::RadioReceiver.receive(). AM=162 from 14
+DEBUG (23): BS::recReqProgBlockNet_receive().
+DEBUG (23): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (24): BS::inQ.dataReady().
+DEBUG (13): BS::inQ.dataReady().
+DEBUG (23): BS::inQ.dataReady().
+DEBUG (24): BS::procInputEvent().
+DEBUG (24): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (24): dataQ[2]::get(b6e27bb8[33]). Size and FlagFree before 1 : FALSE
+DEBUG (24): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (24): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (24): BS::procInputEvent(): nextMessage.
+DEBUG (24): dataQ[2]::get(b6e27bb8[33]). Size and FlagFree before 0 : TRUE
+DEBUG (13): BS::procInputEvent().
+DEBUG (13): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (13): dataQ[2]::get(b6e27a4d[33]). Size and FlagFree before 1 : FALSE
+DEBUG (13): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (13): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (13): BS::procInputEvent(): nextMessage.
+DEBUG (13): dataQ[2]::get(b6e27a4d[33]). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::procInputEvent().
+DEBUG (23): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (23): dataQ[2]::get(b6e27b97[33]). Size and FlagFree before 1 : FALSE
+DEBUG (23): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (23): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (23): BS::procInputEvent(): nextMessage.
+DEBUG (23): dataQ[2]::get(b6e27b97[33]). Size and FlagFree before 0 : TRUE
+DEBUG (24): BS::procInputEvent().
+DEBUG (24): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (24): dataQ[2]::get(b6e27bb8[33]). Size and FlagFree before 0 : TRUE
+DEBUG (24): BS::procInputEvent(): inQueue is empty!
+DEBUG (13): BS::procInputEvent().
+DEBUG (13): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (13): dataQ[2]::get(b6e27a4d[33]). Size and FlagFree before 0 : TRUE
+DEBUG (13): BS::procInputEvent(): inQueue is empty!
+DEBUG (23): BS::procInputEvent().
+DEBUG (23): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (23): dataQ[2]::get(b6e27b97[33]). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::procInputEvent(): inQueue is empty!
+DEBUG (14): BS::sendDone(): SUCCESS SendCounter=1
+DEBUG (14): dataQ[3]::get(b6e150ce[33]). Size and FlagFree before 1 : FALSE
+DEBUG (32): BS::RadioReceiver.receive(). AM=162 from 21
+DEBUG (32): BS::recReqProgBlockNet_receive().
+DEBUG (32): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (31): BS::RadioReceiver.receive(). AM=162 from 21
+DEBUG (31): BS::recReqProgBlockNet_receive().
+DEBUG (31): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (11): BS::RadioReceiver.receive(). AM=162 from 21
+DEBUG (11): BS::recReqProgBlockNet_receive().
+DEBUG (11): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (22): BS::RadioReceiver.receive(). AM=162 from 21
+DEBUG (22): BS::recReqProgBlockNet_receive().
+DEBUG (22): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (12): BS::RadioReceiver.receive(). AM=162 from 21
+DEBUG (12): BS::recReqProgBlockNet_receive().
+DEBUG (12): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (32): BS::inQ.dataReady().
+DEBUG (31): BS::inQ.dataReady().
+DEBUG (11): BS::inQ.dataReady().
+DEBUG (22): BS::inQ.dataReady().
+DEBUG (12): BS::inQ.dataReady().
+DEBUG (32): BS::procInputEvent().
+DEBUG (32): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (32): dataQ[2]::get(b6e27cc0[33]). Size and FlagFree before 1 : FALSE
+DEBUG (32): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (32): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (32): BS::procInputEvent(): nextMessage.
+DEBUG (32): dataQ[2]::get(b6e27cc0[33]). Size and FlagFree before 0 : TRUE
+DEBUG (31): BS::procInputEvent().
+DEBUG (31): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (31): dataQ[2]::get(b6e27c9f[33]). Size and FlagFree before 1 : FALSE
+DEBUG (31): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (31): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (31): BS::procInputEvent(): nextMessage.
+DEBUG (31): dataQ[2]::get(b6e27c9f[33]). Size and FlagFree before 0 : TRUE
+DEBUG (11): BS::procInputEvent().
+DEBUG (11): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (11): dataQ[2]::get(b6e27a0b[33]). Size and FlagFree before 1 : FALSE
+DEBUG (11): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (11): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (11): BS::procInputEvent(): nextMessage.
+DEBUG (11): dataQ[2]::get(b6e27a0b[33]). Size and FlagFree before 0 : TRUE
+DEBUG (22): BS::procInputEvent().
+DEBUG (22): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (22): dataQ[2]::get(b6e27b76[33]). Size and FlagFree before 1 : FALSE
+DEBUG (22): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (22): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (22): BS::procInputEvent(): nextMessage.
+DEBUG (22): dataQ[2]::get(b6e27b76[33]). Size and FlagFree before 0 : TRUE
+DEBUG (12): BS::procInputEvent().
+DEBUG (12): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (12): dataQ[2]::get(b6e27a2c[33]). Size and FlagFree before 1 : FALSE
+DEBUG (12): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (12): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (12): BS::procInputEvent(): nextMessage.
+DEBUG (12): dataQ[2]::get(b6e27a2c[33]). Size and FlagFree before 0 : TRUE
+DEBUG (32): BS::procInputEvent().
+DEBUG (32): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (32): dataQ[2]::get(b6e27cc0[33]). Size and FlagFree before 0 : TRUE
+DEBUG (32): BS::procInputEvent(): inQueue is empty!
+DEBUG (31): BS::procInputEvent().
+DEBUG (31): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (31): dataQ[2]::get(b6e27c9f[33]). Size and FlagFree before 0 : TRUE
+DEBUG (31): BS::procInputEvent(): inQueue is empty!
+DEBUG (11): BS::procInputEvent().
+DEBUG (11): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (11): dataQ[2]::get(b6e27a0b[33]). Size and FlagFree before 0 : TRUE
+DEBUG (11): BS::procInputEvent(): inQueue is empty!
+DEBUG (22): BS::procInputEvent().
+DEBUG (22): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (22): dataQ[2]::get(b6e27b76[33]). Size and FlagFree before 0 : TRUE
+DEBUG (22): BS::procInputEvent(): inQueue is empty!
+DEBUG (12): BS::procInputEvent().
+DEBUG (12): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (12): dataQ[2]::get(b6e27a2c[33]). Size and FlagFree before 0 : TRUE
+DEBUG (12): BS::procInputEvent(): inQueue is empty!
+DEBUG (21): BS::sendDone(): SUCCESS SendCounter=1
+DEBUG (21): dataQ[3]::get(b6e151b5[33]). Size and FlagFree before 1 : FALSE
+DEBUG (12): BS::sendTimer.fired(): 
+DEBUG (12): BS::sendNextMsg(): 
+DEBUG (12): dataQ[3]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (12): BS::sendMessage():AM=162, senToMote=255.
+DEBUG (12): BS::sendRadioN(): AM=162 to 255, reqAck=FALSE
+DEBUG (23): BS::RadioReceiver.receive(). AM=162 from 12
+DEBUG (23): BS::recReqProgBlockNet_receive().
+DEBUG (23): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (22): BS::RadioReceiver.receive(). AM=162 from 12
+DEBUG (22): BS::recReqProgBlockNet_receive().
+DEBUG (22): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (21): BS::RadioReceiver.receive(). AM=162 from 12
+DEBUG (21): BS::recReqProgBlockNet_receive().
+DEBUG (21): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (13): BS::RadioReceiver.receive(). AM=162 from 12
+DEBUG (13): BS::recReqProgBlockNet_receive().
+DEBUG (13): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (11): BS::RadioReceiver.receive(). AM=162 from 12
+DEBUG (11): BS::recReqProgBlockNet_receive().
+DEBUG (11): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::inQ.dataReady().
+DEBUG (22): BS::inQ.dataReady().
+DEBUG (21): BS::inQ.dataReady().
+DEBUG (13): BS::inQ.dataReady().
+DEBUG (11): BS::inQ.dataReady().
+DEBUG (23): BS::procInputEvent().
+DEBUG (23): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (23): dataQ[2]::get(b6e27b97[33]). Size and FlagFree before 1 : FALSE
+DEBUG (23): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (23): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (23): BS::procInputEvent(): nextMessage.
+DEBUG (23): dataQ[2]::get(b6e27b97[33]). Size and FlagFree before 0 : TRUE
+DEBUG (22): BS::procInputEvent().
+DEBUG (22): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (22): dataQ[2]::get(b6e27b76[33]). Size and FlagFree before 1 : FALSE
+DEBUG (22): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (22): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (22): BS::procInputEvent(): nextMessage.
+DEBUG (22): dataQ[2]::get(b6e27b76[33]). Size and FlagFree before 0 : TRUE
+DEBUG (21): BS::procInputEvent().
+DEBUG (21): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (21): dataQ[2]::get(b6e27b55[33]). Size and FlagFree before 1 : FALSE
+DEBUG (21): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (21): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (21): BS::procInputEvent(): nextMessage.
+DEBUG (21): dataQ[2]::get(b6e27b55[33]). Size and FlagFree before 0 : TRUE
+DEBUG (13): BS::procInputEvent().
+DEBUG (13): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (13): dataQ[2]::get(b6e27a4d[33]). Size and FlagFree before 1 : FALSE
+DEBUG (13): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (13): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (13): BS::procInputEvent(): nextMessage.
+DEBUG (13): dataQ[2]::get(b6e27a4d[33]). Size and FlagFree before 0 : TRUE
+DEBUG (11): BS::procInputEvent().
+DEBUG (11): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (11): dataQ[2]::get(b6e27a0b[33]). Size and FlagFree before 1 : FALSE
+DEBUG (11): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (11): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (11): BS::procInputEvent(): nextMessage.
+DEBUG (11): dataQ[2]::get(b6e27a0b[33]). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::procInputEvent().
+DEBUG (23): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (23): dataQ[2]::get(b6e27b97[33]). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::procInputEvent(): inQueue is empty!
+DEBUG (22): BS::procInputEvent().
+DEBUG (22): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (22): dataQ[2]::get(b6e27b76[33]). Size and FlagFree before 0 : TRUE
+DEBUG (22): BS::procInputEvent(): inQueue is empty!
+DEBUG (21): BS::procInputEvent().
+DEBUG (21): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (21): dataQ[2]::get(b6e27b55[33]). Size and FlagFree before 0 : TRUE
+DEBUG (21): BS::procInputEvent(): inQueue is empty!
+DEBUG (13): BS::procInputEvent().
+DEBUG (13): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (13): dataQ[2]::get(b6e27a4d[33]). Size and FlagFree before 0 : TRUE
+DEBUG (13): BS::procInputEvent(): inQueue is empty!
+DEBUG (11): BS::procInputEvent().
+DEBUG (11): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (11): dataQ[2]::get(b6e27a0b[33]). Size and FlagFree before 0 : TRUE
+DEBUG (11): BS::procInputEvent(): inQueue is empty!
+DEBUG (12): BS::sendDone(): SUCCESS SendCounter=1
+DEBUG (12): dataQ[3]::get(b6e1508c[33]). Size and FlagFree before 1 : FALSE
+DEBUG (11): BS::sendTimer.fired(): 
+DEBUG (11): BS::sendNextMsg(): 
+DEBUG (11): dataQ[3]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (11): dataQ[3]::get(b6e1506b[33]). Size and FlagFree before 0 : TRUE
+DEBUG (11): BS::sendMessage(): outQueue is empty!
+DEBUG (33): BS::sendTimer.fired(): 
+DEBUG (33): BS::sendNextMsg(): 
+DEBUG (33): dataQ[3]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (33): BS::sendMessage():AM=162, senToMote=255.
+DEBUG (33): BS::sendRadioN(): AM=162 to 255, reqAck=FALSE
+DEBUG (34): BS::RadioReceiver.receive(). AM=162 from 33
+DEBUG (34): BS::recReqProgBlockNet_receive().
+DEBUG (34): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (32): BS::RadioReceiver.receive(). AM=162 from 33
+DEBUG (32): BS::recReqProgBlockNet_receive().
+DEBUG (32): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::RadioReceiver.receive(). AM=162 from 33
+DEBUG (23): BS::recReqProgBlockNet_receive().
+DEBUG (23): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (22): BS::RadioReceiver.receive(). AM=162 from 33
+DEBUG (22): BS::recReqProgBlockNet_receive().
+DEBUG (22): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (24): BS::RadioReceiver.receive(). AM=162 from 33
+DEBUG (24): BS::recReqProgBlockNet_receive().
+DEBUG (24): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (34): BS::inQ.dataReady().
+DEBUG (32): BS::inQ.dataReady().
+DEBUG (23): BS::inQ.dataReady().
+DEBUG (22): BS::inQ.dataReady().
+DEBUG (24): BS::inQ.dataReady().
+DEBUG (34): BS::procInputEvent().
+DEBUG (34): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (34): dataQ[2]::get(b6e27d02[33]). Size and FlagFree before 1 : FALSE
+DEBUG (34): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (34): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (34): BS::procInputEvent(): nextMessage.
+DEBUG (34): dataQ[2]::get(b6e27d02[33]). Size and FlagFree before 0 : TRUE
+DEBUG (32): BS::procInputEvent().
+DEBUG (32): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (32): dataQ[2]::get(b6e27cc0[33]). Size and FlagFree before 1 : FALSE
+DEBUG (32): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (32): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (32): BS::procInputEvent(): nextMessage.
+DEBUG (32): dataQ[2]::get(b6e27cc0[33]). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::procInputEvent().
+DEBUG (23): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (23): dataQ[2]::get(b6e27b97[33]). Size and FlagFree before 1 : FALSE
+DEBUG (23): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (23): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (23): BS::procInputEvent(): nextMessage.
+DEBUG (23): dataQ[2]::get(b6e27b97[33]). Size and FlagFree before 0 : TRUE
+DEBUG (22): BS::procInputEvent().
+DEBUG (22): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (22): dataQ[2]::get(b6e27b76[33]). Size and FlagFree before 1 : FALSE
+DEBUG (22): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (22): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (22): BS::procInputEvent(): nextMessage.
+DEBUG (22): dataQ[2]::get(b6e27b76[33]). Size and FlagFree before 0 : TRUE
+DEBUG (24): BS::procInputEvent().
+DEBUG (24): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (24): dataQ[2]::get(b6e27bb8[33]). Size and FlagFree before 1 : FALSE
+DEBUG (24): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (24): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (24): BS::procInputEvent(): nextMessage.
+DEBUG (24): dataQ[2]::get(b6e27bb8[33]). Size and FlagFree before 0 : TRUE
+DEBUG (34): BS::procInputEvent().
+DEBUG (34): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (34): dataQ[2]::get(b6e27d02[33]). Size and FlagFree before 0 : TRUE
+DEBUG (34): BS::procInputEvent(): inQueue is empty!
+DEBUG (32): BS::procInputEvent().
+DEBUG (32): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (32): dataQ[2]::get(b6e27cc0[33]). Size and FlagFree before 0 : TRUE
+DEBUG (32): BS::procInputEvent(): inQueue is empty!
+DEBUG (23): BS::procInputEvent().
+DEBUG (23): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (23): dataQ[2]::get(b6e27b97[33]). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::procInputEvent(): inQueue is empty!
+DEBUG (22): BS::procInputEvent().
+DEBUG (22): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (22): dataQ[2]::get(b6e27b76[33]). Size and FlagFree before 0 : TRUE
+DEBUG (22): BS::procInputEvent(): inQueue is empty!
+DEBUG (24): BS::procInputEvent().
+DEBUG (24): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (24): dataQ[2]::get(b6e27bb8[33]). Size and FlagFree before 0 : TRUE
+DEBUG (24): BS::procInputEvent(): inQueue is empty!
+DEBUG (33): BS::sendDone(): SUCCESS SendCounter=1
+DEBUG (33): dataQ[3]::get(b6e15341[33]). Size and FlagFree before 1 : FALSE
+DEBUG (24): BS::sendTimer.fired(): 
+DEBUG (24): BS::sendNextMsg(): 
+DEBUG (24): dataQ[3]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (24): BS::sendMessage():AM=162, senToMote=255.
+DEBUG (24): BS::sendRadioN(): AM=162 to 255, reqAck=FALSE
+DEBUG (34): BS::sendTimer.fired(): 
+DEBUG (34): BS::sendNextMsg(): 
+DEBUG (34): dataQ[3]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (34): dataQ[3]::get(b6e15362[33]). Size and FlagFree before 0 : TRUE
+DEBUG (34): BS::sendMessage(): outQueue is empty!
+DEBUG (34): BS::RadioReceiver.receive(). AM=162 from 24
+DEBUG (34): BS::recReqProgBlockNet_receive().
+DEBUG (34): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::RadioReceiver.receive(). AM=162 from 24
+DEBUG (23): BS::recReqProgBlockNet_receive().
+DEBUG (23): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (14): BS::RadioReceiver.receive(). AM=162 from 24
+DEBUG (14): BS::recReqProgBlockNet_receive().
+DEBUG (14): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (13): BS::RadioReceiver.receive(). AM=162 from 24
+DEBUG (13): BS::recReqProgBlockNet_receive().
+DEBUG (13): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (33): BS::RadioReceiver.receive(). AM=162 from 24
+DEBUG (33): BS::recReqProgBlockNet_receive().
+DEBUG (33): dataQ[2]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (34): BS::inQ.dataReady().
+DEBUG (23): BS::inQ.dataReady().
+DEBUG (14): BS::inQ.dataReady().
+DEBUG (13): BS::inQ.dataReady().
+DEBUG (33): BS::inQ.dataReady().
+DEBUG (34): BS::procInputEvent().
+DEBUG (34): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (34): dataQ[2]::get(b6e27d02[33]). Size and FlagFree before 1 : FALSE
+DEBUG (34): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (34): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (34): BS::procInputEvent(): nextMessage.
+DEBUG (34): dataQ[2]::get(b6e27d02[33]). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::procInputEvent().
+DEBUG (23): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (23): dataQ[2]::get(b6e27b97[33]). Size and FlagFree before 1 : FALSE
+DEBUG (23): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (23): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (23): BS::procInputEvent(): nextMessage.
+DEBUG (23): dataQ[2]::get(b6e27b97[33]). Size and FlagFree before 0 : TRUE
+DEBUG (14): BS::procInputEvent().
+DEBUG (14): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (14): dataQ[2]::get(b6e27a6e[33]). Size and FlagFree before 1 : FALSE
+DEBUG (14): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (14): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (14): BS::procInputEvent(): nextMessage.
+DEBUG (14): dataQ[2]::get(b6e27a6e[33]). Size and FlagFree before 0 : TRUE
+DEBUG (13): BS::procInputEvent().
+DEBUG (13): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (13): dataQ[2]::get(b6e27a4d[33]). Size and FlagFree before 1 : FALSE
+DEBUG (13): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (13): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (13): BS::procInputEvent(): nextMessage.
+DEBUG (13): dataQ[2]::get(b6e27a4d[33]). Size and FlagFree before 0 : TRUE
+DEBUG (33): BS::procInputEvent().
+DEBUG (33): dataQ[2]::read(). Size and FlagFree before 1 : FALSE
+DEBUG (33): dataQ[2]::get(b6e27ce1[33]). Size and FlagFree before 1 : FALSE
+DEBUG (33): BS::procRecReqProgBlock(). Local version=0, Req Version 0 Oper=1, BM.isAllBitSet=FALSE
+DEBUG (33): BS::procRecReqProgBlock(). Request RO_NEW_VERSION discarted!
+DEBUG (33): BS::procInputEvent(): nextMessage.
+DEBUG (33): dataQ[2]::get(b6e27ce1[33]). Size and FlagFree before 0 : TRUE
+DEBUG (34): BS::procInputEvent().
+DEBUG (34): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (34): dataQ[2]::get(b6e27d02[33]). Size and FlagFree before 0 : TRUE
+DEBUG (34): BS::procInputEvent(): inQueue is empty!
+DEBUG (23): BS::procInputEvent().
+DEBUG (23): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (23): dataQ[2]::get(b6e27b97[33]). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::procInputEvent(): inQueue is empty!
+DEBUG (14): BS::procInputEvent().
+DEBUG (14): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (14): dataQ[2]::get(b6e27a6e[33]). Size and FlagFree before 0 : TRUE
+DEBUG (14): BS::procInputEvent(): inQueue is empty!
+DEBUG (13): BS::procInputEvent().
+DEBUG (13): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (13): dataQ[2]::get(b6e27a4d[33]). Size and FlagFree before 0 : TRUE
+DEBUG (13): BS::procInputEvent(): inQueue is empty!
+DEBUG (33): BS::procInputEvent().
+DEBUG (33): dataQ[2]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (33): dataQ[2]::get(b6e27ce1[33]). Size and FlagFree before 0 : TRUE
+DEBUG (33): BS::procInputEvent(): inQueue is empty!
+DEBUG (24): BS::sendDone(): SUCCESS SendCounter=1
+DEBUG (24): dataQ[3]::get(b6e15218[33]). Size and FlagFree before 1 : FALSE
+DEBUG (32): BS::sendTimer.fired(): 
+DEBUG (32): BS::sendNextMsg(): 
+DEBUG (32): dataQ[3]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (32): dataQ[3]::get(b6e15320[33]). Size and FlagFree before 0 : TRUE
+DEBUG (32): BS::sendMessage(): outQueue is empty!
+DEBUG (23): BS::sendTimer.fired(): 
+DEBUG (23): BS::sendNextMsg(): 
+DEBUG (23): dataQ[3]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (23): dataQ[3]::get(b6e151f7[33]). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::sendMessage(): outQueue is empty!
+DEBUG (14): BS::sendTimer.fired(): 
+DEBUG (14): BS::sendNextMsg(): 
+DEBUG (14): dataQ[3]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (14): dataQ[3]::get(b6e150ce[33]). Size and FlagFree before 0 : TRUE
+DEBUG (14): BS::sendMessage(): outQueue is empty!
+DEBUG (21): BS::sendTimer.fired(): 
+DEBUG (21): BS::sendNextMsg(): 
+DEBUG (21): dataQ[3]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (21): dataQ[3]::get(b6e151b5[33]). Size and FlagFree before 0 : TRUE
+DEBUG (21): BS::sendMessage(): outQueue is empty!
+DEBUG (12): BS::sendTimer.fired(): 
+DEBUG (12): BS::sendNextMsg(): 
+DEBUG (12): dataQ[3]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (12): dataQ[3]::get(b6e1508c[33]). Size and FlagFree before 0 : TRUE
+DEBUG (12): BS::sendMessage(): outQueue is empty!
+DEBUG (33): BS::sendTimer.fired(): 
+DEBUG (33): BS::sendNextMsg(): 
+DEBUG (33): dataQ[3]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (33): dataQ[3]::get(b6e15341[33]). Size and FlagFree before 0 : TRUE
+DEBUG (33): BS::sendMessage(): outQueue is empty!
+DEBUG (24): BS::sendTimer.fired(): 
+DEBUG (24): BS::sendNextMsg(): 
+DEBUG (24): dataQ[3]::read(). Size and FlagFree before 0 : TRUE
+DEBUG (24): dataQ[3]::get(b6e15218[33]). Size and FlagFree before 0 : TRUE
+DEBUG (24): BS::sendMessage(): outQueue is empty!
+DEBUG (11): VM::BitVector.get(): bitnum=0, bits=0, ARRAY_SIZE=8
+DEBUG (11): BS::ProgReqTimer.fired(). nextBlock=0
+DEBUG (11): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (11): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (12): VM::BitVector.get(): bitnum=0, bits=0, ARRAY_SIZE=8
+DEBUG (12): BS::ProgReqTimer.fired(). nextBlock=0
+DEBUG (12): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (12): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (11): BS::outQ.dataReady().
+DEBUG (13): VM::BitVector.get(): bitnum=0, bits=0, ARRAY_SIZE=8
+DEBUG (13): BS::ProgReqTimer.fired(). nextBlock=0
+DEBUG (13): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (13): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (12): BS::outQ.dataReady().
+DEBUG (14): VM::BitVector.get(): bitnum=0, bits=0, ARRAY_SIZE=8
+DEBUG (14): BS::ProgReqTimer.fired(). nextBlock=0
+DEBUG (14): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (14): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (13): BS::outQ.dataReady().
+DEBUG (14): BS::outQ.dataReady().
+DEBUG (21): VM::BitVector.get(): bitnum=0, bits=0, ARRAY_SIZE=8
+DEBUG (21): BS::ProgReqTimer.fired(). nextBlock=0
+DEBUG (21): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (21): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (22): VM::BitVector.get(): bitnum=0, bits=0, ARRAY_SIZE=8
+DEBUG (22): BS::ProgReqTimer.fired(). nextBlock=0
+DEBUG (22): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (22): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (21): BS::outQ.dataReady().
+DEBUG (22): BS::outQ.dataReady().
+DEBUG (23): VM::BitVector.get(): bitnum=0, bits=0, ARRAY_SIZE=8
+DEBUG (23): BS::ProgReqTimer.fired(). nextBlock=0
+DEBUG (23): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (23): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (23): BS::outQ.dataReady().
+DEBUG (24): VM::BitVector.get(): bitnum=0, bits=0, ARRAY_SIZE=8
+DEBUG (24): BS::ProgReqTimer.fired(). nextBlock=0
+DEBUG (24): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (24): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (24): BS::outQ.dataReady().
+DEBUG (31): VM::BitVector.get(): bitnum=0, bits=0, ARRAY_SIZE=8
+DEBUG (31): BS::ProgReqTimer.fired(). nextBlock=0
+DEBUG (31): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (31): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (32): VM::BitVector.get(): bitnum=0, bits=0, ARRAY_SIZE=8
+DEBUG (32): BS::ProgReqTimer.fired(). nextBlock=0
+DEBUG (32): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (32): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (31): BS::outQ.dataReady().
+DEBUG (33): VM::BitVector.get(): bitnum=0, bits=0, ARRAY_SIZE=8
+DEBUG (33): BS::ProgReqTimer.fired(). nextBlock=0
+DEBUG (33): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (33): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (32): BS::outQ.dataReady().
+DEBUG (34): VM::BitVector.get(): bitnum=0, bits=0, ARRAY_SIZE=8
+DEBUG (34): BS::ProgReqTimer.fired(). nextBlock=0
+DEBUG (34): BS::sendReqProgBlock(): insert in outQueue --- BlkId=0
+DEBUG (34): dataQ[3]::put(). Size and FlagFree before 0 : TRUE
+DEBUG (33): BS::outQ.dataReady().
+DEBUG (34): BS::outQ.dataReady().
