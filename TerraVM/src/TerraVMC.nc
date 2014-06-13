@@ -277,15 +277,27 @@ void U16toMU(uint16_t value, uint16_t Maddr,uint8_t v1_len){
 
 // Return CEU internal slot offset for EvtId
 uint16_t getEvtCeuId(uint8_t EvtId){
-	uint8_t i;
-	uint16_t CeuId=gate0;
+	uint8_t i=0;
+//	uint16_t CeuId=gate0;
+	uint16_t currSlot=gate0;
+dbg(APPNAME,"VM::getEvtCeuId(): currSlot=%d, EvtId=%d, slotId=%d, i=%d, inEvts=%d\n", currSlot, EvtId,(*(nx_uint8_t*)(MEM+currSlot)),i,inEvts );
+	while (EvtId > (*(nx_uint8_t*)(MEM+currSlot)) && i < inEvts) {
+		i++;
+		currSlot = 	currSlot + 1 + ((*(nx_uint8_t*)(MEM+currSlot+1))*2) + 1;
+dbg(APPNAME,"VM::getEvtCeuId(): currSlot=%d, EvtId=%d, slotId=%d, i=%d, inEvts=%d\n", currSlot, EvtId,(*(nx_uint8_t*)(MEM+currSlot)),i,inEvts );
+	}
+	if (EvtId != (*(nx_uint8_t*)(MEM+currSlot))) dbg(APPNAME,"ERROR Event %d not found! Returning wrong event!\n",EvtId);
+	return currSlot+1; // Return addr of 'n' gates for EvtId
+
+/*
 	for (i=1; i<= EvtId;i++){
 		CeuId = CeuId + ((*(nx_uint8_t*)(MEM+CeuId)) * 2) + 1;
-dbg(APPNAME,"VM::getEvtCeuId(): Salto anterior: addr=%d, value=%d\n",MEM+CeuId,*(nx_uint8_t*)(MEM+CeuId));
+dbg(APPNAME,"VM::getEvtCeuId(): Salto anterior: addr=%ld, value=%d\n",MEM+CeuId,*(nx_uint8_t*)(MEM+CeuId));
 dbg(APPNAME,"VM::getEvtCeuId(): EvtId=%d, gate0=%d, i=%d ,CeuId=%d\n",EvtId,gate0,i,CeuId);
 		}
 dbg(APPNAME,"VM::getEvtCeuId(): EvtId=%d, gate0=%d, i=%d ,CeuId=%d\n",EvtId,gate0,i,CeuId);
 	return CeuId;
+*/
 }
 
 void  proc_set_wd_tables(uint16_t id, uint16_t len,uint32_t val, uint8_t cv){
@@ -383,35 +395,35 @@ int ceu_track_cmp (tceu_trk* trk1, tceu_trk* trk2) {
 void ceu_track_ins (u8 stack, u8 tree, int chk, tceu_nlbl lbl)
 {
 	dbg(APPNAME,"CEU::ceu_track_ins():: track_n=%d, stack=%d tree=%d chk=%d lbl=%d\n",CEU->tracks_n,stack,tree,chk,lbl);
-    {int i;
-    if (chk) {
-        for (i=1; i<=CEU->tracks_n; i++) {
-            if (lbl==(CEU->p_tracks+i)->lbl) {
-                return;
-            }
-        }
-    }}
+	{int i;
+		if (chk) {
+			for (i=1; i<=CEU->tracks_n; i++) {
+				if (lbl==(CEU->p_tracks+i)->lbl) {
+					return;
+				}
+			}
+		}}
 
-{
-    int i;
+	{
+		int i;
 
-    tceu_trk trk = {
-        stack,
-        tree,
-        lbl
-    };
+		tceu_trk trk = {
+			stack,
+			tree,
+			lbl
+		};
 
 
-    for ( i = ++CEU->tracks_n;
-          (i>1) && ceu_track_cmp(&trk,CEU->p_tracks+(i/2));
-          i /= 2 ) {
-        //CEU->tracks[i] = CEU->tracks[i/2];
-    	memcpy(CEU->p_tracks+i,CEU->p_tracks+(i/2),sizeof(tceu_trk));
-//   	   dbg(APPNAME,"CEU::ceu_track_ins():: Ceu_data[%d] \n",(char*)(CEU->p_tracks+i)-(char*)CEU->p_tracks);
-    }
-    //CEU->tracks[i] = trk;
-    *(tceu_trk*)(CEU->p_tracks+i) = trk;
-}
+		for ( i = ++CEU->tracks_n;
+					(i>1) && ceu_track_cmp(&trk,CEU->p_tracks+(i/2));
+				i /= 2 ) {
+			//CEU->tracks[i] = CEU->tracks[i/2];
+			memcpy(CEU->p_tracks+i,CEU->p_tracks+(i/2),sizeof(tceu_trk));
+			//   	   dbg(APPNAME,"CEU::ceu_track_ins():: Ceu_data[%d] \n",(char*)(CEU->p_tracks+i)-(char*)CEU->p_tracks);
+		}
+		//CEU->tracks[i] = trk;
+		*(tceu_trk*)(CEU->p_tracks+i) = trk;
+	}
 
 
 }
@@ -905,18 +917,65 @@ void f_neg(uint8_t Modifier){
  }
  
 void f_cast(uint8_t Modifier){
-	int32_t stack;
+	uint32_t stack;
 	uint8_t type;
-	type = (uint8_t)((getPar8(1) & 0x70)>>4);
+	type = (uint8_t)(Modifier & 0x3);
 	stack = pop();
 	dbg(APPNAME,"VM::f_cast(%02x): type=%d, stack=%d, ",Modifier,type,stack);
 	switch (type){
-		case U8 : dbg_clear(APPNAME,"type='u8' , cast=%d\n",( uint8_t)stack); push(( uint8_t)stack); break;
-		case U16: dbg_clear(APPNAME,"type='u16', cast=%d\n",(uint16_t)stack); push((uint16_t)stack); break;
-		case U32: dbg_clear(APPNAME,"type='u32', cast=%d\n",(uint32_t)stack); push((uint32_t)stack); break;
-		case S8 : dbg_clear(APPNAME,"type='s8' , cast=%d\n",(  int8_t)stack); push((  int8_t)stack); break;
-		case S16: dbg_clear(APPNAME,"type='s16', cast=%d\n",( int16_t)stack); push(( int16_t)stack); break;
-		case S32: dbg_clear(APPNAME,"type='s32', cast=%d\n",( int32_t)stack); push(( int32_t)stack); break;
+		case x8 : dbg_clear(APPNAME,"type='x8' , cast=%d\n",( uint8_t)stack); push(( uint8_t)stack); break;
+		case x16: dbg_clear(APPNAME,"type='x16', cast=%d\n",(uint16_t)stack); push((uint16_t)stack); break;
+		case x32: dbg_clear(APPNAME,"type='x32', cast=%d\n",(uint32_t)stack); push((uint32_t)stack); break;
+	}
+}
+
+void f_inc(uint8_t Modifier){
+	uint8_t v1_len;
+	uint16_t Maddr;
+	v1_len = (uint8_t)(1<<(Modifier & 0x03));
+	Maddr = getPar16(2);
+	dbg(APPNAME,"VM::f_inc(%02x): v1_len=%d, Maddr=%d, value+1=%d, \n",Modifier,v1_len,Maddr,getMVal(Maddr,v1_len)+1);
+	setMVal((getMVal(Maddr,v1_len)+1),Maddr,v1_len);	
+}
+
+void f_dec(uint8_t Modifier){
+	uint8_t v1_len;
+	uint16_t Maddr;
+	v1_len = (uint8_t)(1<<(Modifier & 0x03));
+	Maddr = getPar16(2);
+	dbg(APPNAME,"VM::f_dec(%02x): v1_len=%d, Maddr=%d, value-1=%d, \n",Modifier,v1_len,Maddr,getMVal(Maddr,v1_len)-1);
+	setMVal((getMVal(Maddr,v1_len)-1),Maddr,v1_len);	
+}
+
+void f_incx(uint8_t Modifier){ 
+	uint8_t v1_len;
+	uint16_t Maddr;
+	v1_len = (uint8_t)(1<<(Modifier & 0x03));
+	Maddr = getPar16(1);
+	dbg(APPNAME,"VM::f_incx(%02x): v1_len=%d, Maddr=%d, value+1=%d, \n",Modifier,v1_len,Maddr,getMVal(Maddr,v1_len)+1);
+	setMVal((getMVal(Maddr,v1_len)+1),Maddr,v1_len);	
+}
+
+void f_decx(uint8_t Modifier){ 
+	uint8_t v1_len;
+	uint16_t Maddr;
+	v1_len = (uint8_t)(1<<(Modifier & 0x03));
+	Maddr = getPar16(1);
+	dbg(APPNAME,"VM::f_decx(%02x): v1_len=%d, Maddr=%d, value-1=%d, \n",Modifier,v1_len,Maddr,getMVal(Maddr,v1_len)-1);
+	setMVal((getMVal(Maddr,v1_len)-1),Maddr,v1_len);	
+}
+
+void f_deref(uint8_t Modifier){
+	uint16_t MAddr;
+	uint8_t type, tlen;
+	type = (uint8_t)(Modifier & 0x3);
+	tlen = 1 << type;
+	MAddr = (uint16_t)pop();
+	dbg(APPNAME,"VM::f_deref(%02x): type=%d, MAddr=%d, ",Modifier,type,MAddr);
+	switch (type){
+		case x8 : dbg_clear(APPNAME,"type='x8' , value=%d\n",( uint8_t)getMVal(MAddr,tlen)); push(( uint8_t)getMVal(MAddr,tlen)); break;
+		case x16: dbg_clear(APPNAME,"type='x16', value=%d\n",(uint16_t)getMVal(MAddr,tlen)); push((uint16_t)getMVal(MAddr,tlen)); break;
+		case x32: dbg_clear(APPNAME,"type='x32', value=%d\n",(uint32_t)getMVal(MAddr,tlen)); push((uint32_t)getMVal(MAddr,tlen)); break;
 	}
 }
 
@@ -966,11 +1025,10 @@ void f_pushx_p(uint8_t Modifier){
 }
 
 void f_pusharr_v(uint8_t Modifier){
-	uint8_t v1_len,p1_1len,v2_len,p2_1len,p3_1len,Aux,sig;
+	uint8_t v1_len,p1_1len,v2_len,p2_1len,p3_1len,Aux;
 	uint16_t Maddr,Vidx,Max;
 	v1_len = (uint8_t)(1<<((Modifier & 0x03)));
 	Aux = getPar8(1);
-	sig     = (uint8_t)(1<<((Aux & 0x80)>>7));
 	p1_1len = (uint8_t)(1<<((Aux & 0x40)>>6));
 	v2_len  = (uint8_t)(1<<((Aux & 0x30)>>4));
 	p2_1len = (uint8_t)(1<<((Aux & 0x04)>>2));
@@ -979,8 +1037,8 @@ void f_pusharr_v(uint8_t Modifier){
  	Vidx  = getPar16(p2_1len);
 	Max   = getPar16(p3_1len);
 	dbg(APPNAME,"VM::f_pusharr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, Val=%d\n",Modifier,Maddr,Vidx,Max,
-			(getMVal(Vidx,v2_len)<Max)?(sig==0)?getMVal(Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len):getMVal(Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len):0);
-	(getMVal(Vidx,v2_len)<Max)?(sig==0)?push(getMVal(Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len)):push(getMVal(Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len)):0;
+			(getMVal(Vidx,v2_len)<Max)?getMVal(Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len):0);
+	(getMVal(Vidx,v2_len)<Max)?push(getMVal(Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len)):0;
 }
 
 void f_pop(uint8_t Modifier){ 
@@ -1011,7 +1069,6 @@ void f_poparr_v(uint8_t Modifier){
 	uint32_t Value;
 	v1_len = (uint8_t)(1<<((Modifier & 0x03)));
 	Aux = getPar8(1);
-	sig     = (uint8_t)(1<<((Aux & 0x80)>>7));
 	p1_1len = (uint8_t)(1<<((Aux & 0x40)>>6));
 	v2_len  = (uint8_t)(1<<((Aux & 0x30)>>4));
 	p2_1len = (uint8_t)(1<<((Aux & 0x04)>>2));
@@ -1021,7 +1078,7 @@ void f_poparr_v(uint8_t Modifier){
 	Max   = getPar16(p3_1len);
 	Value=pop();
 	dbg(APPNAME,"VM::f_poparr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, Value=%d\n",Modifier,Maddr,Vidx,Max,Value);
-	(getMVal(Vidx,v2_len)<Max)?(sig==0)?setMVal(Value,Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len):setMVal(Value,Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len):0;
+	(getMVal(Vidx,v2_len)<Max)?setMVal(Value,Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len):0;
 }
 
 
@@ -1108,6 +1165,18 @@ void f_chkret(uint8_t Modifier){
 	if (*(uint8_t*)(MEM+Maddr)>0) PC=PC+1;
 }
 
+void f_asen(uint8_t Modifier){
+	uint8_t p1_1len,p2_1len;
+	uint16_t gate,lbl;
+	p1_1len = (uint8_t)(1<<((Modifier & 0x02)>>1));
+	p2_1len = (uint8_t)(1<<((Modifier & 0x01)));
+	gate = getPar16(p1_1len);
+	lbl = getPar16(p2_1len);
+	dbg(APPNAME,"VM::f_asen(%02x): gate=%d, lbl=%d\n",Modifier,gate,lbl);
+	dbg("VMDBG","VM:: async enable: gate=%d; label=%d.\n",gate,lbl);
+	ceu_async_enable(gate,lbl);
+}
+
 void f_exec(uint8_t Modifier){ 
 	uint8_t p1_1len;
 	uint16_t Const;
@@ -1130,16 +1199,54 @@ void f_ifelse(uint8_t Modifier){
 	if (pop()) PC=getLblAddr(lbl1); else PC=getLblAddr(lbl2);
 }
 
-void f_outevt(uint8_t Modifier){
-	uint8_t p1_1len;
-	uint16_t Cevt;
-	p1_1len = (uint8_t)(1<<(Modifier & 0x01));
-	Cevt  = getPar16(p1_1len);
+void f_outevt_e(uint8_t Modifier){
+	uint8_t Cevt;
+	Cevt  = getPar8(1);
 	dbg(APPNAME,"VM::f_outevt_c(%02x): Cevt=%d\n",Modifier,Cevt);
 	dbg("VMDBG","VM:: emitting output event %d\n",Cevt);
 	call VMCustom.procOutEvt(Cevt);
 }
 
+void f_outevt_c(uint8_t Modifier){
+	uint8_t Clen,Aux;
+	uint8_t Cevt;
+	uint32_t Const;
+	Clen = (uint8_t)((Modifier & 0x03)+1);
+	Cevt  = getPar8(1);
+	Const = getPar32(Clen);
+	dbg(APPNAME,"VM::f_outevt_c(%02x): Cevt=%d, Clen=%d, Const=%d\n",Modifier,Cevt,Clen,Const);
+	push(Const);
+	call VMCustom.procOutEvt(Cevt);
+}
+
+void f_outevt_v(uint8_t Modifier){
+	uint8_t Cevt,tp_len;
+	uint16_t Clen,Maddr;
+	tp_len = (uint8_t)(1<<(Modifier & 0x02));
+	Cevt  = getPar8(1);
+	Maddr = getPar16(2);
+	dbg(APPNAME,"VM::f_outevt_v(%02x): Cevt=%d, Maddr=%d\n",Modifier,Cevt,Maddr);
+	push(getMVal(Maddr,tp_len));
+	call VMCustom.procOutEvt(Cevt);
+}
+void f_outevtx_v(uint8_t Modifier){
+	uint8_t Cevt,tp_len;
+	uint16_t Clen,Maddr;
+	tp_len = (uint8_t)(1<<(Modifier & 0x02));
+	Cevt  = getPar8(1);
+	Maddr = getPar16(1);
+	dbg(APPNAME,"VM::f_outevtx_v(%02x): Cevt=%d, Maddr=%d\n",Modifier,Cevt,Maddr);
+	push(getMVal(Maddr,tp_len));
+	call VMCustom.procOutEvt(Cevt);
+}
+
+void f_outevt_z(uint8_t Modifier){
+	uint8_t Cevt;
+	Cevt = getPar8(1);
+	dbg(APPNAME,"VM::f_outevt_z(%02x): Evt=%d, \n",Modifier,Cevt);
+	call VMCustom.procOutEvt(Cevt);
+	}
+	
 void f_tkclr(uint8_t Modifier){
 	uint8_t p1_1len,p2_1len;
 	uint16_t lbl1,lbl2;
@@ -1162,20 +1269,55 @@ void f_trg(uint8_t Modifier){
 	ceu_trigger(lbl);
 }
 
-void f_set_c(uint8_t Modifier){
-	uint8_t v1_len,p1_1len,p2_1lenx;
+void f_set16_c(uint8_t Modifier){
+	uint8_t v1_len,p1_1len,p2_1len;
 	uint16_t Maddr;
 	uint32_t Const;
 	v1_len = (uint8_t)(1<<((Modifier & 0x0C)>>2));
 	p1_1len = (uint8_t)(1<<((Modifier & 0x02)>>1));
-	p2_1lenx = (uint8_t)(v1_len/((Modifier & 0x01)+1));
+	p2_1len = (uint8_t)(1<<(Modifier & 0x01));
 	Maddr = getPar16(p1_1len);
-	Const = getPar32(p2_1lenx);
-	dbg(APPNAME,"VM::f_set_c(%02x): v1_len=%d, p1_1len=%d, p_1lenx=%d, Maddr=%d, Const=%d\n",Modifier,v1_len,p1_1len,p2_1lenx,Maddr,Const);
-	if (getLblAddr((uint16_t)Const) > 0)
-		dbg("VMDBG","VM:: possible await EVENT for label %d\n",Const);
+	Const = getPar32(p2_1len);
+	dbg(APPNAME,"VM::f_set16_c(%02x): v1_len=%d, p1_1len=%d, p2_len=%d, Maddr=%d, Const=%d\n",Modifier,v1_len,p1_1len,p2_1len,Maddr,Const);
+	//if (getLblAddr((uint16_t)Const) > 0) dbg("VMDBG","VM:: possible await EVENT for label %d\n",Const);
 	setMVal(Const,Maddr,v1_len);
 }
+
+void f_set_c(uint8_t Modifier){
+	uint8_t v1_len,p1_1len,p2_len, param;
+	uint16_t Maddr;
+	uint32_t Const;
+	param = getPar8(1);
+	v1_len = (uint8_t)(1<<((param & 0x30)>>4));
+	p1_1len = (uint8_t)(1<<((param & 0x04)>>2));
+	p2_len = (uint8_t)(1<<(param & 0x03));
+	Maddr = getPar16(p1_1len);
+	Const = getPar32(p2_len);
+	dbg(APPNAME,"VM::f_set_c(%02x): v1_len=%d, p1_1len=%d, p2_len=%d, Maddr=%d, Const=%d\n",Modifier,v1_len,p1_1len,p2_len,Maddr,Const);
+	//if (getLblAddr((uint16_t)Const) > 0) dbg("VMDBG","VM:: possible await EVENT for label %d\n",Const);
+	setMVal(Const,Maddr,v1_len);
+}
+
+void f_set_e(uint8_t Modifier){
+	uint8_t v1_len;
+	uint16_t Maddr1;
+	uint32_t Value;
+	v1_len = (uint8_t)(1<<(Modifier & 0x02));
+	Maddr1 = (uint16_t)pop();
+	Value = pop();
+	dbg(APPNAME,"VM::f_set_e(%02x): v1_len=%d, Maddr1=%d, Value=%d\n",Modifier,v1_len,Maddr1,Value);
+	setMVal(Value,Maddr1,v1_len);
+}
+
+
+void f_func(uint8_t Modifier){ 
+	uint8_t fID;
+	fID  = getPar8(1);
+	dbg(APPNAME,"VM::f_func(%02x): fID=%d\n",Modifier,fID);
+	dbg("VMDBG","VM:: call function %d\n",fID);
+	call VMCustom.callFunction(fID);
+}
+
 
 void f_set_v(uint8_t Modifier){
 	uint8_t v1_len,p1_1len,p2_1len;
@@ -1224,10 +1366,26 @@ void f_clken_v(uint8_t Modifier){
 	ceu_wclock_enable(gate, (s32)unit2val(Time,unit), lbl);
 }
 
+void f_clken_e(uint8_t Modifier){
+	uint8_t p1_1len,p2_1len,unit;
+	uint16_t gate,lbl;
+	uint32_t Time=0;
+	p1_1len = (uint8_t)(1<<((Modifier & 0x08)>>3));
+	p2_1len = (uint8_t)(1<<((Modifier & 0x04)>>2));
+	unit = (uint8_t)(1<<(Modifier & 0x03));
+	gate = getPar16(p1_1len);
+	lbl = getPar16(p2_1len);
+	Time = pop();
+	dbg(APPNAME,"VM::f_clken_e(%02x): p1_1len=%d, p2_1len=%d, gate=%d, unit=%d, Time=%d, lbl=%d\n",
+		Modifier,p1_1len,p2_1len,gate,unit,Time,lbl);
+	dbg("VMDBG","VM:: await timer %ld for label %d\n",(s32)unit2val(Time,unit), lbl);
+	ceu_wclock_enable(gate, (s32)unit2val(Time,unit), lbl);
+}
+
 void f_tkins_max(uint8_t Modifier){
 	uint8_t stack,p1_1len;
 	uint16_t lbl;
-	stack = (uint8_t)(Modifier >> 2);
+	stack = (uint8_t)(CEU->stack + (Modifier >> 2));
 	p1_1len = (uint8_t)(1<<(Modifier & 0x01));
 	lbl = getPar16(p1_1len);
 	dbg(APPNAME,"VM::f_tkins_max(%02x): stack=%d, p1_1len=%d, lbl=%d, \n",Modifier,stack,p1_1len,lbl);
@@ -1236,14 +1394,13 @@ void f_tkins_max(uint8_t Modifier){
 }
 
 void f_tkins_z(uint8_t Modifier){ 
-	uint8_t tree,chk,p1_1len,p2_1len;
+	uint8_t tree,chk,p2_1len;
 	uint16_t lbl;
-	p1_1len = (uint8_t)(1<<((Modifier & 0x08)>>3));
-	p2_1len = (uint8_t)(1<<((Modifier & 0x04)>>2));
+	p2_1len = (uint8_t)(1<<((Modifier & 0x02)>>1));
 	chk = (uint8_t)(Modifier & 0x01);
-	tree = getPar8(p1_1len);
+	tree = getPar8(1);
 	lbl = getPar16(p2_1len);
-	dbg(APPNAME,"VM::f_tkins_z(%02x): p1_1len=%d, tree=%d, chk=%d, p2_1len=%d, lbl=%d, \n",Modifier,p1_1len,tree,chk,p2_1len,lbl);
+	dbg(APPNAME,"VM::f_tkins_z(%02x): tree=%d, chk=%d, p2_1len=%d, lbl=%d, \n",Modifier,tree,chk,p2_1len,lbl);
 	dbg("VMDBG","VM:: enable track for label %d\n", lbl);
 	ceu_track_ins(0,tree,chk,lbl);
 }
@@ -1260,6 +1417,9 @@ void f_tkins_z(uint8_t Modifier){
 			case op_nop : f_nop(Modifier); break;
 			case op_end : f_end(Modifier); break;
 			case op_return : f_return(Modifier); break;
+			case op_bnot : f_bnot(Modifier); break;
+			case op_lnot : f_lnot(Modifier); break;
+			case op_neg : f_neg(Modifier); break;
 			case op_sub : f_sub(Modifier); break;
 			case op_add : f_add(Modifier); break;
 			case op_mod : f_mod(Modifier); break;
@@ -1278,36 +1438,47 @@ void f_tkins_z(uint8_t Modifier){
 			case op_lt : f_lt(Modifier); break;
 			case op_lor : f_lor(Modifier); break;
 			case op_land : f_land(Modifier); break;
-			case op_bnot : f_bnot(Modifier); break;
-			case op_lnot : f_lnot(Modifier); break;
-			case op_neg : f_neg(Modifier); break;
-			case op_cast : f_cast(Modifier); break;
-			case op_push_c : f_push_c(Modifier); break;
-			case op_push_v : f_push_v(Modifier); break;
-			case op_pushx_v : f_pushx_v(Modifier); break;
-			case op_push_p : f_push_p(Modifier); break;
-			case op_pushx_p : f_pushx_p(Modifier); break;
-			case op_pusharr_v : f_pusharr_v(Modifier); break;
+			case op_set_c : f_set_c(Modifier); break;
+			case op_func : f_func(Modifier); break;
+			case op_outevt_z : f_outevt_z(Modifier); break;
+			case op_outevt_e : f_outevt_e(Modifier); break;
 			case op_pop : f_pop(Modifier); break;
 			case op_popx : f_popx(Modifier); break;
 			case op_poparr_v : f_poparr_v(Modifier); break;
+			case op_push_c : f_push_c(Modifier); break;
+			case op_push_p : f_push_p(Modifier); break;
+			case op_push_v : f_push_v(Modifier); break;
+			case op_pushx_p : f_pushx_p(Modifier); break;
+			case op_pushx_v : f_pushx_v(Modifier); break;
+			case op_pusharr_v : f_pusharr_v(Modifier); break;
+			case op_set_e : f_set_e(Modifier); break;
 			case op_setarr_vc : f_setarr_vc(Modifier); break;
 			case op_setarr_vv : f_setarr_vv(Modifier); break;
-			case op_memclr : f_memclr(Modifier); break;
 			case op_getextdt_p : f_getextdt_p(Modifier); break;
 			case op_getextdt_v : f_getextdt_v(Modifier); break;
-			case op_chkret : f_chkret(Modifier); break;
+			case op_cast : f_cast(Modifier); break;
+			case op_inc : f_inc(Modifier); break;
+			case op_dec : f_dec(Modifier); break;
+			case op_incx : f_incx(Modifier); break;
+			case op_decx : f_decx(Modifier); break;
+			case op_outevt_c : f_outevt_c(Modifier); break;
+			case op_outevt_v : f_outevt_v(Modifier); break;
+			case op_outevtx_v : f_outevtx_v(Modifier); break;
 			case op_exec : f_exec(Modifier); break;
+			case op_memclr : f_memclr(Modifier); break;
 			case op_ifelse : f_ifelse(Modifier); break;
-			case op_outevt_c : f_outevt(Modifier); break;
-			case op_tkclr : f_tkclr(Modifier); break;
 			case op_trg : f_trg(Modifier); break;
-			case op_set_c : f_set_c(Modifier); break;
-			case op_set_v : f_set_v(Modifier); break;
+			case op_tkins_z : f_tkins_z(Modifier); break;
+			case op_tkclr : f_tkclr(Modifier); break;
+			case op_chkret : f_chkret(Modifier); break;
+			case op_asen : f_asen(Modifier); break;
+			case op_deref : f_deref(Modifier); break;
 			case op_clken_c : f_clken_c(Modifier); break;
 			case op_clken_v : f_clken_v(Modifier); break;
+			case op_clken_e : f_clken_e(Modifier); break;
 			case op_tkins_max : f_tkins_max(Modifier); break;
-			case op_tkins_z : f_tkins_z(Modifier); break;
+			case op_set16_c : f_set16_c(Modifier); break;
+			case op_set_v : f_set_v(Modifier); break;
 		}
 	
 	}
@@ -1323,7 +1494,7 @@ void f_tkins_z(uint8_t Modifier){
 	event void VMCustom.queueEvt(uint8_t evtId, void *data){
 #ifndef ONLY_BSTATION
 		evtData_t evtData;
-		dbg(APPNAME,"VM::VMCustom.queueEvt(): queueing evtId=%d\n",evtId);
+		dbg(APPNAME,"VM::VMCustom.queueEvt(): queueing evtId=%d. procFlag=%s\n",evtId,(procFlag)?"TRUE":"FALSE");
 		// Queue the message event
 		evtData.evtId = evtId;
 		evtData.data = data;
@@ -1396,8 +1567,8 @@ void f_tkins_z(uint8_t Modifier){
 	event void BSTimerAsync.fired()
     {
 #ifndef ONLY_BSTATION
-        call BSTimerAsync.startOneShot(10);
-        ceu_go_async(NULL,NULL);
+        //call BSTimerAsync.startOneShot(10);
+        //ceu_go_async(NULL,NULL);
 #endif
     }
 

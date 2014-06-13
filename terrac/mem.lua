@@ -16,20 +16,18 @@ end
 
 
 local t2n = {
-     us = 10^0,
-     ms = 10^3,
-      s = 10^6,
-    min = 60*10^6,
-      h = 60*60*10^6,
+     ms = 10^0,
+      s = 10^3,
+    min = 60*10^3,
+      h = 60*60*10^3,
 }
 
 
 local t2idx = {
-     us = 0,
-     ms = 1,
-      s = 2,
-    min = 3,
-      h = 4,
+     ms = 0,
+      s = 1,
+    min = 2,
+      h = 3,
 }
 
 _MEM.t2idx=t2idx
@@ -100,11 +98,8 @@ F = {
             else
                 var.off = alloc(len)
             end
---print("mem::Block_pre: var/len/pos",var.id,len,var.off,me.depth)
---print("mem::Block_pre:",var.id,var.off)
             -- afb build a var table in _MEM
             _MEM.vars[var.off]= (_MEM.vars[var.off] or '')..var.id..':'..len..', '
---print("mem::Block_pre: Var/addr",var.id, var.off)
             
             if var.isEvt then
                 var.awt0 = alloc(1)
@@ -173,7 +168,7 @@ F = {
     ParAnd_pre = function (me)
         me.off = alloc(#me)        -- TODO: bitmap?
 		-- afb build a var table in _MEM
-        _MEM.vars[me.off]= 'ParAnd_flag['..#me..']'
+        _MEM.vars[me.off]= ( _MEM.vars[me.off] or '')..'ParAnd_flag['..#me..'], '
     end,
     ParAnd = 'Block',
 
@@ -394,18 +389,18 @@ F = {
     end,
 
     WCLOCKK = function (me)
-        local h,min,s,ms,us = unpack(me)
-        me.us  = us*t2n.us + ms*t2n.ms + s*t2n.s + min*t2n.min + h*t2n.h
-        me.ms  = (us*t2n.us + ms*t2n.ms + s*t2n.s + min*t2n.min + h*t2n.h)/1000
+        local h,min,s,ms = unpack(me)
+ --       me.us  = (ms*t2n.ms + s*t2n.s + min*t2n.min + h*t2n.h)*1000
+        me.ms  = (ms*t2n.ms + s*t2n.s + min*t2n.min + h*t2n.h)
 --afb        me.val = me.us
-        me.val = _TP.getConstType(me.us / 1000,me.ln)..' '..me.us / 1000   -- Convert micro to milli
+        me.val = _TP.getConstType(me.ms,me.ln)..' '..me.ms   -- uses milli
 --afb        ASR(me.us>0 and me.us<=2000000000, me, 'constant is out of range')
         ASR(me.ms>0 and me.ms<= (math.pow(2,32))-1, me, 'constant is out of range')
     end,
 
     WCLOCKE = function (me)
         local exp, unit = unpack(me)
-        me.us   = nil
+        me.ms   = nil
 --afb        me.val  = exp.val .. '*' .. t2n[unit] .. 'L'
         me.val  = t2idx[unit]..' '..exp.tp..' '..exp.val
         me.accs = exp.accs

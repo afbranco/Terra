@@ -120,7 +120,8 @@ $(info TOSVERSION  = $(TOSVERSION))
 $(info ***********************)
 
 PFLAGS += -fno-strict-aliasing # required for accessing VARS
-MSG_SIZE = 29
+#MSG_SIZE = 29
+MSG_SIZE = 34
 
 CFLAGS += -DNO_DEBUG 
 CFLAGS += -I. -ICustomVMs/TerraNet/ 

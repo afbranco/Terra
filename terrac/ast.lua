@@ -136,7 +136,7 @@ end
 local C; C = {
     [1] = function (ln, spc, ...) -- spc=CK''
         local blk = node('Block')(ln)
-        blk[#blk+1] = node('Dcl_var')(ln, 'var', 'short',  false, '$ret')
+        blk[#blk+1] = node('Dcl_var')(ln, 'var', 'ubyte',  false, '$ret')
         for i=1, FIN do
             blk[#blk+1] = node('Dcl_int')(ln,true,'void',false,'$fin_'..i)
         end
@@ -173,21 +173,25 @@ local C; C = {
         if not b2 then
             return node('Block')(ln, b1)
         end
+        
+        -- afb : Finally isn't implemented.
+        ASR(FALSE, b2, 'Finally is not implemented in this version!')
 
-        FIN = FIN + 1
-        local fin = node('Finally')(ln, b2)
-        fin.n = FIN
-
-        local evt = '$fin_'..FIN
-        local awt = node('AwaitInt')(ln, node('Var')(ln, evt), true)
-        b1[#b1+1] = node('EmitInt')(ln, node('Var')(ln, evt))
-
-        local blk = node('Block')(ln,
-                node('ParAnd')(ln,
-                    b1,
-                    node('BlockN')(ln, awt, fin)))
-        blk.fin = fin
-        return blk
+-- afb : Finally isn't implemented.
+--        FIN = FIN + 1
+--        local fin = node('Finally')(ln, b2)
+--        fin.n = FIN
+--
+--        local evt = '$fin_'..FIN
+--        local awt = node('AwaitInt')(ln, node('Var')(ln, evt), true)
+--        b1[#b1+1] = node('EmitInt')(ln, node('Var')(ln, evt))
+--
+--        local blk = node('Block')(ln,
+--                node('ParAnd')(ln,
+--                    b1,
+--                    node('BlockN')(ln, awt, fin)))
+--        blk.fin = fin
+--        return blk
     end,
 
     If = function (ln, ...)
@@ -356,10 +360,11 @@ local C; C = {
                  or op=='+' or op=='~' or op=='*') then
                 op = 'cast'
             end
+--print("ast::Exp: op=",op)
             return node('Op1_'..op)(ln, v2,
                                     C._Exp(ln, select(3,...)))
         else                    -- binary expression
---print("ast::_Exp2:", v1.tag, v2, v3.tag)
+print("ast::_Exp2:", v1.tag, v2, v3.tag)
             -- v1=e1, v2=op, v3=e2, v4=?
             if v2 == ':' then
                 return C._Exp(ln,

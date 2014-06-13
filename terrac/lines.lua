@@ -20,6 +20,7 @@ function WRN (cond, me, msg)
     local ln = (type(me)=='number' and me) or me.ln
     if not cond then
         DBG('WRN : line '..ln..' : '..msg)
+        _ENV.n_wrns = _ENV.n_wrns + 1;
     end
     return cond
 end

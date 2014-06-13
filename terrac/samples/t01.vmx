@@ -1,427 +1,46 @@
-83 356 396 426 426 426 5 1 3 0 18 3 8
-00 | 0000 0 track:0
+30 41 45 45 45 45 1 0 0 0 0 0 0
+00 | 0000 0 track 0
 00 | 0001 0
 00 | 0002 0
 00 | 0003 0
-00 | 0004 0 track:1
+00 | 0004 0 track 1
 00 | 0005 0
 00 | 0006 0
 00 | 0007 0
-00 | 0008 0 track:2
-00 | 0009 0
-00 | 0010 0
-00 | 0011 0
-00 | 0012 0 track:3
-00 | 0013 0
-00 | 0014 0
-00 | 0015 0
-00 | 0016 0 track:4
-00 | 0017 0
-00 | 0018 0
-00 | 0019 0
-00 | 0020 0 track:5
-00 | 0021 0
-00 | 0022 0
-00 | 0023 0
-00 | 0024 0000 wClock:0
-00 | 0025 0001
-00 | 0026 0002
-00 | 0027 0003
-00 | 0028 0004
-00 | 0029 0005
-00 | 0030 0006
-00 | 0031 0007
-00 | 0032 0008 async:0
-00 | 0033 0009
-00 | 0034 0010 async:1
-00 | 0035 0011
-00 | 0036 0012 async:2
-00 | 0037 0013
-00 | 0038 0014 emits:0
-00 | 0039 0015
-00 | 0040 0016 emits:1
-00 | 0041 0017
-00 | 0042 0018 inEvt 001 : A
-00 | 0043 0019           : 01 gates
-00 | 0044 0020
-00 | 0045 0021
-00 | 0046 0022 $ret:2, 
-00 | 0047 0023 
-00 | 0048 0024 xx:1, 
-00 | 0049 0025 yy:1, 
-00 | 0050 0026 ee:2, 
-00 | 0051 0027 
-00 | 0052 0028 ee_awt0, 
-00 | 0053 0029 ee_waits[1], 
-00 | 0054 0030 
-00 | 0055 0031 zz:4, 
-00 | 0056 0032 
-00 | 0057 0033 
-00 | 0058 0034 
-00 | 0059 0035 v:2, 
-00 | 0060 0036 
-00 | 0061 0037 xx:1, 
-00 | 0062 0038 xx_awt0, 
-00 | 0063 0039 yy:1, 
-00 | 0064 0040 yy_awt0, 
-00 | 0065 0041 ww:2, 
-00 | 0066 0042 
-00 | 0067 0043 xx:1, 
-00 | 0068 0044 xx_awt0, 
-00 | 0069 0045 yy:1, 
-00 | 0070 0046 yy_awt0, 
-00 | 0071 0047 ww:2, 
-00 | 0072 0048 
-00 | 0073 0049 eex:2, zz1a:2, xx:1, 
-00 | 0074 0050 xx_awt0, 
-00 | 0075 0051 zz1b:2, yy:1, 
-00 | 0076 0052 yy_awt0, 
-00 | 0077 0053 ww:2, 
-00 | 0078 0054 
-00 | 0079 0055 afb1:2, 
-00 | 0080 0056 
-00 | 0081 0057 __afb1_0x8bc66d0:2, 
-00 | 0082 0058 
-68 | 0083 68 memclr 0 22                   | clear all gates
-00 | 0084 00 
-16 | 0085 16 
-a0 | 0086 a0 set_c ubyte 18 1              | config gate A idx= 1 
-12 | 0087 12 
-01 | 0088 01 
-a0 | 0089 a0 set_c ubyte 19 1              | config gate A with 1 await(s)
-13 | 0090 13 
-01 | 0091 01 
-a0 | 0092 a0 set_c ubyte 28 1              | event ee = 1 gates
-1c | 0093 1c 
-01 | 0094 01 
-68 | 0095 68 memclr 29 2                   | clear ee 1 wait(s) 
-1d | 0096 1d 
-02 | 0097 02 
-e0 | 0098 e0 tkins_max 0 5                 | insert track ParEver_sub_1_5
-05 | 0099 05 
-e0 | 0100 e0 tkins_max 0 6                 | insert track ParEver_sub_2_6
-06 | 0101 06 
-e0 | 0102 e0 tkins_max 0 7                 | insert track ParEver_sub_3_7
-07 | 0103 07 
-e0 | 0104 e0 tkins_max 0 8                 | insert track ParEver_sub_4_8
-08 | 0105 08 
-01 | 0106 01 end                           | end
-a5 | 0107 a5 set_c ushort 20 13            | await A[0]
-14 | 0108 14 
-0d | 0109 0d 
-01 | 0110 01 end                           | end
-70 | 0111 70 getextdt_v 35 2               | get Ext Data v 2
-23 | 0112 23 
-02 | 0113 02 
-1c | 0114 1c push_c 1                      | push 1
-01 | 0115 01 
-55 | 0116 55 popx_u ushort 26              | emit ee from stack
-1a | 0117 1a 
-e8 | 0118 e8 tkins_max 2 18                | insert track Emit_mch_ee_18
-12 | 0119 12 
-e4 | 0120 e4 tkins_max 1 19                | insert track Emit_cnt_ee_19
-13 | 0121 13 
-01 | 0122 01 end                           | end
-9c | 0123 9c trg 28                        | trigger ee
-1c | 0124 1c 
-01 | 0125 01 end                           | end
-7c | 0126 7c exec 20                       | goto ubyte 20
-14 | 0127 14 
-c0 | 0128 c0 clken_c 0 10 21               | clock enable Awake_10000_21 10msec
-00 | 0129 00 
-0a | 0130 0a 
-15 | 0131 15 
-01 | 0132 01 end                           | end
-1c | 0133 1c push_c 1                      | push 1
-01 | 0134 01 
-29 | 0135 29 pushx_vs short 35             | push v:short
-23 | 0136 23 
-04 | 0137 04 add                           | add
-29 | 0138 29 pushx_vs short 35             | push v:short
-23 | 0139 23 
-49 | 0140 49 set short                     | set (short)*(pop1) = pop2
-7c | 0141 7c exec 14                       | goto ubyte 14
-0e | 0142 0e 
-68 | 0143 68 memclr 0 8                    | clear WClocks gates from 0 to 1
-00 | 0144 00 
-08 | 0145 08 
-98 | 0146 98 tkclr 17 23                   | clear tracks from label 17 to label 23
-11 | 0147 11 
-17 | 0148 17 
-01 | 0149 01 end                           | end
-b0 | 0150 b0 set_v byte 37 24              | xx'=xx
-25 | 0151 25 
-18 | 0152 18 
-b0 | 0153 b0 set_v byte 39 25              | yy'=yy
-27 | 0154 27 
-19 | 0155 19 
-f0 | 0156 f0 asen 0 30                     | ceu_async_enable 0 Async_0_30
-00 | 0157 00 
-1e | 0158 1e 
-01 | 0159 01 end                           | end
-a0 | 0160 a0 set_c ubyte 38 0              | event xx = 0 gates
-26 | 0161 26 
-00 | 0162 00 
-68 | 0163 68 memclr 39 0                   | clear xx 0 wait(s) 
-27 | 0164 27 
-00 | 0165 00 
-a0 | 0166 a0 set_c ubyte 40 0              | event yy = 0 gates
-28 | 0167 28 
-00 | 0168 00 
-68 | 0169 68 memclr 41 0                   | clear yy 0 wait(s) 
-29 | 0170 29 
-00 | 0171 00 
-1c | 0172 1c push_c 1                      | push 1
-01 | 0173 01 
-2d | 0174 2d pushx_vu ushort 41            | push ww:ushort
-29 | 0175 29 
-4d | 0176 4d set ushort                    | set (ushort)*(pop1) = pop2
-18 | 0177 18 inc byte 37                   | inc xx:byte
-25 | 0178 25 
-18 | 0179 18 inc byte 39                   | inc yy:byte
-27 | 0180 27 
-f0 | 0181 f0 asen 0 27                     | ceu_async_enable 0 Loop_ini_27
-00 | 0182 00 
-1b | 0183 1b 
-7c | 0184 7c exec 27                       | goto ubyte 27
-1b | 0185 1b 
-98 | 0186 98 tkclr 30 29                   | clear tracks from label 30 to label 29
-1e | 0187 1e 
-1d | 0188 1d 
-01 | 0189 01 end                           | end
-b0 | 0190 b0 set_v byte 43 24              | xx'=xx
-2b | 0191 2b 
-18 | 0192 18 
-b0 | 0193 b0 set_v byte 45 25              | yy'=yy
-2d | 0194 2d 
-19 | 0195 19 
-f0 | 0196 f0 asen 1 37                     | ceu_async_enable 1 Async_1_37
-01 | 0197 01 
-25 | 0198 25 
-01 | 0199 01 end                           | end
-a0 | 0200 a0 set_c ubyte 44 0              | event xx = 0 gates
-2c | 0201 2c 
-00 | 0202 00 
-68 | 0203 68 memclr 45 0                   | clear xx 0 wait(s) 
-2d | 0204 2d 
-00 | 0205 00 
-a0 | 0206 a0 set_c ubyte 46 0              | event yy = 0 gates
-2e | 0207 2e 
-00 | 0208 00 
-68 | 0209 68 memclr 47 0                   | clear yy 0 wait(s) 
-2f | 0210 2f 
-00 | 0211 00 
-1c | 0212 1c push_c 1                      | push 1
-01 | 0213 01 
-2d | 0214 2d pushx_vu ushort 47            | push ww:ushort
-2f | 0215 2f 
-4d | 0216 4d set ushort                    | set (ushort)*(pop1) = pop2
-18 | 0217 18 inc byte 43                   | inc xx:byte
-2b | 0218 2b 
-18 | 0219 18 inc byte 45                   | inc yy:byte
-2d | 0220 2d 
-f0 | 0221 f0 asen 1 34                     | ceu_async_enable 1 Loop_ini_34
-01 | 0222 01 
-22 | 0223 22 
-7c | 0224 7c exec 34                       | goto ubyte 34
-22 | 0225 22 
-98 | 0226 98 tkclr 37 36                   | clear tracks from label 37 to label 36
-25 | 0227 25 
-24 | 0228 24 
-01 | 0229 01 end                           | end
-e0 | 0230 e0 tkins_max 0 40                | insert track Await_ee_40
-28 | 0231 28 
-01 | 0232 01 end                           | end
-a5 | 0233 a5 set_c ushort 29 41            | await Awake_ee_41
-1d | 0234 1d 
-29 | 0235 29 
-01 | 0236 01 end                           | end
-2d | 0237 2d pushx_vu ushort 26            | push ee:ushort
-1a | 0238 1a 
-2d | 0239 2d pushx_vu ushort 49            | push eex:ushort
-31 | 0240 31 
-4d | 0241 4d set ushort                    | set (ushort)*(pop1) = pop2
-01 | 0242 01 end                           | end
-1c | 0243 1c push_c 1                      | push 1
-01 | 0244 01 
-2e | 0245 2e pushx_vu ulong 31             | push zz:ulong
-1f | 0246 1f 
-4e | 0247 4e set ulong                     | set (ulong)*(pop1) = pop2
-1c | 0248 1c push_c 1                      | push 1
-01 | 0249 01 
-28 | 0250 28 pushx_vs byte 24              | push xx:byte
-18 | 0251 18 
-0d | 0252 0d eq                            | eq
-80 | 0253 80 ifelse 65 66                  | ifelse True_65 False_66
-41 | 0254 41 
-42 | 0255 42 
-1c | 0256 1c push_c 1                      | push 1
-01 | 0257 01 
-2d | 0258 2d pushx_vu ushort 49            | push zz1a:ushort
-31 | 0259 31 
-4d | 0260 4d set ushort                    | set (ushort)*(pop1) = pop2
-1c | 0261 1c push_c 1                      | push 1
-01 | 0262 01 
-2d | 0263 2d pushx_vu ushort 51            | push zz1b:ushort
-33 | 0264 33 
-4d | 0265 4d set ushort                    | set (ushort)*(pop1) = pop2
-7c | 0266 7c exec 67                       | goto ubyte 67
-43 | 0267 43 
-b0 | 0268 b0 set_v byte 49 24              | xx'=xx
-31 | 0269 31 
-18 | 0270 18 
-b0 | 0271 b0 set_v byte 51 25              | yy'=yy
-33 | 0272 33 
-19 | 0273 19 
-f0 | 0274 f0 asen 2 64                     | ceu_async_enable 2 Async_2_64
-02 | 0275 02 
-40 | 0276 40 
-01 | 0277 01 end                           | end
-a0 | 0278 a0 set_c ubyte 50 0              | event xx = 0 gates
-32 | 0279 32 
-00 | 0280 00 
-68 | 0281 68 memclr 51 0                   | clear xx 0 wait(s) 
-33 | 0282 33 
-00 | 0283 00 
-a0 | 0284 a0 set_c ubyte 52 0              | event yy = 0 gates
-34 | 0285 34 
-00 | 0286 00 
-68 | 0287 68 memclr 53 0                   | clear yy 0 wait(s) 
-35 | 0288 35 
-00 | 0289 00 
-1c | 0290 1c push_c 1                      | push 1
-01 | 0291 01 
-2d | 0292 2d pushx_vu ushort 53            | push ww:ushort
-35 | 0293 35 
-4d | 0294 4d set ushort                    | set (ushort)*(pop1) = pop2
-1c | 0295 1c push_c 0                      | push 0
-00 | 0296 00 
-2d | 0297 2d pushx_vu ushort 55            | push afb1:ushort
-37 | 0298 37 
-4d | 0299 4d set ushort                    | set (ushort)*(pop1) = pop2
-1d | 0300 1d push_c 1000                   | push 1000
-03 | 0301 03 
-e8 | 0302 e8 
-2d | 0303 2d pushx_vu ushort 57            | push __afb1_0x8bc66d0:ushort
-39 | 0304 39 
-4d | 0305 4d set ushort                    | set (ushort)*(pop1) = pop2
-2d | 0306 2d pushx_vu ushort 57            | push __afb1_0x8bc66d0:ushort
-39 | 0307 39 
-2d | 0308 2d pushx_vu ushort 55            | push afb1:ushort
-37 | 0309 37 
-0f | 0310 0f gte                           | gte
-80 | 0311 80 ifelse 61 62                  | ifelse True_61 False_62
-3d | 0312 3d 
-3e | 0313 3e 
-f1 | 0314 f1 tkins_z 1 11 53               | insert track Loop_out_53
-0b | 0315 0b 
-35 | 0316 35 
-01 | 0317 01 end                           | end
-7c | 0318 7c exec 63                       | goto ubyte 63
-3f | 0319 3f 
-18 | 0320 18 inc byte 49                   | inc xx:byte
-31 | 0321 31 
-18 | 0322 18 inc byte 51                   | inc yy:byte
-33 | 0323 33 
-1c | 0324 1c push_c 1                      | push 1
-01 | 0325 01 
-2d | 0326 2d pushx_vu ushort 55            | push afb1:ushort
-37 | 0327 37 
-04 | 0328 04 add                           | add
-2d | 0329 2d pushx_vu ushort 55            | push afb1:ushort
-37 | 0330 37 
-4d | 0331 4d set ushort                    | set (ushort)*(pop1) = pop2
-7c | 0332 7c exec 63                       | goto ubyte 63
-3f | 0333 3f 
-f0 | 0334 f0 asen 2 51                     | ceu_async_enable 2 Loop_ini_51
-02 | 0335 02 
-33 | 0336 33 
-7c | 0337 7c exec 51                       | goto ubyte 51
-33 | 0338 33 
-98 | 0339 98 tkclr 54 63                   | clear tracks from label 54 to label 63
-36 | 0340 36 
-3f | 0341 3f 
-7c | 0342 7c exec 67                       | goto ubyte 67
-43 | 0343 43 
-01 | 0344 01 end                           | end
-68 | 0345 68 memclr 8 6                    | clear asyncs gates from 0 to 3
-08 | 0346 08 
-06 | 0347 06 
-68 | 0348 68 memclr 0 8                    | clear WClocks gates from 0 to 1
-00 | 0349 00 
-08 | 0350 08 
-98 | 0351 98 tkclr 2 67                    | clear tracks from label 2 to label 67
-02 | 0352 02 
-43 | 0353 43 
-02 | 0354 02 return                        | return
-01 | 0355 01 end                           | end
-01 | 0356 01 L1(0x01) => 83 (0x53)
-53 | 0357 53 
-05 | 0358 05 L5(0x05) => 107 (0x6b)
-6b | 0359 6b 
-06 | 0360 06 L6(0x06) => 150 (0x96)
-96 | 0361 96 
-07 | 0362 07 L7(0x07) => 190 (0xbe)
-be | 0363 be 
-08 | 0364 08 L8(0x08) => 230 (0xe6)
-e6 | 0365 e6 
-1e | 0366 1e L30(0x1e) => 160 (0xa0)
-a0 | 0367 a0 
-10 | 0368 10 L16(0x10) => 143 (0x8f)
-8f | 0369 8f 
-22 | 0370 22 L34(0x22) => 217 (0xd9)
-d9 | 0371 d9 
-12 | 0372 12 L18(0x12) => 123 (0x7b)
-7b | 0373 7b 
-24 | 0374 24 L36(0x24) => 226 (0xe2)
-e2 | 0375 e2 
-25 | 0376 25 L37(0x25) => 200 (0xc8)
-c8 | 0377 c8 
-14 | 0378 14 L20(0x14) => 128 (0x80)
-80 | 0379 80 
-28 | 0380 28 L40(0x28) => 233 (0xe9)
-e9 | 0381 e9 
-15 | 0382 15 L21(0x15) => 133 (0x85)
-85 | 0383 85 
-0d | 0384 0d L13(0x0d) => 111 (0x6f)
-6f | 0385 6f 
-1b | 0386 1b L27(0x1b) => 177 (0xb1)
-b1 | 0387 b1 
-0e | 0388 0e L14(0x0e) => 114 (0x72)
-72 | 0389 72 
-29 | 0390 29 L41(0x29) => 237 (0xed)
-ed | 0391 ed 
-1d | 0392 1d L29(0x1d) => 186 (0xba)
-ba | 0393 ba 
-13 | 0394 13 L19(0x13) => 126 (0x7e)
-7e | 0395 7e 
-03 | 0396 03 L3(0x03) => 345 (0x0159)
-01 | 0397 01 
-59 | 0398 59 
-3d | 0399 3d L61(0x3d) => 314 (0x013a)
-01 | 0400 01 
-3a | 0401 3a 
-3f | 0402 3f L63(0x3f) => 334 (0x014e)
-01 | 0403 01 
-4e | 0404 4e 
-40 | 0405 40 L64(0x40) => 278 (0x0116)
-01 | 0406 01 
-16 | 0407 16 
-43 | 0408 43 L67(0x43) => 344 (0x0158)
-01 | 0409 01 
-58 | 0410 58 
-35 | 0411 35 L53(0x35) => 339 (0x0153)
-01 | 0412 01 
-53 | 0413 53 
-41 | 0414 41 L65(0x41) => 256 (0x0100)
-01 | 0415 01 
-00 | 0416 00 
-33 | 0417 33 L51(0x33) => 306 (0x0132)
-01 | 0418 01 
-32 | 0419 32 
-3e | 0420 3e L62(0x3e) => 320 (0x0140)
-01 | 0421 01 
-40 | 0422 40 
-42 | 0423 42 L66(0x42) => 268 (0x010c)
-01 | 0424 01 
-0c | 0425 0c 
+00 | 0008 0000 $ret:1, 
+00 | 0009 0001 x2:1, 
+00 | 0010 0002 x1:2, 
+00 | 0011 0003 
+00 | 0012 0004 msg:16, 
+00 | 0013 0005 
+00 | 0014 0006 
+00 | 0015 0007 
+00 | 0016 0008 
+00 | 0017 0009 
+00 | 0018 0010 
+00 | 0019 0011 
+00 | 0020 0012 
+00 | 0021 0013 
+00 | 0022 0014 
+00 | 0023 0015 
+00 | 0024 0016 
+00 | 0025 0017 
+00 | 0026 0018 
+00 | 0027 0019 
+00 | 0028 0020 msg2:2, 
+00 | 0029 0021 
+78 | 0030 78 memclr 0 0                    | clear all gates
+00 | 0031 00 
+00 | 0032 00 
+3a | 0033 3a pushx_v long 16               | push msg.x2:long
+10 | 0034 10 
+28 | 0035 28 push_c 1                      | push &x2
+01 | 0036 01 
+40 | 0037 40 set_e ubyte                   | set (ubyte)*(pop1) = pop2
+01 | 0038 01 end                           | end
+01 | 0039 01 end                           | end program
+01 | 0040 01 end                           | end
+01 | 0041 01 L1(0x01) => 30 (0x1e)
+1e | 0042 1e 
+03 | 0043 03 L3(0x03) => 39 (0x27)
+27 | 0044 27 

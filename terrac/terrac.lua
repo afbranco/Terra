@@ -86,7 +86,7 @@ do
     dofile 'labels.lua'
 --    dofile 'analysis.lua'
 --    _AST.dump(_AST.root)
-print(print_r(_AST.root,"terrac: root"))
+--print(print_r(_AST.root,"terrac: root"))
     dofile 'asm.lua'
     dofile 'code.lua'
 --    _AST.dump(_AST.root)
@@ -142,6 +142,10 @@ do
             if ext.pre == 'input' then
                 --str = str..'#define IN_'..ext.id..' '.._MEM.gtes[ext.n]..'\n'
                 ins[#ins+1] = _MEM.gtes[ext.n]
+--print("terrac:: evts:",ext.id,ext.idx,_ENV.awaits[ext] or 0)
+                if ((_ENV.awaits[ext] or 0) > 0) then
+                  _ENV.n_ins_active = _ENV.n_ins_active + 1;
+                end
             else
                 --str = str..'#define OUT_'..ext.id..' '..ext.seq..'\n'
                 outs = outs + 1
@@ -329,14 +333,16 @@ end
 LblTableEnd_addr=pos;
 
 
+
 -- ====  Environment parameters  ====
 -- codeAddr,LblTable11_addr,LblTable12_addr,LblTable21_addr,LblTable22_addr,LblTableEnd_addr,n_tracks,n_wavlocks,wclock0,gate0
 asmText = codeAddr..' '..LblTable11_addr..' '..LblTable12_addr..' '..LblTable21_addr..' '..LblTable22_addr..' '..LblTableEnd_addr
-asmText = asmText ..' '..ALL.n_tracks..' '.._ENV.n_wclocks..' '.. _ENV.n_asyncs ..' '.._MEM.gtes.wclock0..' '.._ENV.gate0..' '.._ENV.n_ins..' '.._MEM.gtes.async0..'\n'
+asmText = asmText ..' '..ALL.n_tracks..' '.._ENV.n_wclocks..' '.. _ENV.n_asyncs ..' '.._MEM.gtes.wclock0
+asmText = asmText ..' '.._ENV.gate0..' '.._ENV.n_ins_active..' '.._MEM.gtes.async0..'\n'
 -- === Tracks ===
 xAddr=0
 for x=1,ALL.n_tracks+1,1 do
-  asmText = asmText ..'00 | '..string.format('%04d',xAddr)..' '.. 0 ..' '..'track:'.. x-1 ..'\n'; xAddr=xAddr+1;
+  asmText = asmText ..'00 | '..string.format('%04d',xAddr)..' '.. 0 ..' '..'track '.. x-1 ..'\n'; xAddr=xAddr+1;
   for y=1,(4-1),1 do
     asmText = asmText ..'00 | '..string.format('%04d',xAddr)..' '.. 0 ..'\n'; xAddr=xAddr+1;
   end
@@ -344,21 +350,21 @@ end
 xMemAddr=(ALL.n_tracks+1)*4;
 -- === WClocks ===
 for x=1,_ENV.n_wclocks,1 do
-  asmText = asmText ..'00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..' '..'wClock:'.. x-1 ..'\n'; xAddr=xAddr+1;
+  asmText = asmText ..'00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..' '..'wClock '.. x-1 ..'\n'; xAddr=xAddr+1;
   for y=1,_ENV.c.tceu_wclock.len-1,1 do
     asmText = asmText ..'00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..'\n'; xAddr=xAddr+1;
   end
 end
 -- === Asyncs ===
 for x=1,_ENV.n_asyncs,1 do
-  asmText = asmText ..'00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..' '..'async:'.. x-1 ..'\n'; xAddr=xAddr+1;
+  asmText = asmText ..'00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..' '..'async_'.. x-1 ..'\n'; xAddr=xAddr+1;
   for y=1,_ENV.c.tceu_nlbl.len-1,1 do
     asmText = asmText ..'00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..'\n'; xAddr=xAddr+1;
   end
 end
 -- === Emits ===
 for x=1,_ENV.n_emits,1 do
-  asmText = asmText ..'00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..' '..'emits:'.. x-1 ..'\n'; xAddr=xAddr+1;
+  asmText = asmText ..'00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..' '..'emits '.. x-1 ..'\n'; xAddr=xAddr+1;
   for y=1,_ENV.c.tceu_nlbl.len-1,1 do
     asmText = asmText ..'00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..'\n'; xAddr=xAddr+1;
   end
@@ -404,8 +410,17 @@ print('Using '.. lastBytes+_AST.root.max_stack*4 ..' bytes of VM memory')
 print('Total of '.. math.ceil((LblTableEnd_addr-codeAddr)/24)..' message(s)')
 
 if (lastBytes+_AST.root.max_stack*4 > (60*24)) then
-	print('WARNING: Program may be too long for VM memory. Please check target VM memory capacity!')
+  WRN(false,_AST.root,'Program may be too long for VM memory. Please check target VM memory capacity!')
 end
+
+if _ENV.n_wrns > 0 then
+  if _ENV.n_wrns > 1 then
+    print('** Attention to the total of '.. _ENV.n_wrns ..' warning messages **')
+  else
+    print('** Attention to the total of '.. _ENV.n_wrns ..' warning message **')
+  end
+end
+
 -- OUTPUT_ASM
 
 local out2

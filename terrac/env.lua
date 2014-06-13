@@ -36,7 +36,8 @@ _ENV = {
     gate0     = 0; --afb
     n_ins     = 0; --afb
     n_outs     = 0; --afb
-	
+    n_ins_active = 0; --afb	
+    n_wrns = 0;       --afb Count warning messages
     dets  = {},
 }
 
@@ -146,7 +147,11 @@ F = {
         local dir, tp, id, idx = unpack(me)
 --print("env::Dcl_ext:", dir, tp, id, idx)
 --print(print_r(_ENV.c,"ENV.c"))
-        ASR(tp=='void' or _TP.deref(tp) or _ENV.c[tp],me, 'invalid event type')
+--        ASR(tp=='void' or _TP.deref(tp)) or _ENV.c[tp],me, 'invalid event type')
+  
+--print("env::Dcl_ext:",id, tp, _TP.isBasicType(tp),_TP.deref(tp), (_TP.isBasicType(tp) or  _TP.deref(tp)) )
+        ASR( (_TP.isBasicType(tp) or  _TP.deref(tp)),me, 'invalid event type')
+
         for k,val in ipairs(_ENV.exts) do
           if val.pre==dir then 
             ASR(not (val.id==id), me, 'event "'..id..'" is already declared at line '.. (val.ln or 0))
@@ -171,6 +176,8 @@ F = {
     Dcl_int = 'Dcl_var',
     Dcl_var = function (me)
         local pre, tp, dim, id, exp = unpack(me)
+--print("env::Dcl_var:",tp,dim, _TP.isBasicType(_TP.deref(tp) or tp),(not dim) or  _TP.isBasicType(_TP.deref(tp) or tp))
+        ASR( (not dim) or  _TP.isBasicType(_TP.deref(tp) or tp),me,'Arrays can have only basic types')
         me.var = newvar(me, _AST.iter'Block'(), pre, tp, dim, id)
     end,
 
@@ -195,7 +202,8 @@ F = {
     Dcl_func = function (me)
        local op,tp,id,args,idx = unpack(me)
 --print("env::Dcl_func:", op, tp, id, idx)
-        ASR(tp=='void' or _TP.deref(tp) or _ENV.c[tp],me, 'invalid function type')
+--print("env::Dcl_func:", tp=='void', _TP.deref(tp) , _ENV.c[tp]~=nil)
+        ASR(not(tp=='void' or _TP.deref(tp)) and _ENV.c[tp],me, 'invalid function type "'..tp..'"')
         for k,val in ipairs(_ENV.exts) do
           if val.pre=='func' then 
             ASR(not (val.id==id), me, 'function "'..id..'" is already declared at line '.. (val.ln or 0))
@@ -205,7 +213,9 @@ F = {
         ASR(idx<255, me,' function event numeric id must be less than 255')
 
         for k,tp in ipairs(args) do
-          ASR(tp=='void' or _TP.deref(tp) or _ENV.c[tp],me, '<'..tp..'> in position '..k..' is invalid argument type in function <'..id..'>')
+--print("env::Dcl_func: arg:",k, tp, (_TP.isBasicType(tp) or _TP.isBasicType(_TP.deref(tp))) or _TP.deref(tp))
+          ASR(not(tp=='void') and (_ENV.c[tp] or _ENV.c[_TP.deref(tp)]),me, '<'..tp..'> in position '..k..' is invalid argument type in function <'..id..'>')
+          ASR((_TP.isBasicType(tp) or _TP.isBasicType(_TP.deref(tp))) or _TP.deref(tp),me, 'register <'..tp..'> in position '..k..' in function <'..id..'> must be a pointer.')
         end
         me.ext = {
             ln    = me.ln,
@@ -304,8 +314,9 @@ F = {
     EmitInt = function (me)
         local e1, e2 = unpack(me)
         ASR(e1.var.isEvt, me, 'event "'..e1.var.id..'" is not declared')
-        ASR(((not e2) or _TP.contains(e1.var.tp,e2.tp,true)),
-                me, 'invalid emit')
+        err, cast = _TP.argsTp(e1.var.tp,e2.tp)
+        ASR(not err,me, 'invalid attribution ['..e2.tp..'] to ['..e1.var.tp..'].')
+        WRN(not cast,me, 'automatic cast from ['..e2.tp..'] to ['..e1.var.tp..'].')
 
         me.gte = _ENV.n_emits
         _ENV.n_emits = _ENV.n_emits + 2     -- (cnt/awk)
@@ -323,11 +334,12 @@ F = {
         me.tp = e1.ext.tp
 
         if e2 then
-            ASR(_TP.contains(e1.ext.tp,e2.tp,true),
-                    me, "non-matching types on `emit´")
+          err, cast = _TP.argsTp(e1.ext.tp,e2.tp)
+          ASR(not err,me, 'invalid attribution ['..e2.tp..'] to ['..e1.ext.tp..'].')
+          WRN(not cast,me, 'automatic cast from ['..e2.tp..'] to ['..e1.ext.tp..'].')
+--          ASR(_TP.contains(e1.ext.tp,e2.tp,true),me, "non-matching types on `emit´")
         else
-            ASR(e1.ext.tp=='void',
-                    me, "missing parameters on `emit´")
+            ASR(e1.ext.tp=='void',me, "missing parameters on `emit´")
         end
     end,
 
@@ -391,8 +403,13 @@ F = {
         local e1, e2, no_fin = unpack(me)
         e1 = e1 or _AST.iter'SetBlock'()[1]
 --print('env::SetExp:',e1.lval,e1.tp,e2.tp,no_fin)
-        ASR(e1.lval and _TP.contains(e1.tp,e2.tp,true),me, 'invalid attribution: ['.. e1.tp ..'] can not contain [' .. e2.tp ..']')
+--        WRN(e1.lval and _TP.contains(e1.tp,e2.tp,true),me, 'invalid attribution: ['.. e1.tp ..'] can not contain [' .. e2.tp ..']')
 
+        error, cast = _TP.argsTp(e1.tp,e2.tp)
+          ASR(not error,me,'incompatible types on an attribution: '.. e1.tp ..' and '.. e2.tp)
+          WRN(not cast,me, 'automatic cast from ['.. e2.tp ..'] to [' .. e1.tp ..'].')
+
+        
         if no_fin then
             return              -- no `finally´ required
         end
@@ -529,10 +546,11 @@ F = {
 
     ['Op1_*'] = function (me)
         local op, e1 = unpack(me)
+print("env::Op1_*:",e1.tag)
         me.tp   = _TP.deref(e1.tp, true)
         me.lval = true
         me.fst  = e1.fst
-        ASR(me.tp, me, 'invalid operand to unary "*"')
+        ASR(me.tp and e1.tag=='Var', me, 'invalid operand to unary "*"')
     end,
 
     ['Op1_&'] = function (me)
@@ -545,6 +563,8 @@ F = {
 
     ['Op2_.'] = function (me)
         local op, e1, id = unpack(me)
+print("env::Op2_.",me[1],me[2].tp,me[3].tag)
+        ASR(e1.fst.fields[id], me, 'invalid field name')
         me.tp   = e1.fst.fields[id].tp
         me.lval = true
         me.fst  = e1.fst
@@ -552,8 +572,8 @@ F = {
 
     Op_var = function (me)
         local op, exp = unpack(me)
---print("env::Op_var:", op,exp.tp, exp.tag, exp.var.id,_TP.isNumeric(exp.tp))
-        ASR(not(exp.tag=='Var' and _TP.isNumeric(tp)), me, 'invalid target to operation "++" or "--"')
+--print("env::Op_var:", op,exp.tp, exp.tag, exp.var.id,_TP.isNumeric(exp.tp),_TP.deref(exp.tp))
+        ASR(exp.tag=='Var' and _TP.isNumeric(exp.tp), me, 'invalid "inc/dec" target. Received a "'..exp.tag..'" of type "'..exp.tp..'"')
         me.tp   = exp.tp
         me.lval = exp.lval
         me.fst  = exp.fst
@@ -561,6 +581,7 @@ F = {
 
     Op1_cast = function (me)
         local tp, exp = unpack(me)
+--print("env::Op1_cast:", tp)
         me.tp   = tp
         me.lval = exp.lval
         me.fst  = exp.fst

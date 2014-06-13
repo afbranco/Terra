@@ -234,8 +234,11 @@ public class ControlCore implements MessageListener
 		msg.set_lblTableEnd(progBin.getLabelTableEnd());
 		msg.set_nTracks(progBin.getNTracks());
 		msg.set_wClocks(progBin.getWClocks());
+		msg.set_asyncs(progBin.getAsyncs());
 		msg.set_wClock0(progBin.getWClock0());
 		msg.set_gate0(progBin.getGate0());
+		msg.set_inEvts(progBin.getInEvts());
+		msg.set_async0(progBin.getAsync0());
 		
 		System.out.println(msg.toString());		
 		TCPtimer.schedule(new sendMsg("NewProgVersion",msg), 10);

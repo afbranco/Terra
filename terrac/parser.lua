@@ -144,7 +144,7 @@ _GG = {
             + EM'config statement (usually a missing `input/output/function/regtype´)'
     , _CfgStmtB = V'_Dcl_regt'
             + EM'config statement (usually a missing `regtype varName with varDefs end´)'
-    ,_Dcl_func = (CKEY'function' * V'ID_type' * V'ID_c' * K'(' * V'Arg_list' * K')') * PNUM
+    ,_Dcl_func = (CKEY'function' * CKEY(TYPES) * V'ID_c' * K'(' * V'Arg_list' * K')') * PNUM
     
     , Arg_list = ( V'ID_type' * (EK',' * EV'ID_type')^0  )^-1
 ------
@@ -256,7 +256,7 @@ _GG = {
                                 end)
                     )^0
     , _13     = V'_Prim'
-    , _Prim   = V'_Parens' + V'Func' 
+    , _Prim   = V'_Parens' + V'Func'
               + V'Var'   + V'C'   + V'SIZEOF'
               + V'NULL'    + V'CONST' --+ V'STRING'
               + V'EmitExtE'
@@ -276,11 +276,13 @@ _GG = {
                 (NUM * K'min' + Cc(0)) *
                 (NUM * K's'   + Cc(0)) *
                 (NUM * K'ms'  + Cc(0)) *
-                (NUM * K'us'  + Cc(0)) *
+--                (NUM * K'us'  + Cc(0)) *
+--                (NUM * EM'<h,min,s,ms,us>')^-1
                 (NUM * EM'<h,min,s,ms,us>')^-1
     , WCLOCKE = K'(' * V'Exp' * EK')' * C(
-                    K'h' + K'min' + K's' + K'ms' + K'us'
-                  + EM'<h,min,s,ms,us>'
+                    K'h' + K'min' + K's' + K'ms' --+ K'us'
+--                  + EM'<h,min,s,ms,us>'
+                  + EM'<h,min,s,ms>'
               )
 
     , Pause    = KEY'pause/if' * EV'Var' * V'_Do'
@@ -300,8 +302,10 @@ _GG = {
 
     , _Dcl_ext = (CKEY'input'+CKEY'output') * EV'ID_type' * EV'ID_ext' * PNUM
 
-    , _Dcl_int  = CKEY'event' * EV'ID_type' * Cc(false) *
+    , _Dcl_int  = CKEY'event' * CKEY(TYPES) * Cc(false) *
                     V'__Dcl_int' * (K','*V'__Dcl_int')^0
+--    , _Dcl_int  = CKEY'event' * EV'ID_type' * Cc(false) *
+--                    V'__Dcl_int' * (K','*V'__Dcl_int')^0
     , __Dcl_int = EV'ID_int' * (V'_Sets' + Cc(false)*Cc(false)*Cc(false))
 
     , _Dcl_var  = CKEY'var' * EV'ID_type' * (K'['*NUM*K']'+Cc(false)) *

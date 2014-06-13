@@ -175,15 +175,12 @@ void  proc_q_clear(uint16_t id){
 	}
 	
 /**
- *	procOutEvt(uint16_t id, uint16_t len, uint32_t val, uint8_t cv)
+ *	procOutEvt(uint8_t id)
  *  	procOutEvt - process the out events (emit)
  * 
  *	id - Event ID
- *	len - data parameter length
- *	val - Variable address or Constant value
- *	cv  - if 0 then val is a constant else val is an address
  */
-command void VM.procOutEvt(uint16_t id){
+command void VM.procOutEvt(uint8_t id){
 	dbg(APPNAME,"Custom::procOutEvt(): id=%d\n",id);
 	switch (id){
 		case INIT 		: proc_init(id); break;
@@ -211,6 +208,12 @@ command void VM.procOutEvt(uint16_t id){
 		case Q_CLEAR 	: proc_q_clear(id); break;
 	}
 }
+
+
+	command void VM.callFunction(uint8_t id){
+		dbg(APPNAME,"Custom::VM.callFunction(%d)\n",id);
+	}
+
 
 	task void BCRadio_receive(){
 		signal VM.queueEvt(RECEIVE, &ExtDataRadioReceived);		

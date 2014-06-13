@@ -7,6 +7,9 @@ local types = {
     ubyte=true,  byte=true,
 }
 
+function _TP.isBasicType(tp)
+  return types[tp]
+end
 -- TODO: enforce passing parameter `c´ to isNumeric/deref/contains/max ?
 
 function _TP.raw (tp)
@@ -32,6 +35,37 @@ end
 function _TP.ext (tp)
     return (string.sub(tp,1,1) == '_') and
             (not string.match(tp, '(.-)%*$')) and tp
+end
+
+
+function _TP.argsTp(tp1,tp2)
+    -- error == true -> incompatible types
+    -- cast == true -> need cast
+    local error = true 
+    local cast = false
+    if (_TP.isBasicType(tp1) or _TP.isBasicType(_TP.deref(tp1))) then -- is a basic type
+      if (_TP.deref(tp1)) then
+          if (_TP.deref(tp2)) then
+            error = (_ENV.c[_TP.deref(tp1)].len < _ENV.c[_TP.deref(tp2)].len) -- _TP.contains() like
+            cast = error
+          else
+            error = true
+            cast = false
+          end
+      else
+          if _TP.isBasicType(tp2) then
+            cast = (_ENV.c[tp1].len < _ENV.c[tp2].len)
+            error = false
+          else
+            error = true
+            cast = false
+          end
+      end
+    else  -- is NOT a basic type
+         error = not(tp1==tp2)
+         cast = false
+    end
+    return error, cast
 end
 
 function _TP.contains (tp1, tp2, c)

@@ -1,34 +1,163 @@
-config 10.1.2 do
+config 0.1.0 do
 
-regtype evtData with
-	var byte [4] a;
-	var short b;
-end
-	regtype radio with
-		var ulong a;
-		var ubyte b;
-		var byte [16] data;
+
+	regtype usrMsg_t with
+		var ushort source;
+		var ushort target;
+		var ubyte d8_1;
+		var ubyte d8_2;
+		var ubyte d8_3;
+		var ubyte d8_4;
+		var ushort d16_1;
+		var ushort d16_2;
+		var ushort d16_3;
+		var ushort d16_4;
+		var ulong d32_1;
+		var ulong d32_2;
 	end
 
+	regtype test_t with
+		var short x1;
+		var ubyte[10] data;
+		var long x2;
+	end
 
-	input short A 1;
-	input radio RECEIVE 7;
-	input evtData* AA11 11;
-	output radio* AAAA 11;
-	output ulong OYYYY 1;
-	output ulong OZZZ 12;
+	// Terra Default events
 
-	function ubyte* f0(radio) 1;
-	function ubyte f1(evtData, byte, ulong, radio) 2;
+	output ubyte INIT  0;
+	output ubyte  LEDS  1;
+	output ubyte  LED0  2;
+	output ubyte  LED1  3;
+	output ubyte  LED2  4;
+	output void REQ_TEMP  5;
+	output void REQ_PHOTO  6;
+	output void REQ_VOLTS  7;
+	output usrMsg_t* SEND  8;
+	output usrMsg_t* SEND_ACK 9;
+	output ubyte SET_PORT_A  10;
+	output ubyte SET_PORT_B  11;
+	output ubyte CFG_PORT_A  12;
+	output ubyte CFG_PORT_B  13;
+	output ubyte REQ_PORT_A  14;
+	output ubyte REQ_PORT_B  15;
+	output ubyte CFG_INT_A  16;
+	output ubyte CFG_INT_B  17;
+	output ubyte REQ_CUSTOM_A  18;
+	output usrMsg_t* Q_PUT  19;
+	output usrMsg_t* Q_GET  20;
+	output ubyte* Q_SIZE  21;
+	output void Q_CLEAR  22;
 
-	function casa* f2(void) 3;
+	input ushort TEMP 0;
+	input ushort PHOTO 1;
+	input ushort VOLTS 2;
+	input ushort SEND_DONE 3;
+	input ubyte SEND_DONE_ACK 4;
+	input usrMsg_t* RECEIVE 5;
+	input ubyte Q_READY 6;
+	input ubyte PORT_A 7;
+	input ubyte PORT_B 8;
+	input ubyte INT_A 9;
+	input ubyte INT_B 10;
+	input ubyte CUSTOM_A 11;
+
+	function byte f0(usrMsg_t*, short*) 1;
+	function ubyte f1(byte) 2;
+	function ubyte f2(ubyte, ubyte) 3;
+
+	function byte f3() 4;
 
 end
 
-var byte xx,yy;
-event ushort ee;
+var ubyte x2;
+var short x1;
+var test_t msg;
+var test_t* msg2;// = &msg;
 
-  	await RECEIVE;
+x2=msg.data[1+1];
+
+//msg[1].x1 = 7;
+
+//msg.data[1] = 10;
+
+//emit LEDS(msg.x1 + 5);
+
+/*
+event byte ee;
+var byte xx;
+
+emit ee(xx);
+
+par do
+	var byte count=0;
+	var byte* count2 = &count;
+	loop do
+		await 500ms;
+		emit LED0(2);
+		inc count;
+		if (count%4)==0 then
+			emit REQ_CUSTOM_A(count);
+		end
+	end
+with
+	loop do
+		await 1s;
+		emit LED1(2);
+	end
+with
+	loop do
+		await CUSTOM_A;
+		emit LED2(2);
+	end
+with
+	loop do
+		await CUSTOM_A;
+		emit REQ_TEMP();
+		await TEMP;
+	end
+with
+	loop do
+		await RECEIVE;
+		emit LED2(2);
+	end
+with
+	loop do
+		await TEMP;
+		emit LED2(1);
+	end
+end
+
+/*
+var radio a1;
+a1 = await RECEIVE;
+
+var ulong z1 = 257;
+
+par/and do
+  await (2*(xx+yy))ms;
+with
+  await (yy)ms;
+with
+  await 200h1s;
+with
+  await 1s;
+with
+  await 1s;
+end
+
+var long sdrf=10;
+
+par/and do
+  await 1s;
+with
+  await 1s;
+with
+  await 1s;
+with
+  await 1s;
+end
+
+
   // tests a program with a simulation in parallel
   par do
       // original program
@@ -59,7 +188,7 @@ emit ee(1);
 		end
       end
   with
-    var ushort eex = await ee;
+
 
   end
 

@@ -7,12 +7,12 @@
 public class newProgVersionMsg extends net.tinyos.message.Message {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 32;
+    public static final int DEFAULT_MESSAGE_SIZE = 34;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 160;
 
-    /** Create a new newProgVersionMsg of size 32. */
+    /** Create a new newProgVersionMsg of size 34. */
     public newProgVersionMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -125,6 +125,9 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [gate0=0x"+Long.toHexString(get_gate0())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [inEvts=0x"+Long.toHexString(get_inEvts())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [async0=0x"+Long.toHexString(get_async0())+"]\n";
@@ -1020,9 +1023,72 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: async0
+    // Accessor methods for field: inEvts
     //   Field type: int, unsigned
     //   Offset (bits): 208
+    //   Size (bits): 16
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'inEvts' is signed (false).
+     */
+    public static boolean isSigned_inEvts() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'inEvts' is an array (false).
+     */
+    public static boolean isArray_inEvts() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'inEvts'
+     */
+    public static int offset_inEvts() {
+        return (208 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'inEvts'
+     */
+    public static int offsetBits_inEvts() {
+        return 208;
+    }
+
+    /**
+     * Return the value (as a int) of the field 'inEvts'
+     */
+    public int get_inEvts() {
+        return (int)getUIntBEElement(offsetBits_inEvts(), 16);
+    }
+
+    /**
+     * Set the value of the field 'inEvts'
+     */
+    public void set_inEvts(int value) {
+        setUIntBEElement(offsetBits_inEvts(), 16, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'inEvts'
+     */
+    public static int size_inEvts() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'inEvts'
+     */
+    public static int sizeBits_inEvts() {
+        return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: async0
+    //   Field type: int, unsigned
+    //   Offset (bits): 224
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -1044,14 +1110,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'async0'
      */
     public static int offset_async0() {
-        return (208 / 8);
+        return (224 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'async0'
      */
     public static int offsetBits_async0() {
-        return 208;
+        return 224;
     }
 
     /**
@@ -1085,7 +1151,7 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: refTA1
     //   Field type: long, unsigned
-    //   Offset (bits): 224
+    //   Offset (bits): 240
     //   Size (bits): 32
     /////////////////////////////////////////////////////////
 
@@ -1107,14 +1173,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'refTA1'
      */
     public static int offset_refTA1() {
-        return (224 / 8);
+        return (240 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'refTA1'
      */
     public static int offsetBits_refTA1() {
-        return 224;
+        return 240;
     }
 
     /**

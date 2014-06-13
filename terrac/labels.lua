@@ -52,6 +52,10 @@ F = {
         me.lbls_emt[2] = #_LABELS.list-1
     end,
 
+    Prog    = '_Escape',
+--    CfgBlk  = '_Escape',
+
+
     SetBlock_pre = function (me)
         F._Escape_pre(me)
         me.lbl_ana_no = new{'SetBlock_no', to_reach=false,
@@ -172,10 +176,13 @@ F = {
     end,
     AwaitT = function (me)
         if me[1].tag == 'WCLOCKE' then
-            me.lbl = new{'Awake_'..me[1][1][1][1], to_reach=true,
-                        me=me, err='awake of `await´'}
+          if (me[1][1][1].tag=='Var') then
+            me.lbl = new{'Awake_'..me[1][1][1][1], to_reach=true,me=me, err='awake of `await´'}
+          else
+            me.lbl = new{'Awake_'..'exp', to_reach=true,me=me, err='awake of `await´'}
+          end
         else
-            me.lbl = new{'Awake_'..me[1].us, to_reach=true,
+            me.lbl = new{'Awake_'..me[1].ms, to_reach=true,
                         me=me, err='awake of `await´'}
         end
     end,

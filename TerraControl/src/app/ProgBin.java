@@ -21,8 +21,11 @@ public class ProgBin {
 	private int labelTableEnd;
 	private int nTracks;
 	private int wClocks;
+	private int asyncs;
 	private int wClock0;
 	private int gate0;
+	private int inEvts;
+	private int async0;
 	
 	short[][] ProgData= new short[MAX_BLOCKS][BLOCK_SIZE];
 
@@ -50,8 +53,11 @@ public class ProgBin {
 	public int getLabelTableEnd() {return labelTableEnd;}
 	public int getNTracks() {return nTracks;}
 	public int getWClocks() {return wClocks;}
+	public int getAsyncs() {return asyncs;}
 	public int getWClock0() {return wClock0;}
 	public int getGate0() {return gate0;}
+	public int getInEvts() {return inEvts;}
+	public int getAsync0() {return async0;}
 	
 	public void ReadFile(String FileName) {
 		short blockCount = 0;
@@ -64,7 +70,7 @@ public class ProgBin {
 			// Read first line to get environment parameters
 			if (((strLine = br.readLine()) != null)){
 				String params[] = strLine.split(" ");
-				if (params.length==10){
+				if (params.length==13){
 					startProg = Integer.decode(params[0]);
 					labelTable11 = Integer.decode(params[1]);
 					labelTable12 = Integer.decode(params[2]);
@@ -73,10 +79,15 @@ public class ProgBin {
 					labelTableEnd = Integer.decode(params[5]);					
 					nTracks = Integer.decode(params[6]);					
 					wClocks = Integer.decode(params[7]);
-					wClock0 = Integer.decode(params[8]);
-					gate0 = Integer.decode(params[9]);
+					asyncs = Integer.decode(params[8]);
+					wClock0 = Integer.decode(params[9]);
+					gate0 = Integer.decode(params[10]);
+					inEvts = Integer.decode(params[11]);
+					async0 = Integer.decode(params[12]);
 				}
 			}
+
+			
 			//Read File Line By Line
 			blockStart = (short)Math.floor(startProg/BLOCK_SIZE);
 			while ((strLine = br.readLine()) != null)   {
