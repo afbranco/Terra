@@ -181,17 +181,22 @@ F = {
         me.var = newvar(me, _AST.iter'Block'(), pre, tp, dim, id)
     end,
 
+
     Dcl_regt = function(me)
 --print(print_r(me,"env::Dcl_regt: me"))
       local RegId = me[1]
       local RegFields= {}
       local memsize = 0
+      local offset = 0
+      local lastSize = 0
       for i=2, #me do
+        offset = offset + lastSize
         local var = me[i]
 --print('env::Dcl_regt: var',var)
         local  pre, tp, dim, id = unpack(var)
         local len = ((dim and dim*_ENV.c[var[2]].len) or _ENV.c[var[2]].len)
-        RegFields[id]={pre=pre,tp=tp,dim=dim,id=id,len=len}
+        lastSize = len
+        RegFields[id]={pre=pre,tp=tp,dim=dim,id=id,len=len,offset=offset}
         RegFields[i-1]=RegFields[id]
 --print('env::Dcl_regt:',tp,id)
         memsize = memsize + len
@@ -244,18 +249,31 @@ F = {
     end,
 
 
+   
     Var = function (me)
-        local id = unpack(me)
+        local id, idField = unpack(me)
+print("env::Var:",id, idField)
 --print(print_r(me,"env::Var: me"))
         local blk = me.blk or _AST.iter('Block')()
         while blk do
             for i=#blk.vars, 1, -1 do   -- n..1 (hidden vars)
                 local var = blk.vars[i]
                 if var.id == id then
+--print(print_r(var,"env::Var: var"))
+print("env::Var: fields",var.fields,var.tp,idField)
+                  if var.fields and idField then
+                    ASR(var.fields[idField],me,'invalid field name "'..idField..'" for "'..id..'"')
+print("env::Var: fields",var.fields[idField].tp)
+                    me.var  = var.fields[idField]
+                    me.tp   = var.fields[idField].tp
+                    me.lval = (not var.fields[idField].arr)
+                    me.fst  = var.fields[idField]
+                  else
                     me.var  = var
                     me.tp   = var.tp
                     me.lval = (not var.arr)
                     me.fst  = var
+                  end
                     return
                 end
             end
@@ -402,7 +420,7 @@ F = {
     SetExp = function (me)
         local e1, e2, no_fin = unpack(me)
         e1 = e1 or _AST.iter'SetBlock'()[1]
---print('env::SetExp:',e1.lval,e1.tp,e2.tp,no_fin)
+print('env::SetExp:',e1.lval,e1.tp,e2.tp,no_fin,unpack(e2[1]))
 --        WRN(e1.lval and _TP.contains(e1.tp,e2.tp,true),me, 'invalid attribution: ['.. e1.tp ..'] can not contain [' .. e2.tp ..']')
 
         error, cast = _TP.argsTp(e1.tp,e2.tp)
@@ -450,6 +468,8 @@ F = {
     --------------------------------------------------------------------------
 
     Exp = function (me)
+--print("env::Exp:",me[1][1])
+--print(print_r(me,"env::Exp: me"))
         me.lval = me[1].lval
         me.tp   = me[1].tp
         me.fst  = me[1].fst
@@ -488,7 +508,8 @@ F = {
 
     Op2_idx = function (me)
 --print(print_r(me,"env:Op2_idx: me"))
---print("env::Op2_idx:",me[2].tp,me[3].tp)
+print("env::Op2_idx:",me[2][1],me[2].tag,me[2].tp,me[2][2],me[3][1],me[3].tag,me[3].tp)
+print("env::Op2_idx:",me[2][2])
         local _, arr, idx = unpack(me)
         local _arr = ASR(_TP.deref(arr.tp,true), me, 'cannot index a non array')
 --        ASR(_arr and _TP.isNumeric(idx.tp,true), me, 'invalid array index')
@@ -546,11 +567,32 @@ F = {
 
     ['Op1_*'] = function (me)
         local op, e1 = unpack(me)
-print("env::Op1_*:",e1.tag)
-        me.tp   = _TP.deref(e1.tp, true)
-        me.lval = true
-        me.fst  = e1.fst
-        ASR(me.tp and e1.tag=='Var', me, 'invalid operand to unary "*"')
+        local tp
+--print(print_r(e1,"env::Op1_*: e1"))
+      if (e1.tag=='Var') then  -- single var/field (not array) 
+print("env::Op1_*:",e1.tp,e1.tag,e1[2])
+        if (e1[2]) then -- field
+          ASR(_TP.deref(e1.tp, true) and e1.tag=='Var', me, 'invalid operand to unary "*"')
+          ASR(_ENV.c[_TP.deref(e1.tp)].fields[e1[2]], me, 'invalid field "'.. e1[2] ..'" for "'.. _TP.deref(e1.tp) ..'" register type.')
+          tp   = _ENV.c[_TP.deref(e1.tp)].fields[e1[2]].tp
+          me.offset = _ENV.c[_TP.deref(e1.tp)].fields[e1[2]].offset
+        else  -- var
+          ASR(_TP.deref(e1.tp, true) and e1.tag=='Var', me, 'invalid operand to unary "*"')
+          tp   = _TP.deref(e1.tp, true)
+        end
+      else    -- Op2_idx
+print("env::Op1_*:",e1.tag,e1[2][1],e1[2][2])
+        if (e1[2][2]) then -- field array
+--print("env::Op1_*:",e1.tp,e1.tag,e1[2][2])--,_ENV.c[e1.tp].fields[e1[2][2]].tp,_ENV.c[e1.tp].fields[e1[2][2]].dim)
+          tp   = e1.tp
+          me.dim = e1.dim
+        else -- var array
+          tp = _TP.deref(e1.tp)
+        end
+      end
+      me.tp   = tp
+      me.lval = true
+      me.fst  = e1.fst        
     end,
 
     ['Op1_&'] = function (me)

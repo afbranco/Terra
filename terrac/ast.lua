@@ -380,6 +380,9 @@ print("ast::_Exp2:", v1.tag, v2, v3.tag)
             end
         end
     end,
+
+    Field    = node('Var'),
+
     ExpList  = node('ExpList'),
     Op_var   = node('Op_var'),
     Func     = node('Func'),

@@ -248,15 +248,15 @@ _GG = {
     , _12     = V'_13' *
                     (
 --                        K'(' * Cc'call' * V'ExpList' * EK')' +
-                        K'[' * Cc'idx'  * V'_Exp'    * EK']' +
-                        (CK':' + CK'.')
-                            * (CK(Alpha * (Alphanum+'?')^0) /
-                                function (id)
-                                    return (string.gsub(id,'%?','_'))
-                                end)
+                        K'[' * Cc'idx'  * V'_Exp'    * EK']' 
+--                       + (CK':' + CK'.')
+--                            * (CK(Alpha * (Alphanum+'?')^0) /
+--                                function (id)
+--                                    return (string.gsub(id,'%?','_'))
+--                                end)
                     )^0
     , _13     = V'_Prim'
-    , _Prim   = V'_Parens' + V'Func'
+    , _Prim   = V'_Parens' + V'Func' + V'Field'
               + V'Var'   + V'C'   + V'SIZEOF'
               + V'NULL'    + V'CONST' --+ V'STRING'
               + V'EmitExtE'
@@ -320,12 +320,18 @@ _GG = {
 --    , Func     = V'ID_var' * K'(' * Cc'call' * V'ExpList' * EK')'
     , Func     = V'ID_var' * K'(' * V'ExpList' * EK')'
     , Ext      = V'ID_ext'
+    , Field    = V'ID_field'
     , Var      = V'ID_var'
     , C        = V'ID_c'
 
-    , ID_version  = PNUM*K'.'*PNUM*K'.'*PNUM + EM'config NUM.NUM.NUM do ... end'
+--    , ID_version  = PNUM*K'.'*PNUM*K'.'*PNUM + EM'config NUM.NUM.NUM do ... end'
+    , ID_version  = PNUM + EM'config NUM.NUM.NUM do ... end'
 
     , ID_ext  = -KEYS * CK(m.R'AZ'*ALPHANUM^0)
+ 
+    , ID_field = (-KEYS * CK(m.R'az'*(Alphanum+'?')^0)) * K'.' * (-KEYS * CK(m.R'az'*(Alphanum+'?')^0))
+--                    / function(id) return (string.gsub(id,'%?','_')) end
+ 
     , ID_var  = -KEYS * CK(m.R'az'*(Alphanum+'?')^0)
                     / function(id) return (string.gsub(id,'%?','_')) end
     , ID_int  = V'ID_var'

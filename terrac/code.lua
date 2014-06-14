@@ -960,9 +960,60 @@ print("code::SetExp: op2_.",reg.tag, id)
     ['Op1_not']  = function (me) Op1_any(me,'lnot') end,
     ['Op1_*'] = function (me)
         local op, e1 = unpack(me)
+print("code::Op1_*:",e1[2],me.tp,e1.tp)
 		ASR(not _TP.deref(_TP.deref(e1.tp)),me,'"**Var" is not implemented! ')
-       	codeB = LINE(me,'push *'..e1[1],nil,'// Op1_*(push pointer content):: ')
-       	BYTECODE(me,codeB,'op_push_p',e1.tp,e1.val)
+        if (e1.tag == 'Var') then -- var or field (not array)
+          if (e1[2]) then -- field
+print("code::Op1_*:",e1[2],me.tp,me.offset)
+            codeB = LINE(me,'push '..e1[2] ..' offset',nil,'// (push field position offset):: ')
+            BYTECODE(me,codeB,'op_push_c',me.offset)
+            codeB = LINE(me,'push *'..e1[1],nil,'// Op1_*(push pointer content):: ')
+            BYTECODE(me,codeB,'op_push_p',e1.tp,e1.val)
+            codeB = LINE(me,'add: pointed addr + field offset')
+            BYTECODE(me,codeB,'op2_any','add')
+            -- Get value pointed by the indexed addr
+            codeB = LINE(me,'deref '..me.tp,nil,'// push Var ')
+            BYTECODE(me,codeB,'op_deref',me.tp)
+          else -- var
+            codeB = LINE(me,'push *'..e1[1],nil,'// Op1_*(push pointer content):: ')
+            BYTECODE(me,codeB,'op_push_p',e1.tp,e1.val)
+          end
+        else
+          if (e1[2][2]) then -- field array
+  -- TODO
+          else -- var array
+print("code::Op1_*: field_array: ",me[2][2][1],me[2][2][2]) -- field = me[2][2][2]
+            local idx = me[2][3]
+            local arr = me[2]
+            if (idx.tag == 'CONST') then
+              ASR(tonumber(idx.val) < tonumber(me.fst.arr),me,'index >= array size')
+              codeB = LINE(me,'push '..me.fst.id ..'['..idx[1] ..']',nil,'//  push array')
+              BYTECODE(me,codeB,'op_push_v',me.tp,arr.val+(idx.val*_ENV.c[_TP.deref(me.tp) or me.tp].len))
+            else
+              if (me[2][2][2]) then  -- field var
+                codeB = LINE(me,'push &'..me[2][2][1]..'.'..me[2][2][2],nil,'// base addr')
+                BYTECODE(me,codeB,'op_push_c',me[2][2].val)
+              else  -- single var
+                codeB = LINE(me,'push &'..me[2][2][1],nil,'// base addr')
+                BYTECODE(me,codeB,'op_push_c',me[2][2].val)
+              end
+              CONC(me,me[2][3]); -- idx
+              codeB = LINE(me,'push idx max '..arr.fst.arr,nil,'// push array max idx')
+              BYTECODE(me,codeB,'op_push_c',arr.fst.arr)
+              codeB = LINE(me,'mod: limmit idx')
+              BYTECODE(me,codeB,'op2_any','mod')
+              codeB = LINE(me,'push var len '.._TP.deref(arr.tp),nil,'// push array var len')
+              BYTECODE(me,codeB,'op_push_c',_ENV.c[_TP.deref(arr.tp)].len)
+              codeB = LINE(me,'mult: varlen * idx')
+              BYTECODE(me,codeB,'op2_any','mult')
+              codeB = LINE(me,'add: array base addr + len position')
+              BYTECODE(me,codeB,'op2_any','add')
+              -- Get value pointed by the indexed addr
+              codeB = LINE(me,'deref '.._TP.deref(arr.tp),nil,'// push Var ')
+              BYTECODE(me,codeB,'op_deref',_TP.deref(arr.tp))
+            end  
+          end
+        end
     end,
   ['Op2_.'] = function (me)
     local op, e1, id = unpack(me)
@@ -1103,7 +1154,7 @@ print('code:Op2_.:: field é um array\n',me[2].tp)
   Op2_idx = function (me)
     local _, arr, idx = unpack(me)
 --print(print_r(me,"code::Op2_idx: me"))
-print("code::Op2_idx:",idx.tag,arr.tp,me.tp)
+print("code::Op2_idx:",idx.tag,arr.tp,me.tp,arr.val,idx.val,me[2][1],me[2][2])
     ASR(_TP.isBasicType( _TP.deref(_TP.deref(arr.tp)) or _TP.deref(arr.tp)),me,'Arrays can have only basic types.')
     --ASR((idx.tag == 'CONST' or idx.tag=='Var'),me,'array index cannot be an expression! ')
 
@@ -1113,8 +1164,13 @@ print("code::Op2_idx:",idx.tag,arr.tp,me.tp)
         codeB = LINE(me,'push '..me.fst.id ..'['..idx[1] ..']',nil,'//  push array')
         BYTECODE(me,codeB,'op_push_v',me.tp,arr.val+(idx.val*_ENV.c[_TP.deref(me.tp) or me.tp].len))
       else
-        codeB = LINE(me,'push &'..me[2][1],nil,'// base addr')
-        BYTECODE(me,codeB,'op_push_c',me[2].val)
+        if (me[2][2]) then  -- field var
+          codeB = LINE(me,'push &'..me[2][1]..'.'..me[2][2],nil,'// base addr')
+          BYTECODE(me,codeB,'op_push_c',me[2].val)
+        else  -- single var
+          codeB = LINE(me,'push &'..me[2][1],nil,'// base addr')
+          BYTECODE(me,codeB,'op_push_c',me[2].val)
+        end
         CONC(me,me[3]); -- idx
         codeB = LINE(me,'push idx max '..arr.fst.arr,nil,'// push array max idx')
         BYTECODE(me,codeB,'op_push_c',arr.fst.arr)

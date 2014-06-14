@@ -136,7 +136,8 @@ F = {
                     len = _ENV.c[field.tp].len
                 end
                 lastSize = len
-                field.var = offset
+                field.offset = offset
+                field.val = offset + var.val
               end
             end
 
@@ -185,6 +186,8 @@ F = {
     end,
 
     Var = function (me)
+print("mem:Var:",unpack(me),me.var.id,me.var.val)
+--print(print_r(me,"mem:Var: me"))
         me.val = me.var.val
         me.accs = { {me.var, (me.var.arr and 'no') or 'rd', me.var.tp, false,
                     'variable/event `'..me.var.id..'´ (line '..me.ln..')'} }

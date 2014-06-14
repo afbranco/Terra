@@ -1,4 +1,4 @@
-config 0.1.0 do
+config 0 do
 
 
 	regtype usrMsg_t with
@@ -14,12 +14,6 @@ config 0.1.0 do
 		var ushort d16_4;
 		var ulong d32_1;
 		var ulong d32_2;
-	end
-
-	regtype test_t with
-		var short x1;
-		var ubyte[10] data;
-		var long x2;
 	end
 
 	// Terra Default events
@@ -69,13 +63,38 @@ config 0.1.0 do
 
 end
 
-var ubyte x2;
+regtype test_t with
+	var short x1;
+	var byte[10] data;
+	var long x2;
+end
+
+regtype user_reg with
+	var ubyte id;
+	var ushort source;
+	var ubyte d1;
+	var ushort d2;
+	var ulong d3;
+end
+
+var ubyte* x2;
 var short x1;
+var short*[4] x3;
 var test_t msg;
-var test_t* msg2;// = &msg;
+var test_t* msg2;
+var user_reg* umsg;
 
-x2=msg.data[1+1];
+//umsg = msg.data;
 
+//x1 = *umsg.id;
+
+//msg2 = &msg;
+
+
+
+//x1 = *x3[x1];
+x1 = *msg.data[1];
+//x2=1;
 //msg[1].x1 = 7;
 
 //msg.data[1] = 10;
