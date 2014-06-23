@@ -62,14 +62,26 @@ if not _OPTS.input then
 end
 
 
+local cpp_file = 'precomp.terra'
+-- Pre-processor phase
+    local cpp = assert(io.popen('cpp -C '.._OPTS.input..' ' ..cpp_file, 'w'))
+    cpp:close()
+
 -- INPUT
 local inp
-if _OPTS.input == '-' then
-    inp = io.stdin
-else
-    inp = assert(io.open(_OPTS.input))
+--inp = io.stdin
+--inp = assert(io.open(cpp_file))
+--_STR = inp:read'*a'
+_STR=""
+
+-- Remove '#' lines generated from cpp
+for line in io.lines(cpp_file) do
+--  print(string.sub(line,1,1))
+  if string.sub(line,1,1) ~= '#' then
+    _STR = _STR..line..'\n'
+  end
 end
-_STR = inp:read'*a'
+--os.remove(cpp_file)
 
 -- PARSE
 do
@@ -404,10 +416,20 @@ for x,op in pairs(_AST.root.opcode) do
 	end	
 end
 
-print('Code size = '.. (nlines) ..' bytes.') 
-print('Stack size = '.._AST.root.max_stack..' ('.._AST.root.max_stack*4 ..' bytes).') 
-print('Using '.. lastBytes+_AST.root.max_stack*4 ..' bytes of VM memory')
-print('Total of '.. math.ceil((LblTableEnd_addr-codeAddr)/24)..' message(s)')
+local CodeSize = endCode-codeAddr
+local CtlVars  = codeAddr
+local LblTab   = LblTableEnd_addr-endCode
+local Stack    = _AST.root.max_stack*4
+local TotalMem = CtlVars + CodeSize + LblTab + Stack
+local RadioMsgs = ((codeAddr%24) == 0 and math.ceil((LblTableEnd_addr-codeAddr)/24)) or 1+math.ceil((LblTableEnd_addr-codeAddr-(24-codeAddr%24))/24)
+--print((codeAddr%24) == 0 , ((LblTableEnd_addr-codeAddr)/24) , 1,LblTableEnd_addr-codeAddr,(24-codeAddr%24))
+print('-------------------------------------------------------------')
+print('<<<<   Terra Compiler -- VM Version: '.. _ENV.vm_version.. '    >>>>')
+print('Memory allocation:')
+print('Total =','Code','+ Ctl/Vars','+ LblTab','+ Stack')
+print(TotalMem,CodeSize,CtlVars,'',LblTab,'',Stack)
+print('Radio Msgs = ',RadioMsgs)
+print('-------------------------------------------------------------')
 
 if (lastBytes+_AST.root.max_stack*4 > (60*24)) then
   WRN(false,_AST.root,'Program may be too long for VM memory. Please check target VM memory capacity!')
@@ -415,9 +437,9 @@ end
 
 if _ENV.n_wrns > 0 then
   if _ENV.n_wrns > 1 then
-    print('** Attention to the total of '.. _ENV.n_wrns ..' warning messages **')
+    print('** Found '.. _ENV.n_wrns ..' warning messages **')
   else
-    print('** Attention to the total of '.. _ENV.n_wrns ..' warning message **')
+    print('** Found '.. _ENV.n_wrns ..' warning message **')
   end
 end
 

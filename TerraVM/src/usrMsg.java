@@ -7,12 +7,12 @@
 public class usrMsg extends net.tinyos.message.Message {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 25;
+    public static final int DEFAULT_MESSAGE_SIZE = 27;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 151;
 
-    /** Create a new usrMsg of size 25. */
+    /** Create a new usrMsg of size 27. */
     public usrMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -85,7 +85,7 @@ public class usrMsg extends net.tinyos.message.Message {
     public String toString() {
       String s = "Message <usrMsg> \n";
       try {
-        s += "  [id=0x"+Long.toHexString(get_id())+"]\n";
+        s += "  [type=0x"+Long.toHexString(get_type())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [source=0x"+Long.toHexString(get_source())+"]\n";
@@ -94,34 +94,11 @@ public class usrMsg extends net.tinyos.message.Message {
         s += "  [target=0x"+Long.toHexString(get_target())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [d8_1=0x"+Long.toHexString(get_d8_1())+"]\n";
-      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
-      try {
-        s += "  [d8_2=0x"+Long.toHexString(get_d8_2())+"]\n";
-      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
-      try {
-        s += "  [d8_3=0x"+Long.toHexString(get_d8_3())+"]\n";
-      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
-      try {
-        s += "  [d8_4=0x"+Long.toHexString(get_d8_4())+"]\n";
-      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
-      try {
-        s += "  [d16_1=0x"+Long.toHexString(get_d16_1())+"]\n";
-      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
-      try {
-        s += "  [d16_2=0x"+Long.toHexString(get_d16_2())+"]\n";
-      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
-      try {
-        s += "  [d16_3=0x"+Long.toHexString(get_d16_3())+"]\n";
-      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
-      try {
-        s += "  [d16_4=0x"+Long.toHexString(get_d16_4())+"]\n";
-      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
-      try {
-        s += "  [d32_1=0x"+Long.toHexString(get_d32_1())+"]\n";
-      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
-      try {
-        s += "  [d32_2=0x"+Long.toHexString(get_d32_2())+"]\n";
+        s += "  [data=";
+        for (int i = 0; i < 22; i++) {
+          s += "0x"+Long.toHexString(getElement_data(i) & 0xff)+" ";
+        }
+        s += "]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       return s;
     }
@@ -129,65 +106,65 @@ public class usrMsg extends net.tinyos.message.Message {
     // Message-type-specific access methods appear below.
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: id
+    // Accessor methods for field: type
     //   Field type: short, unsigned
     //   Offset (bits): 0
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'id' is signed (false).
+     * Return whether the field 'type' is signed (false).
      */
-    public static boolean isSigned_id() {
+    public static boolean isSigned_type() {
         return false;
     }
 
     /**
-     * Return whether the field 'id' is an array (false).
+     * Return whether the field 'type' is an array (false).
      */
-    public static boolean isArray_id() {
+    public static boolean isArray_type() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'id'
+     * Return the offset (in bytes) of the field 'type'
      */
-    public static int offset_id() {
+    public static int offset_type() {
         return (0 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'id'
+     * Return the offset (in bits) of the field 'type'
      */
-    public static int offsetBits_id() {
+    public static int offsetBits_type() {
         return 0;
     }
 
     /**
-     * Return the value (as a short) of the field 'id'
+     * Return the value (as a short) of the field 'type'
      */
-    public short get_id() {
-        return (short)getUIntBEElement(offsetBits_id(), 8);
+    public short get_type() {
+        return (short)getUIntBEElement(offsetBits_type(), 8);
     }
 
     /**
-     * Set the value of the field 'id'
+     * Set the value of the field 'type'
      */
-    public void set_id(short value) {
-        setUIntBEElement(offsetBits_id(), 8, value);
+    public void set_type(short value) {
+        setUIntBEElement(offsetBits_type(), 8, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'id'
+     * Return the size, in bytes, of the field 'type'
      */
-    public static int size_id() {
+    public static int size_type() {
         return (8 / 8);
     }
 
     /**
-     * Return the size, in bits, of the field 'id'
+     * Return the size, in bits, of the field 'type'
      */
-    public static int sizeBits_id() {
+    public static int sizeBits_type() {
         return 8;
     }
 
@@ -318,633 +295,156 @@ public class usrMsg extends net.tinyos.message.Message {
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: d8_1
-    //   Field type: short, unsigned
+    // Accessor methods for field: data
+    //   Field type: short[], unsigned
     //   Offset (bits): 40
-    //   Size (bits): 8
+    //   Size of each element (bits): 8
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'd8_1' is signed (false).
+     * Return whether the field 'data' is signed (false).
      */
-    public static boolean isSigned_d8_1() {
+    public static boolean isSigned_data() {
         return false;
     }
 
     /**
-     * Return whether the field 'd8_1' is an array (false).
+     * Return whether the field 'data' is an array (true).
      */
-    public static boolean isArray_d8_1() {
-        return false;
+    public static boolean isArray_data() {
+        return true;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'd8_1'
+     * Return the offset (in bytes) of the field 'data'
      */
-    public static int offset_d8_1() {
-        return (40 / 8);
+    public static int offset_data(int index1) {
+        int offset = 40;
+        if (index1 < 0 || index1 >= 22) throw new ArrayIndexOutOfBoundsException();
+        offset += 0 + index1 * 8;
+        return (offset / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'd8_1'
+     * Return the offset (in bits) of the field 'data'
      */
-    public static int offsetBits_d8_1() {
-        return 40;
+    public static int offsetBits_data(int index1) {
+        int offset = 40;
+        if (index1 < 0 || index1 >= 22) throw new ArrayIndexOutOfBoundsException();
+        offset += 0 + index1 * 8;
+        return offset;
     }
 
     /**
-     * Return the value (as a short) of the field 'd8_1'
+     * Return the entire array 'data' as a short[]
      */
-    public short get_d8_1() {
-        return (short)getUIntBEElement(offsetBits_d8_1(), 8);
+    public short[] get_data() {
+        short[] tmp = new short[22];
+        for (int index0 = 0; index0 < numElements_data(0); index0++) {
+            tmp[index0] = getElement_data(index0);
+        }
+        return tmp;
     }
 
     /**
-     * Set the value of the field 'd8_1'
+     * Set the contents of the array 'data' from the given short[]
      */
-    public void set_d8_1(short value) {
-        setUIntBEElement(offsetBits_d8_1(), 8, value);
+    public void set_data(short[] value) {
+        for (int index0 = 0; index0 < value.length; index0++) {
+            setElement_data(index0, value[index0]);
+        }
     }
 
     /**
-     * Return the size, in bytes, of the field 'd8_1'
+     * Return an element (as a short) of the array 'data'
      */
-    public static int size_d8_1() {
+    public short getElement_data(int index1) {
+        return (short)getUIntBEElement(offsetBits_data(index1), 8);
+    }
+
+    /**
+     * Set an element of the array 'data'
+     */
+    public void setElement_data(int index1, short value) {
+        setUIntBEElement(offsetBits_data(index1), 8, value);
+    }
+
+    /**
+     * Return the total size, in bytes, of the array 'data'
+     */
+    public static int totalSize_data() {
+        return (176 / 8);
+    }
+
+    /**
+     * Return the total size, in bits, of the array 'data'
+     */
+    public static int totalSizeBits_data() {
+        return 176;
+    }
+
+    /**
+     * Return the size, in bytes, of each element of the array 'data'
+     */
+    public static int elementSize_data() {
         return (8 / 8);
     }
 
     /**
-     * Return the size, in bits, of the field 'd8_1'
+     * Return the size, in bits, of each element of the array 'data'
      */
-    public static int sizeBits_d8_1() {
+    public static int elementSizeBits_data() {
         return 8;
     }
 
-    /////////////////////////////////////////////////////////
-    // Accessor methods for field: d8_2
-    //   Field type: short, unsigned
-    //   Offset (bits): 48
-    //   Size (bits): 8
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'd8_2' is signed (false).
-     */
-    public static boolean isSigned_d8_2() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'd8_2' is an array (false).
-     */
-    public static boolean isArray_d8_2() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'd8_2'
-     */
-    public static int offset_d8_2() {
-        return (48 / 8);
-    }
-
-    /**
-     * Return the offset (in bits) of the field 'd8_2'
-     */
-    public static int offsetBits_d8_2() {
-        return 48;
-    }
-
-    /**
-     * Return the value (as a short) of the field 'd8_2'
-     */
-    public short get_d8_2() {
-        return (short)getUIntBEElement(offsetBits_d8_2(), 8);
-    }
-
-    /**
-     * Set the value of the field 'd8_2'
-     */
-    public void set_d8_2(short value) {
-        setUIntBEElement(offsetBits_d8_2(), 8, value);
-    }
-
-    /**
-     * Return the size, in bytes, of the field 'd8_2'
-     */
-    public static int size_d8_2() {
-        return (8 / 8);
-    }
-
-    /**
-     * Return the size, in bits, of the field 'd8_2'
-     */
-    public static int sizeBits_d8_2() {
-        return 8;
-    }
-
-    /////////////////////////////////////////////////////////
-    // Accessor methods for field: d8_3
-    //   Field type: short, unsigned
-    //   Offset (bits): 56
-    //   Size (bits): 8
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'd8_3' is signed (false).
-     */
-    public static boolean isSigned_d8_3() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'd8_3' is an array (false).
-     */
-    public static boolean isArray_d8_3() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'd8_3'
-     */
-    public static int offset_d8_3() {
-        return (56 / 8);
-    }
-
-    /**
-     * Return the offset (in bits) of the field 'd8_3'
-     */
-    public static int offsetBits_d8_3() {
-        return 56;
-    }
-
-    /**
-     * Return the value (as a short) of the field 'd8_3'
-     */
-    public short get_d8_3() {
-        return (short)getUIntBEElement(offsetBits_d8_3(), 8);
-    }
-
-    /**
-     * Set the value of the field 'd8_3'
-     */
-    public void set_d8_3(short value) {
-        setUIntBEElement(offsetBits_d8_3(), 8, value);
-    }
-
-    /**
-     * Return the size, in bytes, of the field 'd8_3'
-     */
-    public static int size_d8_3() {
-        return (8 / 8);
-    }
-
-    /**
-     * Return the size, in bits, of the field 'd8_3'
-     */
-    public static int sizeBits_d8_3() {
-        return 8;
-    }
-
-    /////////////////////////////////////////////////////////
-    // Accessor methods for field: d8_4
-    //   Field type: short, unsigned
-    //   Offset (bits): 64
-    //   Size (bits): 8
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'd8_4' is signed (false).
-     */
-    public static boolean isSigned_d8_4() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'd8_4' is an array (false).
-     */
-    public static boolean isArray_d8_4() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'd8_4'
-     */
-    public static int offset_d8_4() {
-        return (64 / 8);
-    }
-
-    /**
-     * Return the offset (in bits) of the field 'd8_4'
-     */
-    public static int offsetBits_d8_4() {
-        return 64;
-    }
-
-    /**
-     * Return the value (as a short) of the field 'd8_4'
-     */
-    public short get_d8_4() {
-        return (short)getUIntBEElement(offsetBits_d8_4(), 8);
-    }
-
-    /**
-     * Set the value of the field 'd8_4'
-     */
-    public void set_d8_4(short value) {
-        setUIntBEElement(offsetBits_d8_4(), 8, value);
-    }
-
-    /**
-     * Return the size, in bytes, of the field 'd8_4'
-     */
-    public static int size_d8_4() {
-        return (8 / 8);
-    }
-
-    /**
-     * Return the size, in bits, of the field 'd8_4'
-     */
-    public static int sizeBits_d8_4() {
-        return 8;
-    }
-
-    /////////////////////////////////////////////////////////
-    // Accessor methods for field: d16_1
-    //   Field type: int, unsigned
-    //   Offset (bits): 72
-    //   Size (bits): 16
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'd16_1' is signed (false).
-     */
-    public static boolean isSigned_d16_1() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'd16_1' is an array (false).
-     */
-    public static boolean isArray_d16_1() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'd16_1'
-     */
-    public static int offset_d16_1() {
-        return (72 / 8);
-    }
-
-    /**
-     * Return the offset (in bits) of the field 'd16_1'
-     */
-    public static int offsetBits_d16_1() {
-        return 72;
-    }
-
-    /**
-     * Return the value (as a int) of the field 'd16_1'
-     */
-    public int get_d16_1() {
-        return (int)getUIntBEElement(offsetBits_d16_1(), 16);
-    }
-
-    /**
-     * Set the value of the field 'd16_1'
-     */
-    public void set_d16_1(int value) {
-        setUIntBEElement(offsetBits_d16_1(), 16, value);
-    }
-
-    /**
-     * Return the size, in bytes, of the field 'd16_1'
-     */
-    public static int size_d16_1() {
-        return (16 / 8);
-    }
-
-    /**
-     * Return the size, in bits, of the field 'd16_1'
-     */
-    public static int sizeBits_d16_1() {
-        return 16;
-    }
-
-    /////////////////////////////////////////////////////////
-    // Accessor methods for field: d16_2
-    //   Field type: int, unsigned
-    //   Offset (bits): 88
-    //   Size (bits): 16
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'd16_2' is signed (false).
-     */
-    public static boolean isSigned_d16_2() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'd16_2' is an array (false).
-     */
-    public static boolean isArray_d16_2() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'd16_2'
-     */
-    public static int offset_d16_2() {
-        return (88 / 8);
-    }
-
-    /**
-     * Return the offset (in bits) of the field 'd16_2'
-     */
-    public static int offsetBits_d16_2() {
-        return 88;
-    }
-
-    /**
-     * Return the value (as a int) of the field 'd16_2'
-     */
-    public int get_d16_2() {
-        return (int)getUIntBEElement(offsetBits_d16_2(), 16);
-    }
-
-    /**
-     * Set the value of the field 'd16_2'
-     */
-    public void set_d16_2(int value) {
-        setUIntBEElement(offsetBits_d16_2(), 16, value);
-    }
-
-    /**
-     * Return the size, in bytes, of the field 'd16_2'
-     */
-    public static int size_d16_2() {
-        return (16 / 8);
-    }
-
-    /**
-     * Return the size, in bits, of the field 'd16_2'
-     */
-    public static int sizeBits_d16_2() {
-        return 16;
-    }
-
-    /////////////////////////////////////////////////////////
-    // Accessor methods for field: d16_3
-    //   Field type: int, unsigned
-    //   Offset (bits): 104
-    //   Size (bits): 16
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'd16_3' is signed (false).
-     */
-    public static boolean isSigned_d16_3() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'd16_3' is an array (false).
-     */
-    public static boolean isArray_d16_3() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'd16_3'
-     */
-    public static int offset_d16_3() {
-        return (104 / 8);
-    }
-
-    /**
-     * Return the offset (in bits) of the field 'd16_3'
-     */
-    public static int offsetBits_d16_3() {
-        return 104;
-    }
-
-    /**
-     * Return the value (as a int) of the field 'd16_3'
-     */
-    public int get_d16_3() {
-        return (int)getUIntBEElement(offsetBits_d16_3(), 16);
-    }
-
-    /**
-     * Set the value of the field 'd16_3'
-     */
-    public void set_d16_3(int value) {
-        setUIntBEElement(offsetBits_d16_3(), 16, value);
-    }
-
-    /**
-     * Return the size, in bytes, of the field 'd16_3'
-     */
-    public static int size_d16_3() {
-        return (16 / 8);
-    }
-
-    /**
-     * Return the size, in bits, of the field 'd16_3'
-     */
-    public static int sizeBits_d16_3() {
-        return 16;
-    }
-
-    /////////////////////////////////////////////////////////
-    // Accessor methods for field: d16_4
-    //   Field type: int, unsigned
-    //   Offset (bits): 120
-    //   Size (bits): 16
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'd16_4' is signed (false).
-     */
-    public static boolean isSigned_d16_4() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'd16_4' is an array (false).
-     */
-    public static boolean isArray_d16_4() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'd16_4'
-     */
-    public static int offset_d16_4() {
-        return (120 / 8);
-    }
-
-    /**
-     * Return the offset (in bits) of the field 'd16_4'
-     */
-    public static int offsetBits_d16_4() {
-        return 120;
-    }
-
-    /**
-     * Return the value (as a int) of the field 'd16_4'
-     */
-    public int get_d16_4() {
-        return (int)getUIntBEElement(offsetBits_d16_4(), 16);
-    }
-
-    /**
-     * Set the value of the field 'd16_4'
-     */
-    public void set_d16_4(int value) {
-        setUIntBEElement(offsetBits_d16_4(), 16, value);
-    }
-
-    /**
-     * Return the size, in bytes, of the field 'd16_4'
-     */
-    public static int size_d16_4() {
-        return (16 / 8);
-    }
-
-    /**
-     * Return the size, in bits, of the field 'd16_4'
-     */
-    public static int sizeBits_d16_4() {
-        return 16;
-    }
-
-    /////////////////////////////////////////////////////////
-    // Accessor methods for field: d32_1
-    //   Field type: long, unsigned
-    //   Offset (bits): 136
-    //   Size (bits): 32
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'd32_1' is signed (false).
-     */
-    public static boolean isSigned_d32_1() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'd32_1' is an array (false).
-     */
-    public static boolean isArray_d32_1() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'd32_1'
-     */
-    public static int offset_d32_1() {
-        return (136 / 8);
-    }
-
-    /**
-     * Return the offset (in bits) of the field 'd32_1'
-     */
-    public static int offsetBits_d32_1() {
-        return 136;
-    }
-
-    /**
-     * Return the value (as a long) of the field 'd32_1'
-     */
-    public long get_d32_1() {
-        return (long)getUIntBEElement(offsetBits_d32_1(), 32);
-    }
-
-    /**
-     * Set the value of the field 'd32_1'
-     */
-    public void set_d32_1(long value) {
-        setUIntBEElement(offsetBits_d32_1(), 32, value);
-    }
-
-    /**
-     * Return the size, in bytes, of the field 'd32_1'
-     */
-    public static int size_d32_1() {
-        return (32 / 8);
-    }
-
-    /**
-     * Return the size, in bits, of the field 'd32_1'
-     */
-    public static int sizeBits_d32_1() {
-        return 32;
-    }
-
-    /////////////////////////////////////////////////////////
-    // Accessor methods for field: d32_2
-    //   Field type: long, unsigned
-    //   Offset (bits): 168
-    //   Size (bits): 32
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'd32_2' is signed (false).
-     */
-    public static boolean isSigned_d32_2() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'd32_2' is an array (false).
-     */
-    public static boolean isArray_d32_2() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'd32_2'
-     */
-    public static int offset_d32_2() {
-        return (168 / 8);
-    }
-
     /**
-     * Return the offset (in bits) of the field 'd32_2'
+     * Return the number of dimensions in the array 'data'
      */
-    public static int offsetBits_d32_2() {
-        return 168;
+    public static int numDimensions_data() {
+        return 1;
     }
 
     /**
-     * Return the value (as a long) of the field 'd32_2'
+     * Return the number of elements in the array 'data'
      */
-    public long get_d32_2() {
-        return (long)getUIntBEElement(offsetBits_d32_2(), 32);
+    public static int numElements_data() {
+        return 22;
     }
 
     /**
-     * Set the value of the field 'd32_2'
+     * Return the number of elements in the array 'data'
+     * for the given dimension.
      */
-    public void set_d32_2(long value) {
-        setUIntBEElement(offsetBits_d32_2(), 32, value);
+    public static int numElements_data(int dimension) {
+      int array_dims[] = { 22,  };
+        if (dimension < 0 || dimension >= 1) throw new ArrayIndexOutOfBoundsException();
+        if (array_dims[dimension] == 0) throw new IllegalArgumentException("Array dimension "+dimension+" has unknown size");
+        return array_dims[dimension];
     }
 
     /**
-     * Return the size, in bytes, of the field 'd32_2'
+     * Fill in the array 'data' with a String
      */
-    public static int size_d32_2() {
-        return (32 / 8);
+    public void setString_data(String s) { 
+         int len = s.length();
+         int i;
+         for (i = 0; i < len; i++) {
+             setElement_data(i, (short)s.charAt(i));
+         }
+         setElement_data(i, (short)0); //null terminate
     }
 
     /**
-     * Return the size, in bits, of the field 'd32_2'
+     * Read the array 'data' as a String
      */
-    public static int sizeBits_d32_2() {
-        return 32;
+    public String getString_data() { 
+         char carr[] = new char[Math.min(net.tinyos.message.Message.MAX_CONVERTED_STRING_LENGTH,22)];
+         int i;
+         for (i = 0; i < carr.length; i++) {
+             if ((char)getElement_data(i) == (char)0) break;
+             carr[i] = (char)getElement_data(i);
+         }
+         return new String(carr,0,i);
     }
 
 }

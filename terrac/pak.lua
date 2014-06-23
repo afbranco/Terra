@@ -1,5 +1,5 @@
-fout = assert(io.open('ceu','w'))
-fin  = assert(io.open'ceu.lua'):read'*a'
+fout = assert(io.open('terrac','w'))
+fin  = assert(io.open'terrac.lua'):read'*a'
 
 function subst (name)
     local s, e = string.find(fin, "dofile '"..name.."'")
@@ -20,19 +20,19 @@ subst 'props.lua'
 subst 'mem.lua'
 subst 'tight.lua'
 subst 'labels.lua'
-subst 'analysis.lua'
+--subst 'analysis.lua'
 subst 'asm.lua'
 subst 'code.lua'
 
 -- template.c
-do
-    local tpl = assert(io.open'template.c'):read'*a'
-
-    local s, e = string.find(fin, "assert%(io%.open'template%.c'%):read'%*a'")
-    fin = string.sub(fin, 1, (s-1))
-            .. "[===[" .. tpl .. "]===]" ..
-          string.sub(fin, (e+1))
-end
+--do
+--    local tpl = assert(io.open'template.c'):read'*a'
+--
+--    local s, e = string.find(fin, "assert%(io%.open'template%.c'%):read'%*a'")
+--    fin = string.sub(fin, 1, (s-1))
+--            .. "[===[" .. tpl .. "]===]" ..
+--          string.sub(fin, (e+1))
+--end
 
 fout:write([=[
 #!/usr/bin/env lua
@@ -71,4 +71,4 @@ SOFTWARE.
 ]=] .. fin)
 
 fout:close()
-os.execute('chmod +x ceu')
+os.execute('chmod +x terrac')

@@ -2,7 +2,7 @@
 opcode={
   op_nop=0,
   op_end=1,
-  op_return=2,
+
   op_bnot=3,
   op_lnot=4,
   op_neg=5,
@@ -45,8 +45,8 @@ opcode={
   op_cast=84,
   op_inc=88,
   op_dec=92,
-  op_incx=96,
-  op_decx=100,
+  op_memcpy=96,
+  op_memcpyx=100,
   op_outevt_c=104,
   op_outevt_v=108,
   op_outevtx_v=112,
@@ -59,6 +59,7 @@ opcode={
   op_chkret=140,
   op_asen=144,
   op_deref=148,
+  op_getextdt_e=152,
   op_clken_c=160,
   op_clken_v=176,
   op_clken_e=192,
@@ -168,13 +169,6 @@ end
 		OPCODE(me,bytecode,codeA,codeB)
 	end,
 
- 	-- arg={}
-	op_return= function (me,codeB,arg)
-		local bytecode = string.format('%02x',(opcode['op_return']))
-		local codeA = 'return'
-		OPCODE(me,bytecode,codeA,codeB)
-	end, 
-	
 	-- arg={type}
 	op_cast= function (me,codeB,arg)   		
 		local bytecode = string.format('%02x',(opcode['op_cast']))+typelen[arg[1]]
@@ -182,37 +176,38 @@ end
 		OPCODE(me,bytecode,codeA,codeB)
 	end, 
 
-  -- arg={type,addr}
+  -- arg={type}
   op_inc= function (me,codeB,arg)      
     local bytecode=''
     local codeA = ''
-    if (_TP.getConstLen(arg[2]) == 0) then
-      bytecode = string.format('%02x',(opcode['op_incx'])+(typelen[arg[1]] or '0' ))
-      bytecode = string.format('%s %s',bytecode,_TP.getConstBytes(arg[2]))
-      codeA = 'incx'..' '..arg[1]..' '..arg[2]
-    else
-      bytecode = string.format('%02x',(opcode['op_inc'])+(typelen[arg[1]] or '0' ))
-      bytecode = string.format('%s %s',bytecode,_TP.getConstBytes(arg[2],2))
-      codeA = 'inc'..' '..arg[1]..' '..arg[2]
-    end
+    bytecode = string.format('%02x',(opcode['op_inc'])+(typelen[arg[1]] or '0' ))
+    codeA = 'inc'..' '..arg[1]
     OPCODE(me,bytecode,codeA,codeB,-1)
   end, 
 
-  -- arg={type,addr}
+  -- arg={type}
   op_dec= function (me,codeB,arg)      
 print("asm::op_dec:",_TP.getConstBytes(arg[2],2))
     local bytecode=''
     local codeA = ''
-    if (_TP.getConstLen(arg[2]) == 0) then
-      bytecode = string.format('%02x',(opcode['op_decx'])+(typelen[arg[1]] or '0' ))
-      bytecode = string.format('%s %s',bytecode,_TP.getConstBytes(arg[2]))
-      codeA = 'decx'..' '..arg[1]..' '..arg[2]
-    else
-      bytecode = string.format('%02x',(opcode['op_dec'])+(typelen[arg[1]] or '0' ))
-      bytecode = string.format('%s %s',bytecode,_TP.getConstBytes(arg[2],2))
-      codeA = 'dec'..' '..arg[1]..' '..arg[2]
-    end
+    bytecode = string.format('%02x',(opcode['op_dec'])+(typelen[arg[1]] or '0' ))
+    codeA = 'dec'..' '..arg[1]
     OPCODE(me,bytecode,codeA,codeB,-1)
+  end, 
+
+  -- arg={len,addrFrom,addrTo}
+  op_memcpy= function (me,codeB,arg) 
+    if (_TP.getConstLen(arg[1]) == 0 ) then  
+      local bytecode = string.format('%02x',(opcode['op_memcpyx']) + _TP.getConstLen(arg[2])*2 + _TP.getConstLen(arg[3]))
+      bytecode = string.format('%s %s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytes(arg[2]),_TP.getConstBytes(arg[3]))
+      local codeA = 'memcpyx '..arg[1]..'B. '..arg[2]..' -> '.. arg[3]
+      OPCODE(me,bytecode,codeA,codeB)   
+    else
+      local bytecode = string.format('%02x',(opcode['op_memcpy']) + _TP.getConstLen(arg[2])*2 + _TP.getConstLen(arg[3]))
+      bytecode = string.format('%s %s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytes(arg[2]),_TP.getConstBytes(arg[3]))
+      local codeA = 'memcpy '..arg[1]..'B. '..arg[2]..' -> '.. arg[3]
+      OPCODE(me,bytecode,codeA,codeB)   
+    end
   end, 
 
 	-- arg={ConstValue}
@@ -286,10 +281,10 @@ print("asm::op_dec:",_TP.getConstBytes(arg[2],2))
   op_set_e= function (me,codeB,arg) 
     local bytecode=''
     local codeA = ''
---print("asm::op_set:",arg[1])
+print("asm::op_set_e:",arg[1],typelen[arg[1]])
     bytecode = string.format('%02x',(opcode['op_set_e'])+(typelen[arg[1]] or '0' ))
     codeA = 'set_e'..' '..arg[1]
-    OPCODE(me,bytecode,codeA,codeB,-1)
+    OPCODE(me,bytecode,codeA,codeB,-2)
   end,
 
  
@@ -337,13 +332,20 @@ print("asm::op_dec:",_TP.getConstBytes(arg[2],2))
 		OPCODE(me,bytecode,codeA,codeB)	
 	end, 
 	
-	-- arg={addr,len}
-	op_getextdt_v= function (me,codeB,arg) 
-		local bytecode = string.format('%02x',(opcode['op_getextdt_v']) + _TP.getConstLen(arg[1])*2 + _TP.getConstLen(arg[2]))
-		bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytes(arg[2]))
-		local codeA = 'getextdt_v '..arg[1]..' '..arg[2]
-		OPCODE(me,bytecode,codeA,codeB)		
-	end, 
+  -- arg={addr,len}
+  op_getextdt_v= function (me,codeB,arg) 
+    local bytecode = string.format('%02x',(opcode['op_getextdt_v']) + _TP.getConstLen(arg[1])*2 + _TP.getConstLen(arg[2]))
+    bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytes(arg[2]))
+    local codeA = 'getextdt_v '..arg[1]..' '..arg[2]
+    OPCODE(me,bytecode,codeA,codeB)   
+  end, 
+  -- arg={len}
+  op_getextdt_e= function (me,codeB,arg) 
+    local bytecode = string.format('%02x',(opcode['op_getextdt_e']) + _TP.getConstLen(arg[1]))
+    bytecode = string.format('%s %s',bytecode,_TP.getConstBytes(arg[1]))
+    local codeA = 'getextdt_e '..arg[1]
+    OPCODE(me,bytecode,codeA,codeB)   
+  end, 
 
 	-- arg={addr}
 	op_chkret= function (me,codeB,arg)
@@ -366,7 +368,7 @@ print("asm::op_dec:",_TP.getConstBytes(arg[2],2))
 		local bytecode = string.format('%02x',(opcode['op_ifelse']) + _TP.getConstLen(arg[1])*2 + _TP.getConstLen(arg[2]))
 		bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytes(arg[2]))
 		local codeA = 'ifelse '..arg[1]..' '..arg[2]
-		OPCODE(me,bytecode,codeA,codeB)			
+		OPCODE(me,bytecode,codeA,codeB,-1)			
 	end, 
 
   -- arg={evt}
@@ -375,7 +377,7 @@ print("asm::op_dec:",_TP.getConstBytes(arg[2],2))
     local codeA = ''
       bytecode = string.format('%02x %02x',(opcode['op_outevt_e']),arg[1])
       codeA = 'outevt_e '..arg[1]
-    OPCODE(me,bytecode,codeA,codeB)     
+    OPCODE(me,bytecode,codeA,codeB,-1)     
   end,
   	
 	-- arg={evt,const_val}
@@ -456,7 +458,7 @@ print("asm::op_dec:",_TP.getConstBytes(arg[2],2))
     local bytecode = string.format('%02x',(opcode['op_func']))
     bytecode = string.format('%s %s',bytecode,_TP.getConstBytes(arg[1]))
     local codeA = 'func '..arg[1]
-    OPCODE(me,bytecode,codeA,codeB) 
+    OPCODE(me,bytecode,codeA,codeB,(-1*(_ENV.func_nArgs[arg[1]]))+1) -- nArgs pop's  + 1 return push
   end, 
 
 

@@ -101,6 +101,7 @@ public class ControlForm {
 	JCheckBox TargetSel;
 	JButton btnSendGR;
 
+	JRadioButton rdbtnmsgtype;
 	
 	int ControlMsgsLine = 0;
 	private ControlTableModel ControlTableModel;
@@ -802,8 +803,18 @@ public class ControlForm {
 		JLabel lblDataMessages = new JLabel("Data Messages");
 		lblDataMessages.setHorizontalAlignment(SwingConstants.CENTER);
 		lblDataMessages.setFont(new Font("Dialog", Font.BOLD, 14));
-		lblDataMessages.setBounds(352, 37, 154, 15);
+		lblDataMessages.setBounds(352, 10, 154, 15);
 		monitorPanel.add(lblDataMessages);
+
+		rdbtnmsgtype = new JRadioButton("MsgType: Decimal");
+		rdbtnmsgtype.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				rdbtnmsgtype.setText( (rdbtnmsgtype.isSelected()==false)?"MsgType: Decimal":"MsgType: Hexa");
+				}
+		});
+		rdbtnmsgtype.setBounds(250, 35, 200, 23);
+		monitorPanel.add(rdbtnmsgtype);
+
 		
 		textClock = new JTextField();
 		textClock.setEditable(false);
@@ -1007,7 +1018,7 @@ public class ControlForm {
 	
 	public void sendBSMsg(int Sender, int EvtId, int Seq, String Data){
 //		System.out.println("sendBSMsg");
-		String line = String.format("%s:sendBSMsg: Sender= %03d, EvtId=%02d, Seq=%03d, data=[%s]\n", DateFormat.format(System.currentTimeMillis()),Sender,EvtId,Seq,Data);	
+		String line = String.format("%s:sendBSMsg: Sender= %03d, EvtId=%02d, data=[%s]\n", DateFormat.format(System.currentTimeMillis()),Sender,EvtId,Data);	
 		DataMsgs.append(line);
 		DataMsgs.setCaretPosition(DataMsgs.getDocument().getLength());
 	}
@@ -1195,5 +1206,9 @@ public class ControlForm {
 	}
 	public JComboBox<String> getComboPrefix() {
 		return comboPrefix;
+	}
+
+	public boolean getMsgType(){
+		return rdbtnmsgtype.isSelected();
 	}
 }

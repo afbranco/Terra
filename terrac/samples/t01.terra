@@ -1,4 +1,4 @@
-config 0 do
+config 0.0.1 do
 
 
 	regtype usrMsg_t with
@@ -78,28 +78,60 @@ regtype user_reg with
 end
 
 var ubyte* x2;
-var short x1;
-var short*[4] x3;
+var ushort* x5;
+var byte x1;
+var short x6;
+var byte[7] x3;
+var byte*[5] x4;
 var test_t msg;
 var test_t* msg2;
 var user_reg* umsg;
 
-//umsg = msg.data;
-
-//x1 = *umsg.id;
-
-//msg2 = &msg;
 
 
+x4[x1] = &x1;
+*x4[x1] = x1 + 1;
 
-//x1 = *x3[x1];
-x1 = *msg.data[1];
-//x2=1;
-//msg[1].x1 = 7;
 
-//msg.data[1] = 10;
+x1 = *x2;
+x3[x1] = 1;
+x4[x1] = x2;
+msg.x2 = x1;
+msg.data[5] = 1;
+msg2.data[1] = 1;
 
-//emit LEDS(msg.x1 + 5);
+
+x2 = x5;
+x1 = x6;
+x1 = 10;
+x1 = 1000;
+
+x3[1] = 11;
+
+
+x1 = *x2;
+
+umsg = msg.data;
+umsg.id = 10000;
+
+
+
+msg2 = &msg;
+x2 = x4[3];
+x4[3] = x2;
+x1 = x3[x1+x1];
+x1= msg2.data[msg.data[2]];
+x1 = *x2;
+
+x5 = &x3[1];
+x5 = &msg.data[1];
+
+x3[1] = msg.x1 + 1;
+x1 = x3[1];
+x1 = msg.x2;
+msg.x2 = x1;
+
+emit LEDS(msg.x1 + 5);
 
 /*
 event byte ee;

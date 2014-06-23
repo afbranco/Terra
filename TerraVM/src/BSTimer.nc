@@ -14,6 +14,8 @@ interface BSTimer{
 
 	command void startOneShot(uint32_t dt);
 	command uint32_t getNow();
+	command bool isRunning();
+	command void stop();
 	event void fired();
 	
 }

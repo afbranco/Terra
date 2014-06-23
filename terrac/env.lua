@@ -38,6 +38,9 @@ _ENV = {
     n_outs     = 0; --afb
     n_ins_active = 0; --afb	
     n_wrns = 0;       --afb Count warning messages
+    vm_version = '0';
+    extOut_nArgs={},
+    func_nArgs={},
     dets  = {},
 }
 
@@ -143,14 +146,19 @@ F = {
         end
     end,
 
+    CfgBlk = function (me)
+        local n1, n2, n3 = unpack(me)
+print("env::CfgBlk:", n1, n2, n3) 
+        _ENV.vm_version = (n1 or 0)..'.' .. (n2 or 0)..'.' .. (n3 or 0)
+    end,
     Dcl_ext = function (me)
         local dir, tp, id, idx = unpack(me)
 --print("env::Dcl_ext:", dir, tp, id, idx)
 --print(print_r(_ENV.c,"ENV.c"))
 --        ASR(tp=='void' or _TP.deref(tp)) or _ENV.c[tp],me, 'invalid event type')
   
---print("env::Dcl_ext:",id, tp, _TP.isBasicType(tp),_TP.deref(tp), (_TP.isBasicType(tp) or  _TP.deref(tp)) )
-        ASR( (_TP.isBasicType(tp) or  _TP.deref(tp)),me, 'invalid event type')
+print("env::Dcl_ext:",id, tp, _TP.isBasicType(tp),_TP.deref(tp), (_TP.isBasicType(tp) or  _TP.deref(tp)) )
+--        ASR( (_TP.isBasicType(tp) or  _TP.deref(tp)),me, 'invalid event type')
 
         for k,val in ipairs(_ENV.exts) do
           if val.pre==dir then 
@@ -159,7 +167,6 @@ F = {
           end
         end
         ASR(idx<255, me, dir..' event numeric id must be less than 255')
-
         me.ext = {
             ln    = me.ln,
             id    = id,
@@ -171,6 +178,9 @@ F = {
         }
         _ENV.exts[id] = me.ext
         _ENV.exts[#_ENV.exts+1] = me.ext
+        if dir == 'output' then 
+          _ENV.extOut_nArgs[idx] = ((tp=='void') and 0) or 1
+        end
     end,
 
     Dcl_int = 'Dcl_var',
@@ -234,6 +244,7 @@ F = {
         }
         _ENV.exts[#_ENV.exts+1] = me.ext
         _ENV.exts[id] = me.ext
+        _ENV.func_nArgs[idx] = #args
     end,
 
     Ext = function (me)
@@ -244,7 +255,8 @@ F = {
     Func = function (me)
 --print("env::Func:",me[1])
         local id = unpack(me)
-        me.ext = ASR(_ENV.exts[id],me, 'function "'..id..'" is not declared')
+        ASR(_ENV.exts[id],me, 'function "'..id..'" is not declared')
+        me.ext = _ENV.exts[id]
         me.tp = _ENV.exts[id].tp
     end,
 
@@ -252,7 +264,7 @@ F = {
    
     Var = function (me)
         local id, idField = unpack(me)
-print("env::Var:",id, idField)
+print("env::Var:",id)
 --print(print_r(me,"env::Var: me"))
         local blk = me.blk or _AST.iter('Block')()
         while blk do
@@ -260,21 +272,12 @@ print("env::Var:",id, idField)
                 local var = blk.vars[i]
                 if var.id == id then
 --print(print_r(var,"env::Var: var"))
-print("env::Var: fields",var.fields,var.tp,idField)
-                  if var.fields and idField then
-                    ASR(var.fields[idField],me,'invalid field name "'..idField..'" for "'..id..'"')
-print("env::Var: fields",var.fields[idField].tp)
-                    me.var  = var.fields[idField]
-                    me.tp   = var.fields[idField].tp
-                    me.lval = (not var.fields[idField].arr)
-                    me.fst  = var.fields[idField]
-                  else
-                    me.var  = var
-                    me.tp   = var.tp
-                    me.lval = (not var.arr)
-                    me.fst  = var
-                  end
-                    return
+                  me.var  = var
+                  me.tp   = var.tp
+                  me.lval = (not var.arr)
+                  me.fst  = var
+                  me.arr = var.arr
+                  return
                 end
             end
             blk = blk.par
@@ -332,10 +335,12 @@ print("env::Var: fields",var.fields[idField].tp)
     EmitInt = function (me)
         local e1, e2 = unpack(me)
         ASR(e1.var.isEvt, me, 'event "'..e1.var.id..'" is not declared')
-        err, cast = _TP.argsTp(e1.var.tp,e2.tp)
-        ASR(not err,me, 'invalid attribution ['..e2.tp..'] to ['..e1.var.tp..'].')
-        WRN(not cast,me, 'automatic cast from ['..e2.tp..'] to ['..e1.var.tp..'].')
-
+        if (e2) then
+print("env::EmitInt:",e1.var.tp,e2.tp)
+          err, cast,_,_, len1, len2 = _TP.tpCompat(e1.var.tp,e2.tp)
+          ASR(not err,me,'type/size incompatibility: '.. e1.var.tp..'/'..len1 ..' <--> '.. e2.tp..'/'..len2..'')
+          WRN(not cast,me, 'Applying the minimum size in the attribution "'.. e1.var.tp..'/'..len1 ..'" = "' .. e2.tp..'/'..len2 ..'". ')
+        end
         me.gte = _ENV.n_emits
         _ENV.n_emits = _ENV.n_emits + 2     -- (cnt/awk)
     end,
@@ -352,9 +357,9 @@ print("env::Var: fields",var.fields[idField].tp)
         me.tp = e1.ext.tp
 
         if e2 then
-          err, cast = _TP.argsTp(e1.ext.tp,e2.tp)
-          ASR(not err,me, 'invalid attribution ['..e2.tp..'] to ['..e1.ext.tp..'].')
-          WRN(not cast,me, 'automatic cast from ['..e2.tp..'] to ['..e1.ext.tp..'].')
+          err, cast,_,_,len1,len2 = _TP.tpCompat(e1.ext.tp,e2.tp,nil,e2.arr)
+          ASR(not err,me,'type/size incompatibility: '.. e1.ext.tp..'/'..len1 ..' <--> '.. e2.tp..'/'..len2..'')
+          WRN(not cast,me, 'Applying the minimum size in the attribution "'.. e1.ext.tp..'/'..len1 ..'" = "' .. e2.tp..'/'..len2 ..'". ')
 --          ASR(_TP.contains(e1.ext.tp,e2.tp,true),me, "non-matching types on `emit´")
         else
             ASR(e1.ext.tp=='void',me, "missing parameters on `emit´")
@@ -420,12 +425,14 @@ print("env::Var: fields",var.fields[idField].tp)
     SetExp = function (me)
         local e1, e2, no_fin = unpack(me)
         e1 = e1 or _AST.iter'SetBlock'()[1]
-print('env::SetExp:',e1.lval,e1.tp,e2.tp,no_fin,unpack(e2[1]))
+print('env::SetExp:',e1.tag, e2.tag, e1[1].tag, e2[1].tag, e1.lval,e1.tp,e2.tp,e1[1].arr,e2[1].arr,no_fin)
 --        WRN(e1.lval and _TP.contains(e1.tp,e2.tp,true),me, 'invalid attribution: ['.. e1.tp ..'] can not contain [' .. e2.tp ..']')
+          ASR(not (e1[1].tag=='CONST'),me,'constant at left side of attribution.')
+          ASR(not (e1[1].tag=='Op1_&'),me,'VarAddr at left side of attribution.')
 
-        error, cast = _TP.argsTp(e1.tp,e2.tp)
-          ASR(not error,me,'incompatible types on an attribution: '.. e1.tp ..' and '.. e2.tp)
-          WRN(not cast,me, 'automatic cast from ['.. e2.tp ..'] to [' .. e1.tp ..'].')
+        local error, cast, tp1,tp2,len1,len2 = _TP.tpCompat(e1.tp,e2.tp,e1[1].arr,e2[1].arr)
+          ASR(not error,me,'type/size incompatibility: '.. e1.tp..'/'..len1 ..' <--> '.. e2.tp..'/'..len2..'')
+          WRN(not cast,me, 'Applying the minimum size in the attribution "'.. e1.tp..'/'..len1 ..'" = "' .. e2.tp..'/'..len2 ..'". ')
 
         
         if no_fin then
@@ -454,7 +461,10 @@ print('env::SetExp:',e1.lval,e1.tp,e2.tp,no_fin,unpack(e2[1]))
             ASR(_TP.isNumeric(e1.tp,true), me, 'invalid attribution: not a numeric value')
         else    -- AwaitInt / AwaitExt
             local evt = awt.ret[1].var or awt.ret[1].ext
-            ASR(_TP.contains(e1.tp,evt.tp,true), me, 'invalid attribution: ['.. e1.tp ..'] can not contain [' .. evt.tp ..']')
+            -- ASR(_TP.contains(e1.tp,evt.tp,true), me, 'invalid attribution: ['.. e1.tp ..'] can not contain [' .. evt.tp ..']')
+            local error, cast, tp1,tp2,len1,len2 = _TP.tpCompat(e1.tp,evt.tp,e1[1].arr,awt[1].arr)
+            ASR(not error,me,'type/size incompatibility: '.. e1.tp..'/'..len1 ..' <--> '.. evt.tp..'/'..len2..'')
+            WRN(not cast,me, 'automatic cast from ['.. evt.tp ..'] to [' .. e1.tp ..'].')
         end
         me.fst = awt.fst
     end,
@@ -467,9 +477,19 @@ print('env::SetExp:',e1.lval,e1.tp,e2.tp,no_fin,unpack(e2[1]))
 
     --------------------------------------------------------------------------
 
-    Exp = function (me)
---print("env::Exp:",me[1][1])
+    LExp = function (me)
+print("env::LExp:",me.tag,me[1].tag, me[1].arr, me[1][1])
 --print(print_r(me,"env::Exp: me"))
+--        ASR(not(me[1].tag=='Var' and (me[1].arr)),me,'missing array index for "'..me[1][1]..'".')
+        me.lval = me[1].lval
+        me.tp   = me[1].tp
+        me.fst  = me[1].fst
+    end,
+
+    Exp = function (me)
+print("env::Exp:",me.tag,me[1].tag,me[1][1])
+--print(print_r(me,"env::Exp: me"))
+--        ASR(not(me[1].tag=='Var' and (me[1].arr)),me,'missing array index for "'..me[1][1]..'".')
         me.lval = me[1].lval
         me.tp   = me[1].tp
         me.fst  = me[1].fst
@@ -509,8 +529,9 @@ print('env::SetExp:',e1.lval,e1.tp,e2.tp,no_fin,unpack(e2[1]))
     Op2_idx = function (me)
 --print(print_r(me,"env:Op2_idx: me"))
 print("env::Op2_idx:",me[2][1],me[2].tag,me[2].tp,me[2][2],me[3][1],me[3].tag,me[3].tp)
-print("env::Op2_idx:",me[2][2])
         local _, arr, idx = unpack(me)
+print("env::Op2_idx:",arr.tp)
+        ASR(arr.arr, me, 'cannot index a non array')
         local _arr = ASR(_TP.deref(arr.tp,true), me, 'cannot index a non array')
 --        ASR(_arr and _TP.isNumeric(idx.tp,true), me, 'invalid array index')
         --me.tp   = _TP.deref(me[2].tp)
@@ -559,6 +580,7 @@ print("env::Op2_idx:",me[2][2])
     ['Op2_<']  = 'Op2_same',
 
     Op2_any = function (me)
+        local op, e1, e2 = unpack(me)
         me.tp  = _TP.max(e1.tp,e2.tp,true)
     end,
     ['Op2_or']  = 'Op2_any',
@@ -568,31 +590,38 @@ print("env::Op2_idx:",me[2][2])
     ['Op1_*'] = function (me)
         local op, e1 = unpack(me)
         local tp
---print(print_r(e1,"env::Op1_*: e1"))
-      if (e1.tag=='Var') then  -- single var/field (not array) 
+        
 print("env::Op1_*:",e1.tp,e1.tag,e1[2])
-        if (e1[2]) then -- field
-          ASR(_TP.deref(e1.tp, true) and e1.tag=='Var', me, 'invalid operand to unary "*"')
-          ASR(_ENV.c[_TP.deref(e1.tp)].fields[e1[2]], me, 'invalid field "'.. e1[2] ..'" for "'.. _TP.deref(e1.tp) ..'" register type.')
-          tp   = _ENV.c[_TP.deref(e1.tp)].fields[e1[2]].tp
-          me.offset = _ENV.c[_TP.deref(e1.tp)].fields[e1[2]].offset
-        else  -- var
-          ASR(_TP.deref(e1.tp, true) and e1.tag=='Var', me, 'invalid operand to unary "*"')
-          tp   = _TP.deref(e1.tp, true)
-        end
-      else    -- Op2_idx
-print("env::Op1_*:",e1.tag,e1[2][1],e1[2][2])
-        if (e1[2][2]) then -- field array
---print("env::Op1_*:",e1.tp,e1.tag,e1[2][2])--,_ENV.c[e1.tp].fields[e1[2][2]].tp,_ENV.c[e1.tp].fields[e1[2][2]].dim)
-          tp   = e1.tp
-          me.dim = e1.dim
-        else -- var array
-          tp = _TP.deref(e1.tp)
-        end
-      end
-      me.tp   = tp
-      me.lval = true
-      me.fst  = e1.fst        
+        ASR(_TP.deref(e1.tp, true) and e1.tag~='CONST', me, 'invalid operand to unary "*"')
+        me.tp   = _TP.deref(e1.tp, true)
+        me.lval = true
+        me.fst  = e1.fst        
+        
+        
+----print(print_r(e1,"env::Op1_*: e1"))
+--      if (e1.tag=='Var') then  -- single var/field (not array) 
+--        if (e1[2]) then -- field
+--          ASR(_TP.deref(e1.tp, true) and e1.tag=='Var', me, 'invalid operand to unary "*"')
+--          ASR(_ENV.c[_TP.deref(e1.tp)].fields[e1[2]], me, 'invalid field "'.. e1[2] ..'" for "'.. _TP.deref(e1.tp) ..'" register type.')
+--          tp   = _ENV.c[_TP.deref(e1.tp)].fields[e1[2]].tp
+--          me.offset = _ENV.c[_TP.deref(e1.tp)].fields[e1[2]].offset
+--        else  -- var
+--          ASR(_TP.deref(e1.tp, true) and e1.tag=='Var', me, 'invalid operand to unary "*"')
+--          tp   = _TP.deref(e1.tp, true)
+--        end
+--      else    -- Op2_idx
+--print("env::Op1_*:",e1.tag,e1[2][1],e1[2][2])
+--        if (e1[2][2]) then -- field array
+----print("env::Op1_*:",e1.tp,e1.tag,e1[2][2])--,_ENV.c[e1.tp].fields[e1[2][2]].tp,_ENV.c[e1.tp].fields[e1[2][2]].dim)
+--          tp   = e1.tp
+--          me.dim = e1.dim
+--        else -- var array
+--          tp = _TP.deref(e1.tp)
+--        end
+--      end
+--      me.tp   = tp
+--      me.lval = true
+--      me.fst  = e1.fst        
     end,
 
     ['Op1_&'] = function (me)
@@ -605,17 +634,19 @@ print("env::Op1_*:",e1.tag,e1[2][1],e1[2][2])
 
     ['Op2_.'] = function (me)
         local op, e1, id = unpack(me)
-print("env::Op2_.",me[1],me[2].tp,me[3].tag)
-        ASR(e1.fst.fields[id], me, 'invalid field name')
-        me.tp   = e1.fst.fields[id].tp
+        ASR(_ENV.c[_TP.deref(e1.tp) or e1.tp].fields, me,'var "'.. e1[1]..'" is not a register. ')
+        local field = _ENV.c[_TP.deref(e1.tp) or e1.tp].fields[id]
+        ASR(field, me, 'invalid field name')
+        me.tp   = (field.dim and field.tp..'*') or field.tp
         me.lval = true
         me.fst  = e1.fst
+        me.arr = field.dim
     end,
 
     Op_var = function (me)
         local op, exp = unpack(me)
---print("env::Op_var:", op,exp.tp, exp.tag, exp.var.id,_TP.isNumeric(exp.tp),_TP.deref(exp.tp))
-        ASR(exp.tag=='Var' and _TP.isNumeric(exp.tp), me, 'invalid "inc/dec" target. Received a "'..exp.tag..'" of type "'..exp.tp..'"')
+print("env::Op_var:", op,exp[1].tag,exp[1].tp, exp[1].tag,exp[1].lval,exp[1].fst,_TP.isNumeric(exp.tp),_TP.deref(exp.tp))
+        ASR((exp.tag=='Var' or exp.tag=='Op2_idx' or exp.tag=='Op2_.') and _TP.isBasicType(exp.tp), me, 'invalid "inc/dec" target. Received a "'..exp.tag..'" of type "'..exp.tp..'"')
         me.tp   = exp.tp
         me.lval = exp.lval
         me.fst  = exp.fst
@@ -661,7 +692,8 @@ print("env::SIZEOF")
     end,
     CONST = function (me)
         local v = unpack(me)
-        me.tp   = _TP.getConstType(v,me.ln)
+        --ASR(_TP.getConstLen(v) < 3,me,'Constant > 32bits size')
+        me.tp   = _TP.getConstType(v,me)
         me.lval = false
         me.fst  = false
         ASR(string.sub(v,1,1)=="'" or tonumber(v), me, 'malformed number')

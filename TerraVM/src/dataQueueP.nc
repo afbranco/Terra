@@ -81,11 +81,12 @@ implementation{
 		return flagFreeQ;
 	}
 
-	command void dataQueue.clearAll(){
+	command error_t dataQueue.clearAll(){
 		qHead=0; 
 		qTail=0; 
 		qSize=0;
 		flagFreeQ=TRUE;
+		return SUCCESS;
 	}
 
 	command error_t dataQueue.element(uint8_t id, void* Data){

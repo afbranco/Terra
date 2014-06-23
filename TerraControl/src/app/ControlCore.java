@@ -170,12 +170,24 @@ public class ControlCore implements MessageListener
 		// Received a usrMsg
 		if (msg instanceof usrMsg) {
 			usrMsg omsg = (usrMsg)msg;
-			String Data;
-			Data = String.format("%d %d %d %d | %d %d %d %d | %d %d", 
-					omsg.get_d8_1(),omsg.get_d8_2(),omsg.get_d8_3(),omsg.get_d8_4(),
-					omsg.get_d16_1(),omsg.get_d16_2(),omsg.get_d16_3(),omsg.get_d16_4(),
-					omsg.get_d32_1(),omsg.get_d32_2() );
-			controlform.sendBSMsg(omsg.get_source(),omsg.get_id(),0,Data);
+			String Data="";
+			System.out.println("MsgType="+controlform.getMsgType());
+			if (controlform.getMsgType()) {				
+				for (int i=0; i<20; i++) {
+					Data = Data + String.format("%02x,",omsg.get_data()[i]); 				
+				}
+			} else{ 
+				for (int i=0; i<4; i++) {
+					Data = Data + String.format("%d,",omsg.get_data()[i]); 				
+				}
+				for (int i=4; i<11; i=i+2) {
+					Data = Data + String.format("%d,",(omsg.get_data()[i] << 8) + omsg.get_data()[i+1]); 				
+				}
+				for (int i=12; i<20; i=i+4) {
+					Data = Data + String.format("%d,",(omsg.get_data()[i] << 24) + (omsg.get_data()[i+1] << 16) + (omsg.get_data()[i] * 8) + omsg.get_data()[i+1]); 				
+				}
+			}
+			controlform.sendBSMsg(omsg.get_source(),omsg.get_type(),0,Data);
 			System.out.println(omsg.toString());
 		}
 

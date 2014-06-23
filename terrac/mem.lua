@@ -186,7 +186,7 @@ F = {
     end,
 
     Var = function (me)
-print("mem:Var:",unpack(me),me.var.id,me.var.val)
+print("mem:Var:",me.var.id,me.var.val,me.var.arr)
 --print(print_r(me,"mem:Var: me"))
         me.val = me.var.val
         me.accs = { {me.var, (me.var.arr and 'no') or 'rd', me.var.tp, false,
@@ -229,7 +229,9 @@ print("mem:Var:",unpack(me),me.var.id,me.var.val)
         local len, val, valType
         if e2 then
             local tp = _TP.deref(e1.ext.tp, true)
+print("mem::EmitExtE:",e1.ext.id, e1.ext.tp, e2.tp)
             if tp then
+            ASR(_TP.deref(e2.tp),me,'invalid type. Expecting '..e1.ext.tp..' and received '.. e2.tp)
                 len = _ENV.c[_TP.deref(_TP.deref(e2.tp)) or _TP.deref(e2.tp) or e2.tp].len --'sizeof('.._TP.c(tp)..')'
                 val = e2.val
                 valType = ''
@@ -267,6 +269,7 @@ print("mem:Var:",unpack(me),me.var.id,me.var.val)
 --afb #endif
 --afb ]]
     end,
+
     AwaitExt = function (me)
         local e1 = unpack(me)
         if _TP.deref(e1.ext.tp) then
@@ -275,8 +278,14 @@ print("mem:Var:",unpack(me),me.var.id,me.var.val)
             me.val = '*((int*)CEU->ext_data)'
         end
     end,
+
     AwaitT = function (me)
         me.val = 'CEU->wclk_late'
+    end,
+
+    LExp = function (me)
+        me.val  = me[1].val
+        me.accs = me[1].accs
     end,
 
     Exp = function (me)
@@ -321,8 +330,7 @@ print("mem:Var:",unpack(me),me.var.id,me.var.val)
 
     Op2_any = function (me)
         local op, e1, e2 = unpack(me)
-        me.val = '('..e1.val..ceu2c(op)..e2.val..')'
-        me.val = '('..e1.val..ceu2c(op)..e2.val..')'
+        me.val = ' '
         me.accs = e1.accs
         me.accs = {}
         accs_join(me, e1)
@@ -360,6 +368,7 @@ print("mem:Var:",unpack(me),me.var.id,me.var.val)
 
     ['Op1_*'] = function (me)
         local op, e1 = unpack(me)
+        ASR(e1.val,me,'invalid operand to unary "*"')
         me.val = '('..ceu2c(op)..e1.val..')'
         me.accs = e1.accs
         me.accs[1][3] = _TP.deref(me.accs[1][3], true)
@@ -367,16 +376,17 @@ print("mem:Var:",unpack(me),me.var.id,me.var.val)
     end,
     ['Op1_&'] = function (me)
         local op, e1 = unpack(me)
-        me.val = '('..ceu2c(op)..e1.val..')'
+        me.val = ' '
         me.accs = e1.accs
         me.accs[1][2] = 'no'
     end,
 
     ['Op2_.'] = function (me)
         local op, e1, id = unpack(me)
+        local field = _ENV.c[_TP.deref(e1.tp) or e1.tp].fields[id]
 --        me.val  = '('..e1.val..ceu2c(op)..e1.fst.fields[id].var..')'
-        me.val  = e1.val + e1.fst.fields[id].var
-        me.tp   = e1.fst.fields[id].tp
+        me.val  = field.var
+        me.tp   = me.tp
         me.accs = e1.accs
     end,
 
@@ -419,10 +429,12 @@ print("mem:Var:",unpack(me),me.var.id,me.var.val)
                     'symbol `'..me[1]..'´ (line '..me.ln..')'} }
     end,
     SIZEOF = function (me)
-print("mem::SIZEOF:",_ENV.c[me[1]].len,_TP.getConstType(_ENV.c[me[1]].len),me.ln)
+      ASR(_ENV.c[_TP.deref(me[1]) or me[1]],me,'invalid type "'.. me[1] ..'"')
+      local tp = (_TP.deref(me[1]) and 'ushort') or me[1]
+print("mem::SIZEOF:",_ENV.c[tp].len,_TP.getConstType(_ENV.c[tp].len),me.ln)
 --        me.val = 'sizeof('.._TP.c(me[1])..')'
-      me.val = _ENV.c[me[1]].len
-      me.tp = _TP.getConstType(_ENV.c[me[1]].len,me.ln)
+      me.val = _ENV.c[tp].len
+      me.tp = _TP.getConstType(_ENV.c[tp].len,me.ln)
       me.accs = me[1].accs
     end,
 --    STRING = function (me)

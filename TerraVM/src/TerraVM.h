@@ -30,6 +30,8 @@
 #define PTR(tp,str) ((tp)(CEU->p_mem + str))
 #define PTR_EXT(id,idx) ((tceu_nlbl*)(PTR(char*,id)+1+idx*sizeof(tceu_nlbl)))
 
+#define ASYNC_DELAY 2
+
 #ifdef PRINTF
 #include "printf.h"
 #endif
@@ -86,7 +88,7 @@ enum {
 	// OpCodes
 	op_nop=0,
 	op_end=1,
-	op_return=2,
+
 	op_bnot=3,
 	op_lnot=4,
 	op_neg=5,
@@ -129,8 +131,8 @@ enum {
 	op_cast=84,
 	op_inc=88,
 	op_dec=92,
-	op_incx=96,
-	op_decx=100,
+	op_memcpy=96,
+	op_memcpyx=100,
 	op_outevt_c=104,
 	op_outevt_v=108,
 	op_outevtx_v=112,
@@ -143,6 +145,7 @@ enum {
 	op_chkret=140,
 	op_asen=144,
 	op_deref=148,
+	op_getextdt_e=152,
 	op_clken_c=160,
 	op_clken_v=176,
 	op_clken_e=192,

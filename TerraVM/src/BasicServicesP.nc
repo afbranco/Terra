@@ -197,7 +197,8 @@ implementation{
 		if ( call TimerVM.isRunning() ) call TimerVM.stop();
 		call TimerVM.startOneShot(dt);
 		}
-	event void TimerVM.fired(){signal BSTimerVM.fired();}
+	command bool BSTimerVM.isRunning(){ return call TimerAsync.isRunning();}
+	command void BSTimerVM.stop(){ call TimerAsync.stop();}	event void TimerVM.fired(){signal BSTimerVM.fired();}
 
 
 /*******************************
@@ -205,12 +206,14 @@ implementation{
  *****************************/
 	command uint32_t BSTimerAsync.getNow(){return call TimerAsync.getNow();}
 	command void BSTimerAsync.startOneShot(uint32_t dt){
-		dbg(APPNAME, "BS::BSTimerAync.startOneShot() dt=%ld, getdt=%ld, isRunning=%s\n",dt,call TimerAsync.getdt(),_TFstr(call TimerAsync.isRunning()));
+		dbg(APPNAME, "BS::BSTimerAsync.startOneShot() dt=%ld, getdt=%ld, isRunning=%s\n",dt,call TimerAsync.getdt(),_TFstr(call TimerAsync.isRunning()));
 		if ( call TimerAsync.isRunning() ) call TimerAsync.stop();
 		call TimerAsync.startOneShot(dt);
 		}
+	command bool BSTimerAsync.isRunning(){ return call TimerAsync.isRunning();}
+	command void BSTimerAsync.stop(){ call TimerAsync.stop();}
 	event void TimerAsync.fired(){signal BSTimerAsync.fired();}
-
+	
 /* **********************************************************************************
  * 
  *                            Auxiliaries functions

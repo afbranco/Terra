@@ -49,10 +49,10 @@ F = {
             MAX_all(me)
         end
         if NO_fin[me.tag] then
-            ASR(not _AST.iter'Finally'(), me, 'not permitted inside `finally´')
+            ASR(not _AST.iter'Finally'(), me, me.tag ..' is not permitted inside `finally´')
         end
         if NO_async[me.tag] then
-            ASR(not _AST.iter'Async'(), me,'not permitted inside `async´')
+            ASR(not _AST.iter'Async'(), me, me.tag ..' is not permitted inside `async´')
         end
     end,
 

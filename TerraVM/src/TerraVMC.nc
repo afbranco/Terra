@@ -78,7 +78,7 @@ implementation
 		}
 		// Start VM enginne
 #ifndef ONLY_BSTATION
-		ceu_boot();
+		//ceu_boot();
 #endif
 	}	
 
@@ -286,7 +286,10 @@ dbg(APPNAME,"VM::getEvtCeuId(): currSlot=%d, EvtId=%d, slotId=%d, i=%d, inEvts=%
 		currSlot = 	currSlot + 1 + ((*(nx_uint8_t*)(MEM+currSlot+1))*2) + 1;
 dbg(APPNAME,"VM::getEvtCeuId(): currSlot=%d, EvtId=%d, slotId=%d, i=%d, inEvts=%d\n", currSlot, EvtId,(*(nx_uint8_t*)(MEM+currSlot)),i,inEvts );
 	}
-	if (EvtId != (*(nx_uint8_t*)(MEM+currSlot))) dbg(APPNAME,"ERROR Event %d not found! Returning wrong event!\n",EvtId);
+	if (EvtId != (*(nx_uint8_t*)(MEM+currSlot))) { 
+		dbg(APPNAME,"WARNING: Not found a slot for event %d!\n",EvtId);
+		return 0;
+	}
 	return currSlot+1; // Return addr of 'n' gates for EvtId
 
 /*
@@ -526,6 +529,8 @@ void ceu_wclock_enable (int gte, s32 us, tceu_nlbl lbl) {
 
 void ceu_async_enable (int gte, tceu_nlbl lbl) {
     PTR(tceu_nlbl*,async0)[gte] = lbl;
+	if (!call BSTimerAsync.isRunning()) 
+		call BSTimerAsync.startOneShot(ASYNC_DELAY); // afb: moved to here to avoid timer cicles without active async 
 }
 
 /**********************************************************************/
@@ -560,7 +565,8 @@ int ceu_go_async(int* ret, int* pending)
 {
     int i,s=0;
     tceu_nlbl* ASY0 = PTR(tceu_nlbl*,async0);
-   dbg(APPNAME,"CEU::ceu_go_async(): ret=%d, pending=%d, asyncs=%d, async_cur=%d\n",*ret,*pending,asyncs,CEU->async_cur);
+   dbg(APPNAME,"CEU::ceu_go_async(): ret=%d, pending=%d, async0=%d,asyncs=%d, async_cur=%d, ASY0[0]=%d\n",
+   				(ret==NULL?0:*ret),(pending==NULL?0:*pending),async0,asyncs,CEU->async_cur,ASY0[0]);
 
     for (i=0; i < asyncs; i++) {
         int idx = (CEU->async_cur+i) % asyncs;
@@ -727,7 +733,7 @@ int ceu_go_all ()
     {
         old = (u32)call BSTimerVM.getNow();
         ceu_go_init(NULL);
-		call BSTimerAsync.startOneShot(10);
+//		call BSTimerAsync.startOneShot(ASYNC_DELAY); // afb: moved to async_enable
     }
 
 /**********************************************************************
@@ -738,10 +744,6 @@ void f_nop(uint8_t Modifier){ dbg(APPNAME,"VM::f_nop(%02x)\n",Modifier); }
 void f_end(uint8_t Modifier){ 
 	dbg(APPNAME,"VM::f_end(%02x)\n",Modifier); 
 	dbg("VMDBG","VM:: End of Trail\n"); 
-	}
-void f_return(uint8_t Modifier){ 
-	dbg(APPNAME,"VM::f_return(%02x)\n",Modifier); 
-	dbg("VMDBG","VM:: Return\n");
 	}
 void f_sub(uint8_t Modifier){ 
 	int32_t v1,v2;
@@ -933,7 +935,7 @@ void f_inc(uint8_t Modifier){
 	uint8_t v1_len;
 	uint16_t Maddr;
 	v1_len = (uint8_t)(1<<(Modifier & 0x03));
-	Maddr = getPar16(2);
+	Maddr = (uint16_t)pop();
 	dbg(APPNAME,"VM::f_inc(%02x): v1_len=%d, Maddr=%d, value+1=%d, \n",Modifier,v1_len,Maddr,getMVal(Maddr,v1_len)+1);
 	setMVal((getMVal(Maddr,v1_len)+1),Maddr,v1_len);	
 }
@@ -942,27 +944,34 @@ void f_dec(uint8_t Modifier){
 	uint8_t v1_len;
 	uint16_t Maddr;
 	v1_len = (uint8_t)(1<<(Modifier & 0x03));
-	Maddr = getPar16(2);
+	Maddr = (uint16_t)pop();
 	dbg(APPNAME,"VM::f_dec(%02x): v1_len=%d, Maddr=%d, value-1=%d, \n",Modifier,v1_len,Maddr,getMVal(Maddr,v1_len)-1);
 	setMVal((getMVal(Maddr,v1_len)-1),Maddr,v1_len);	
 }
 
-void f_incx(uint8_t Modifier){ 
-	uint8_t v1_len;
-	uint16_t Maddr;
-	v1_len = (uint8_t)(1<<(Modifier & 0x03));
-	Maddr = getPar16(1);
-	dbg(APPNAME,"VM::f_incx(%02x): v1_len=%d, Maddr=%d, value+1=%d, \n",Modifier,v1_len,Maddr,getMVal(Maddr,v1_len)+1);
-	setMVal((getMVal(Maddr,v1_len)+1),Maddr,v1_len);	
+
+void f_memcpy(uint8_t Modifier){
+	uint8_t p2_1len,p3_1len;
+	uint16_t size,MaddrFrom,MaddrTo;
+	p2_1len = (uint8_t)(1<<((Modifier & 0x02)>>1));
+	p3_1len = (uint8_t)(1<<((Modifier & 0x01)));
+	size 	  = getPar16(2);
+	MaddrFrom = getPar16(p2_1len);
+	MaddrTo   = getPar16(p2_1len);
+	dbg(APPNAME,"VM::f_memcpy(%02x): size=%d, p2_1len=%d, p3_1len=%d, AddrTo=%d, AddrFrom=%d \n",Modifier,size,p2_1len,p3_1len,MaddrTo,MaddrFrom);
+	memcpy((void*)(MEM+MaddrTo),(void*)(MEM+MaddrFrom),size);
 }
 
-void f_decx(uint8_t Modifier){ 
-	uint8_t v1_len;
-	uint16_t Maddr;
-	v1_len = (uint8_t)(1<<(Modifier & 0x03));
-	Maddr = getPar16(1);
-	dbg(APPNAME,"VM::f_decx(%02x): v1_len=%d, Maddr=%d, value-1=%d, \n",Modifier,v1_len,Maddr,getMVal(Maddr,v1_len)-1);
-	setMVal((getMVal(Maddr,v1_len)-1),Maddr,v1_len);	
+void f_memcpyx(uint8_t Modifier){
+	uint8_t p2_1len,p3_1len;
+	uint16_t size,MaddrFrom,MaddrTo;
+	p2_1len = (uint8_t)(1<<((Modifier & 0x02)>>1));
+	p3_1len = (uint8_t)(1<<((Modifier & 0x01)));
+	size 	  = getPar16(1);
+	MaddrFrom = getPar16(p2_1len);
+	MaddrTo   = getPar16(p2_1len);
+	dbg(APPNAME,"VM::f_memcpyx(%02x): size=%d, p2_1len=%d, p3_1len=%d, AddrTo=%d, AddrFrom=%d \n",Modifier,size,p2_1len,p3_1len,MaddrTo,MaddrFrom);
+	memcpy((void*)(MEM+MaddrTo),(void*)(MEM+MaddrFrom),size);
 }
 
 void f_deref(uint8_t Modifier){
@@ -1038,7 +1047,9 @@ void f_pusharr_v(uint8_t Modifier){
 	Max   = getPar16(p3_1len);
 	dbg(APPNAME,"VM::f_pusharr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, Val=%d\n",Modifier,Maddr,Vidx,Max,
 			(getMVal(Vidx,v2_len)<Max)?getMVal(Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len):0);
-	(getMVal(Vidx,v2_len)<Max)?push(getMVal(Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len)):0;
+//	(getMVal(Vidx,v2_len)<Max)?push(getMVal(Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len)):0;
+// Alterado para fazer push de Addr+Idx
+	push(Maddr+((getMVal(Vidx,v2_len)%Max)*v1_len));
 }
 
 void f_pop(uint8_t Modifier){ 
@@ -1078,7 +1089,7 @@ void f_poparr_v(uint8_t Modifier){
 	Max   = getPar16(p3_1len);
 	Value=pop();
 	dbg(APPNAME,"VM::f_poparr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, Value=%d\n",Modifier,Maddr,Vidx,Max,Value);
-	(getMVal(Vidx,v2_len)<Max)?setMVal(Value,Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len):0;
+	setMVal(Value,Maddr+((getMVal(Vidx,v2_len)%Max)*v1_len),v1_len);
 }
 
 
@@ -1098,7 +1109,7 @@ void f_setarr_vc(uint8_t Modifier){
 	Max   = getPar16(p3_1len);
 	Const = getPar32(p4_len);
 	dbg(APPNAME,"VM::f_setarr_vc(%02x):Maddr=%d, Vidx=%d, Max=%d, Const=%d\n",Modifier,Maddr,Vidx,Max,Const);
-	(getMVal(Vidx,v2_len)<Max)?memcpy((MEM+Maddr+(getMVal(Vidx,v2_len)*v1_len)),&Const,v1_len):0;
+	memcpy((MEM+Maddr+((getMVal(Vidx,v2_len)%Max)*v1_len)),&Const,v1_len);
 }
 void f_setarr_vv(uint8_t Modifier){
 	uint8_t v1_len,p1_1len,p2_1len,v2_len,p3_1len,p4_1len,v4_len,Aux;
@@ -1116,7 +1127,7 @@ void f_setarr_vv(uint8_t Modifier){
 	Max    = getPar16(p3_1len);
 	Maddr2 = getPar16(p4_1len);
 	dbg(APPNAME,"VM::f_setarr_vv(%02x):Maddr1=%d, Vidx=%d, Max=%d, Madr2=%d\n",Modifier,Maddr1,Vidx,Max,Maddr2);
-	(getMVal(Vidx,v2_len)<Max)?memcpy((MEM+Maddr1+(getMVal(Vidx,v2_len)*v1_len)),(MEM+Maddr2),v1_len):0;
+	memcpy((MEM+Maddr1+((getMVal(Vidx,v2_len)%Max)*v1_len)),(MEM+Maddr2),v1_len);
 }
 
 void f_memclr(uint8_t Modifier){
@@ -1151,6 +1162,16 @@ void f_getextdt_v(uint8_t Modifier){
 	Maddr = getPar16(p1_1len);
 	len = getPar16(p2_1len);
 	dbg(APPNAME,"VM::f_getextdt_v(%02x): Maddr=%d, len=%d\n",Modifier,Maddr,len);
+	dbg("VMDBG","VM:: reading input event data.\n");
+	memcpy((MEM+Maddr),CEU->ext_data,len);
+	}
+void f_getextdt_e(uint8_t Modifier){
+	uint8_t p1_1len;
+	uint16_t Maddr,len;
+	p1_1len = (uint8_t)(1<<((Modifier & 0x01)));
+	Maddr = (uint16_t)pop();
+	len = getPar16(p1_1len);
+	dbg(APPNAME,"VM::f_getextdt_e(%02x): Maddr=%d, len=%d\n",Modifier,Maddr,len);
 	dbg("VMDBG","VM:: reading input event data.\n");
 	memcpy((MEM+Maddr),CEU->ext_data,len);
 	}
@@ -1201,10 +1222,12 @@ void f_ifelse(uint8_t Modifier){
 
 void f_outevt_e(uint8_t Modifier){
 	uint8_t Cevt;
+	uint32_t value;
+	value = pop();
 	Cevt  = getPar8(1);
 	dbg(APPNAME,"VM::f_outevt_c(%02x): Cevt=%d\n",Modifier,Cevt);
 	dbg("VMDBG","VM:: emitting output event %d\n",Cevt);
-	call VMCustom.procOutEvt(Cevt);
+	call VMCustom.procOutEvt(Cevt,value);
 }
 
 void f_outevt_c(uint8_t Modifier){
@@ -1215,8 +1238,7 @@ void f_outevt_c(uint8_t Modifier){
 	Cevt  = getPar8(1);
 	Const = getPar32(Clen);
 	dbg(APPNAME,"VM::f_outevt_c(%02x): Cevt=%d, Clen=%d, Const=%d\n",Modifier,Cevt,Clen,Const);
-	push(Const);
-	call VMCustom.procOutEvt(Cevt);
+	call VMCustom.procOutEvt(Cevt,Const);
 }
 
 void f_outevt_v(uint8_t Modifier){
@@ -1226,8 +1248,7 @@ void f_outevt_v(uint8_t Modifier){
 	Cevt  = getPar8(1);
 	Maddr = getPar16(2);
 	dbg(APPNAME,"VM::f_outevt_v(%02x): Cevt=%d, Maddr=%d\n",Modifier,Cevt,Maddr);
-	push(getMVal(Maddr,tp_len));
-	call VMCustom.procOutEvt(Cevt);
+	call VMCustom.procOutEvt(Cevt,getMVal(Maddr,tp_len));
 }
 void f_outevtx_v(uint8_t Modifier){
 	uint8_t Cevt,tp_len;
@@ -1236,15 +1257,14 @@ void f_outevtx_v(uint8_t Modifier){
 	Cevt  = getPar8(1);
 	Maddr = getPar16(1);
 	dbg(APPNAME,"VM::f_outevtx_v(%02x): Cevt=%d, Maddr=%d\n",Modifier,Cevt,Maddr);
-	push(getMVal(Maddr,tp_len));
-	call VMCustom.procOutEvt(Cevt);
+	call VMCustom.procOutEvt(Cevt,getMVal(Maddr,tp_len));
 }
 
 void f_outevt_z(uint8_t Modifier){
 	uint8_t Cevt;
 	Cevt = getPar8(1);
 	dbg(APPNAME,"VM::f_outevt_z(%02x): Evt=%d, \n",Modifier,Cevt);
-	call VMCustom.procOutEvt(Cevt);
+	call VMCustom.procOutEvt(Cevt,0);
 	}
 	
 void f_tkclr(uint8_t Modifier){
@@ -1302,11 +1322,11 @@ void f_set_e(uint8_t Modifier){
 	uint8_t v1_len;
 	uint16_t Maddr1;
 	uint32_t Value;
-	v1_len = (uint8_t)(1<<(Modifier & 0x02));
+	v1_len = (uint8_t)(1<<(Modifier & 0x03));
 	Maddr1 = (uint16_t)pop();
 	Value = pop();
-	dbg(APPNAME,"VM::f_set_e(%02x): v1_len=%d, Maddr1=%d, Value=%d\n",Modifier,v1_len,Maddr1,Value);
 	setMVal(Value,Maddr1,v1_len);
+	dbg(APPNAME,"VM::f_set_e(%02x): v1_len=%d, Maddr1=%d, Value=%d, ValuePos=%d\n",Modifier,v1_len,Maddr1,Value,getMVal(Maddr1,v1_len));
 }
 
 
@@ -1416,7 +1436,7 @@ void f_tkins_z(uint8_t Modifier){
 		switch (Opcode){
 			case op_nop : f_nop(Modifier); break;
 			case op_end : f_end(Modifier); break;
-			case op_return : f_return(Modifier); break;
+
 			case op_bnot : f_bnot(Modifier); break;
 			case op_lnot : f_lnot(Modifier); break;
 			case op_neg : f_neg(Modifier); break;
@@ -1459,8 +1479,8 @@ void f_tkins_z(uint8_t Modifier){
 			case op_cast : f_cast(Modifier); break;
 			case op_inc : f_inc(Modifier); break;
 			case op_dec : f_dec(Modifier); break;
-			case op_incx : f_incx(Modifier); break;
-			case op_decx : f_decx(Modifier); break;
+			case op_memcpy : f_memcpy(Modifier); break;
+			case op_memcpyx : f_memcpyx(Modifier); break;
 			case op_outevt_c : f_outevt_c(Modifier); break;
 			case op_outevt_v : f_outevt_v(Modifier); break;
 			case op_outevtx_v : f_outevtx_v(Modifier); break;
@@ -1473,6 +1493,7 @@ void f_tkins_z(uint8_t Modifier){
 			case op_chkret : f_chkret(Modifier); break;
 			case op_asen : f_asen(Modifier); break;
 			case op_deref : f_deref(Modifier); break;
+			case op_getextdt_e : f_getextdt_e(Modifier); break;
 			case op_clken_c : f_clken_c(Modifier); break;
 			case op_clken_v : f_clken_v(Modifier); break;
 			case op_clken_e : f_clken_e(Modifier); break;
@@ -1509,6 +1530,7 @@ void f_tkins_z(uint8_t Modifier){
 #ifndef ONLY_BSTATION
 	task void procEvent(){
 		evtData_t evtData;
+		uint16_t ceuId;
 		dbg(APPNAME,"VM::procEvent(): haltedFlag = %s, procFlag=%s\n",(haltedFlag)?"TRUE":"FALSE",(procFlag)?"TRUE":"FALSE");
 		if (haltedFlag == TRUE) {call evtQ.dequeue(); return;}
 		// Verify if the queue has some event and if the processing is stopped
@@ -1517,7 +1539,11 @@ void f_tkins_z(uint8_t Modifier){
 			dbg(APPNAME,"VM::procEvent(): Dequeue an event and ...\n");
 			evtData=call evtQ.dequeue();
 			dbg(APPNAME,"VM::procEvent(): ... calling ceu_go_event() for evtId=%d\n", evtData.evtId );
-			ceu_go_event(NULL,getEvtCeuId(evtData.evtId),evtData.data);
+			ceuId = getEvtCeuId(evtData.evtId);
+			if (ceuId==0)
+				dbg(APPNAME,"VM::procEvent(): Discarding event %d\n",evtData.evtId);
+			else
+				ceu_go_event(NULL,ceuId,evtData.data);
 		}
 		dbg(APPNAME,"VM::procEvent()...\n");
 	}
@@ -1538,8 +1564,10 @@ void f_tkins_z(uint8_t Modifier){
 
 	event void* VMCustom.getRealAddr(uint16_t Maddr, uint8_t v1_len){
 #ifndef ONLY_BSTATION
-		dbg(APPNAME,"VM::VMCustom.getRealAddr(): Maddr=%d, MVal = %d, RealMEM=%x\n",Maddr,getMVal(Maddr,v1_len),(MEM + getMVal(Maddr,v1_len)));
-		return (MEM + getMVal(Maddr,v1_len));
+//		dbg(APPNAME,"VM::VMCustom.getRealAddr(): Maddr=%d, v1_len=%d,MVal = %x, RealMEM=%x\n",Maddr,v1_len,getMVal(Maddr,v1_len),(MEM + getMVal(Maddr,v1_len)));
+//		return (MEM + getMVal(Maddr,v1_len));
+		dbg(APPNAME,"VM::VMCustom.getRealAddr(): Maddr=%d, v1_len=%d,RealMEM=%x\n",Maddr,v1_len,(MEM + Maddr));
+		return (MEM + Maddr);
 #else
 		return 0;
 #endif
@@ -1549,6 +1577,12 @@ void f_tkins_z(uint8_t Modifier){
 #ifndef ONLY_BSTATION
 		currStack = currStack + 4 ;
 		return *(uint32_t*)(CEU_data+currStack-4);
+#endif
+	}
+	event void VMCustom.push(uint32_t value){
+#ifndef ONLY_BSTATION
+		currStack = currStack - 4 ;
+		*(uint32_t*)(CEU_data+currStack)=value;
 #endif
 	}
 
@@ -1563,12 +1597,24 @@ void f_tkins_z(uint8_t Modifier){
 #endif
     }
     
+	bool hasAsync(){
+		uint8_t i;
+	    tceu_nlbl* ASY0 = PTR(tceu_nlbl*,async0);
+        for (i=0 ; i < asyncs ; i++) {
+            if (ASY0[i] != Inactive) {
+                return TRUE;
+            }
+        }
+        return FALSE;
+	}
     
 	event void BSTimerAsync.fired()
     {
 #ifndef ONLY_BSTATION
-        //call BSTimerAsync.startOneShot(10);
-        //ceu_go_async(NULL,NULL);
+		dbg(APPNAME,"VM::BSTimerAsync.fired()\n");
+		if (hasAsync()) call BSTimerAsync.startOneShot(ASYNC_DELAY);
+	    ceu_go_async(NULL,NULL);
+	     
 #endif
     }
 
@@ -1616,6 +1662,8 @@ void f_tkins_z(uint8_t Modifier){
 		data->gate0 = gate0;
 		data->inEvts = inEvts;
 		data->async0 = async0;
+		dbg(APPNAME,"VM::BSUpload.getEnv(): lbl11=%d, lbl12=%d, lbl21=%d, lbl22=%d, lblEnd=%d, nTracks=%d, wClocks=%d, asyncs=%d, wClock0=%d, gate0=%d, async0=%d\n",
+				LblTab11,LblTab12,LblTab21,LblTab22,LblTabEnd,nTracks,wClocks,asyncs,wClock0,gate0,async0);
 	}
 
 

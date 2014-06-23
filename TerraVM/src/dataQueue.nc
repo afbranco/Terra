@@ -9,6 +9,6 @@ interface dataQueue{
 	command uint8_t maxSize();
 	command bool isFree();
 	event void dataReady();
-	command void clearAll();
+	command error_t clearAll();
 	command error_t element(uint8_t id, void* Data);
 }

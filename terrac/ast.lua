@@ -205,18 +205,19 @@ local C; C = {
     end,
 
     Break = node('Break'),
+    
     Loop  = function (ln, _i, _j, blk)
         if not _i then
             return node('Loop')(ln, blk)
         end
 
         -- Define loop counter type
---print("ast::Loop: _j", _j[1].tag,_j[1][1],blk)
+--print("ast::Loop: _j", _j[1].tag,_j[1][1])
 --print(print_r(_AST,"ast::Loop: _AST"))
 --print(print_r(_j,"ast::Loop: _j"))
-        if _j and _j[1].tag=='CONST' then
+        if _j and _j[1].tag=='CONST' then -- Var type is not defined yet here
           ctype = _TP.getConstType(_j[1][1],ln)
-        elseif _j[1].tag=='Var' then
+        elseif _j and _j[1].tag=='Var' then
 --print("ast::Loop: _j", _j[1].tag,_j[1][1])
           ctype = 'ulong'        
         else
@@ -226,15 +227,20 @@ local C; C = {
         local i = function() return EXP(node('Var')(ln, _i)) end
         local dcl_i = node('Dcl_var')(ln, 'var', ctype, false, _i)
         dcl_i.read_only = true
+
         local set_i = node('SetExp')(ln, i(),
                                         EXP(node('CONST')(ln, '0')))
-        local nxt_i = node('SetExp')(ln, i(),
-                        EXP(node('Op2_+')(ln, '+', i(),
-                                node('CONST')(ln,'1'))))
+
+--        local nxt_i = node('SetExp')(ln, i(),
+--                        EXP(node('Op2_+')(ln, '+', i(),
+--                                node('CONST')(ln,'1'))))
+
+        local nxt_i = node('Op_var')(ln, 'inc', node('Var')(ln, _i))
+
 
         if not _j then
             return node('Block')(ln, dcl_i, set_i,
-                                    node('Loop')(ln,blk))
+                                    node('Loop')(ln,node('BlockN')(ln, blk, nxt_i)))
         end
 
         local j_name = '__'.._i..'_'.. string.sub(tostring(blk),8)
@@ -347,6 +353,7 @@ local C; C = {
 
     CallStmt = node('CallStmt'),
 
+    LExp = node('LExp'),
     Exp = node('Exp'),
     _Exp = function (ln, ...)
         local v1, v2, v3, v4 = ...
@@ -365,11 +372,19 @@ local C; C = {
                                     C._Exp(ln, select(3,...)))
         else                    -- binary expression
 print("ast::_Exp2:", v1.tag, v2, v3.tag)
+print("ast::_Exp2:", v1[1], v2, v3[1])
             -- v1=e1, v2=op, v3=e2, v4=?
-            if v2 == ':' then
-                return C._Exp(ln,
-                    node('Op2_.')(ln, '.',
-                                    node('Op1_*')(ln,'*',v1), v3),
+            if v1.tag=='CONST' and v3.tag=='CONST' and 
+              (v2=='+' or v2=='-' or v2=='/' or v2=='*' or v2 == '%')
+            then
+
+              if v2=='/' and (v3[1]*1)==0 then
+                ASR(false,v3,'division by zero.')
+              else
+                loadstring('newConst = '..v1[1]..' '..v2..' '..v3[1])()
+              end
+              return C._Exp(ln,
+                      node('CONST')(ln, math.ceil(newConst)),
                     select(4,...)
                 )
             else
@@ -380,8 +395,6 @@ print("ast::_Exp2:", v1.tag, v2, v3.tag)
             end
         end
     end,
-
-    Field    = node('Var'),
 
     ExpList  = node('ExpList'),
     Op_var   = node('Op_var'),

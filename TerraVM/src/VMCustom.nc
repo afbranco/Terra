@@ -10,9 +10,10 @@
  * 
  */
 interface VMCustom{
-	command void procOutEvt(uint8_t id);
+	command void procOutEvt(uint8_t id, uint32_t value);
 	command void callFunction(uint8_t id);
 	event  uint32_t pop();
+	event  void push(uint32_t val);
 	event void queueEvt(uint8_t evtId,void* data);
 	event int32_t getMVal(uint16_t Maddr, uint8_t v1_len);
 	event void setMVal(uint32_t value,uint16_t Maddr, uint8_t v1_len);

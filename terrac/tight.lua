@@ -72,7 +72,9 @@ F = {
     Loop = function (me)
         local body = unpack(me)
         SAME(me, body)
-        ASR(_AST.iter'Async'() or me.isBounded or body.blocks,
+print("tight::Loop:",_AST.iter'Async'(),me.isBounded,body.blocks)
+--afb        ASR(_AST.iter'Async'() or me.isBounded or body.blocks,
+        ASR(_AST.iter'Async'() or body.blocks,
                 me,'tight loop')
         me.blocks = body.awaits or body.returns
     end,

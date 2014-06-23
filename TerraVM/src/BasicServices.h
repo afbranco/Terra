@@ -128,7 +128,7 @@ typedef nx_struct GenericData {
 	nx_uint8_t DataSize;
 	nx_uint16_t sendToMote;
 	nx_uint8_t reqAck;
-	nx_uint8_t Data[MSG_BUFF_SIZE];
+	nx_uint8_t Data[34];//[MSG_BUFF_SIZE];
 } GenericData_t;
 
 #endif /* BASIC_SERVICES_H */

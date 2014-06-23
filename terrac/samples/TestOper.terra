@@ -1,0 +1,148 @@
+#include "TerraNet.defs"
+
+
+
+
+regtype user_reg with
+	var ubyte d8_1;
+	var ubyte d8_2;
+	var ubyte d8_3;
+	var ubyte d8_4;
+	var ushort d16_1;
+	var ushort d16_2;
+	var ushort d16_3;
+	var ushort d16_4;
+	var ulong d32_1;
+	var ulong d32_2;
+end
+
+regtype user_reg2 with
+	var ubyte[20] data;
+end
+
+var usrMsg_t* msgp;
+var usrMsg_t msg;
+var usrMsg2_t msg2;
+var usrMsg2_t* msg2p;
+var user_reg data;
+var user_reg data2;
+var user_reg* datap;
+var ubyte[20] vetor;
+var ubyte*[20] vetorp;
+var ushort x;
+var ushort* xp;
+event ubyte ee;
+
+var user_reg2 data5;
+var user_reg2* data5p;
+
+//await_until(x,ee,x>10);
+await_until(msg,RECEIVE,msg.type==1);
+
+//x = 100000;
+
+//datap = msg.data;
+//msg = data;
+//data = msg;
+//emit REQ_TEMP();
+
+//emit LEDS(vetor[0]);
+
+
+//msgp=&msg2;
+//emit SEND(&msg);
+
+//x = sizeof<long> * 2;
+//data = await RECEIVE;
+//vetor = data;
+//msg.data = vetor;
+//*vetorp[2] = await TEMP;
+//*xp = await TEMP;
+
+//xp = &vetor[1];
+//xp = &vetor[0];
+//xp = vetorp[0];
+
+//vetorp[2] = &vetor[1];
+//data5 = datap;
+//datap = &data5;
+//xp = data5;
+
+//x = 1000;
+//datap = vetor;
+//datap = msg.data;
+
+//vetor[2] = x;
+//data2 = x;
+//data2 = msg.data;
+//data2 = vetor[1];
+
+//vetor = data2;
+
+//x = vetor[1];
+//vetor[1] = vetor[x+1];
+//x = data2.d16_2;
+//data2.d16_2 = x;
+//x = msg.data[1];
+
+
+/*
+
+var ubyte x1;
+var ubyte* x1p;
+x1p=&x1;
+
+msgp = &msg;
+
+
+msg.data[0] = 10;
+
+vetor[0] = 1;
+vetor[3] = 2;
+
+vetor[4] = 0;
+vetor[5] = 3;
+
+
+msg.data[0] = 10;
+inc msg.data[0];
+
+msg.data = vetor;
+
+inc msg.data[0];
+inc msg.data[3];
+inc msg.data[4];
+inc msg.data[5];
+
+data = vetor;
+data = msg.data;
+msg.data = vetor;
+
+
+msg2 = msg;
+
+datap = msg.data;
+msg = await RECEIVE;
+
+
+data.d8_1 = 0;
+data.d8_2 = 15;
+data.d16_1 = 1000;
+data.d32_1 = 1<<17;
+
+msg.type=2;
+msg.source=11;
+msg.target=1;
+
+event byte fila;
+
+/*
+*/
+
+
+
+
+
+
+
+

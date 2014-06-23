@@ -71,7 +71,9 @@ class Network:
         ##self.tossim.addChannel("Packet", outDBG)
         ##self.tossim.addChannel("Serial", outDBG)
         ##self.tossim.addChannel("QueueC", outDBG)
+        ##self.tossim.addChannel("HplAtm128Timer0AsyncP", outDBG)
         ##self.tossim.addChannel("Scheduler", outDBG)
+        #--------------------------------------
         self.tossim.addChannel("terra", outDBG)
         self.tossim.addChannel("TVIEW", outDBG)
         self.tossim.addChannel("TVIEW", outCMD)

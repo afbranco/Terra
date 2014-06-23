@@ -182,15 +182,13 @@ _GG = {
     , Dcl_det   = KEY'deterministic' * EV'__ID' * EKEY'with' *
                      EV'__ID' * (K',' * EV'__ID')^0
 
-    , _Set  = V'Exp' * V'_Sets'
+    , _Set  = V'LExp' * V'_Sets'
     , _Sets = (CK'=' + CK':=') * (
                 Cc'SetAwait' * (V'AwaitT'+V'AwaitExt'+V'AwaitInt') +
                 Cc'SetBlock' * V'_SetBlock' +
                 Cc'SetExp'   * V'Exp' +
                 EM'expression'
               )
-
-    , Op_var = ((CKEY'inc' + CKEY'dec') * EV'Var') 
 
     , CallStmt = m.Cmt(V'Exp',
                     function (s,i,...)
@@ -230,6 +228,7 @@ _GG = {
                 V'_Do'
     , Break   = K'break'
 
+    , LExp     = V'_Exp'
     , Exp     = V'_Exp'
     , _Exp    = V'_1'
     , _1      = V'_2'  * (CK'or'  * V'_2')^0
@@ -249,14 +248,14 @@ _GG = {
                     (
 --                        K'(' * Cc'call' * V'ExpList' * EK')' +
                         K'[' * Cc'idx'  * V'_Exp'    * EK']' 
---                       + (CK':' + CK'.')
---                            * (CK(Alpha * (Alphanum+'?')^0) /
---                                function (id)
---                                    return (string.gsub(id,'%?','_'))
---                                end)
+                       + (CK'.' )
+                            * (CK(Alpha * (Alphanum+'?')^0) /
+                                function (id)
+                                    return (string.gsub(id,'%?','_'))
+                                end)
                     )^0
     , _13     = V'_Prim'
-    , _Prim   = V'_Parens' + V'Func' + V'Field'
+    , _Prim   = V'_Parens' + V'Func'
               + V'Var'   + V'C'   + V'SIZEOF'
               + V'NULL'    + V'CONST' --+ V'STRING'
               + V'EmitExtE'
@@ -264,6 +263,8 @@ _GG = {
     , ExpList = ( V'_Exp'*(K','*EV'_Exp')^0 )^-1
 
     , _Parens  = K'(' * EV'_Exp' * EK')'
+
+    , Op_var = (CKEY'inc' + CKEY'dec') * EV'_Exp' 
 
     , SIZEOF = KEY'sizeof' * EK'<' * EV'ID_type' * EK'>'
     , CONST = CK( #m.R'09' * (m.R'09'+m.S'xX'+m.R'AF'+m.R'af')^1 )
@@ -320,17 +321,12 @@ _GG = {
 --    , Func     = V'ID_var' * K'(' * Cc'call' * V'ExpList' * EK')'
     , Func     = V'ID_var' * K'(' * V'ExpList' * EK')'
     , Ext      = V'ID_ext'
-    , Field    = V'ID_field'
     , Var      = V'ID_var'
     , C        = V'ID_c'
 
---    , ID_version  = PNUM*K'.'*PNUM*K'.'*PNUM + EM'config NUM.NUM.NUM do ... end'
-    , ID_version  = PNUM + EM'config NUM.NUM.NUM do ... end'
+    , ID_version  = PNUM*K'.'*PNUM*K'.'*PNUM + EM'config NUM.NUM.NUM do ... end'
 
     , ID_ext  = -KEYS * CK(m.R'AZ'*ALPHANUM^0)
- 
-    , ID_field = (-KEYS * CK(m.R'az'*(Alphanum+'?')^0)) * K'.' * (-KEYS * CK(m.R'az'*(Alphanum+'?')^0))
---                    / function(id) return (string.gsub(id,'%?','_')) end
  
     , ID_var  = -KEYS * CK(m.R'az'*(Alphanum+'?')^0)
                     / function(id) return (string.gsub(id,'%?','_')) end

@@ -1,0 +1,108 @@
+/*{-{*/
+#ifndef _TERRANET_
+#define _TERRANET_
+config 0.0.1 do
+
+/*
+ * Define constants
+ */
+
+// Boolean
+#define TRUE 1
+#define FALSE 0
+// Leds Constants
+#define ON 1
+#define OFF 0
+#define TOGGLE 2
+// Interrupt config
+#define RISING 1
+#define FALLING 0
+#define DISABLE 2
+// Port Cfg
+#define pIN 0
+#define pOUT 1
+// Message
+#define BROADCAST 0xffff
+
+
+/*
+ * Define custom registers
+ */
+
+	// usrMsg_t - Radio/Queue Data Message Register
+	regtype usrMsg_t with
+		var ubyte type;
+		var ushort source;
+		var ushort target;
+		var ubyte[20] data;
+	end
+
+	// Alternative fixed values data message
+	regtype usrMsg2_t with
+		var ubyte type;
+		var ushort source;
+		var ushort target;
+		var ubyte d8_1;
+		var ubyte d8_2;
+		var ubyte d8_3;
+		var ubyte d8_4;
+		var ushort d16_1;
+		var ushort d16_2;
+		var ushort d16_3;
+		var ushort d16_4;
+		var ulong d32_1;
+		var ulong d32_2;
+	end
+
+	// TerraNet Output events
+	output ubyte		INIT			0;
+	output ubyte		LEDS			1;
+	output ubyte		LED0			2;
+	output ubyte		LED1			3;
+	output ubyte		LED2			4;
+	output void			REQ_TEMP		5;
+	output void			REQ_PHOTO		6;
+	output void			REQ_VOLTS		7;
+	output usrMsg_t* 	SEND			8;
+	output usrMsg_t* 	SEND_ACK		9;
+	output ubyte		SET_PORT_A		10;
+	output ubyte		SET_PORT_B		11;
+	output ubyte 		CFG_PORT_A		12;
+	output ubyte 		CFG_PORT_B		13;
+	output ubyte 		REQ_PORT_A		14;
+	output ubyte 		REQ_PORT_B		15;
+	output ubyte 		CFG_INT_A		16;
+	output ubyte 		CFG_INT_B		17;
+	output ubyte 		REQ_CUSTOM_A	18;
+
+	// TerraNet Input events
+	input ushort 	TEMP 			0;
+	input ushort 	PHOTO 			1;
+	input ushort	VOLTS 			2;
+	input ushort 	SEND_DONE 		3;
+	input ubyte 	SEND_DONE_ACK	4;
+	input usrMsg_t	RECEIVE 		5;
+	input ubyte 	Q_READY 		6;
+	input ubyte 	PORT_A 			7;
+	input ubyte 	PORT_B 			8;
+	input ubyte 	INT_A 			9;
+	input ubyte 	INT_B 			10;
+	input ubyte 	CUSTOM_A 		11;
+
+	// TerraNet functions
+	function ushort getNodeId()		0;
+	function ubyte qPut(usrMsg_t*) 	1;
+	function ubyte qGet(usrMsg_t*) 	2;
+	function ubyte qSize()			3;
+	function ubyte qClear()			4;
+
+// Request/await macros
+#define getTemp(var)  emit REQ_TEMP();  var=await TEMP 
+#define getPhoto(var) emit REQ_PHOTO(); var=await PHOTO 
+#define getVolts(var) emit REQ_VOLTS(); var=await VOLTS 
+// await/until macro
+#define await_until(ret,evt,cond) loop do ret = await evt; if cond then break; end end
+
+end
+#endif
+/*}-}*/
