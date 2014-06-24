@@ -357,16 +357,20 @@ print("asm::op_set_e:",arg[1],typelen[arg[1]])
 	
  	-- arg={lbl.n}
 	op_exec = function (me,codeB,arg)
-		local bytecode = string.format('%02x',(opcode['op_exec'])+(_TP.getConstLen(arg[1])))
-		bytecode = string.format('%s %s',bytecode,_TP.getConstBytes(arg[1]))
+--lbl    local bytecode = string.format('%02x',(opcode['op_exec'])+(_TP.getConstLen(arg[1])))
+    local bytecode = string.format('%02x',(opcode['op_exec'])+(1))
+--lbl    bytecode = string.format('%s %s',bytecode,_TP.getConstBytes(arg[1]))
+    bytecode = string.format('%s %s',bytecode,_TP.getConstBytesLbl(arg[1]))
 		local codeA = 'exec '..arg[1]
 		OPCODE(me,bytecode,codeA,codeB)
 	end,
 	
  	-- arg={lbl.n,lbl.n}
 	op_ifelse= function (me,codeB,arg) 
-		local bytecode = string.format('%02x',(opcode['op_ifelse']) + _TP.getConstLen(arg[1])*2 + _TP.getConstLen(arg[2]))
-		bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytes(arg[2]))
+--lbl    local bytecode = string.format('%02x',(opcode['op_ifelse']) + _TP.getConstLen(arg[1])*2 + _TP.getConstLen(arg[2]))
+    local bytecode = string.format('%02x',(opcode['op_ifelse']) + 1*2 + 1)
+--lbl    bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytes(arg[2]))
+    bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytesLbl(arg[1]),_TP.getConstBytesLbl(arg[2]))
 		local codeA = 'ifelse '..arg[1]..' '..arg[2]
 		OPCODE(me,bytecode,codeA,codeB,-1)			
 	end, 
@@ -417,21 +421,25 @@ print("asm::op_set_e:",arg[1],typelen[arg[1]])
 
  	-- arg={lbl.n,lbl.n}
 	op_tkclr= function (me,codeB,arg) 
-		local bytecode = string.format('%02x',(opcode['op_tkclr']) + _TP.getConstLen(arg[1])*2 + _TP.getConstLen(arg[2]))
-		bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytes(arg[2]))
+--lbl    local bytecode = string.format('%02x',(opcode['op_tkclr']) + 1*2 + 1)
+    local bytecode = string.format('%02x',(opcode['op_tkclr']) + _TP.getConstLen(arg[1])*2 + _TP.getConstLen(arg[2]))
+--lbl    bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytes(arg[2]))
+    bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytesLbl(arg[1]),_TP.getConstBytesLbl(arg[2]))
 		local codeA = 'tkclr '..arg[1]..' '..arg[2]
 		OPCODE(me,bytecode,codeA,codeB)			
 	end, 
 
  	-- arg={lbl.n}
 	op_trg= function (me,codeB,arg) 
-		local bytecode = string.format('%02x',(opcode['op_trg'])+(_TP.getConstLen(arg[1])))
-		bytecode = string.format('%s %s',bytecode,_TP.getConstBytes(arg[1]))
+--lbl    local bytecode = string.format('%02x',(opcode['op_trg'])+(_TP.getConstLen(arg[1])))
+    local bytecode = string.format('%02x',(opcode['op_trg'])+1)
+--lbl    bytecode = string.format('%s %s',bytecode,_TP.getConstBytes(arg[1]))
+    bytecode = string.format('%s %s',bytecode,_TP.getConstBytesLbl(arg[1]))
 		local codeA = 'trg '..arg[1]
 		OPCODE(me,bytecode,codeA,codeB)	
 	end, 
 	
-	-- arg={var_type,var_addr,const_val}
+	-- arg={var_type,var_addr,const_val,?lbl}
 	op_set_c= function (me,codeB,arg) 
 --		local p2_len
 --		local p2_1len
@@ -439,17 +447,25 @@ print("asm::op_set_e:",arg[1],typelen[arg[1]])
 --		if (2^_TP.getConstLen(arg[3]) <= 2^typelen[arg[1]]/2) then p2_1lenx=1 p2_len=p2_len/2 end
 --		local bytecode = string.format('%02x',(opcode['op_set_c']) +  typelen[arg[1]]*2^2 + _TP.getConstLen(arg[2])*2 + p2_1lenx)
 --		bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[2]),_TP.getConstBytes(arg[3],p2_len))		
-    if (2^_TP.getConstLen(arg[3]) <= 2) then
-      local bytecode = string.format('%02x',(opcode['op_set16_c']) +  typelen[arg[1]]*2^2 + _TP.getConstLen(arg[2])*2 + _TP.getConstLen(arg[3]))
-      bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[2]),_TP.getConstBytes(arg[3]))    
-      local codeA = 'set16_c '..arg[1]..' '..arg[2]..' '..arg[3]
-      OPCODE(me,bytecode,codeA,codeB)     
+
+    if arg[4] then -- const_val is a label
+        local bytecode = string.format('%02x',(opcode['op_set16_c']) +  typelen[arg[1]]*2^2 + _TP.getConstLen(arg[2])*2 + 1)
+        bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[2]),_TP.getConstBytesLbl(arg[3]))    
+        local codeA = 'set16_c '..arg[1]..' '..arg[2]..' '..arg[3]
+        OPCODE(me,bytecode,codeA,codeB)     
     else
-      local bytecode = string.format('%02x %02x',(opcode['op_set_c']),
-           typelen[arg[1]]*2^4 + _TP.getConstLen(arg[2])*2^2 + _TP.getConstLen(arg[3]))
-      bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[2]),_TP.getConstBytes(arg[3]))    
-      local codeA = 'set_c '..arg[1]..' '..arg[2]..' '..arg[3]
-      OPCODE(me,bytecode,codeA,codeB)     
+      if (2^_TP.getConstLen(arg[3]) <= 2) then
+        local bytecode = string.format('%02x',(opcode['op_set16_c']) +  typelen[arg[1]]*2^2 + _TP.getConstLen(arg[2])*2 + _TP.getConstLen(arg[3]))
+        bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[2]),_TP.getConstBytes(arg[3]))    
+        local codeA = 'set16_c '..arg[1]..' '..arg[2]..' '..arg[3]
+        OPCODE(me,bytecode,codeA,codeB)     
+      else
+        local bytecode = string.format('%02x %02x',(opcode['op_set_c']),
+             typelen[arg[1]]*2^4 + _TP.getConstLen(arg[2])*2^2 + _TP.getConstLen(arg[3]))
+        bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[2]),_TP.getConstBytes(arg[3]))    
+        local codeA = 'set_c '..arg[1]..' '..arg[2]..' '..arg[3]
+        OPCODE(me,bytecode,codeA,codeB)     
+      end
     end
 	end, 
 
@@ -472,48 +488,59 @@ print("asm::op_set_e:",arg[1],typelen[arg[1]])
 
 	-- arg={gate,const_time,label}
 	op_clken_c= function (me,codeB,arg) 
-		local bytecode = string.format('%02x',(opcode['op_clken_c']) +  _TP.getConstLen(arg[1])*2^3 + _TP.getConstLen(arg[3])*2^2 + _TP.getConstLen(arg[2]))
-		bytecode = string.format('%s %s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytes(arg[2]),_TP.getConstBytes(arg[3]))		
+--lbl    local bytecode = string.format('%02x',(opcode['op_clken_c']) +  _TP.getConstLen(arg[1])*2^3 + _TP.getConstLen(arg[3])*2^2 + _TP.getConstLen(arg[2]))
+    local bytecode = string.format('%02x',(opcode['op_clken_c']) +  _TP.getConstLen(arg[1])*2^3 + 1*2^2 + _TP.getConstLen(arg[2]))
+--lbl    bytecode = string.format('%s %s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytes(arg[2]),_TP.getConstBytes(arg[3]))    
+    bytecode = string.format('%s %s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytes(arg[2]),_TP.getConstBytesLbl(arg[3]))    
 		local codeA = 'clken_c '..arg[1]..' '..arg[2]..' '..arg[3]
 		OPCODE(me,bytecode,codeA,codeB)		
 	end, 
 
   -- arg={gate,unit, var_type, var_addr,label}
   op_clken_v= function (me,codeB,arg) 
-    local bytecode = string.format('%02x',(opcode['op_clken_v']) +  _TP.getConstLen(arg[1])*2^3 + _TP.getConstLen(arg[5])*2^2 + typelen[arg[3]])
-    bytecode = string.format('%s %s %s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytes(arg[2]),_TP.getConstBytes(arg[4],2),_TP.getConstBytes(arg[5]))
+--lbl    local bytecode = string.format('%02x',(opcode['op_clken_v']) +  _TP.getConstLen(arg[1])*2^3 + _TP.getConstLen(arg[5])*2^2 + typelen[arg[3]])
+    local bytecode = string.format('%02x',(opcode['op_clken_v']) +  _TP.getConstLen(arg[1])*2^3 + 1*2^2 + typelen[arg[3]])
+--lbl    bytecode = string.format('%s %s %s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytes(arg[2]),_TP.getConstBytes(arg[4],2),_TP.getConstBytes(arg[5]))
+    bytecode = string.format('%s %s %s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytes(arg[2]),_TP.getConstBytes(arg[4],2),_TP.getConstBytesLbl(arg[5]))
     local codeA = 'clken_v '..arg[1]..' '..arg[2]..' '..arg[3]..' '..arg[4]..' '..arg[5]
     OPCODE(me,bytecode,codeA,codeB)     
   end,
   -- arg={gate,unit,label}
   op_clken_e= function (me,codeB,arg) 
-print("asm::op_clken_e:",arg[1],arg[2],arg[3])
-    local bytecode = string.format('%02x',(opcode['op_clken_e']) +  _TP.getConstLen(arg[1])*2^3 + _TP.getConstLen(arg[3])*2^2 + arg[2])
-    bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytes(arg[3]))
+--lbl    local bytecode = string.format('%02x',(opcode['op_clken_e']) +  _TP.getConstLen(arg[1])*2^3 + _TP.getConstLen(arg[3])*2^2 + arg[2])
+    local bytecode = string.format('%02x',(opcode['op_clken_e']) +  _TP.getConstLen(arg[1])*2^3 + 1*2^2 + arg[2])
+--lbl    bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytes(arg[3]))
+    bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytesLbl(arg[3]))
     local codeA = 'clken_e '..arg[1]..' '..arg[2]..' '..arg[3]
     OPCODE(me,bytecode,codeA,codeB)     
   end,
  
 	-- arg={stack,label)
 	op_tkins_max= function (me,codeB,arg) 
-		local bytecode = string.format('%02x',(opcode['op_tkins_max']) +  arg[1]*2^2 + _TP.getConstLen(arg[2]))
-		bytecode = string.format('%s %s',bytecode,_TP.getConstBytes(arg[2]))		
+--lbl    local bytecode = string.format('%02x',(opcode['op_tkins_max']) +  arg[1]*2^2 + _TP.getConstLen(arg[2]))
+    local bytecode = string.format('%02x',(opcode['op_tkins_max']) +  arg[1]*2^2 + 1)
+--lbl    bytecode = string.format('%s %s',bytecode,_TP.getConstBytes(arg[2]))    
+    bytecode = string.format('%s %s',bytecode,_TP.getConstBytesLbl(arg[2]))    
 		local codeA = 'tkins_max '..arg[1]..' '..arg[2]
 		OPCODE(me,bytecode,codeA,codeB)			
 	end, 
 
 	-- arg={chk,tree,label)
 	op_tkins_z= function (me,codeB,arg) 
-		local bytecode = string.format('%02x',(opcode['op_tkins_z']) +  _TP.getConstLen(arg[3])*2 + arg[1])
-		bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[2],1),_TP.getConstBytes(arg[3]))		
+--lbl    local bytecode = string.format('%02x',(opcode['op_tkins_z']) +  _TP.getConstLen(arg[3])*2 + arg[1])
+    local bytecode = string.format('%02x',(opcode['op_tkins_z']) +  1*2 + arg[1])
+--lbl    bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[2],1),_TP.getConstBytes(arg[3]))   
+    bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[2],1),_TP.getConstBytesLbl(arg[3]))   
 		local codeA = 'tkins_z '..arg[1]..' '..arg[2]..' '..arg[3]
 		OPCODE(me,bytecode,codeA,codeB)				
 	end, 
 
   -- arg={gate,label)
   op_asen= function (me,codeB,arg)
-    local bytecode = string.format('%02x',(opcode['op_asen']) + _TP.getConstLen(arg[1])*2 + _TP.getConstLen(arg[2]))
-    bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytes(arg[2]))
+--lbl    local bytecode = string.format('%02x',(opcode['op_asen']) + _TP.getConstLen(arg[1])*2 + _TP.getConstLen(arg[2]))
+    local bytecode = string.format('%02x',(opcode['op_asen']) + _TP.getConstLen(arg[1])*2 + 1)
+--lbl    bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytes(arg[2]))
+    bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytesLbl(arg[2]))
     local codeA = 'asen '..arg[1]..' '..arg[2]
     OPCODE(me,bytecode,codeA,codeB)   end, 
 

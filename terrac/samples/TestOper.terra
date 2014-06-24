@@ -36,8 +36,14 @@ event ubyte ee;
 var user_reg2 data5;
 var user_reg2* data5p;
 
+
+loop do
+	await 1s;
+	inc x;
+end
+
 //await_until(x,ee,x>10);
-await_until(msg,RECEIVE,msg.type==1);
+//await_until(msg,RECEIVE,msg.type==1);
 
 //x = 100000;
 

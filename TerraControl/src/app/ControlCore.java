@@ -239,11 +239,7 @@ public class ControlCore implements MessageListener
 		msg.set_blockLen(progBin.getNumBlocks());
 		msg.set_blockStart(progBin.getBlockStart());
 		msg.set_startProg(progBin.getStartProg());
-		msg.set_lblTable11(progBin.getLabelTable11());
-		msg.set_lblTable12(progBin.getLabelTable12());
-		msg.set_lblTable21(progBin.getLabelTable21());
-		msg.set_lblTable22(progBin.getLabelTable22());
-		msg.set_lblTableEnd(progBin.getLabelTableEnd());
+		msg.set_endProg(progBin.getEndProg());
 		msg.set_nTracks(progBin.getNTracks());
 		msg.set_wClocks(progBin.getWClocks());
 		msg.set_asyncs(progBin.getAsyncs());

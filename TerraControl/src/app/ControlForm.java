@@ -886,6 +886,12 @@ public class ControlForm {
 		reqConfigRetryCount=0;
 
 		progBin = new ProgBin(binFile);
+		String error = progBin.getLastError();
+		System.out.println("***: "+error);
+		if (error.length() > 0) {
+			appendControlMsg("****** "+error);
+			return;
+		}
 
 		// Start the new configuration
 		barFSM.setValue(0);

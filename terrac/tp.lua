@@ -226,13 +226,13 @@ function _TP.getConstBytesLbl(val,len)
   len = 2;
   nx=1
   local nval = tonumber(val)
-  local bytes = string.format('%02x*',nval % 256)
+  local bytes = string.format('.%02x ',nval % 256)
   while (math.floor(nval/256) > 0 or len>1)  and nx < 4 do
     nx = nx+1;
     len = len - 1;
     nval = math.floor(nval/256)
     -- big-endian byte order
-    bytes = string.format('%02x* %s ',nval % 256,bytes)
+    bytes = string.format('.%02x %s ',nval % 256,bytes)
   end
   return trim(bytes)
 end

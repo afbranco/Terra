@@ -10,15 +10,12 @@ public class ProgBin {
 	static short MAX_BLOCKS = 80; //16;
 	static int MAX_TABLE_LEN = BLOCK_SIZE * MAX_BLOCKS;
 
+	private String lastError;
 	
 	private short numBlocks;
 	private short blockStart;
 	private int startProg;
-	private int labelTable11;
-	private int labelTable12;
-	private int labelTable21;
-	private int labelTable22;
-	private int labelTableEnd;
+	private int endProg;
 	private int nTracks;
 	private int wClocks;
 	private int asyncs;
@@ -33,7 +30,7 @@ public class ProgBin {
 		String FileName = vmxFile;
 		System.out.printf("ProgBin:file=%s\n",FileName);
 		resetProgData();
-		ReadFile(FileName);
+		lastError = ReadFile(FileName);
 	}
 
 	private void resetProgData(){
@@ -46,11 +43,7 @@ public class ProgBin {
 	public short[] getProgBlock(short Block){return ProgData[Block];}
 	public short getBlockStart() {return blockStart;}
 	public int getStartProg() {return startProg;}
-	public int getLabelTable11() {return labelTable11;}
-	public int getLabelTable12() {return labelTable12;}
-	public int getLabelTable21() {return labelTable21;}
-	public int getLabelTable22() {return labelTable22;}
-	public int getLabelTableEnd() {return labelTableEnd;}
+	public int getEndProg() {return endProg;}
 	public int getNTracks() {return nTracks;}
 	public int getWClocks() {return wClocks;}
 	public int getAsyncs() {return asyncs;}
@@ -58,8 +51,10 @@ public class ProgBin {
 	public int getGate0() {return gate0;}
 	public int getInEvts() {return inEvts;}
 	public int getAsync0() {return async0;}
+
+	public String getLastError() {return lastError;}
 	
-	public void ReadFile(String FileName) {
+	public String ReadFile(String FileName) {
 		short blockCount = 0;
 		int byteCount;
 		try {
@@ -70,21 +65,23 @@ public class ProgBin {
 			// Read first line to get environment parameters
 			if (((strLine = br.readLine()) != null)){
 				String params[] = strLine.split(" ");
-				if (params.length==13){
+				if (params.length==9){
 					startProg = Integer.decode(params[0]);
-					labelTable11 = Integer.decode(params[1]);
-					labelTable12 = Integer.decode(params[2]);
-					labelTable21 = Integer.decode(params[3]);
-					labelTable22 = Integer.decode(params[4]);
-					labelTableEnd = Integer.decode(params[5]);					
-					nTracks = Integer.decode(params[6]);					
-					wClocks = Integer.decode(params[7]);
-					asyncs = Integer.decode(params[8]);
-					wClock0 = Integer.decode(params[9]);
-					gate0 = Integer.decode(params[10]);
-					inEvts = Integer.decode(params[11]);
-					async0 = Integer.decode(params[12]);
+					endProg = Integer.decode(params[1]);
+					nTracks = Integer.decode(params[2]);					
+					wClocks = Integer.decode(params[3]);
+					asyncs = Integer.decode(params[4]);
+					wClock0 = Integer.decode(params[5]);
+					gate0 = Integer.decode(params[6]);
+					inEvts = Integer.decode(params[7]);
+					async0 = Integer.decode(params[8]);
+				} else {
+					br.close();
+					return (String)(".vmx format error - incompatible header line.");	
 				}
+			} else {
+				br.close();
+				return (String)(".vmx format error - empty file.");	
 			}
 
 			
@@ -102,8 +99,9 @@ public class ProgBin {
 			//Close the input stream
 			in.close();
 		} catch (Exception e) {
-			e.printStackTrace();
+			return (String)(".vmx format error."+ e.getMessage());	
 		}			
+		return (String)("");
 	}
 
 

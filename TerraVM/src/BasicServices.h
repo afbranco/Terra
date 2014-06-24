@@ -71,11 +71,12 @@ typedef nx_struct newProgVersion{
 	nx_uint8_t blockLen; 		// Number of program blocks
 	nx_uint8_t blockStart; 		// first block
 	nx_uint16_t startProg; 		// Start prog addr. 
-	nx_uint16_t lblTable11; 	// Label 1x1 Table addr
-	nx_uint16_t lblTable12; 	// Label 1x2 Table addr
-	nx_uint16_t lblTable21; 	// Label 2x1 Table addr
-	nx_uint16_t lblTable22; 	// Label 2x2 Table addr
-	nx_uint16_t lblTableEnd;	// Label tables end addr
+	nx_uint16_t endProg; 		// Start prog addr. 
+//	nx_uint16_t lblTable11; 	// Label 1x1 Table addr
+//	nx_uint16_t lblTable12; 	// Label 1x2 Table addr
+//	nx_uint16_t lblTable21; 	// Label 2x1 Table addr
+//	nx_uint16_t lblTable22; 	// Label 2x2 Table addr
+//	nx_uint16_t lblTableEnd;	// Label tables end addr
 	nx_uint16_t nTracks; 		// Tracks number
 	nx_uint16_t wClocks; 		// Clocks number
 	nx_uint16_t asyncs; 		// Asyncs number

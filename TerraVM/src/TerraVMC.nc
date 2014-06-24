@@ -39,7 +39,8 @@ implementation
 
 	// Ceu Environment vars
 	uint16_t ProgStart;
-	uint16_t LblTab11,LblTab12,LblTab21,LblTab22,LblTabEnd;
+	uint16_t ProgEnd;
+//	uint16_t LblTab11,LblTab12,LblTab21,LblTab22,LblTabEnd;
 	uint16_t nTracks;
 	uint16_t wClocks;
 	uint16_t asyncs;
@@ -110,8 +111,9 @@ implementation
 
 	uint16_t getLblAddr(uint16_t lbl){
 		uint16_t pos;
-		dbg(APPNAME,"VM::getLblAddr(%d): start=%d end=%d\n",lbl,LblTab11,LblTabEnd);		
-
+		dbg(APPNAME,"VM::getLblAddr(%d):\n",lbl);	
+		return lbl;	
+/*
 		// Looking in 1x1 table 
 		for (pos=LblTab11; pos < LblTab12;pos=pos+2){ // +2 assuming 8bits labels and 8bits adrr
 //dbg(APPNAME,"VM::getLblAddr(%d): 1x1 - LblTab[%d]=%d -> value=%d\n",lbl,pos,*(uint8_t*)&CEU_data[pos],*(uint8_t*)(&CEU_data[pos+1]));
@@ -133,7 +135,8 @@ implementation
 			if (*(nx_uint16_t*)&CEU_data[pos] == lbl) return *(nx_uint16_t*)(&CEU_data[pos+2]);		
 		}
 		return 0;
-	}
+*/
+ 	}
 
 
 //------------------------ auxiliary functions --------
@@ -544,7 +547,7 @@ int ceu_go_init (int* ret)
    CEU->p_mem = CEU_data+((nTracks+1)*sizeof(tceu_trk));
    MEM = CEU->p_mem;
 
-   ceu_track_ins(CEU_STACK_MIN, CEU_TREE_MAX, 0, Init);
+   ceu_track_ins(CEU_STACK_MIN, CEU_TREE_MAX, 0, ProgStart);
     return ceu_go(ret);
 }
 
@@ -1248,7 +1251,8 @@ void f_outevt_v(uint8_t Modifier){
 	Cevt  = getPar8(1);
 	Maddr = getPar16(2);
 	dbg(APPNAME,"VM::f_outevt_v(%02x): Cevt=%d, Maddr=%d\n",Modifier,Cevt,Maddr);
-	call VMCustom.procOutEvt(Cevt,getMVal(Maddr,tp_len));
+//	call VMCustom.procOutEvt(Cevt,getMVal(Maddr,tp_len));
+	call VMCustom.procOutEvt(Cevt,Maddr);
 }
 void f_outevtx_v(uint8_t Modifier){
 	uint8_t Cevt,tp_len;
@@ -1257,7 +1261,8 @@ void f_outevtx_v(uint8_t Modifier){
 	Cevt  = getPar8(1);
 	Maddr = getPar16(1);
 	dbg(APPNAME,"VM::f_outevtx_v(%02x): Cevt=%d, Maddr=%d\n",Modifier,Cevt,Maddr);
-	call VMCustom.procOutEvt(Cevt,getMVal(Maddr,tp_len));
+//	call VMCustom.procOutEvt(Cevt,getMVal(Maddr,tp_len));
+	call VMCustom.procOutEvt(Cevt,Maddr);
 }
 
 void f_outevt_z(uint8_t Modifier){
@@ -1630,11 +1635,12 @@ void f_tkins_z(uint8_t Modifier){
 
 	event void BSUpload.setEnv(newProgVersion_t* data){
 		ProgStart = (uint16_t)data->startProg;
-		LblTab11 = data->lblTable11;
-		LblTab12 = data->lblTable12;
-		LblTab21 = data->lblTable21;
-		LblTab22 = data->lblTable22;
-		LblTabEnd = data->lblTableEnd;
+		ProgEnd = (uint16_t)data->endProg;
+//		LblTab11 = data->lblTable11;
+//		LblTab12 = data->lblTable12;
+//		LblTab21 = data->lblTable21;
+//		LblTab22 = data->lblTable22;
+//		LblTabEnd = data->lblTableEnd;
 		nTracks = data->nTracks;
 		wClocks = data->wClocks;
 		asyncs = data->asyncs;
@@ -1643,18 +1649,19 @@ void f_tkins_z(uint8_t Modifier){
 		inEvts = data->inEvts;
 		async0 = data->async0;
 
-		dbg(APPNAME,"VM::BSUpload.setEnv(): lbl11=%d, lbl12=%d, lbl21=%d, lbl22=%d, lblEnd=%d, nTracks=%d, wClocks=%d, asyncs=%d, wClock0=%d, gate0=%d, async0=%d\n",
-				LblTab11,LblTab12,LblTab21,LblTab22,LblTabEnd,nTracks,wClocks,asyncs,wClock0,gate0,async0);
+		dbg(APPNAME,"VM::BSUpload.setEnv(): ProgStart=%d, ProgEnd=%d, nTracks=%d, wClocks=%d, asyncs=%d, wClock0=%d, gate0=%d, async0=%d\n",
+				ProgStart, ProgEnd, nTracks,wClocks,asyncs,wClock0,gate0,async0);
 	} 
 	
 	event void BSUpload.getEnv(newProgVersion_t* data){
 		dbg(APPNAME,"VM::BSUpload.getEnv()\n");
 		data->startProg = ProgStart;
-		data->lblTable11 = LblTab11;
-		data->lblTable12 = LblTab12;
-		data->lblTable21 = LblTab21;
-		data->lblTable22 = LblTab22;
-		data->lblTableEnd = LblTabEnd;;
+		data->endProg = ProgEnd;
+//		data->lblTable11 = LblTab11;
+//		data->lblTable12 = LblTab12;
+//		data->lblTable21 = LblTab21;
+//		data->lblTable22 = LblTab22;
+//		data->lblTableEnd = LblTabEnd;
 		data->nTracks = nTracks;
 		data->wClocks = wClocks;
 		data->asyncs = asyncs;
@@ -1662,8 +1669,8 @@ void f_tkins_z(uint8_t Modifier){
 		data->gate0 = gate0;
 		data->inEvts = inEvts;
 		data->async0 = async0;
-		dbg(APPNAME,"VM::BSUpload.getEnv(): lbl11=%d, lbl12=%d, lbl21=%d, lbl22=%d, lblEnd=%d, nTracks=%d, wClocks=%d, asyncs=%d, wClock0=%d, gate0=%d, async0=%d\n",
-				LblTab11,LblTab12,LblTab21,LblTab22,LblTabEnd,nTracks,wClocks,asyncs,wClock0,gate0,async0);
+		dbg(APPNAME,"VM::BSUpload.getEnv(): ProgStart=%d, ProgEnd=%d, nTracks=%d, wClocks=%d, asyncs=%d, wClock0=%d, gate0=%d, async0=%d\n",
+				ProgStart, ProgEnd,nTracks,wClocks,asyncs,wClock0,gate0,async0);
 	}
 
 

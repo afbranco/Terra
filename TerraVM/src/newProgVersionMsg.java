@@ -7,12 +7,12 @@
 public class newProgVersionMsg extends net.tinyos.message.Message {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 34;
+    public static final int DEFAULT_MESSAGE_SIZE = 26;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 160;
 
-    /** Create a new newProgVersionMsg of size 34. */
+    /** Create a new newProgVersionMsg of size 26. */
     public newProgVersionMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -97,19 +97,7 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
         s += "  [startProg=0x"+Long.toHexString(get_startProg())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [lblTable11=0x"+Long.toHexString(get_lblTable11())+"]\n";
-      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
-      try {
-        s += "  [lblTable12=0x"+Long.toHexString(get_lblTable12())+"]\n";
-      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
-      try {
-        s += "  [lblTable21=0x"+Long.toHexString(get_lblTable21())+"]\n";
-      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
-      try {
-        s += "  [lblTable22=0x"+Long.toHexString(get_lblTable22())+"]\n";
-      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
-      try {
-        s += "  [lblTableEnd=0x"+Long.toHexString(get_lblTableEnd())+"]\n";
+        s += "  [endProg=0x"+Long.toHexString(get_endProg())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [nTracks=0x"+Long.toHexString(get_nTracks())+"]\n";
@@ -393,324 +381,72 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: lblTable11
+    // Accessor methods for field: endProg
     //   Field type: int, unsigned
     //   Offset (bits): 48
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'lblTable11' is signed (false).
+     * Return whether the field 'endProg' is signed (false).
      */
-    public static boolean isSigned_lblTable11() {
+    public static boolean isSigned_endProg() {
         return false;
     }
 
     /**
-     * Return whether the field 'lblTable11' is an array (false).
+     * Return whether the field 'endProg' is an array (false).
      */
-    public static boolean isArray_lblTable11() {
+    public static boolean isArray_endProg() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'lblTable11'
+     * Return the offset (in bytes) of the field 'endProg'
      */
-    public static int offset_lblTable11() {
+    public static int offset_endProg() {
         return (48 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'lblTable11'
+     * Return the offset (in bits) of the field 'endProg'
      */
-    public static int offsetBits_lblTable11() {
+    public static int offsetBits_endProg() {
         return 48;
     }
 
     /**
-     * Return the value (as a int) of the field 'lblTable11'
+     * Return the value (as a int) of the field 'endProg'
      */
-    public int get_lblTable11() {
-        return (int)getUIntBEElement(offsetBits_lblTable11(), 16);
+    public int get_endProg() {
+        return (int)getUIntBEElement(offsetBits_endProg(), 16);
     }
 
     /**
-     * Set the value of the field 'lblTable11'
+     * Set the value of the field 'endProg'
      */
-    public void set_lblTable11(int value) {
-        setUIntBEElement(offsetBits_lblTable11(), 16, value);
+    public void set_endProg(int value) {
+        setUIntBEElement(offsetBits_endProg(), 16, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'lblTable11'
+     * Return the size, in bytes, of the field 'endProg'
      */
-    public static int size_lblTable11() {
+    public static int size_endProg() {
         return (16 / 8);
     }
 
     /**
-     * Return the size, in bits, of the field 'lblTable11'
+     * Return the size, in bits, of the field 'endProg'
      */
-    public static int sizeBits_lblTable11() {
-        return 16;
-    }
-
-    /////////////////////////////////////////////////////////
-    // Accessor methods for field: lblTable12
-    //   Field type: int, unsigned
-    //   Offset (bits): 64
-    //   Size (bits): 16
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'lblTable12' is signed (false).
-     */
-    public static boolean isSigned_lblTable12() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'lblTable12' is an array (false).
-     */
-    public static boolean isArray_lblTable12() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'lblTable12'
-     */
-    public static int offset_lblTable12() {
-        return (64 / 8);
-    }
-
-    /**
-     * Return the offset (in bits) of the field 'lblTable12'
-     */
-    public static int offsetBits_lblTable12() {
-        return 64;
-    }
-
-    /**
-     * Return the value (as a int) of the field 'lblTable12'
-     */
-    public int get_lblTable12() {
-        return (int)getUIntBEElement(offsetBits_lblTable12(), 16);
-    }
-
-    /**
-     * Set the value of the field 'lblTable12'
-     */
-    public void set_lblTable12(int value) {
-        setUIntBEElement(offsetBits_lblTable12(), 16, value);
-    }
-
-    /**
-     * Return the size, in bytes, of the field 'lblTable12'
-     */
-    public static int size_lblTable12() {
-        return (16 / 8);
-    }
-
-    /**
-     * Return the size, in bits, of the field 'lblTable12'
-     */
-    public static int sizeBits_lblTable12() {
-        return 16;
-    }
-
-    /////////////////////////////////////////////////////////
-    // Accessor methods for field: lblTable21
-    //   Field type: int, unsigned
-    //   Offset (bits): 80
-    //   Size (bits): 16
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'lblTable21' is signed (false).
-     */
-    public static boolean isSigned_lblTable21() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'lblTable21' is an array (false).
-     */
-    public static boolean isArray_lblTable21() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'lblTable21'
-     */
-    public static int offset_lblTable21() {
-        return (80 / 8);
-    }
-
-    /**
-     * Return the offset (in bits) of the field 'lblTable21'
-     */
-    public static int offsetBits_lblTable21() {
-        return 80;
-    }
-
-    /**
-     * Return the value (as a int) of the field 'lblTable21'
-     */
-    public int get_lblTable21() {
-        return (int)getUIntBEElement(offsetBits_lblTable21(), 16);
-    }
-
-    /**
-     * Set the value of the field 'lblTable21'
-     */
-    public void set_lblTable21(int value) {
-        setUIntBEElement(offsetBits_lblTable21(), 16, value);
-    }
-
-    /**
-     * Return the size, in bytes, of the field 'lblTable21'
-     */
-    public static int size_lblTable21() {
-        return (16 / 8);
-    }
-
-    /**
-     * Return the size, in bits, of the field 'lblTable21'
-     */
-    public static int sizeBits_lblTable21() {
-        return 16;
-    }
-
-    /////////////////////////////////////////////////////////
-    // Accessor methods for field: lblTable22
-    //   Field type: int, unsigned
-    //   Offset (bits): 96
-    //   Size (bits): 16
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'lblTable22' is signed (false).
-     */
-    public static boolean isSigned_lblTable22() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'lblTable22' is an array (false).
-     */
-    public static boolean isArray_lblTable22() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'lblTable22'
-     */
-    public static int offset_lblTable22() {
-        return (96 / 8);
-    }
-
-    /**
-     * Return the offset (in bits) of the field 'lblTable22'
-     */
-    public static int offsetBits_lblTable22() {
-        return 96;
-    }
-
-    /**
-     * Return the value (as a int) of the field 'lblTable22'
-     */
-    public int get_lblTable22() {
-        return (int)getUIntBEElement(offsetBits_lblTable22(), 16);
-    }
-
-    /**
-     * Set the value of the field 'lblTable22'
-     */
-    public void set_lblTable22(int value) {
-        setUIntBEElement(offsetBits_lblTable22(), 16, value);
-    }
-
-    /**
-     * Return the size, in bytes, of the field 'lblTable22'
-     */
-    public static int size_lblTable22() {
-        return (16 / 8);
-    }
-
-    /**
-     * Return the size, in bits, of the field 'lblTable22'
-     */
-    public static int sizeBits_lblTable22() {
-        return 16;
-    }
-
-    /////////////////////////////////////////////////////////
-    // Accessor methods for field: lblTableEnd
-    //   Field type: int, unsigned
-    //   Offset (bits): 112
-    //   Size (bits): 16
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'lblTableEnd' is signed (false).
-     */
-    public static boolean isSigned_lblTableEnd() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'lblTableEnd' is an array (false).
-     */
-    public static boolean isArray_lblTableEnd() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'lblTableEnd'
-     */
-    public static int offset_lblTableEnd() {
-        return (112 / 8);
-    }
-
-    /**
-     * Return the offset (in bits) of the field 'lblTableEnd'
-     */
-    public static int offsetBits_lblTableEnd() {
-        return 112;
-    }
-
-    /**
-     * Return the value (as a int) of the field 'lblTableEnd'
-     */
-    public int get_lblTableEnd() {
-        return (int)getUIntBEElement(offsetBits_lblTableEnd(), 16);
-    }
-
-    /**
-     * Set the value of the field 'lblTableEnd'
-     */
-    public void set_lblTableEnd(int value) {
-        setUIntBEElement(offsetBits_lblTableEnd(), 16, value);
-    }
-
-    /**
-     * Return the size, in bytes, of the field 'lblTableEnd'
-     */
-    public static int size_lblTableEnd() {
-        return (16 / 8);
-    }
-
-    /**
-     * Return the size, in bits, of the field 'lblTableEnd'
-     */
-    public static int sizeBits_lblTableEnd() {
+    public static int sizeBits_endProg() {
         return 16;
     }
 
     /////////////////////////////////////////////////////////
     // Accessor methods for field: nTracks
     //   Field type: int, unsigned
-    //   Offset (bits): 128
+    //   Offset (bits): 64
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -732,14 +468,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'nTracks'
      */
     public static int offset_nTracks() {
-        return (128 / 8);
+        return (64 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'nTracks'
      */
     public static int offsetBits_nTracks() {
-        return 128;
+        return 64;
     }
 
     /**
@@ -773,7 +509,7 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: wClocks
     //   Field type: int, unsigned
-    //   Offset (bits): 144
+    //   Offset (bits): 80
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -795,14 +531,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'wClocks'
      */
     public static int offset_wClocks() {
-        return (144 / 8);
+        return (80 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'wClocks'
      */
     public static int offsetBits_wClocks() {
-        return 144;
+        return 80;
     }
 
     /**
@@ -836,7 +572,7 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: asyncs
     //   Field type: int, unsigned
-    //   Offset (bits): 160
+    //   Offset (bits): 96
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -858,14 +594,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'asyncs'
      */
     public static int offset_asyncs() {
-        return (160 / 8);
+        return (96 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'asyncs'
      */
     public static int offsetBits_asyncs() {
-        return 160;
+        return 96;
     }
 
     /**
@@ -899,7 +635,7 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: wClock0
     //   Field type: int, unsigned
-    //   Offset (bits): 176
+    //   Offset (bits): 112
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -921,14 +657,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'wClock0'
      */
     public static int offset_wClock0() {
-        return (176 / 8);
+        return (112 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'wClock0'
      */
     public static int offsetBits_wClock0() {
-        return 176;
+        return 112;
     }
 
     /**
@@ -962,7 +698,7 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: gate0
     //   Field type: int, unsigned
-    //   Offset (bits): 192
+    //   Offset (bits): 128
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -984,14 +720,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'gate0'
      */
     public static int offset_gate0() {
-        return (192 / 8);
+        return (128 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'gate0'
      */
     public static int offsetBits_gate0() {
-        return 192;
+        return 128;
     }
 
     /**
@@ -1025,7 +761,7 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: inEvts
     //   Field type: int, unsigned
-    //   Offset (bits): 208
+    //   Offset (bits): 144
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -1047,14 +783,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'inEvts'
      */
     public static int offset_inEvts() {
-        return (208 / 8);
+        return (144 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'inEvts'
      */
     public static int offsetBits_inEvts() {
-        return 208;
+        return 144;
     }
 
     /**
@@ -1088,7 +824,7 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: async0
     //   Field type: int, unsigned
-    //   Offset (bits): 224
+    //   Offset (bits): 160
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -1110,14 +846,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'async0'
      */
     public static int offset_async0() {
-        return (224 / 8);
+        return (160 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'async0'
      */
     public static int offsetBits_async0() {
-        return 224;
+        return 160;
     }
 
     /**
@@ -1151,7 +887,7 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: refTA1
     //   Field type: long, unsigned
-    //   Offset (bits): 240
+    //   Offset (bits): 176
     //   Size (bits): 32
     /////////////////////////////////////////////////////////
 
@@ -1173,14 +909,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'refTA1'
      */
     public static int offset_refTA1() {
-        return (240 / 8);
+        return (176 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'refTA1'
      */
     public static int offsetBits_refTA1() {
-        return 240;
+        return 176;
     }
 
     /**

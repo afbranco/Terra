@@ -472,6 +472,7 @@ implementation{
  		ProgBlockLen = Data->blockLen;
  		// Update environment values: StartProg addr, etc..
  		signal BSUpload.setEnv(Data);
+		dbg(APPNAME, "BS::procNewProgVersion(). ProgBlockStart=%d, ProgBlockLen=%d \n",ProgBlockStart,ProgBlockLen);
  		// reset all memory (leave set unused blocks)
  		atomic call BM.resetRange(ProgBlockStart,(ProgBlockStart+ProgBlockLen)-1);
  		//printBM();

@@ -264,16 +264,34 @@ for x,op in ipairs(_AST.root.opcode) do
 	end	
 end
 
-  -- Print sorted label table
---for x=1, 1000 do
---  if (_AST.root.labeltable[x] ~= nil) then
---    print(x,_AST.root.labeltable[x])
---  end
---end
+-- Rebuild 'op' with addrs in opcode_aux field
+_AST.root.opcode_aux={}
+local lblL,lblH;
+for x,op in pairs(_AST.root.opcode) do
+  if (string.sub(op,1,1) ~= 'L') then 
+    _AST.root.opcode_aux[x] = op
+    if (string.sub(op,1,1) == '.') then
+      if (lblH==nil) then
+        lblH = string.sub(op,2,3)
+      else
+        lblL = string.sub(op,2,3)
+        local lbl = tonumber(('0x'..lblH))*256 + tonumber('0x'..lblL)
+        local addr = _AST.root.labeltable[lbl]
+        print(string.format('%04d',_AST.root.op_addr[x-1]),lbl,addr,_TP.getConstBytes(addr,2))
+        _AST.root.opcode_aux[x-1]=string.format('%02x',addr / 256)
+        _AST.root.opcode_aux[x]=string.format('%02x',addr % 256)
+        lblH = nil
+      end
+    end
+  end 
+end
+
 
 pos=endCode
 idx=table.getn(_AST.root.opcode)+1
 
+
+--[[
 -- Code for LblTable11 :: label(1byte) x Addr(1byte)
 LblTable11_addr=pos;
 for lbl,addr in pairs(_AST.root.labeltable) do
@@ -344,11 +362,12 @@ for lbl,addr in pairs(_AST.root.labeltable) do
 end
 LblTableEnd_addr=pos;
 
+--]]
 
 
 -- ====  Environment parameters  ====
 -- codeAddr,LblTable11_addr,LblTable12_addr,LblTable21_addr,LblTable22_addr,LblTableEnd_addr,n_tracks,n_wavlocks,wclock0,gate0
-asmText = codeAddr..' '..LblTable11_addr..' '..LblTable12_addr..' '..LblTable21_addr..' '..LblTable22_addr..' '..LblTableEnd_addr
+asmText = codeAddr..' '..endCode --LblTable11_addr..' '..LblTable12_addr..' '..LblTable21_addr..' '..LblTable22_addr..' '..LblTableEnd_addr
 asmText = asmText ..' '..ALL.n_tracks..' '.._ENV.n_wclocks..' '.. _ENV.n_asyncs ..' '.._MEM.gtes.wclock0
 asmText = asmText ..' '.._ENV.gate0..' '.._ENV.n_ins_active..' '.._MEM.gtes.async0..'\n'
 -- === Tracks ===
@@ -405,10 +424,12 @@ lastBytes=0
 _AST.root.x_stack = 0;
 _AST.root.max_stack = 0;
 for x,op in pairs(_AST.root.opcode) do
+  if x > endCode then break end
 	if (string.sub(op,1,1) ~= 'L') then 
 		_AST.root.x_stack = _AST.root.x_stack + (_AST.root.n_stack[x] or 0);
 		_AST.root.max_stack = math.max(_AST.root.max_stack,_AST.root.x_stack);
-		asmText = asmText ..trim(op)..' | '..string.format('%04d',_AST.root.op_addr[x])..' '..op..' '..(_AST.root.code2[x] or '')..'\n'
+--    asmText = asmText ..trim(op)..' | '..string.format('%04d',_AST.root.op_addr[x])..' '..op..' '..(_AST.root.code2[x] or '')..'\n'
+    asmText = asmText .. (_AST.root.opcode_aux[x] or '--') ..' | '..string.format('%04d',_AST.root.op_addr[x])..' '..op..' '..(_AST.root.code2[x] or '')..'\n'
 		nlines=nlines+1;
 		lastBytes=_AST.root.op_addr[x];
 	else
@@ -418,16 +439,16 @@ end
 
 local CodeSize = endCode-codeAddr
 local CtlVars  = codeAddr
-local LblTab   = LblTableEnd_addr-endCode
+--local LblTab   = LblTableEnd_addr-endCode
 local Stack    = _AST.root.max_stack*4
-local TotalMem = CtlVars + CodeSize + LblTab + Stack
-local RadioMsgs = ((codeAddr%24) == 0 and math.ceil((LblTableEnd_addr-codeAddr)/24)) or 1+math.ceil((LblTableEnd_addr-codeAddr-(24-codeAddr%24))/24)
+local TotalMem = CtlVars + CodeSize + Stack
+local RadioMsgs = ((codeAddr%24) == 0 and math.ceil((CodeSize)/24)) or 1+math.ceil((CodeSize-(24-codeAddr%24))/24)
 --print((codeAddr%24) == 0 , ((LblTableEnd_addr-codeAddr)/24) , 1,LblTableEnd_addr-codeAddr,(24-codeAddr%24))
 print('-------------------------------------------------------------')
 print('<<<<   Terra Compiler -- VM Version: '.. _ENV.vm_version.. '    >>>>')
 print('Memory allocation:')
-print('Total =','Code','+ Ctl/Vars','+ LblTab','+ Stack')
-print(TotalMem,CodeSize,CtlVars,'',LblTab,'',Stack)
+print('Total =','Code','+ Ctl/Vars','+ Stack')
+print(TotalMem,CodeSize,CtlVars,'',Stack)
 print('Radio Msgs = ',RadioMsgs)
 print('-------------------------------------------------------------')
 

@@ -76,7 +76,7 @@ function SWITCH (me, lbl)
 --//> _lbl_ = ]]..lbl.id..[[;
 --//> goto _SWITCH_;
 --]])
-    codeB = LINE(me,'goto '.._TP.getConstType(lbl.n,me)..' '..lbl.n, nil,'// goto '..lbl.id)
+    codeB = LINE(me,'goto '..' '..lbl.n, nil,'// goto '..lbl.id)
     BYTECODE(me,codeB,'op_exec',lbl.n)
 end
 
@@ -1286,7 +1286,7 @@ print("code::SetAwait: *var:",e1[1][2].tag,e1[1][2][1],e1[1][2].val,e1[1][2].tp)
     --                    ..(int.var.awt0+1+me.gte*_ENV.c.tceu_nlbl.len)
     --                    ..') = '..me.lbl_awk.id..';')
     codeB = LINE(me, 'await '..me.lbl_awk.id,nil,'// AwaitInt:: wait')
-    BYTECODE(me,codeB,'op_set_c','ushort',(int.var.awt0+1+me.gte*_ENV.c.tceu_nlbl.len),me.lbl_awk.n)
+    BYTECODE(me,codeB,'op_set_c','ushort',(int.var.awt0+1+me.gte*_ENV.c.tceu_nlbl.len),me.lbl_awk.n,true)
 
     HALT(me)
 
@@ -1339,7 +1339,7 @@ print("code::SetAwait: *var:",e1[1][2].tag,e1[1][2][1],e1[1][2].val,e1[1][2].tp)
 --print("code::AwaitExt: ",e1.ext.n,me.gte,me.lbl.n,_MEM.gtes[e1.ext.n])
 --        LINE(me, '//> *PTR_EXT(IN_'..e1.ext.id..','..me.gte..') = '..me.lbl.id..';')
         codeB = LINE(me, 'await '..e1.ext.id..'['..me.gte..']',nil,'// AwaitExt:: ')
-		BYTECODE(me,codeB,'op_set_c','ushort',(_MEM.gtes[e1.ext.n]+2+(me.gte*2)),me.lbl.n)
+		BYTECODE(me,codeB,'op_set_c','ushort',(_MEM.gtes[e1.ext.n]+2+(me.gte*2)),me.lbl.n,true)
 
         HALT(me) 
         CASE(me, me.lbl)
