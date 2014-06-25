@@ -89,8 +89,8 @@ do
     dofile 'lines.lua'
     dofile 'parser.lua'
     dofile 'ast.lua'
---    _AST.dump(_AST.root)
     dofile 'env.lua'
+--    _AST.dump(_AST.root)
     dofile 'props.lua'
 --print(print_r(_AST.root,"terrac: root"))
     dofile 'mem.lua'

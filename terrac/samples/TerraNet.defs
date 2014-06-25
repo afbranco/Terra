@@ -87,7 +87,7 @@ config 0.0.1 do
 	input ubyte 	PORT_B 			8;
 	input ubyte 	INT_A 			9;
 	input ubyte 	INT_B 			10;
-	input ubyte 	CUSTOM_A 		11;
+	input void 	CUSTOM_A 		11;
 
 	// TerraNet functions
 	function ushort getNodeId()		0;

@@ -39,47 +39,41 @@ function _TP.ext (tp)
 end
 
 
+function _TP.getAuxTag(tp1,arr1)
+    local aux={}
+    aux.tp = tp1
+    aux.ntp = tp1
+    aux.arr = arr1
+    aux.lvl=0
+    aux.len=0
+    aux.bType=nil
+    aux.auxtag=nil
+    while _TP.deref(aux.ntp) do aux.ntp = _TP.deref(aux.ntp); aux.lvl = aux.lvl+1 end
+    aux.bType = _TP.isBasicType(aux.ntp)
+    aux.len = (aux.arr and aux.arr*_ENV.c[aux.ntp].len) or (_TP.isBasicType(aux.ntp) and ((aux.lvl==0 and _ENV.c[aux.ntp].len) or 2)) or _ENV.c[aux.ntp].len 
+
+    aux.auxtag = 
+          ((    aux.ntp == 'void'                       ) and 'void'    ) or
+          ((not aux.bType and aux.lvl==1                ) and 'pointer' ) or
+          ((not aux.bType and aux.lvl==0                ) and 'data'    ) or
+          ((    aux.bType and aux.lvl==0                ) and 'var'     ) or
+          ((    aux.bType and aux.lvl==1 and not aux.arr) and 'pointer' ) or
+          ((    aux.bType and aux.lvl==1 and     aux.arr) and 'data'    ) or
+          ((    aux.bType and aux.lvl==2 and not aux.arr) and 'pointer2') or
+          ((    aux.bType and aux.lvl==2 and     aux.arr) and 'pointer2') or 'other'
+
+print("tp::getAuxTag:",aux.auxtag,aux.tp,aux.ntp,aux.lvl,aux.arr,aux.len)
+return aux
+end
+
 function _TP.tpCompat(tp1,tp2,arr1,arr2)
     -- error == true -> incompatible types
     -- cast == true -> need cast
 print("tp::tpCompat:",tp1,tp2)
     local error = true 
     local cast = false
-    local ntp1 = tp1
-    local ntp2 = tp2
-    local lvl1=0
-    local lvl2=0
-    local len1,len2
-    local bType1,bType2
-    local auxtag1,auxtag2
-    while _TP.deref(ntp1) do ntp1 = _TP.deref(ntp1); lvl1 = lvl1+1 end
-    while _TP.deref(ntp2) do ntp2 = _TP.deref(ntp2); lvl2 = lvl2+1 end
-    bType1 = _TP.isBasicType(ntp1)
-    bType2 = _TP.isBasicType(ntp2)
-
-    len1 = (arr1 and arr1*_ENV.c[ntp1].len) or (_TP.isBasicType(ntp1) and ((lvl1==0 and _ENV.c[ntp1].len) or 2)) or _ENV.c[ntp1].len 
-
-    len2 = (arr2 and arr2*_ENV.c[ntp2].len) or (_TP.isBasicType(ntp2) and ((lvl2==0 and _ENV.c[ntp2].len) or 2)) or _ENV.c[ntp2].len 
-
-
-auxtag1 = ((not bType1 and lvl1==1             ) and 'pointer') or
-          ((not bType1 and lvl1==0             ) and 'data') or
-          ((    bType1 and lvl1==0             ) and 'var') or
-          ((    bType1 and lvl1==1 and not arr1) and 'pointer') or
-          ((    bType1 and lvl1==1 and     arr1) and 'data') or
-          ((    bType1 and lvl1==2 and not arr1) and 'pointer2') or
-          ((    bType1 and lvl1==2 and     arr1) and 'pointer2') or 'other'
-
-auxtag2 = ((not bType2 and lvl2==1             ) and 'pointer') or
-          ((not bType2 and lvl2==0             ) and 'data') or
-          ((    bType2 and lvl2==0             ) and 'var') or
-          ((    bType2 and lvl2==1 and not arr2) and 'pointer') or
-          ((    bType2 and lvl2==1 and     arr2) and 'data') or
-          ((    bType2 and lvl2==2 and not arr2) and 'pointer2') or
-          ((    bType2 and lvl2==2 and     arr2) and 'pointer2') or 'other'
-
-print("tp::tpCompat:1",auxtag1,tp1,ntp1,lvl1,arr1,len1)
-print("tp::tpCompat:2",auxtag2,tp2,ntp2,lvl2,arr2,len2)
+    local z1 = _TP.getAuxTag(tp1,arr1)
+    local z2 = _TP.getAuxTag(tp2,arr2)
 
 -- *************************
 -- * Type Compatibility
@@ -94,6 +88,7 @@ print("tp::tpCompat:2",auxtag2,tp2,ntp2,lvl2,arr2,len2)
 -- tpBasic* +  arr  -> data;      arr*tp;   arr*tp
 -- tpBasic** + ~arr -> pointer;   ushort;   arr*tp
 -- tpBasic** +  arr -> pointer;   ushort;   arr*tp
+-- void             -> void;      void;     0
 -----------------------------------------------------
 
 -- *** Valid operations ***
@@ -103,61 +98,27 @@ print("tp::tpCompat:2",auxtag2,tp2,ntp2,lvl2,arr2,len2)
 -- pointer  = data;     addr copy;  len1 <= len2;   len1 < len2
 -- data     = data;     data copy;  min(len1,len2); len1 < len2
 -- var      = var;      data copy;  min(len1,len2); len1 < len2
+-- ???      = void;     default 'invalid'
 -------------------------------------------------------------
 
     if
-        (auxtag1 == 'pointer'  and auxtag2 == 'pointer')  and (len1 <= len2) or
-        (auxtag1 == 'pointer2' and auxtag2 == 'pointer2') and (len1 <= len2) or
-        (auxtag1 == 'pointer'  and auxtag2 == 'data'   )  and (len1 <= len2) or
-        (auxtag1 == 'var'      and auxtag2 == 'var'    )                    
+        (z1.auxtag == 'pointer'  and z2.auxtag == 'pointer')  and (z1.len <= z2.len) or
+        (z1.auxtag == 'pointer2' and z2.auxtag == 'pointer2') and (z1.len <= z2.len) or
+        (z1.auxtag == 'pointer'  and z2.auxtag == 'data'   )  and (z1.len <= z2.len) or
+        (z1.auxtag == 'var'      and z2.auxtag == 'var'    )                    
     then
         error = false
-        cast = (len1 < len2)
+        cast = (z1.len < z2.len)
     elseif
-        (auxtag1 == 'data'     and auxtag2 == 'data'   )                    
+        (z1.auxtag == 'data'     and z2.auxtag == 'data'   )                    
     then
         error = false
-        cast = (len1 ~= len2)
+        cast = (z1.len ~= z2.len)
     else
         error = true
         cast = false
     end
-    return error, cast, ntp1, ntp2, len1, len2
-
---    if (lvl1==lvl2) then
---      if (lvl1==0 and (ntp1=='void' or ntp2=='void')) then -- lvl==0 -> always basic type
---        error = true
---        cast = false
---      elseif (lvl1==1) then
---        error = true
---        cast = len1 < len2
---      elseif (lvl1==1 and (ntp1 == ntp2)) then
---        error = false
---        cast = false
---      elseif (lvl1==1 and not(not arr1 ~= not arr2) and not(not _TP.isBasicType(ntp1) ~= not _TP.isBasicType(ntp2)))then -- ... (arr1 xor arr2)
---        error = true
---        cast = false
---      else
---        if _TP.isBasicType(ntp1) and _TP.isBasicType(ntp2) then
---          error = false -- _TP.contains() like
---          cast = (_ENV.c[ntp1].len < _ENV.c[ntp2].len)
---        else
---           error = (len2<len1) --not(tp1==tp2) -- Pointer swap len 
---           cast = false
---        end
---      end
---    else
---      if      (lvl1==0 and lvl2==1 and not(_TP.isBasicType(tp1)) and arr2)  
---          or  (lvl1==1 and lvl2==0 and not(_TP.isBasicType(tp2)) and arr1)
---      then
---        error = false
---        cast = false
---      else
---        error = true
---        cast = false
---      end
---    end
---    return error, cast, ntp1, ntp2, len1, len2
+    return error, cast, z1.ntp, z2.ntp, z1.len, z2.len
 end
 
 function _TP.contains (tp1, tp2, c)

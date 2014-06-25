@@ -190,25 +190,10 @@ function getAuxValues(e1)
     x1.ntp = (_TP.deref(e1.tp) and 'ushort') or e1.tp  -- Redefine tp if it is a pointer
    
     -- **********************************************************
-    -- * auxtag3 computation from _TP.tpCompat() used in env.lua
+    -- * auxtag3 computation from _TP.getAuxTag() used in env.lua
     -- **********************************************************
-    local ntp1 = e1.tp
-    local lvl1 = 0
-    local bType1
-    local arr1
-    local auxtag3
-    while _TP.deref(ntp1) do ntp1 = _TP.deref(ntp1); lvl1 = lvl1+1 end
-    bType1 = _TP.isBasicType(ntp1)
-    arr1 = e1[1].arr
-    auxtag3 = ((not bType1 and lvl1==1             ) and 'pointer') or
-              ((not bType1 and lvl1==0             ) and 'data') or
-              ((    bType1 and lvl1==0             ) and 'var') or
-              ((    bType1 and lvl1==1 and not arr1) and 'pointer') or
-              ((    bType1 and lvl1==1 and     arr1) and 'data') or
-              ((    bType1 and lvl1==2 and not arr1) and 'pointer') or
-              ((    bType1 and lvl1==2 and     arr1) and 'pointer') or 'other'
-
-    x1.auxtag3 = auxtag3
+    local z1 = _TP.getAuxTag(e1.tp,e1[1].arr)
+    x1.auxtag3 = z1.auxtag
 
     -- **********************************
     -- * x1 parameter table computation 

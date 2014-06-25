@@ -72,6 +72,7 @@ function newvar (me, blk, pre, tp, dim, id)
 
     local nvar = {}
     if not(_TP.deref(tp)) and c.fields then
+      local z1 = _TP.getAuxTag(tp,dim)
       local var = {
           ln    = me.ln,
           id    = id,
@@ -81,12 +82,14 @@ function newvar (me, blk, pre, tp, dim, id)
           isEvt = isEvt,
           arr   = dim,
           n_awaits = 0,
-          fields ={}
+          fields ={},
+          auxtag = z1.auxtag,
       }
       blk.vars[#blk.vars+1] = var
       nvar[#nvar+1]=var
 --print(print_r(c.fields,'env::newvar: c.fields'))
       for k, v in ipairs(c.fields) do
+        local z1 = _TP.getAuxTag(tp,dim)
         local var = {
             ln    = me.ln,
             id    = id..'.'..v.id,
@@ -98,12 +101,14 @@ function newvar (me, blk, pre, tp, dim, id)
             arr   = v.dim,
             lval  = true,
             n_awaits = 0,
+            auxtag = z1.auxtag,
         }
         blk.vars[#blk.vars].fields[#blk.vars[#blk.vars].fields+1] = var
         blk.vars[#blk.vars].fields[v.id] = var
         --nvar[#nvar+1]=var
       end
     else
+        local z1 = _TP.getAuxTag(tp,dim)
         local var = {
             ln    = me.ln,
             id    = id,
@@ -113,6 +118,7 @@ function newvar (me, blk, pre, tp, dim, id)
             isEvt = isEvt,
             arr   = dim,
             n_awaits = 0,
+            auxtag = z1.auxtag,
         }
         blk.vars[#blk.vars+1] = var
         nvar[#nvar+1]=var
@@ -130,7 +136,30 @@ function det2id (v)
     end
 end
 
+function set1stOper(e1,oper)
+    -- Define pointer "first" operation
+    local z1 = _TP.getAuxTag(e1.tp,e1[1].arr)
+    for i, var in ipairs(e1.fst.blk.vars) do
+        if var.id==e1[1][1] then
+          var.firstOper = var.firstOper or oper
+          var.firstOperLn = var.firstOperLn or e1.ln
+print('env::set1stOper:', var.id,var.ln, z1.auxtag, oper)
+          break                  
+        end
+    end
+end
+
+
 F = {
+
+    Block_pos = function (me)
+print('env::Block_pos:',me.tag,#me.vars)
+        for _, var in ipairs(me.vars) do
+print('env::Block_pos: var:',var.id,var.ln,var.auxtag,var.firstOper)
+          ASR(not(var.auxtag=='pointer' and var.firstOper == 'Exp'),{ln=var.firstOperLn},'pointer "'.. var.id ..'" not initialized at this point.')
+        end
+    end,
+
     Block_pre = function (me)
         me.vars = {}
         local async = _AST.iter()()
@@ -277,6 +306,7 @@ print("env::Var:",id)
                   me.lval = (not var.arr)
                   me.fst  = var
                   me.arr = var.arr
+                  me.auxtag = var.auxtag
                   return
                 end
             end
@@ -425,7 +455,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
     SetExp = function (me)
         local e1, e2, no_fin = unpack(me)
         e1 = e1 or _AST.iter'SetBlock'()[1]
-print('env::SetExp:',e1.tag, e2.tag, e1[1].tag, e2[1].tag, e1.lval,e1.tp,e2.tp,e1[1].arr,e2[1].arr,no_fin)
+print('env::SetExp:',e1.tag,e2.tag, e1[1].tag, e2[1].tag, e1.lval,e1.tp,e2.tp,e1[1].arr,e2[1].arr,no_fin)
 --        WRN(e1.lval and _TP.contains(e1.tp,e2.tp,true),me, 'invalid attribution: ['.. e1.tp ..'] can not contain [' .. e2.tp ..']')
           ASR(not (e1[1].tag=='CONST'),me,'constant at left side of attribution.')
           ASR(not (e1[1].tag=='Op1_&'),me,'VarAddr at left side of attribution.')
@@ -434,7 +464,8 @@ print('env::SetExp:',e1.tag, e2.tag, e1[1].tag, e2[1].tag, e1.lval,e1.tp,e2.tp,e
           ASR(not error,me,'type/size incompatibility: '.. e1.tp..'/'..len1 ..' <--> '.. e2.tp..'/'..len2..'')
           WRN(not cast,me, 'Applying the minimum size in the attribution "'.. e1.tp..'/'..len1 ..'" = "' .. e2.tp..'/'..len2 ..'". ')
 
-        
+        set1stOper(e1,"SetExp")
+           
         if no_fin then
             return              -- no `finally´ required
         end
@@ -478,21 +509,23 @@ print('env::SetExp:',e1.tag, e2.tag, e1[1].tag, e2[1].tag, e1.lval,e1.tp,e2.tp,e
     --------------------------------------------------------------------------
 
     LExp = function (me)
-print("env::LExp:",me.tag,me[1].tag, me[1].arr, me[1][1])
+print("env::LExp:",me.tag,me[1].auxtag,me[1].tag, me[1].arr, me[1][1])
 --print(print_r(me,"env::Exp: me"))
 --        ASR(not(me[1].tag=='Var' and (me[1].arr)),me,'missing array index for "'..me[1][1]..'".')
         me.lval = me[1].lval
         me.tp   = me[1].tp
         me.fst  = me[1].fst
+
     end,
 
     Exp = function (me)
-print("env::Exp:",me.tag,me[1].tag,me[1][1])
+print("env::Exp:",me.tag,me[1].auxtag,me[1].tag,me[1][1])
 --print(print_r(me,"env::Exp: me"))
 --        ASR(not(me[1].tag=='Var' and (me[1].arr)),me,'missing array index for "'..me[1][1]..'".')
         me.lval = me[1].lval
         me.tp   = me[1].tp
         me.fst  = me[1].fst
+        if me[1].auxtag then set1stOper(me,"Exp") end
     end,
 
     Op2_call = function (me)

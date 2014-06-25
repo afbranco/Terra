@@ -28,24 +28,39 @@ var user_reg data;
 var user_reg data2;
 var user_reg* datap;
 var ubyte[20] vetor;
-var ubyte*[20] vetorp;
+var ubyte[20] vetorp;
 var ushort x;
 var ushort* xp;
-event ubyte ee;
+//event ubyte ee;
 
 var user_reg2 data5;
 var user_reg2* data5p;
 
-
-loop do
+par do
+	emit LEDS();
+with
 	await 1s;
-	inc x;
 end
+
+//vetorp[1] = x;
+
+//msgp = &msg;
+//datap = msgp;
+
+/*
+do
+var user_reg* datap;
+datap = msgp;
+
+end
+/*
 
 //await_until(x,ee,x>10);
 //await_until(msg,RECEIVE,msg.type==1);
 
 //x = 100000;
+
+//msg.data = vetor;
 
 //datap = msg.data;
 //msg = data;
@@ -59,15 +74,15 @@ end
 //emit SEND(&msg);
 
 //x = sizeof<long> * 2;
+
 //data = await RECEIVE;
 //vetor = data;
-//msg.data = vetor;
 //*vetorp[2] = await TEMP;
 //*xp = await TEMP;
-
-//xp = &vetor[1];
-//xp = &vetor[0];
-//xp = vetorp[0];
+/*
+xp = &vetor[1];
+xp = &vetor[0];
+xp = vetorp[0];
 
 //vetorp[2] = &vetor[1];
 //data5 = datap;

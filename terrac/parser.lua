@@ -70,6 +70,8 @@ local _V2NAME = {
     ID_int  = 'identifier',
     ID_ext  = 'identifier all uppercase',
     ID_type = 'type',
+    ID_btype = 'type',
+    ID_tvoid = 'type',
     _Dcl_var = 'declaration',
     _Dcl_int = 'declaration',
     __ID = 'identifier',
@@ -104,8 +106,8 @@ local EM = function (msg)
         end)
 end
 
-TYPES = P'void'
-      + 'ubyte' + 'ushort' + 'ulong'
+TYPES = -- P'void' +
+       P'ubyte' + 'ushort' + 'ulong'
       + 'byte' + 'short' + 'long'
 
 KEYS = P'and'     
@@ -301,15 +303,17 @@ _GG = {
 
     , EmitInt  = KEY'emit' * EV'Var' * (K'(' * V'Exp'^-1 * EK')')^-1
 
-    , _Dcl_ext = (CKEY'input'+CKEY'output') * EV'ID_type' * EV'ID_ext' * PNUM
+    , _Dcl_ext = (CKEY'input'+CKEY'output') * (EV'ID_type' + EV'ID_tvoid') * EV'ID_ext' * PNUM
 
-    , _Dcl_int  = CKEY'event' * CKEY(TYPES) * Cc(false) *
+    , _Dcl_int  = CKEY'event' * (CKEY(TYPES) + EM'a basic type') * Cc(false) *
                     V'__Dcl_int' * (K','*V'__Dcl_int')^0
 --    , _Dcl_int  = CKEY'event' * EV'ID_type' * Cc(false) *
 --                    V'__Dcl_int' * (K','*V'__Dcl_int')^0
     , __Dcl_int = EV'ID_int' * (V'_Sets' + Cc(false)*Cc(false)*Cc(false))
 
-    , _Dcl_var  = CKEY'var' * EV'ID_type' * (K'['*NUM*K']'+Cc(false)) *
+--    , _Dcl_var  = CKEY'var' * EV'ID_type' * (K'['*NUM*K']'+Cc(false)) *
+--                    V'__Dcl_var' * (K','*V'__Dcl_var')^0
+    , _Dcl_var  = CKEY'var' * ( (EV'ID_btype' * (K'['*NUM*K']')) + (EV'ID_type' * Cc(false))  ) *
                     V'__Dcl_var' * (K','*V'__Dcl_var')^0
     , __Dcl_var = EV'ID_var' * (V'_Sets' + Cc(false)*Cc(false)*Cc(false))
 
@@ -328,15 +332,26 @@ _GG = {
 
     , ID_ext  = -KEYS * CK(m.R'AZ'*ALPHANUM^0)
  
-    , ID_var  = -KEYS * CK(m.R'az'*(Alphanum+'?')^0)
+    , ID_var  = -KEYS * -K'void'* CK(m.R'az'*(Alphanum+'?')^0)
                     / function(id) return (string.gsub(id,'%?','_')) end
     , ID_int  = V'ID_var'
     , ID_c    = V'ID_var' --CK(  P'_' *Alphanum^0)
+
     , ID_type = (CKEY(TYPES)+V'ID_c') * C(K'*'^0) /
                   function (id, star)
                     return (string.gsub(id..star,' ',''))
                   end
-    , ID_field_type = CKEY(TYPES)
+    
+    , ID_btype = CKEY(TYPES) /
+                  function (id)
+                    return (string.gsub(id,' ',''))
+                  end
+
+    , ID_tvoid = (CKEY('void')) * C(K'*'^0) /
+                  function (id, star)
+                    return (string.gsub(id..star,' ',''))
+                  end
+    , ID_field_type = -K'void' * CKEY(TYPES)
     
 --    , STRING = CK( CK'"' * (P(1)-'"'-'\n')^0 * EK'"' )
 
