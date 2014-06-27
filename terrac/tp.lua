@@ -50,7 +50,8 @@ function _TP.getAuxTag(tp1,arr1)
     aux.auxtag=nil
     while _TP.deref(aux.ntp) do aux.ntp = _TP.deref(aux.ntp); aux.lvl = aux.lvl+1 end
     aux.bType = _TP.isBasicType(aux.ntp)
-    aux.len = (aux.arr and aux.arr*_ENV.c[aux.ntp].len) or (_TP.isBasicType(aux.ntp) and ((aux.lvl==0 and _ENV.c[aux.ntp].len) or 2)) or _ENV.c[aux.ntp].len 
+--    aux.len = (aux.arr and aux.arr*_ENV.c[aux.ntp].len) or (_TP.isBasicType(aux.ntp) and ((aux.lvl==0 and _ENV.c[aux.ntp].len) or 2)) or _ENV.c[aux.ntp].len 
+    aux.len = (aux.arr and aux.arr*_ENV.c[aux.ntp].len) or _ENV.c[aux.ntp].len 
 
     aux.auxtag = 
           ((    aux.ntp == 'void'                       ) and 'void'    ) or
@@ -96,7 +97,7 @@ print("tp::tpCompat:",tp1,tp2)
 -------------------------------------------------------------
 -- pointer  = pointer;  addr copy;  len1 <= len2;   len1 < len2
 -- pointer  = data;     addr copy;  len1 <= len2;   len1 < len2
--- data     = data;     data copy;  min(len1,len2); len1 < len2
+-- data     = data;     data copy;  min(len1,len2); len1 <> len2
 -- var      = var;      data copy;  min(len1,len2); len1 < len2
 -- ???      = void;     default 'invalid'
 -------------------------------------------------------------

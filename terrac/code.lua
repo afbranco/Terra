@@ -377,9 +377,11 @@ function getAuxValues(e1)
         x1.auxtag1 = 'Exp'
         x1.auxtag2 = 'Exp'
       end
-    else
-      x1.auxtag1 = 'Exp'
-      x1.auxtag2 = 'Exp'
+    else -- AwaitInt
+      x1.auxtag1 = 'Var'
+      x1.auxtag2 = 'AwaitInt'
+      x1.val = e1.val
+      x1.id = (e1.fst and e1.fst.id) or e1[1][1]
     end
 print("code::getAuxValues:-->:",x1.tag,x1.auxtag1,x1.auxtag2,x1.auxtag3)
 print("code::getAuxValues:var:",x1.tp,x1.ntp,x1.val,x1.id,x1.arr)
@@ -456,7 +458,7 @@ print("code::SetExp():",e1.tag,e2.tag,e1[1].tag,e2[1].tag,e1.arr,e2.arr)
 -- *** getAuxValues() translation: tag -> auxtag2; auxtag3
 -- *******************************************************
 -----------------------------------------------------
--- CONST -> Const
+-- CONST                  -> Const
 -- Var & BasicType        -> Var
 -- Var* & BasicType & arr -> Var* & arr
 -- Var & ~BasicType       -> Reg
@@ -472,7 +474,7 @@ print("code::SetExp():",e1.tag,e2.tag,e1[1].tag,e2[1].tag,e1.arr,e2.arr)
 -- Var*.Field[Const       -> Exp
 -- Var.Field[Var|Exp]     -> Exp
 -- Var*.Field[Var|Exp]    -> Exp
--- AwaitInt               -> Exp  ... used in SetAwait
+-- AwaitInt               -> AwaitInt  ... used in SetAwait
 -- &Var                   -> &Var
 -- &Var*                  -> &Var*
 -----------------------------------------------------
@@ -502,11 +504,15 @@ print("code::SetExp():",e1.tag,e2.tag,e1[1].tag,e2[1].tag,e1.arr,e2.arr)
 --+ var       = var
 -- Var        = Var       -> [set_v]
 --+ var       = var
+-- Var        = AwaitInt  -> [Conc(e2),set_v]
+--+ var       = var
 -- Var*,~arr  = Exp       -> [Conc(e2),pop]
 --+ pointer   = pointer
 -- Var        = Exp       -> [Conc(e2),pop]
 --+ var       = var
 -- Var[Var]   = Var       -> [setarr_vv]
+--+ var       = var
+-- Var[Var]   = AwaitInt  -> [Conc(e2),setarr_vv]
 --+ var       = var
 -- Var*[Var]  = Var*      -> [setarr_vv]
 --+ pointer   = pointer
@@ -548,6 +554,10 @@ print("code::SetExp():",e1.tag,e2.tag,e1[1].tag,e2[1].tag,e1.arr,e2.arr)
     elseif x1.auxtag2 == 'Var' and x2.auxtag2 == 'Var' then
         codeB = LINE(me,x1.id ..' = '.. x2.id..'',nil,'// SetExp:: set var = var')        
         BYTECODE(me,codeB,'op_set_v',x1.ntp,x1.val,x2.val)
+    elseif x1.auxtag2 == 'Var' and x2.auxtag2 == 'AwaitInt' then
+        CONC(me,e2)
+        codeB = LINE(me,x1.id ..' = '.. x2.id..'',nil,'// SetExp:: set var = var')        
+        BYTECODE(me,codeB,'op_set_v',x1.ntp,x1.val,x2.val)
     elseif x1.auxtag2 == 'Var*' and x2.auxtag2 == 'Exp' then
         CONC(me,e2)
         codeB = LINE(me,'pop_ *'..x1.id,nil,'// SetExp:: pop to pointer')
@@ -557,6 +567,10 @@ print("code::SetExp():",e1.tag,e2.tag,e1[1].tag,e2[1].tag,e1.arr,e2.arr)
         codeB = LINE(me,'pop '..x1.id,nil,'// SetExp:: pop to var')
         BYTECODE(me,codeB,'op_pop',x1.tp,x1.val)  
     elseif x1.auxtag2 == 'Var[Var]' and x2.auxtag2 == 'Var' then
+        codeB = LINE(me,''..x1.id..' = '..x2.id,nil,'// set array[var] with var')        
+        BYTECODE(me,codeB,'op_setarr_vv',x1.ntp,x1.val,x1.idxtp,x1.idxval,x1.idxmax,x2.tp,x2.val)
+    elseif x1.auxtag2 == 'Var[Var]' and x2.auxtag2 == 'AwaitInt' then
+        CONC(me,e2)
         codeB = LINE(me,''..x1.id..' = '..x2.id,nil,'// set array[var] with var')        
         BYTECODE(me,codeB,'op_setarr_vv',x1.ntp,x1.val,x1.idxtp,x1.idxval,x1.idxmax,x2.tp,x2.val)
     elseif x1.auxtag2 == 'Var*[Var]' and x2.auxtag2 == 'Var*' then
@@ -1092,7 +1106,6 @@ print("code::SetAwait: *var:",e1[1][2].tag,e1[1][2][1],e1[1][2].val,e1[1][2].tp)
         local e1, e2 = unpack(me)
         local ext = e1.ext
     if ext.pre == 'output' then  -- e1 not Exp
-      --printTable(e2[1])
         if (e2) then
           -- get event type data len
           local par_len,par_tp
@@ -1277,8 +1290,10 @@ print("code::SetAwait: *var:",e1[1][2].tag,e1[1][2][1],e1[1][2].val,e1[1][2].tp)
 
     -- awake
     CASE(me, me.lbl_awk)
-      codeB = LINE(me,'push '..me.id..':'..me.tp,nil,'// push Var ')
-      BYTECODE(me,codeB,'op_push_v',me.tp,me.val)
+
+-- mover para ???
+--      codeB = LINE(me,'push$ '..me.id..':'..me.tp,nil,'// push Var ')
+--      BYTECODE(me,codeB,'op_push_v',me.tp,me.val)
 
   end,
 

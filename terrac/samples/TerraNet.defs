@@ -63,8 +63,8 @@ config 0.0.1 do
 	output void			REQ_TEMP		5;
 	output void			REQ_PHOTO		6;
 	output void			REQ_VOLTS		7;
-	output usrMsg_t* 	SEND			8;
-	output usrMsg_t* 	SEND_ACK		9;
+	output usrMsg_t 	SEND			8;
+	output usrMsg_t 	SEND_ACK		9;
 	output ubyte		SET_PORT_A		10;
 	output ubyte		SET_PORT_B		11;
 	output ubyte 		CFG_PORT_A		12;
@@ -87,7 +87,7 @@ config 0.0.1 do
 	input ubyte 	PORT_B 			8;
 	input ubyte 	INT_A 			9;
 	input ubyte 	INT_B 			10;
-	input void 	CUSTOM_A 		11;
+	input ubyte 	CUSTOM_A 		11;
 
 	// TerraNet functions
 	function ushort getNodeId()		0;

@@ -37,6 +37,7 @@ local NO_async = {
     ParEver=true, ParOr=true, ParAnd=true,
     EmitInt=true,
     Async=true,
+    Finally=true,
     AwaitExt=true, AwaitInt=true, AwaitN=true, AwaitT=true,
 }
 
@@ -49,10 +50,10 @@ F = {
             MAX_all(me)
         end
         if NO_fin[me.tag] then
-            ASR(not _AST.iter'Finally'(), me, me.tag ..' is not permitted inside `finally´')
+            ASR(not _AST.iter'Finally'(), me, 'not permitted inside `finally´')
         end
         if NO_async[me.tag] then
-            ASR(not _AST.iter'Async'(), me, me.tag ..' is not permitted inside `async´')
+            ASR(not _AST.iter'Async'(), me,'not permitted inside `async´')
         end
     end,
 
@@ -108,7 +109,7 @@ F = {
         local blk = _AST.iter'SetBlock'()
         blk.rets[me] = true
 
-        local async = _AST.iter'Async'()
+        local async = _AST.iter'Async'()    
         if async then
             local setblk = _AST.iter'SetBlock'()
             ASR(async.depth<=setblk.depth+1, me, '`return´ without block')
@@ -150,6 +151,8 @@ F = {
     Var = function (me)
         local async = _AST.iter'Async'()
         if async then
+--print("props:Var",me[1])
+            --ASR(not(string.sub(me[1],1,1) == '$' and me[1]~='$ret'),me,'`finally´ is not implemented inside async')
             ASR(_AST.iter'VarList'() or         -- param list
                 me.ret or                       -- var assigned on return
                 async.depth < me.var.blk.depth, -- var is declared inside

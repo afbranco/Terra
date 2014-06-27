@@ -1,7 +1,51 @@
 #include "TerraNet.defs"
 
+regtype radio_t with
+   var ubyte	    code;
+   var ushort   target;
+   var byte[10] data;
+ end 
+
+ regtype usr_t with
+   var ushort tempVal; 
+   var ushort photoVal;
+ end 
+
+var ulong v1;
+var ulong* v1_p;
+var ubyte* v2_p;
+var radio_t msg;
+var radio_t* msg_p;
+var usr_t usr;
+var usr_t* usr_p;
+var ubyte[10] buffer;
 
 
+v1_p = &v1;
+v1 = *v1_p;
+v1_p = msg.data; 	// WRN: 4 < 10
+v1 = msg.data[0];
+msg.data[0] = v1; 	// WRN: 1 < 4
+// v1_p = &msg.data[0]; // ERR: 4 > 1
+v1_p = buffer;		// WRN: 4 < 10
+usr_p = msg.data;	// WRN: 4 < 10
+usr_p = buffer;		// WRN: 4 < 10
+msg.target = v1;	// WRN: 2 < 4
+msg.data[3] = buffer[1];
+msg.data[v1] = buffer[1];
+usr_p.tempVal = v1;	// WRN: 2 < 4
+usr_p.tempVal = *v1_p;	// WRN: 2 < 4
+
+// usr.photoVal = msg_p.data[0]; // ERR: pointer not initialized
+msg_p = &msg;
+usr_p = msg_p;	// WRN: 4 < 13
+usr.photoVal = msg_p.data[0];
+v2_p = &msg_p.data[0];
+
+usr_p.tempVal = await TEMP;
+
+
+/*
 
 regtype user_reg with
 	var ubyte d8_1;
@@ -30,17 +74,42 @@ var user_reg* datap;
 var ubyte[20] vetor;
 var ubyte[20] vetorp;
 var ushort x;
-var ushort* xp;
-//event ubyte ee;
+var ubyte* xp;
+event long ee;
 
 var user_reg2 data5;
 var user_reg2* data5p;
+var ubyte zz;
 
+
+
+
+do
 par do
-	emit LEDS();
+	 zz=
+	//async (x) 
+	do 
+		x = getNodeId();
+		//await 500ms;
+		x = 7;
+	return 17;
+	finally
+		x = 9;
+	return 17;
+	end;
 with
 	await 1s;
-end
+	return 18;
+end;
+end;
+/*
+var ulong x4;
+var ulong* x4_p;
+var ubyte x1;
+var ubyte* x1_p;
+x1_p = &x4;
+x4_p = &x1;
+*/
 
 //vetorp[1] = x;
 
@@ -53,7 +122,7 @@ var user_reg* datap;
 datap = msgp;
 
 end
-/*
+*/
 
 //await_until(x,ee,x>10);
 //await_until(msg,RECEIVE,msg.type==1);
@@ -77,12 +146,12 @@ end
 
 //data = await RECEIVE;
 //vetor = data;
-//*vetorp[2] = await TEMP;
+//vetorp[2] = await TEMP;
 //*xp = await TEMP;
-/*
-xp = &vetor[1];
-xp = &vetor[0];
-xp = vetorp[0];
+
+//xp = &vetor[1];
+//xp = &vetor[0];
+//xp = &vetorp[0];
 
 //vetorp[2] = &vetor[1];
 //data5 = datap;

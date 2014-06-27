@@ -126,7 +126,7 @@ end
 
  	-- arg={lbl.n}
 	lbl = function (me,codeB,arg)
-		local bytecode = string.format('L%02x',arg[1])
+		local bytecode = string.format('L%04x',arg[1])
 		local codeA = bytecode
 		OPCODE(me,bytecode,codeA,codeB)
 	end,
@@ -429,12 +429,10 @@ print("asm::op_set_e:",arg[1],typelen[arg[1]])
 		OPCODE(me,bytecode,codeA,codeB)			
 	end, 
 
- 	-- arg={lbl.n}
+ 	-- arg={GateAddr}
 	op_trg= function (me,codeB,arg) 
---lbl    local bytecode = string.format('%02x',(opcode['op_trg'])+(_TP.getConstLen(arg[1])))
-    local bytecode = string.format('%02x',(opcode['op_trg'])+1)
---lbl    bytecode = string.format('%s %s',bytecode,_TP.getConstBytes(arg[1]))
-    bytecode = string.format('%s %s',bytecode,_TP.getConstBytesLbl(arg[1]))
+    local bytecode = string.format('%02x',(opcode['op_trg'])+(_TP.getConstLen(arg[1])))
+    bytecode = string.format('%s %s',bytecode,_TP.getConstBytes(arg[1]))
 		local codeA = 'trg '..arg[1]
 		OPCODE(me,bytecode,codeA,codeB)	
 	end, 

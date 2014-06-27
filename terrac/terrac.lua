@@ -276,10 +276,11 @@ for x,op in pairs(_AST.root.opcode) do
       else
         lblL = string.sub(op,2,3)
         local lbl = tonumber(('0x'..lblH))*256 + tonumber('0x'..lblL)
-        local addr = _AST.root.labeltable[lbl]
+        local addr = (_AST.root.labeltable[lbl] or 0)
         print(string.format('%04d',_AST.root.op_addr[x-1]),lbl,addr,_TP.getConstBytes(addr,2))
         _AST.root.opcode_aux[x-1]=string.format('%02x',addr / 256)
         _AST.root.opcode_aux[x]=string.format('%02x',addr % 256)
+        _AST.root.code2[x-1] = 'addr:'..(addr or 0)
         lblH = nil
       end
     end

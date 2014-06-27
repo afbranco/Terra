@@ -1048,10 +1048,10 @@ void f_pusharr_v(uint8_t Modifier){
 	Maddr = getPar16(p1_1len);
  	Vidx  = getPar16(p2_1len);
 	Max   = getPar16(p3_1len);
-	dbg(APPNAME,"VM::f_pusharr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, Val=%d\n",Modifier,Maddr,Vidx,Max,
-			(getMVal(Vidx,v2_len)<Max)?getMVal(Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len):0);
+	dbg(APPNAME,"VM::f_pusharr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, Val=%d, IDX OVERFLOW=%s idx=%d newIdx=%d\n",Modifier,Maddr,Vidx,Max,
+			(getMVal(Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len)),_TFstr(getMVal(Vidx,v2_len) > Max),getMVal(Vidx,v2_len),getMVal(Vidx,v2_len)%Max);
 //	(getMVal(Vidx,v2_len)<Max)?push(getMVal(Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len)):0;
-// Alterado para fazer push de Addr+Idx
+// Alterado para fazer push de Addr+Id
 	push(Maddr+((getMVal(Vidx,v2_len)%Max)*v1_len));
 }
 
@@ -1091,7 +1091,8 @@ void f_poparr_v(uint8_t Modifier){
  	Vidx  = getPar16(p2_1len);
 	Max   = getPar16(p3_1len);
 	Value=pop();
-	dbg(APPNAME,"VM::f_poparr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, Value=%d\n",Modifier,Maddr,Vidx,Max,Value);
+	dbg(APPNAME,"VM::f_poparr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, Value=%d, IDX OVERFLOW=%s idx=%d newIdx=%d\n",
+			Modifier,Maddr,Vidx,Max,Value,_TFstr(getMVal(Vidx,v2_len) > Max),getMVal(Vidx,v2_len),getMVal(Vidx,v2_len)%Max);
 	setMVal(Value,Maddr+((getMVal(Vidx,v2_len)%Max)*v1_len),v1_len);
 }
 
@@ -1111,7 +1112,8 @@ void f_setarr_vc(uint8_t Modifier){
  	Vidx  = getPar16(p2_1len);
 	Max   = getPar16(p3_1len);
 	Const = getPar32(p4_len);
-	dbg(APPNAME,"VM::f_setarr_vc(%02x):Maddr=%d, Vidx=%d, Max=%d, Const=%d\n",Modifier,Maddr,Vidx,Max,Const);
+	dbg(APPNAME,"VM::f_setarr_vc(%02x):Maddr=%d, Vidx=%d, Max=%d, Const=%d, IDX OVERFLOW=%s idx=%d newIdx=%d\n",
+			Modifier,Maddr,Vidx,Max,Const,_TFstr(getMVal(Vidx,v2_len) > Max),getMVal(Vidx,v2_len),getMVal(Vidx,v2_len)%Max);
 	memcpy((MEM+Maddr+((getMVal(Vidx,v2_len)%Max)*v1_len)),&Const,v1_len);
 }
 void f_setarr_vv(uint8_t Modifier){
@@ -1129,7 +1131,8 @@ void f_setarr_vv(uint8_t Modifier){
  	Vidx   = getPar16(p2_1len);
 	Max    = getPar16(p3_1len);
 	Maddr2 = getPar16(p4_1len);
-	dbg(APPNAME,"VM::f_setarr_vv(%02x):Maddr1=%d, Vidx=%d, Max=%d, Madr2=%d\n",Modifier,Maddr1,Vidx,Max,Maddr2);
+	dbg(APPNAME,"VM::f_setarr_vv(%02x):Maddr1=%d, Vidx=%d, Max=%d, Madr2=%d, IDX OVERFLOW=%s idx=%d newIdx=%d\n",
+				Modifier,Maddr1,Vidx,Max,Maddr2,_TFstr(getMVal(Vidx,v2_len) > Max),getMVal(Vidx,v2_len),getMVal(Vidx,v2_len)%Max);
 	memcpy((MEM+Maddr1+((getMVal(Vidx,v2_len)%Max)*v1_len)),(MEM+Maddr2),v1_len);
 }
 
@@ -1286,12 +1289,12 @@ void f_tkclr(uint8_t Modifier){
 
 void f_trg(uint8_t Modifier){
 	uint8_t p1_1len;
-	uint16_t lbl;
+	uint16_t gtAddr;
 	p1_1len = (uint8_t)(1<<(Modifier & 0x01));
-	lbl = getPar16(p1_1len);
-	dbg(APPNAME,"VM::f_trg(%02x): p1_1len=%d, lbl=%d, \n",Modifier,p1_1len,lbl);
-	dbg("VMDBG","VM:: trigger event %d\n",lbl);
-	ceu_trigger(lbl);
+	gtAddr = getPar16(p1_1len);
+	dbg(APPNAME,"VM::f_trg(%02x): p1_1len=%d, gtAddr=%d, \n",Modifier,p1_1len,gtAddr);
+	dbg("VMDBG","VM:: trigger event gate=%d\n",gtAddr);
+	ceu_trigger(gtAddr);
 }
 
 void f_set16_c(uint8_t Modifier){

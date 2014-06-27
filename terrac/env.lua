@@ -138,12 +138,13 @@ end
 
 function set1stOper(e1,oper)
     -- Define pointer "first" operation
+print('env::set1stOper:', e1[1],e1[1][1],e1.ln, oper)
     local z1 = _TP.getAuxTag(e1.tp,e1[1].arr)
     for i, var in ipairs(e1.fst.blk.vars) do
-        if var.id==e1[1][1] then
+        if var.id==(e1[1][1] or e1[1]) then
           var.firstOper = var.firstOper or oper
           var.firstOperLn = var.firstOperLn or e1.ln
-print('env::set1stOper:', var.id,var.ln, z1.auxtag, oper)
+print('env::set1stOper_:', var.id,e1.ln, z1.auxtag, oper)
           break                  
         end
     end
@@ -180,6 +181,7 @@ print('env::Block_pos: var:',var.id,var.ln,var.auxtag,var.firstOper)
 print("env::CfgBlk:", n1, n2, n3) 
         _ENV.vm_version = (n1 or 0)..'.' .. (n2 or 0)..'.' .. (n3 or 0)
     end,
+    
     Dcl_ext = function (me)
         local dir, tp, id, idx = unpack(me)
 --print("env::Dcl_ext:", dir, tp, id, idx)
@@ -207,6 +209,7 @@ print("env::Dcl_ext:",id, tp, _TP.isBasicType(tp),_TP.deref(tp), (_TP.isBasicTyp
         }
         _ENV.exts[id] = me.ext
         _ENV.exts[#_ENV.exts+1] = me.ext
+        -- Force 0 or 1 args -- void or non void
         if dir == 'output' then 
           _ENV.extOut_nArgs[idx] = ((tp=='void') and 0) or 1
         end
@@ -342,6 +345,8 @@ print("env::Var:",id)
     AwaitExt = function (me)
         local e1,_ = unpack(me)
         local ext = e1.ext
+print("env::AwaitExt:",e1.ext.id, e1.ext.pre)
+        ASR(e1.ext.pre == 'input',me,'await expect an input event, a time expression, or a var event.')
         me.gte = (_ENV.awaits[ext] or 0)
         _ENV.awaits[ext] = (_ENV.awaits[ext] or 0) + 1
     end,
@@ -369,7 +374,7 @@ print("env::Var:",id)
 print("env::EmitInt:",e1.var.tp,e2.tp)
           err, cast,_,_, len1, len2 = _TP.tpCompat(e1.var.tp,e2.tp)
           ASR(not err,me,'type/size incompatibility: '.. e1.var.tp..'/'..len1 ..' <--> '.. e2.tp..'/'..len2..'')
-          WRN(not cast,me, 'Applying the minimum size in the attribution "'.. e1.var.tp..'/'..len1 ..'" = "' .. e2.tp..'/'..len2 ..'". ')
+          WRN(not cast,me, 'Applying the minimum size: "'.. e1.var.tp..'/'..len1 ..'" <--> "' .. e2.tp..'/'..len2 ..'". ')
         end
         me.gte = _ENV.n_emits
         _ENV.n_emits = _ENV.n_emits + 2     -- (cnt/awk)
@@ -377,6 +382,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
 
     EmitExtS = function (me)
         local e1, _ = unpack(me)
+        ASR(e1.ext.pre=='output', me, 'emit expect an output event or a var event.')
         if e1.ext.pre=='output' then
             F.EmitExtE(me)
         end
@@ -389,7 +395,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
         if e2 then
           err, cast,_,_,len1,len2 = _TP.tpCompat(e1.ext.tp,e2.tp,nil,e2.arr)
           ASR(not err,me,'type/size incompatibility: '.. e1.ext.tp..'/'..len1 ..' <--> '.. e2.tp..'/'..len2..'')
-          WRN(not cast,me, 'Applying the minimum size in the attribution "'.. e1.ext.tp..'/'..len1 ..'" = "' .. e2.tp..'/'..len2 ..'". ')
+          WRN(not cast,me, 'Applying the minimum size: "'.. e1.ext.tp..'/'..len1 ..'" <--> "' .. e2.tp..'/'..len2 ..'". ')
 --          ASR(_TP.contains(e1.ext.tp,e2.tp,true),me, "non-matching types on `emit´")
         else
             ASR(e1.ext.tp=='void',me, "missing parameters on `emit´")
@@ -462,7 +468,7 @@ print('env::SetExp:',e1.tag,e2.tag, e1[1].tag, e2[1].tag, e1.lval,e1.tp,e2.tp,e1
 
         local error, cast, tp1,tp2,len1,len2 = _TP.tpCompat(e1.tp,e2.tp,e1[1].arr,e2[1].arr)
           ASR(not error,me,'type/size incompatibility: '.. e1.tp..'/'..len1 ..' <--> '.. e2.tp..'/'..len2..'')
-          WRN(not cast,me, 'Applying the minimum size in the attribution "'.. e1.tp..'/'..len1 ..'" = "' .. e2.tp..'/'..len2 ..'". ')
+          WRN(not cast,me, 'Applying the minimum size: "'.. e1.tp..'/'..len1 ..'" <--> "' .. e2.tp..'/'..len2 ..'". ')
 
         set1stOper(e1,"SetExp")
            
@@ -495,7 +501,7 @@ print('env::SetExp:',e1.tag,e2.tag, e1[1].tag, e2[1].tag, e1.lval,e1.tp,e2.tp,e1
             -- ASR(_TP.contains(e1.tp,evt.tp,true), me, 'invalid attribution: ['.. e1.tp ..'] can not contain [' .. evt.tp ..']')
             local error, cast, tp1,tp2,len1,len2 = _TP.tpCompat(e1.tp,evt.tp,e1[1].arr,awt[1].arr)
             ASR(not error,me,'type/size incompatibility: '.. e1.tp..'/'..len1 ..' <--> '.. evt.tp..'/'..len2..'')
-            WRN(not cast,me, 'automatic cast from ['.. evt.tp ..'] to [' .. e1.tp ..'].')
+            WRN(not cast,me, 'Applying the minimum size: "'.. e1.tp..'/'..len1 ..'" <--> "' .. evt.tp..'/'..len2 ..'". ')
         end
         me.fst = awt.fst
     end,
@@ -628,8 +634,8 @@ print("env::Op1_*:",e1.tp,e1.tag,e1[2])
         ASR(_TP.deref(e1.tp, true) and e1.tag~='CONST', me, 'invalid operand to unary "*"')
         me.tp   = _TP.deref(e1.tp, true)
         me.lval = true
-        me.fst  = e1.fst        
-        
+        me.fst  = e1.fst
+        set1stOper(e1,"Exp")
         
 ----print(print_r(e1,"env::Op1_*: e1"))
 --      if (e1.tag=='Var') then  -- single var/field (not array) 
@@ -674,6 +680,9 @@ print("env::Op1_*:",e1.tp,e1.tag,e1[2])
         me.lval = true
         me.fst  = e1.fst
         me.arr = field.dim
+
+        set1stOper(e1,"Exp")
+
     end,
 
     Op_var = function (me)

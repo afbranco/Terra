@@ -110,14 +110,25 @@ TYPES = -- P'void' +
        P'ubyte' + 'ushort' + 'ulong'
       + 'byte' + 'short' + 'long'
 
+--KEYS = P'and'     
+--     + 'async'    
+--     + 'await'    + 'break'    + 'C'
+--     + 'constant' + 'deterministic'         + 'do'       + 'else'
+--     + 'else/if'  + 'emit'     + 'end'      + 'event'    --+ 'external'
+--     + 'finally'  + 'FOREVER'  + 'if'       + 'input'    + 'loop'
+--     + 'nohold'   + 'not'      + 'null'     + 'or'       + 'output'
+--     + 'par'      + 'par/and'  + 'par/or'   + 'pause/if' + 'pure'
+--     + 'return'   + 'sizeof'   + 'then'     + 'var'      + 'with'
+--     + 'function' + 'config'   + 'regtype'  + 'inc'      + 'dec'
+--     + TYPES
 KEYS = P'and'     
      + 'async'    
-     + 'await'    + 'break'    + 'C'
-     + 'constant' + 'deterministic'         + 'do'       + 'else'
-     + 'else/if'  + 'emit'     + 'end'      + 'event'    --+ 'external'
+     + 'await'    + 'break'    
+                                            + 'do'       + 'else'
+     + 'else/if'  + 'emit'     + 'end'      + 'event'   
      + 'finally'  + 'FOREVER'  + 'if'       + 'input'    + 'loop'
      + 'nohold'   + 'not'      + 'null'     + 'or'       + 'output'
-     + 'par'      + 'par/and'  + 'par/or'   + 'pause/if' + 'pure'
+     + 'par'      + 'par/and'  + 'par/or'   
      + 'return'   + 'sizeof'   + 'then'     + 'var'      + 'with'
      + 'function' + 'config'   + 'regtype'  + 'inc'      + 'dec'
      + TYPES
@@ -146,32 +157,33 @@ _GG = {
             + EM'config statement (usually a missing `input/output/function/regtype´)'
     , _CfgStmtB = V'_Dcl_regt'
             + EM'config statement (usually a missing `regtype varName with varDefs end´)'
-    ,_Dcl_func = (CKEY'function' * CKEY(TYPES) * V'ID_c' * K'(' * V'Arg_list' * K')') * PNUM
+    ,_Dcl_func = (CKEY'function' * (CKEY(TYPES)+EM'a basic type' ) * (V'ID_c' + EM'a valid function identifier') * K'(' * V'Arg_list' * K')') * PNUM
     
     , Arg_list = ( V'ID_type' * (EK',' * EV'ID_type')^0  )^-1
 ------
-    , _Block = ( V'_Stmt' * (EK';'*K';'^0) +
-                 V'_StmtB' * (K';'^-1*K';'^0)
-               )^0
-             * ( V'_LstStmt' * (EK';'*K';'^0) +
-                 V'_LstStmtB' * (K';'^-1*K';'^0)
-               )^-1
+    , _Block =  ( V'_Stmt' * ((EK';'*K';'^0) + EM'`;´') +
+                 V'_StmtB' * ((K';'^-1*K';'^0) + EM'`;´') 
+               )^0  
+             * ( V'_LstStmt' * ((EK';'*K';'^0) + EM'`;´')  +
+                 V'_LstStmtB' * ((K';'^-1*K';'^0) + EM'`;´') 
+               )^-1  
     , Block  = V'_Block'
     , BlockN = V'_Block'
 
     , _Stmt = V'AwaitT'   + V'AwaitExt'  + V'AwaitInt'
             + V'EmitT'    + V'EmitExtS'  + V'EmitInt'
             + V'_Dcl_int' + V'_Dcl_var'
-            + V'Dcl_det'  
-            + V'_Set'     + V'CallStmt' -- must be after Set
-            + EM'statement ' + V'Op_var'
+--            + V'Dcl_det'  
+            + V'_Set'     --+ V'CallStmt' -- must be after Set
+            + V'Op_var' + EM'statement (not last statement as `return´ or `break´) ' 
 
     , _StmtB = V'_Do'   
              + V'Async'  
-             + V'Host'
+--             + V'Host'
              + V'ParOr' + V'ParAnd' + V'ParEver'
              + V'If'    + V'Loop'
-             + V'Pause' + V'_Dcl_regt'
+--             + V'Pause'
+             + V'_Dcl_regt'
 
     , _LstStmt  = V'_Return' + V'Break' + V'AwaitN'
     , _LstStmtB = V'ParEver'
@@ -181,8 +193,8 @@ _GG = {
                     + V'ParEver' + V'If'    + V'Loop' )
 
     , __ID      = V'ID_c' + V'ID_ext' + V'Var'
-    , Dcl_det   = KEY'deterministic' * EV'__ID' * EKEY'with' *
-                     EV'__ID' * (K',' * EV'__ID')^0
+--afb    , Dcl_det   = KEY'deterministic' * EV'__ID' * EKEY'with' *
+--                     EV'__ID' * (K',' * EV'__ID')^0
 
     , _Set  = V'LExp' * V'_Sets'
     , _Sets = (CK'=' + CK':=') * (
@@ -192,10 +204,10 @@ _GG = {
                 EM'expression'
               )
 
-    , CallStmt = m.Cmt(V'Exp',
-                    function (s,i,...)
-                        return (string.sub(s,i-1,i-1)==')'), ...
-                    end)
+--    , CallStmt = m.Cmt(V'Exp',
+--                    function (s,i,...)
+--                        return (string.sub(s,i-1,i-1)==')'), ...
+--                    end)
 
     , _Do     = KEY'do' * V'BlockN' *
                     (KEY'finally'*V'BlockN' + Cc(false)) *
@@ -260,7 +272,7 @@ _GG = {
     , _Prim   = V'_Parens' + V'Func'
               + V'Var'   + V'C'   + V'SIZEOF'
               + V'NULL'    + V'CONST' --+ V'STRING'
-              + V'EmitExtE'
+              --+ V'EmitExtE'
 
     , ExpList = ( V'_Exp'*(K','*EV'_Exp')^0 )^-1
 
@@ -288,7 +300,7 @@ _GG = {
                   + EM'<h,min,s,ms>'
               )
 
-    , Pause    = KEY'pause/if' * EV'Var' * V'_Do'
+--    , Pause    = KEY'pause/if' * EV'Var' * V'_Do'
 
     , AwaitExt = KEY'await' * EV'Ext'
     , AwaitInt = KEY'await' * EV'Var'
@@ -303,7 +315,9 @@ _GG = {
 
     , EmitInt  = KEY'emit' * EV'Var' * (K'(' * V'Exp'^-1 * EK')')^-1
 
-    , _Dcl_ext = (CKEY'input'+CKEY'output') * (EV'ID_type' + EV'ID_tvoid') * EV'ID_ext' * PNUM
+--    , _Dcl_ext = (CKEY'input'+CKEY'output') * (EV'ID_type' + EV'ID_tvoid') * EV'ID_ext' * PNUM
+    , _Dcl_ext =  (CKEY'output' * (EV'ID_type'   + EV'ID_tvoid') * EV'ID_ext' * PNUM) +
+                  (CKEY'input'  * (EV'ID_typenp' + EV'ID_tvoid') * EV'ID_ext' * PNUM)
 
     , _Dcl_int  = CKEY'event' * (CKEY(TYPES) + EM'a basic type') * Cc(false) *
                     V'__Dcl_int' * (K','*V'__Dcl_int')^0
@@ -317,7 +331,7 @@ _GG = {
                     V'__Dcl_var' * (K','*V'__Dcl_var')^0
     , __Dcl_var = EV'ID_var' * (V'_Sets' + Cc(false)*Cc(false)*Cc(false))
 
-    , _Dcl_field  = CKEY'var' * EV'ID_field_type' * (K'['*PNUM*K']'+Cc(false)) *
+    , _Dcl_field  = CKEY'var' * (EV'ID_field_type' + EM'a valid basic type') * (K'['*PNUM*K']'+Cc(false)) *
                     V'ID_var' * (K','*V'ID_var')^0
                         
     , _Dcl_regt = KEY'regtype' * EV'ID_var' * EKEY'with' * (V'_Dcl_field' * (EK';'*K';'^0))^0 * EKEY'end'
@@ -341,6 +355,10 @@ _GG = {
                   function (id, star)
                     return (string.gsub(id..star,' ',''))
                   end
+    , ID_typenp = (CKEY(TYPES)+V'ID_c') /
+                  function (id)
+                    return (string.gsub(id,' ',''))
+                  end
     
     , ID_btype = CKEY(TYPES) /
                   function (id)
@@ -355,17 +373,17 @@ _GG = {
     
 --    , STRING = CK( CK'"' * (P(1)-'"'-'\n')^0 * EK'"' )
 
-    , Host    = K'C' * (#EK'do')*'do' * m.S' \n\t'^0 *
-                    ( C(V'_C') + C((P(1)-'end')^0) )
-                *S* EK'end'
+--    , Host    = K'C' * (#EK'do')*'do' * m.S' \n\t'^0 *
+--                    ( C(V'_C') + C((P(1)-'end')^0) )
+--                *S* EK'end'
 
     --, _C = '/******/' * (P(1)-'/******/')^0 * '/******/'
-    , _C      = m.Cg(V'_CSEP','mark') *
-                    (P(1)-V'_CEND')^0 *
-                V'_CEND'
-    , _CSEP = '/***' * (1-P'***/')^0 * '***/'
-    , _CEND = m.Cmt(C(V'_CSEP') * m.Cb'mark',
-                    function (s,i,a,b) return a == b end)
+--    , _C      = m.Cg(V'_CSEP','mark') *
+--                    (P(1)-V'_CEND')^0 *
+--                V'_CEND'
+--    , _CSEP = '/***' * (1-P'***/')^0 * '***/'
+--    , _CEND = m.Cmt(C(V'_CSEP') * m.Cb'mark',
+--                    function (s,i,a,b) return a == b end)
 
     , _SPACES = (  m.S'\t\n\r @'
                 + ('//' * (P(1)-'\n')^0 * P'\n'^-1)

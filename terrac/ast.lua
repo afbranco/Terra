@@ -138,7 +138,7 @@ local C; C = {
         local blk = node('Block')(ln)
         blk[#blk+1] = node('Dcl_var')(ln, 'var', 'ubyte',  false, '$ret')
         for i=1, FIN do
-            blk[#blk+1] = node('Dcl_int')(ln,true,'void',false,'$fin_'..i)
+            blk[#blk+1] = node('Dcl_int')(ln,true,'ubyte',false,'$fin_'..i)
         end
         blk[#blk+1] = node('SetBlock')(ln,
                         EXP(node('Var')(ln, '$ret')),
@@ -152,7 +152,7 @@ local C; C = {
     CfgBlk  = node('CfgBlk'),
     Block   = node('Block'),
     BlockN  = node('BlockN'),
-    Host    = node('Host'),
+--    Host    = node('Host'),
 
     _Return = node('_Return'),
 
@@ -175,23 +175,23 @@ local C; C = {
         end
         
         -- afb : Finally isn't implemented.
-        ASR(FALSE, b2, 'Finally is not implemented in this version!')
+--        ASR(FALSE, b2, 'Finally is not implemented in this version!')
 
 -- afb : Finally isn't implemented.
---        FIN = FIN + 1
---        local fin = node('Finally')(ln, b2)
---        fin.n = FIN
---
---        local evt = '$fin_'..FIN
---        local awt = node('AwaitInt')(ln, node('Var')(ln, evt), true)
---        b1[#b1+1] = node('EmitInt')(ln, node('Var')(ln, evt))
---
---        local blk = node('Block')(ln,
---                node('ParAnd')(ln,
---                    b1,
---                    node('BlockN')(ln, awt, fin)))
---        blk.fin = fin
---        return blk
+        FIN = FIN + 1
+        local fin = node('Finally')(ln, b2)
+        fin.n = FIN
+
+        local evt = '$fin_'..FIN
+        local awt = node('AwaitInt')(ln, node('Var')(ln, evt), true)
+        b1[#b1+1] = node('EmitInt')(ln, node('Var')(ln, evt))
+
+        local blk = node('Block')(ln,
+                node('ParAnd')(ln,
+                    b1,
+                    node('BlockN')(ln, awt, fin)))
+        blk.fin = fin
+        return blk
     end,
 
     If = function (ln, ...)
@@ -263,7 +263,7 @@ local C; C = {
                 loop)
     end,
 
-    Pause = node('Pause'),
+--    Pause = node('Pause'),
 
     AwaitExt = node('AwaitExt'),
     AwaitInt = node('AwaitInt'),
@@ -284,7 +284,7 @@ local C; C = {
 --        return unpack(ret)
 --    end,
 
-    Dcl_det = node('Dcl_det'),
+--    Dcl_det = node('Dcl_det'),
 
     _Dcl_var = function (ln, pre, tp, dim, ...)
         local ret = {}
@@ -351,7 +351,7 @@ local C; C = {
         return node('Dcl_func')(ln, tp, name, t[1], args,t[#t])
     end,
 
-    CallStmt = node('CallStmt'),
+--    CallStmt = node('CallStmt'),
 
     LExp = node('LExp'),
     Exp = node('Exp'),
