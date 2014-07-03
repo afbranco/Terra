@@ -63,14 +63,14 @@ function _TP.getAuxTag(tp1,arr1)
           ((    aux.bType and aux.lvl==2 and not aux.arr) and 'pointer2') or
           ((    aux.bType and aux.lvl==2 and     aux.arr) and 'pointer2') or 'other'
 
-print("tp::getAuxTag:",aux.auxtag,aux.tp,aux.ntp,aux.lvl,aux.arr,aux.len)
+--print("tp::getAuxTag:",aux.auxtag,aux.tp,aux.ntp,aux.lvl,aux.arr,aux.len)
 return aux
 end
 
 function _TP.tpCompat(tp1,tp2,arr1,arr2)
     -- error == true -> incompatible types
     -- cast == true -> need cast
-print("tp::tpCompat:",tp1,tp2)
+--print("tp::tpCompat:",tp1,tp2)
     local error = true 
     local cast = false
     local z1 = _TP.getAuxTag(tp1,arr1)

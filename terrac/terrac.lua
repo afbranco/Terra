@@ -277,7 +277,7 @@ for x,op in pairs(_AST.root.opcode) do
         lblL = string.sub(op,2,3)
         local lbl = tonumber(('0x'..lblH))*256 + tonumber('0x'..lblL)
         local addr = (_AST.root.labeltable[lbl] or 0)
-        print(string.format('%04d',_AST.root.op_addr[x-1]),lbl,addr,_TP.getConstBytes(addr,2))
+--print(string.format('%04d',_AST.root.op_addr[x-1]),lbl,addr,_TP.getConstBytes(addr,2))
         _AST.root.opcode_aux[x-1]=string.format('%02x',addr / 256)
         _AST.root.opcode_aux[x]=string.format('%02x',addr % 256)
         _AST.root.code2[x-1] = 'addr:'..(addr or 0)
@@ -445,13 +445,14 @@ local Stack    = _AST.root.max_stack*4
 local TotalMem = CtlVars + CodeSize + Stack
 local RadioMsgs = ((codeAddr%24) == 0 and math.ceil((CodeSize)/24)) or 1+math.ceil((CodeSize-(24-codeAddr%24))/24)
 --print((codeAddr%24) == 0 , ((LblTableEnd_addr-codeAddr)/24) , 1,LblTableEnd_addr-codeAddr,(24-codeAddr%24))
-print('-------------------------------------------------------------')
-print('<<<<   Terra Compiler -- VM Version: '.. _ENV.vm_version.. '    >>>>')
-print('Memory allocation:')
-print('Total =','Code','+ Ctl/Vars','+ Stack')
-print(TotalMem,CodeSize,CtlVars,'',Stack)
-print('Radio Msgs = ',RadioMsgs)
-print('-------------------------------------------------------------')
+print('---------------------------------------------------------------------')
+print('--   <<<<      Terra Compiler -- VM Version: '.. string.format('%12s',_ENV.vm_version) .. '    >>>>  --')
+print('---------------------------------------------------------------------')
+print('--   Memory allocation:                                            --')
+print('--   Total =  Code + Ctl/Vars + Stack           |    Radio Msgs    --')
+print(string.format('--    %4d    %4d     %4d     %4d            |      %4d        --',
+                    TotalMem,CodeSize,CtlVars,Stack,RadioMsgs))
+print('---------------------------------------------------------------------')
 
 if (lastBytes+_AST.root.max_stack*4 > (60*24)) then
   WRN(false,_AST.root,'Program may be too long for VM memory. Please check target VM memory capacity!')

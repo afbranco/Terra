@@ -138,13 +138,13 @@ end
 
 function set1stOper(e1,oper)
     -- Define pointer "first" operation
-print('env::set1stOper:', e1[1],e1[1][1],e1.ln, oper)
+--print('env::set1stOper:', e1[1],e1[1][1],e1.ln, oper)
     local z1 = _TP.getAuxTag(e1.tp,e1[1].arr)
     for i, var in ipairs(e1.fst.blk.vars) do
         if var.id==(e1[1][1] or e1[1]) then
           var.firstOper = var.firstOper or oper
           var.firstOperLn = var.firstOperLn or e1.ln
-print('env::set1stOper_:', var.id,e1.ln, z1.auxtag, oper)
+--print('env::set1stOper_:', var.id,e1.ln, z1.auxtag, oper)
           break                  
         end
     end
@@ -154,9 +154,9 @@ end
 F = {
 
     Block_pos = function (me)
-print('env::Block_pos:',me.tag,#me.vars)
+--print('env::Block_pos:',me.tag,#me.vars)
         for _, var in ipairs(me.vars) do
-print('env::Block_pos: var:',var.id,var.ln,var.auxtag,var.firstOper)
+--print('env::Block_pos: var:',var.id,var.ln,var.auxtag,var.firstOper)
           ASR(not(var.auxtag=='pointer' and var.firstOper == 'Exp'),{ln=var.firstOperLn},'pointer "'.. var.id ..'" not initialized at this point.')
         end
     end,
@@ -178,7 +178,7 @@ print('env::Block_pos: var:',var.id,var.ln,var.auxtag,var.firstOper)
 
     CfgBlk = function (me)
         local n1, n2, n3 = unpack(me)
-print("env::CfgBlk:", n1, n2, n3) 
+--print("env::CfgBlk:", n1, n2, n3) 
         _ENV.vm_version = (n1 or 0)..'.' .. (n2 or 0)..'.' .. (n3 or 0)
     end,
     
@@ -188,7 +188,7 @@ print("env::CfgBlk:", n1, n2, n3)
 --print(print_r(_ENV.c,"ENV.c"))
 --        ASR(tp=='void' or _TP.deref(tp)) or _ENV.c[tp],me, 'invalid event type')
   
-print("env::Dcl_ext:",id, tp, _TP.isBasicType(tp),_TP.deref(tp), (_TP.isBasicType(tp) or  _TP.deref(tp)) )
+--print("env::Dcl_ext:",id, tp, _TP.isBasicType(tp),_TP.deref(tp), (_TP.isBasicType(tp) or  _TP.deref(tp)) )
 --        ASR( (_TP.isBasicType(tp) or  _TP.deref(tp)),me, 'invalid event type')
 
         for k,val in ipairs(_ENV.exts) do
@@ -218,6 +218,8 @@ print("env::Dcl_ext:",id, tp, _TP.isBasicType(tp),_TP.deref(tp), (_TP.isBasicTyp
     Dcl_int = 'Dcl_var',
     Dcl_var = function (me)
         local pre, tp, dim, id, exp = unpack(me)
+        local z =  _TP.getAuxTag(tp,dim)
+        ASR( z.lvl <= 1, me,'invalid pointer to pointer type')
 --print("env::Dcl_var:",tp,dim, _TP.isBasicType(_TP.deref(tp) or tp),(not dim) or  _TP.isBasicType(_TP.deref(tp) or tp))
         ASR( (not dim) or  _TP.isBasicType(_TP.deref(tp) or tp),me,'Arrays can have only basic types')
         me.var = newvar(me, _AST.iter'Block'(), pre, tp, dim, id)
@@ -247,8 +249,8 @@ print("env::Dcl_ext:",id, tp, _TP.isBasicType(tp),_TP.deref(tp), (_TP.isBasicTyp
     end,
 
     Dcl_func = function (me)
-       local op,tp,id,args,idx = unpack(me)
---print("env::Dcl_func:", op, tp, id, idx)
+       local op,mod,tp,id,args,idx = unpack(me)
+--print("env::Dcl_func:", op, mod, tp, id, #args, idx)
 --print("env::Dcl_func:", tp=='void', _TP.deref(tp) , _ENV.c[tp]~=nil)
         ASR(not(tp=='void' or _TP.deref(tp)) and _ENV.c[tp],me, 'invalid function type "'..tp..'"')
         for k,val in ipairs(_ENV.exts) do
@@ -266,6 +268,7 @@ print("env::Dcl_ext:",id, tp, _TP.isBasicType(tp),_TP.deref(tp), (_TP.isBasicTyp
         end
         me.ext = {
             ln    = me.ln,
+            mod   = mod,
             id    = id,
             n     = #_ENV.exts,
             tp    = tp,
@@ -285,18 +288,30 @@ print("env::Dcl_ext:",id, tp, _TP.isBasicType(tp),_TP.deref(tp), (_TP.isBasicTyp
     end,
 
     Func = function (me)
---print("env::Func:",me[1])
+--print("env::Func:",me[1],me.blk)
+--print(print_r(me,"env::Func: me"))
         local id = unpack(me)
         ASR(_ENV.exts[id],me, 'function "'..id..'" is not declared')
         me.ext = _ENV.exts[id]
         me.tp = _ENV.exts[id].tp
+
+        if not (me.ext and (me.ext.mod=='pure' or me.ext.mod=='nohold')) then
+            for pos, tp in ipairs(me.ext.args) do
+                if _TP.deref(tp)  then
+                    local blk = me.blk or _AST.iter('Block')()
+                    ASR(blk.fin, me,
+                        'block at line '..blk.ln..' must contain `finally´')
+                end
+            end
+        end
+
     end,
 
 
    
     Var = function (me)
         local id, idField = unpack(me)
-print("env::Var:",id)
+--print("env::Var:",id)
 --print(print_r(me,"env::Var: me"))
         local blk = me.blk or _AST.iter('Block')()
         while blk do
@@ -345,7 +360,7 @@ print("env::Var:",id)
     AwaitExt = function (me)
         local e1,_ = unpack(me)
         local ext = e1.ext
-print("env::AwaitExt:",e1.ext.id, e1.ext.pre)
+--print("env::AwaitExt:",e1.ext.id, e1.ext.pre)
         ASR(e1.ext.pre == 'input',me,'await expect an input event, a time expression, or a var event.')
         me.gte = (_ENV.awaits[ext] or 0)
         _ENV.awaits[ext] = (_ENV.awaits[ext] or 0) + 1
@@ -371,7 +386,7 @@ print("env::AwaitExt:",e1.ext.id, e1.ext.pre)
         local e1, e2 = unpack(me)
         ASR(e1.var.isEvt, me, 'event "'..e1.var.id..'" is not declared')
         if (e2) then
-print("env::EmitInt:",e1.var.tp,e2.tp)
+--print("env::EmitInt:",e1.var.tp,e2.tp)
           err, cast,_,_, len1, len2 = _TP.tpCompat(e1.var.tp,e2.tp)
           ASR(not err,me,'type/size incompatibility: '.. e1.var.tp..'/'..len1 ..' <--> '.. e2.tp..'/'..len2..'')
           WRN(not cast,me, 'Applying the minimum size: "'.. e1.var.tp..'/'..len1 ..'" <--> "' .. e2.tp..'/'..len2 ..'". ')
@@ -461,7 +476,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
     SetExp = function (me)
         local e1, e2, no_fin = unpack(me)
         e1 = e1 or _AST.iter'SetBlock'()[1]
-print('env::SetExp:',e1.tag,e2.tag, e1[1].tag, e2[1].tag, e1.lval,e1.tp,e2.tp,e1[1].arr,e2[1].arr,no_fin)
+--print('env::SetExp:',e1.tag,e2.tag, e1[1].tag, e2[1].tag, e1.lval,e1.tp,e2.tp,e1[1].arr,e2[1].arr,no_fin)
 --        WRN(e1.lval and _TP.contains(e1.tp,e2.tp,true),me, 'invalid attribution: ['.. e1.tp ..'] can not contain [' .. e2.tp ..']')
           ASR(not (e1[1].tag=='CONST'),me,'constant at left side of attribution.')
           ASR(not (e1[1].tag=='Op1_&'),me,'VarAddr at left side of attribution.')
@@ -476,19 +491,23 @@ print('env::SetExp:',e1.tag,e2.tag, e1[1].tag, e2[1].tag, e1.lval,e1.tp,e2.tp,e1
             return              -- no `finally´ required
         end
 
-        if _TP.deref(e1.tp) then
-            local blk1 = (e1.fst=='_' and _AST.root) or e1.fst.blk
-            if e2.fst and e2.fst~='_' then
-                local blk2 = e2.fst.blk
-                ASR(blk2.fin or blk2.depth<=blk1.depth, me,
-                    'block at line '..blk2.ln..' must contain `finally´')
-                -- int a; pa=&a;    -- `a´ termination must consider `pa´
-            else
-                ASR(blk1.fin or e2[1].tag~='Op2_call' or e2[1].c.mod=='pure',
-                    me, 'block at line '..blk1.ln..' must contain `finally´')
-                -- int* pa = _f();   -- `pa´ termination must consider `_f´
-            end
-        end
+-- :: afb ::
+-- Can't pass here, current function implementation only returns a non pointer integer type. 
+-- If it changes, the below code must be reviewed.
+
+--        if _TP.deref(e1.tp) then
+--            local blk1 = (e1.fst=='_' and _AST.root) or e1.fst.blk
+--            if e2.fst and e2.fst~='_' then
+--                local blk2 = e2.fst.blk
+--                ASR(blk2.fin or blk2.depth<=blk1.depth, me,
+--                    'block at line '..blk2.ln..' must contain `finally´')
+--                -- int a; pa=&a;    -- `a´ termination must consider `pa´
+--            else
+--                ASR(blk1.fin or e2[1].tag~='Op2_call' or e2[1].c.mod=='pure',
+--                    me, 'block at line '..blk1.ln..' must contain `finally´')
+--                -- int* pa = _f();   -- `pa´ termination must consider `_f´
+--            end
+--        end
     end,
 
     SetAwait = function (me)
@@ -515,7 +534,7 @@ print('env::SetExp:',e1.tag,e2.tag, e1[1].tag, e2[1].tag, e1.lval,e1.tp,e2.tp,e1
     --------------------------------------------------------------------------
 
     LExp = function (me)
-print("env::LExp:",me.tag,me[1].auxtag,me[1].tag, me[1].arr, me[1][1])
+--print("env::LExp:",me.tag,me[1].auxtag,me[1].tag, me[1].arr, me[1][1])
 --print(print_r(me,"env::Exp: me"))
 --        ASR(not(me[1].tag=='Var' and (me[1].arr)),me,'missing array index for "'..me[1][1]..'".')
         me.lval = me[1].lval
@@ -525,7 +544,7 @@ print("env::LExp:",me.tag,me[1].auxtag,me[1].tag, me[1].arr, me[1][1])
     end,
 
     Exp = function (me)
-print("env::Exp:",me.tag,me[1].auxtag,me[1].tag,me[1][1])
+--print("env::Exp:",me.tag,me[1].auxtag,me[1].tag,me[1][1])
 --print(print_r(me,"env::Exp: me"))
 --        ASR(not(me[1].tag=='Var' and (me[1].arr)),me,'missing array index for "'..me[1][1]..'".')
         me.lval = me[1].lval
@@ -567,9 +586,9 @@ print("env::Exp:",me.tag,me[1].auxtag,me[1].tag,me[1][1])
 
     Op2_idx = function (me)
 --print(print_r(me,"env:Op2_idx: me"))
-print("env::Op2_idx:",me[2][1],me[2].tag,me[2].tp,me[2][2],me[3][1],me[3].tag,me[3].tp)
+--print("env::Op2_idx:",me[2][1],me[2].tag,me[2].tp,me[2][2],me[3][1],me[3].tag,me[3].tp)
         local _, arr, idx = unpack(me)
-print("env::Op2_idx:",arr.tp)
+--print("env::Op2_idx:",arr.tp)
         ASR(arr.arr, me, 'cannot index a non array')
         local _arr = ASR(_TP.deref(arr.tp,true), me, 'cannot index a non array')
 --        ASR(_arr and _TP.isNumeric(idx.tp,true), me, 'invalid array index')
@@ -630,7 +649,7 @@ print("env::Op2_idx:",arr.tp)
         local op, e1 = unpack(me)
         local tp
         
-print("env::Op1_*:",e1.tp,e1.tag,e1[2])
+--print("env::Op1_*:",e1.tp,e1.tag,e1[2])
         ASR(_TP.deref(e1.tp, true) and e1.tag~='CONST', me, 'invalid operand to unary "*"')
         me.tp   = _TP.deref(e1.tp, true)
         me.lval = true
@@ -687,7 +706,7 @@ print("env::Op1_*:",e1.tp,e1.tag,e1[2])
 
     Op_var = function (me)
         local op, exp = unpack(me)
-print("env::Op_var:", op,exp[1].tag,exp[1].tp, exp[1].tag,exp[1].lval,exp[1].fst,_TP.isNumeric(exp.tp),_TP.deref(exp.tp))
+--print("env::Op_var:", op,exp[1].tag,exp[1].tp, exp[1].tag,exp[1].lval,exp[1].fst,_TP.isNumeric(exp.tp),_TP.deref(exp.tp))
         ASR((exp.tag=='Var' or exp.tag=='Op2_idx' or exp.tag=='Op2_.') and _TP.isBasicType(exp.tp), me, 'invalid "inc/dec" target. Received a "'..exp.tag..'" of type "'..exp.tp..'"')
         me.tp   = exp.tp
         me.lval = exp.lval
@@ -721,7 +740,7 @@ print("env::Op_var:", op,exp[1].tag,exp[1].tp, exp[1].tag,exp[1].lval,exp[1].fst
     WCLOCKR = 'WCLOCKK',
 
     SIZEOF = function (me)
-print("env::SIZEOF")
+--print("env::SIZEOF")
         me.tp   = 'ushort'
         me.lval = true
     end,

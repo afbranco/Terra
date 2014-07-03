@@ -187,7 +187,7 @@ end
 
   -- arg={type}
   op_dec= function (me,codeB,arg)      
-print("asm::op_dec:",_TP.getConstBytes(arg[2],2))
+--print("asm::op_dec:",_TP.getConstBytes(arg[2],2))
     local bytecode=''
     local codeA = ''
     bytecode = string.format('%02x',(opcode['op_dec'])+(typelen[arg[1]] or '0' ))
@@ -281,7 +281,7 @@ print("asm::op_dec:",_TP.getConstBytes(arg[2],2))
   op_set_e= function (me,codeB,arg) 
     local bytecode=''
     local codeA = ''
-print("asm::op_set_e:",arg[1],typelen[arg[1]])
+--print("asm::op_set_e:",arg[1],typelen[arg[1]])
     bytecode = string.format('%02x',(opcode['op_set_e'])+(typelen[arg[1]] or '0' ))
     codeA = 'set_e'..' '..arg[1]
     OPCODE(me,bytecode,codeA,codeB,-2)

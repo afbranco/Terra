@@ -1,9 +1,9 @@
 #include "TerraNet.defs"
 
 regtype radio_t with
-   var ubyte	    code;
+   var ubyte	code;
    var ushort   target;
-   var byte[10] data;
+   var byte[23] data;
  end 
 
  regtype usr_t with
@@ -11,6 +11,7 @@ regtype radio_t with
    var ushort photoVal;
  end 
 
+var usrMsg_t radio;
 var ulong v1;
 var ulong* v1_p;
 var ubyte* v2_p;
@@ -19,6 +20,22 @@ var radio_t* msg_p;
 var usr_t usr;
 var usr_t* usr_p;
 var ubyte[10] buffer;
+
+
+/*
+par/or  do
+do
+	buffer[0]=0;
+	var ushort node = qGet(&msg);
+	await 1s;
+	buffer[1]=1;
+//finally
+	buffer[2]=2;
+end
+with
+	await 10s;
+end
+*/
 
 
 v1_p = &v1;

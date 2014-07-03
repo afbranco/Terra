@@ -74,11 +74,12 @@ local _V2NAME = {
     ID_tvoid = 'type',
     _Dcl_var = 'declaration',
     _Dcl_int = 'declaration',
+    _Dcl_func = 'declaration',
     __ID = 'identifier',
 
     ID_version  = 'version identifier <num.num.num> ',
     CfgBlk = 'Config block declaration',
-    ID_field_type = 'a valid basic type',
+    ID_field_type = 'a valid non pointer basic type',
     _Dcl_struct = 'declaration',
 --    ID_evt  = 'identifier',
     Op_var = 'variable'
@@ -128,7 +129,7 @@ KEYS = P'and'
      + 'else/if'  + 'emit'     + 'end'      + 'event'   
      + 'finally'  + 'FOREVER'  + 'if'       + 'input'    + 'loop'
      + 'nohold'   + 'not'      + 'null'     + 'or'       + 'output'
-     + 'par'      + 'par/and'  + 'par/or'   
+     + 'par'      + 'par/and'  + 'par/or'                + 'pure'
      + 'return'   + 'sizeof'   + 'then'     + 'var'      + 'with'
      + 'function' + 'config'   + 'regtype'  + 'inc'      + 'dec'
      + TYPES
@@ -157,7 +158,9 @@ _GG = {
             + EM'config statement (usually a missing `input/output/function/regtype´)'
     , _CfgStmtB = V'_Dcl_regt'
             + EM'config statement (usually a missing `regtype varName with varDefs end´)'
-    ,_Dcl_func = (CKEY'function' * (CKEY(TYPES)+EM'a basic type' ) * (V'ID_c' + EM'a valid function identifier') * K'(' * V'Arg_list' * K')') * PNUM
+    ,_Dcl_func = (CKEY'function' * (CK'pure'+CK'nohold'+Cc(false)) 
+                  * (CKEY(TYPES) + EM'a basic type' ) 
+                  * (V'ID_c' + EM'a valid function identifier') * K'(' * V'Arg_list' * K')') * PNUM
     
     , Arg_list = ( V'ID_type' * (EK',' * EV'ID_type')^0  )^-1
 ------
@@ -331,8 +334,10 @@ _GG = {
                     V'__Dcl_var' * (K','*V'__Dcl_var')^0
     , __Dcl_var = EV'ID_var' * (V'_Sets' + Cc(false)*Cc(false)*Cc(false))
 
-    , _Dcl_field  = CKEY'var' * (EV'ID_field_type' + EM'a valid basic type') * (K'['*PNUM*K']'+Cc(false)) *
-                    V'ID_var' * (K','*V'ID_var')^0
+    , _Dcl_field  = CKEY'var' * EV'ID_field_type' 
+                    *  (K'['*PNUM*K']' + Cc(false))
+                    *    (V'ID_var' + EM'a valid identifier')  
+                    * (K','*V'ID_var')^0
                         
     , _Dcl_regt = KEY'regtype' * EV'ID_var' * EKEY'with' * (V'_Dcl_field' * (EK';'*K';'^0))^0 * EKEY'end'
     

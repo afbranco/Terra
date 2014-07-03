@@ -1,0 +1,161 @@
+/*{-{*/
+#ifndef _TERRAGRP_
+#define _TERRAGRP_
+config 00.02.00 do
+
+/*
+ * Define constants
+ */
+
+// error_t
+#define SUCCESS 0 
+     // FAIL > 0
+// Boolean
+#define TRUE 1
+#define FALSE 0
+// Leds Constants
+#define ON 1
+#define OFF 0
+#define TOGGLE 2
+// Interrupt config
+#define RISING 1
+#define FALLING 0
+#define DISABLE 2
+// Port Cfg
+#define pIN 0
+#define pOUT 1
+// Message
+#define BROADCAST 0xffff
+#define SEND_DATA_SIZE 16
+
+// Operations
+#define opLT 1
+#define opLTE 2
+#define opGT 3
+#define opGTE 4
+#define opEQ 5
+#define opNEQ 6
+// Aggreg Functions
+#define fAVG 0
+#define fSUM 1
+#define fMAX 2
+#define fMIN 3
+#define fRESERV 5
+// Group Election Status
+#define eACTIVE 1
+#define ePASSIVE 2
+#define eOFF 3
+// Group Election Initial State
+#define EST_NEWRUN 6
+
+/*
+ * Define custom registers
+ */
+
+	// Group control structure
+	regtype group_t with
+		var ubyte   grId;
+		var ushort  param;
+		var ubyte   nhops;
+		var ubyte   status;
+		var ubyte   elFlag;
+		var ubyte   elState;
+		var ushort  leader;
+		var ushort	nextGrp;
+	end
+	
+	// Aggregation control structure
+	regtype aggreg_t with
+		var ubyte   agId;
+		var ushort  seq;
+		var ubyte   grId;
+		var ubyte   sensorId;
+		var ubyte   agOper;
+		var ubyte   agComp;
+		var ulong   refVal;	
+		var ushort	nextAgg;
+	end
+
+	// AggregDone data structure
+	regtype aggDone_t with
+		var ubyte  agId;
+		var ushort count;
+		var ushort countTrue;
+		var ushort countFalse;
+		var ulong  value;
+	end
+	
+	// msgBS_t
+	regtype msgBS_t with
+		var ubyte msgId;
+		var ubyte[SEND_DATA_SIZE] data;
+	end
+
+	// msgGR_t 
+	regtype msgGR_t with
+		var ubyte  grId;
+		var ushort target;
+		var ubyte  msgId;
+		var ubyte[SEND_DATA_SIZE] data;
+	end
+		
+	// Terra Local Output events
+	output ubyte		INIT			0;
+	output ubyte		LEDS			5;
+	output ubyte		LED0			6;
+	output ubyte		LED1			7;
+	output ubyte		LED2			8;
+	output void			REQ_TEMP		9;
+	output void			REQ_PHOTO		10;
+	output void			REQ_VOLTS		11;
+	output ubyte		SET_PORT_A		12;
+	output ubyte		SET_PORT_B		13;
+	output ubyte 		CFG_PORT_A		14;
+	output ubyte 		CFG_PORT_B		15;
+	output ubyte 		REQ_PORT_A		16;
+	output ubyte 		REQ_PORT_B		17;
+	output ubyte 		CFG_INT_A		18;
+	output ubyte 		CFG_INT_B		19;
+	output ubyte 		REQ_CUSTOM_A	20;
+
+	// Terra Grp output events
+	output msgBS_t 		SEND_BS			40;
+	output msgBS_t 		SEND_GR			41;
+	output agg_req_t 	AGGREG			42;
+
+	// Terra Local Input events
+	input ubyte 	ERROR 			0;
+	input ushort 	TEMP 			5;
+	input ushort 	PHOTO 			6;
+	input ushort	VOLTS 			7;
+	input ubyte 	PORT_A 			8;
+	input ubyte 	PORT_B 			9;
+	input ubyte 	INT_A 			10;
+	input ubyte 	INT_B 			11;
+	input ubyte 	CUSTOM_A 		12;
+
+	// TerraGrp input events
+	input recGR_t 		REC_GR		40;
+	input ushort 		SENDBS_DONE 41;
+	input agg_result_t 	AGGREG_DONE	42;
+
+
+	// Terra basic functions
+	function pure ushort getNodeId()	0;
+	function pure ushort random()		1;
+	// TerraGrp Custom functions
+	//       		groupInit( RegName,    Id, param, nhops, status, elFlag, leader)
+	function ushort groupInit(group_t*, ubyte, ubyte, ubyte,  ubyte,  ubyte, ushort)	10;
+	//       		aggregInit(  RegName,   grName, sensorId, agOper, agComp, refVal)
+	function ushort aggregInit(aggreg_t*, group_t*,    ubyte,  ubyte,  ubyte,  ulong)	11;
+
+// Request/await macros
+#define getTemp(var)  emit REQ_TEMP();  var=await TEMP 
+#define getPhoto(var) emit REQ_PHOTO(); var=await PHOTO 
+#define getVolts(var) emit REQ_VOLTS(); var=await VOLTS 
+// await/until macro
+#define await_until(ret,evt,cond) loop do ret = await evt; if cond then break; end end
+
+end
+#endif
+/*}-}*/

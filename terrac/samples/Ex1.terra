@@ -102,7 +102,7 @@ par do
 				msgData.d16_4 = father;
 				msgData.d8_2 = reqTopoBlind;
 				await (nodeId*100)ms;
-				stat = qPut(&msgData);
+				stat = qPut(msgData);
 			else
 				emit REQ_CUSTOM_A(1);
 			end
@@ -118,7 +118,7 @@ with
 		if msgTopo.type == ID_DATA then 	// Received a data Msg, then root it.
 			if father != NO_FATHER then
 				msgTopo.target = father;
-				stat = qPut(&msgTopo);
+				stat = qPut(msgTopo);
 			end
 		end
 		if nodeId != baseNode then
@@ -133,7 +133,7 @@ with
 					inc msgTopo.d8_2;
 					hop = msgTopo.d8_2;
 					msgTopo.source = nodeId;
-					stat = qPut(&msgTopo);
+					stat = qPut(msgTopo);
 				end
 			end
 			/**************************
@@ -143,7 +143,7 @@ with
 				if (father != NO_FATHER) and (reqTopoBlind==FALSE) then
 					//reqTopoBlind = TRUE;
 					msgTopo.target = father;
-					stat = qPut(&msgTopo);
+					stat = qPut(msgTopo);
 				end
 			end
 		end
@@ -162,7 +162,7 @@ with
 				msgTopo.d8_2 = 0;
 				inc seqReq;
 				msgTopo.d16_2 = seqReq;
-				stat = qPut(&msgTopo);
+				stat = qPut(msgTopo);
 				await 2s; // Ignores recent requests
 			end	
 		end
@@ -180,7 +180,7 @@ with
 				msgTopo.target = BROADCAST;
 				inc seqReq;
 				msgTopo.d16_2 = seqReq;
-				stat = qPut(&msgTopo);
+				stat = qPut(msgTopo);
 			end
 		end
 	end
@@ -197,12 +197,12 @@ with
 				reply=0;
 				stat = qGet(&msgRadio);
 				if msgRadio.target == BROADCAST then
-					emit SEND(&msgRadio);
+					emit SEND(msgRadio);
 					await SEND_DONE;
 				else
 					loop do
 						msgRadio.d8_1 = msgRadio.d8_1 + reply;
-						emit SEND_ACK(&msgRadio);
+						emit SEND_ACK(msgRadio);
 						ack = await SEND_DONE_ACK;
 						inc reply;
 						if reply > 20 then

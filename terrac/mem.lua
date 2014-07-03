@@ -187,7 +187,7 @@ F = {
     end,
 
     Var = function (me)
-print("mem:Var:",me.var.id,me.var.val,me.var.arr)
+--print("mem:Var:",me.var.id,me.var.val,me.var.arr)
 --print(print_r(me,"mem:Var: me"))
         me.val = me.var.val
         me.accs = { {me.var, (me.var.arr and 'no') or 'rd', me.var.tp, false,
@@ -230,7 +230,7 @@ print("mem:Var:",me.var.id,me.var.val,me.var.arr)
         local len, val, valType
         if e2 then
             local tp = _TP.deref(e1.ext.tp, true)
-print("mem::EmitExtE:",e1.ext.id, e1.ext.tp, e2.tp)
+--print("mem::EmitExtE:",e1.ext.id, e1.ext.tp, e2.tp)
             if tp then
             ASR(_TP.deref(e2.tp),me,'invalid type. Expecting '..e1.ext.tp..' and received '.. e2.tp)
                 len = _ENV.c[_TP.deref(_TP.deref(e2.tp)) or _TP.deref(e2.tp) or e2.tp].len --'sizeof('.._TP.c(tp)..')'
@@ -432,7 +432,7 @@ print("mem::EmitExtE:",e1.ext.id, e1.ext.tp, e2.tp)
     SIZEOF = function (me)
       ASR(_ENV.c[_TP.deref(me[1]) or me[1]],me,'invalid type "'.. me[1] ..'"')
       local tp = (_TP.deref(me[1]) and 'ushort') or me[1]
-print("mem::SIZEOF:",_ENV.c[tp].len,_TP.getConstType(_ENV.c[tp].len),me.ln)
+--print("mem::SIZEOF:",_ENV.c[tp].len,_TP.getConstType(_ENV.c[tp].len),me.ln)
 --        me.val = 'sizeof('.._TP.c(me[1])..')'
       me.val = _ENV.c[tp].len
       me.tp = _TP.getConstType(_ENV.c[tp].len,me.ln)

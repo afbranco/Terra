@@ -1,4 +1,4 @@
-52 142 1 0 0 0 0 1 0
+90 180 1 0 0 0 0 1 0
 00 | 0000 0 track 0
 00 | 0001 0
 00 | 0002 0
@@ -12,15 +12,15 @@
 00 | 0010 0002
 00 | 0011 0003
 00 | 0012 0004 $ret:1, 
-00 | 0013 0005 v1:4, 
+00 | 0013 0005 radio:25, 
 00 | 0014 0006 
 00 | 0015 0007 
 00 | 0016 0008 
-00 | 0017 0009 v1_p:2, 
+00 | 0017 0009 
 00 | 0018 0010 
-00 | 0019 0011 v2_p:2, 
+00 | 0019 0011 
 00 | 0020 0012 
-00 | 0021 0013 msg:13, 
+00 | 0021 0013 
 00 | 0022 0014 
 00 | 0023 0015 
 00 | 0024 0016 
@@ -33,111 +33,149 @@
 00 | 0031 0023 
 00 | 0032 0024 
 00 | 0033 0025 
-00 | 0034 0026 msg_p:2, 
+00 | 0034 0026 
 00 | 0035 0027 
-00 | 0036 0028 usr:4, 
+00 | 0036 0028 
 00 | 0037 0029 
-00 | 0038 0030 
+00 | 0038 0030 v1:4, 
 00 | 0039 0031 
-00 | 0040 0032 usr_p:2, 
+00 | 0040 0032 
 00 | 0041 0033 
-00 | 0042 0034 buffer:10, 
+00 | 0042 0034 v1_p:2, 
 00 | 0043 0035 
-00 | 0044 0036 
+00 | 0044 0036 v2_p:2, 
 00 | 0045 0037 
-00 | 0046 0038 
+00 | 0046 0038 msg:26, 
 00 | 0047 0039 
 00 | 0048 0040 
 00 | 0049 0041 
 00 | 0050 0042 
 00 | 0051 0043 
-e4 | 0052 e4 set16_c ushort 0 1            | config gate TEMP with 1 await(s) - 0x0001 = 1
-00 | 0053 00 
-01 | 0054 01 
-e4 | 0055 e4 set16_c ushort 9 5            | v1_p = &v1
-09 | 0056 09 
-05 | 0057 05 
-39 | 0058 39 pushx_v ushort 9              | push v1_p:ulong*
-09 | 0059 09 
-96 | 0060 96 deref ulong                   | deref_ *v1_p
-22 | 0061 22 popx ulong 5                  | pop v1
-05 | 0062 05 
-e4 | 0063 e4 set16_c ushort 9 16           | v1_p = msg.data
-09 | 0064 09 
-10 | 0065 10 
-f8 | 0066 f8 set_v ulong 5 16              | v1 = msg.data[0]
-05 | 0067 05 
-10 | 0068 10 
-f0 | 0069 f0 set_v byte 16 5               | msg.data[0] = v1
-10 | 0070 10 
-05 | 0071 05 
-e4 | 0072 e4 set16_c ushort 9 34           | v1_p = buffer
-09 | 0073 09 
-22 | 0074 22 
-e4 | 0075 e4 set16_c ushort 32 16          | usr_p = msg.data
-20 | 0076 20 
-10 | 0077 10 
-e4 | 0078 e4 set16_c ushort 32 34          | usr_p = buffer
-20 | 0079 20 
-22 | 0080 22 
-f4 | 0081 f4 set_v ushort 14 5             | msg.target = v1
-0e | 0082 0e 
-05 | 0083 05 
-f0 | 0084 f0 set_v byte 19 35              | msg.data[3] = buffer[1]
-13 | 0085 13 
-23 | 0086 23 
-28 | 0087 28 push_c 35                     | push_c &buffer[1]
-23 | 0088 23 
-94 | 0089 94 deref ubyte                   | deref ubyte
-28 | 0090 28 push_c 16                     | push msg.data
-10 | 0091 10 
-3a | 0092 3a pushx_v ulong 5               | push v1:ulong
-05 | 0093 05 
-28 | 0094 28 push_c 10                     | push idx max 10
-0a | 0095 0a 
-08 | 0096 08 mod                           | mod: limmit idx
-28 | 0097 28 push_c 1                      | push var len byte
-01 | 0098 01 
-09 | 0099 09 mult                          | mult: varlen * idx
-07 | 0100 07 add                           | add: array base addr + len position
-40 | 0101 40 set_e byte                    | set (byte)*(pop1) = pop2
-3a | 0102 3a pushx_v ulong 5               | push v1:ulong
-05 | 0103 05 
-39 | 0104 39 pushx_v ushort 32             | push usr_p:usr_t*
-20 | 0105 20 
-41 | 0106 41 set_e ushort                  | set (ushort)*(pop1) = pop2
-39 | 0107 39 pushx_v ushort 9              | push v1_p:ulong*
-09 | 0108 09 
-96 | 0109 96 deref ulong                   | deref_ *v1_p
-39 | 0110 39 pushx_v ushort 32             | push usr_p:usr_t*
-20 | 0111 20 
-41 | 0112 41 set_e ushort                  | set (ushort)*(pop1) = pop2
-e4 | 0113 e4 set16_c ushort 26 13          | msg_p = &msg
-1a | 0114 1a 
-0d | 0115 0d 
-f4 | 0116 f4 set_v ushort 32 26            | usr_p(pointer) = msg_p(pointer)
-20 | 0117 20 
-1a | 0118 1a 
-39 | 0119 39 pushx_v ushort 26             | push msg_p:radio_t*
-1a | 0120 1a 
-28 | 0121 28 push_c 3                      | push data offset
-03 | 0122 03 
-07 | 0123 07 add                           | add: reg addr + field offset
-94 | 0124 94 deref byte                    | deref byte
-21 | 0125 21 popx ushort 30                | pop usr.photoVal
-1e | 0126 1e 
-e4 | 0127 e4 set16_c ushort 11 29          | v2_p = &msg_p.data[0]
-0b | 0128 0b 
-1d | 0129 1d 
-e5 | 0130 e5 set16_c ushort 2 22           | await TEMP[0]
-02 | 0131 02 
-00 | 0132 .00 addr:135
-87 | 0133 .16 
-01 | 0134 01 end                           | end
-39 | 0135 39 pushx_v ushort 32             | push usr_p:usr_t*
-20 | 0136 20 
-98 | 0137 98 getextdt_e 2                  | getExtData stack len=2
-02 | 0138 02 
-01 | 0139 01 end                           | end
-01 | 0140 01 end                           | end program
-01 | 0141 01 end                           | end
+00 | 0052 0044 
+00 | 0053 0045 
+00 | 0054 0046 
+00 | 0055 0047 
+00 | 0056 0048 
+00 | 0057 0049 
+00 | 0058 0050 
+00 | 0059 0051 
+00 | 0060 0052 
+00 | 0061 0053 
+00 | 0062 0054 
+00 | 0063 0055 
+00 | 0064 0056 
+00 | 0065 0057 
+00 | 0066 0058 
+00 | 0067 0059 
+00 | 0068 0060 
+00 | 0069 0061 
+00 | 0070 0062 
+00 | 0071 0063 
+00 | 0072 0064 msg_p:2, 
+00 | 0073 0065 
+00 | 0074 0066 usr:4, 
+00 | 0075 0067 
+00 | 0076 0068 
+00 | 0077 0069 
+00 | 0078 0070 usr_p:2, 
+00 | 0079 0071 
+00 | 0080 0072 buffer:10, 
+00 | 0081 0073 
+00 | 0082 0074 
+00 | 0083 0075 
+00 | 0084 0076 
+00 | 0085 0077 
+00 | 0086 0078 
+00 | 0087 0079 
+00 | 0088 0080 
+00 | 0089 0081 
+e4 | 0090 e4 set16_c ushort 0 1            | config gate TEMP with 1 await(s) - 0x0001 = 1
+00 | 0091 00 
+01 | 0092 01 
+e4 | 0093 e4 set16_c ushort 34 30          | v1_p = &v1
+22 | 0094 22 
+1e | 0095 1e 
+39 | 0096 39 pushx_v ushort 34             | push v1_p:ulong*
+22 | 0097 22 
+96 | 0098 96 deref ulong                   | deref_ *v1_p
+22 | 0099 22 popx ulong 30                 | pop v1
+1e | 0100 1e 
+e4 | 0101 e4 set16_c ushort 34 41          | v1_p = msg.data
+22 | 0102 22 
+29 | 0103 29 
+f8 | 0104 f8 set_v ulong 30 41             | v1 = msg.data[0]
+1e | 0105 1e 
+29 | 0106 29 
+f0 | 0107 f0 set_v byte 41 30              | msg.data[0] = v1
+29 | 0108 29 
+1e | 0109 1e 
+e4 | 0110 e4 set16_c ushort 34 72          | v1_p = buffer
+22 | 0111 22 
+48 | 0112 48 
+e4 | 0113 e4 set16_c ushort 70 41          | usr_p = msg.data
+46 | 0114 46 
+29 | 0115 29 
+e4 | 0116 e4 set16_c ushort 70 72          | usr_p = buffer
+46 | 0117 46 
+48 | 0118 48 
+f4 | 0119 f4 set_v ushort 39 30            | msg.target = v1
+27 | 0120 27 
+1e | 0121 1e 
+f0 | 0122 f0 set_v byte 44 73              | msg.data[3] = buffer[1]
+2c | 0123 2c 
+49 | 0124 49 
+28 | 0125 28 push_c 73                     | push_c &buffer[1]
+49 | 0126 49 
+94 | 0127 94 deref ubyte                   | deref ubyte
+28 | 0128 28 push_c 41                     | push msg.data
+29 | 0129 29 
+28 | 0130 28 push_c 23                     | push idx max 23
+17 | 0131 17 
+3a | 0132 3a pushx_v ulong 30              | push v1:ulong
+1e | 0133 1e 
+08 | 0134 08 mod                           | mod: limmit idx
+28 | 0135 28 push_c 1                      | push var len byte
+01 | 0136 01 
+09 | 0137 09 mult                          | mult: varlen * idx
+07 | 0138 07 add                           | add: array base addr + len position
+40 | 0139 40 set_e byte                    | set (byte)*(pop1) = pop2
+3a | 0140 3a pushx_v ulong 30              | push v1:ulong
+1e | 0141 1e 
+39 | 0142 39 pushx_v ushort 70             | push usr_p:usr_t*
+46 | 0143 46 
+41 | 0144 41 set_e ushort                  | set (ushort)*(pop1) = pop2
+39 | 0145 39 pushx_v ushort 34             | push v1_p:ulong*
+22 | 0146 22 
+96 | 0147 96 deref ulong                   | deref_ *v1_p
+39 | 0148 39 pushx_v ushort 70             | push usr_p:usr_t*
+46 | 0149 46 
+41 | 0150 41 set_e ushort                  | set (ushort)*(pop1) = pop2
+e4 | 0151 e4 set16_c ushort 64 38          | msg_p = &msg
+40 | 0152 40 
+26 | 0153 26 
+f4 | 0154 f4 set_v ushort 70 64            | usr_p(pointer) = msg_p(pointer)
+46 | 0155 46 
+40 | 0156 40 
+39 | 0157 39 pushx_v ushort 64             | push msg_p:radio_t*
+40 | 0158 40 
+28 | 0159 28 push_c 3                      | push data offset
+03 | 0160 03 
+07 | 0161 07 add                           | add: reg addr + field offset
+94 | 0162 94 deref byte                    | deref byte
+21 | 0163 21 popx ushort 68                | pop usr.photoVal
+44 | 0164 44 
+e4 | 0165 e4 set16_c ushort 36 67          | v2_p = &msg_p.data[0]
+24 | 0166 24 
+43 | 0167 43 
+e5 | 0168 e5 set16_c ushort 2 22           | await TEMP[0]
+02 | 0169 02 
+00 | 0170 .00 addr:173
+ad | 0171 .16 
+01 | 0172 01 end                           | end
+39 | 0173 39 pushx_v ushort 70             | push usr_p:usr_t*
+46 | 0174 46 
+98 | 0175 98 getextdt_e 2                  | getExtData stack len=2
+02 | 0176 02 
+01 | 0177 01 end                           | end
+01 | 0178 01 end                           | end program
+01 | 0179 01 end                           | end

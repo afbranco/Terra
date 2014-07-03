@@ -173,11 +173,7 @@ local C; C = {
         if not b2 then
             return node('Block')(ln, b1)
         end
-        
-        -- afb : Finally isn't implemented.
---        ASR(FALSE, b2, 'Finally is not implemented in this version!')
 
--- afb : Finally isn't implemented.
         FIN = FIN + 1
         local fin = node('Finally')(ln, b2)
         fin.n = FIN
@@ -342,13 +338,14 @@ local C; C = {
             return node('Dcl_ext')(ln, dir, tp, name, id)
     end,
 
-    _Dcl_func = function (ln, tp, name,...)
+    _Dcl_func = function (ln, op, mod, tp,id,...)
+--print("ast::_Dcl_func:",ln,op,mod, tp,id)
         local args = {}
         local t = { ... }
-        for i=2, #t-1 do
-          args[i-1]=t[i]
+        for i=1, #t-1 do
+          args[i]=t[i]
         end
-        return node('Dcl_func')(ln, tp, name, t[1], args,t[#t])
+        return node('Dcl_func')(ln, op, mod, tp,id, args,t[#t])
     end,
 
 --    CallStmt = node('CallStmt'),
@@ -371,8 +368,8 @@ local C; C = {
             return node('Op1_'..op)(ln, v2,
                                     C._Exp(ln, select(3,...)))
         else                    -- binary expression
-print("ast::_Exp2:", v1.tag, v2, v3.tag)
-print("ast::_Exp2:", v1[1], v2, v3[1])
+--print("ast::_Exp2:", v1.tag, v2, v3.tag)
+--print("ast::_Exp2:", v1[1], v2, v3[1])
             -- v1=e1, v2=op, v3=e2, v4=?
             if v1.tag=='CONST' and v3.tag=='CONST' and 
               (v2=='+' or v2=='-' or v2=='/' or v2=='*' or v2 == '%')

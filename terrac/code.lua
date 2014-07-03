@@ -383,15 +383,15 @@ function getAuxValues(e1)
       x1.val = e1.val
       x1.id = (e1.fst and e1.fst.id) or e1[1][1]
     end
-print("code::getAuxValues:-->:",x1.tag,x1.auxtag1,x1.auxtag2,x1.auxtag3)
-print("code::getAuxValues:var:",x1.tp,x1.ntp,x1.val,x1.id,x1.arr)
-print("code::getAuxValues:idx:",x1.idxval,x1.idxtp,x1.idxmax)
+--print("code::getAuxValues:-->:",x1.tag,x1.auxtag1,x1.auxtag2,x1.auxtag3)
+--print("code::getAuxValues:var:",x1.tp,x1.ntp,x1.val,x1.id,x1.arr)
+--print("code::getAuxValues:idx:",x1.idxval,x1.idxtp,x1.idxmax)
   return x1
 end
 
 function tryDerefCode(me,tag,tp)
     local ntp = (_TP.deref(tp) and 'ushort') or tp
-print("code::tryDerefCode:",tag,tp, ntp)
+--print("code::tryDerefCode:",tag,tp, ntp)
     if (  tag == 'Op2_idx'
           or tag == 'Op2_.'
 --        tag ~= 'CONST'     -- NOT Constants
@@ -414,7 +414,7 @@ end
 
 function Op2_any(me,mnemonic)
     local op, e1, e2 = unpack(me)
-print("code::Op2_any:",op,e1.tag,e1.tp,e2.tag,e2.tp,e1.arr,e2.arr)
+--print("code::Op2_any:",op,e1.tag,e1.tp,e2.tag,e2.tp,e1.arr,e2.arr)
   local err,cast, _, _, len1, len2 = _TP.tpCompat(e1.tp,e2.tp,e1.arr,e2.arr)
   ASR(not err ,me,'type/size incompatibility: "'..e1.tp..'/'..len1 .. '" <--> "'..e2.tp..'/'..len2)
   --WRN(not cast,me,'automatic cast from ['.. e2.tp ..'] to [' .. e1.tp ..'].')
@@ -446,7 +446,7 @@ end
 -- *******************************************************
 function SetExp(me)
     local e1, e2 = unpack(me)
-print("code::SetExp():",e1.tag,e2.tag,e1[1].tag,e2[1].tag,e1.arr,e2.arr)
+--print("code::SetExp():",e1.tag,e2.tag,e1[1].tag,e2[1].tag,e1.arr,e2.arr)
 
     local x1 = getAuxValues(e1)
     local x2 = getAuxValues(e2)
@@ -812,7 +812,7 @@ F = {
 
   SetAwait = function (me)
     local e1, e2 = unpack(me)
-print("code::SetWait:",e1.tp,e1[1].tag,e1[1].val,e2.tag)
+--print("code::SetWait:",e1.tp,e1[1].tag,e1[1].val,e2.tag)
 --print(print_r(me,"code::SetWait: me"))
     --ATTR(me, e1, e2.ret)
 
@@ -830,11 +830,11 @@ print("code::SetWait:",e1.tp,e1[1].tag,e1[1].val,e2.tag)
         BYTECODE(me,codeB,'op_getextdt_p',e1.val,_ENV.c[_TP.deref(e1.tp)].len)
       elseif (e1[1].tag=='Var' and not _TP.deref(e1.tp)) then
         local x1 = getAuxValues(e1)
-print("code::SetAwait: var:",x1.auxtag1,x1.auxtag2, x1.tp, x1.ntp, x1.val,x1.id)
+--print("code::SetAwait: var:",x1.auxtag1,x1.auxtag2, x1.tp, x1.ntp, x1.val,x1.id)
         codeB = LINE(me,'getExtData '..x1.id..' '.._ENV.c[e1.tp].len,nil,'// getExtDt <localVarAddr> <len>')
         BYTECODE(me,codeB,'op_getextdt_v',x1.val,_ENV.c[e1.tp].len)
       elseif (e1[1].tag=='Op1_*' and e1[1][2].tag == 'Var') then
-print("code::SetAwait: *var:",e1[1][2].tag,e1[1][2][1],e1[1][2].val,e1[1][2].tp)
+--print("code::SetAwait: *var:",e1[1][2].tag,e1[1][2][1],e1[1][2].val,e1[1][2].tp)
         codeB = LINE(me,'getExtData *'..e1[1][2][1]..' '..(_ENV.c[_TP.deref(e1[1][2].tp)].len),nil,'// getExtDtp <localVar pointer> <len>')
         BYTECODE(me,codeB,'op_getextdt_p',e1[1][2].val,_ENV.c[_TP.deref(e1[1][2].tp)].len)
       else
@@ -1376,7 +1376,7 @@ print("code::SetAwait: *var:",e1[1][2].tag,e1[1][2][1],e1[1][2].val,e1[1][2].tp)
     ['Op1_*'] = function (me)
         local op, e1, e2 = unpack(me)
         local tp = (_TP.deref(_TP.deref(e1.tp)) and 'ushort') or (_TP.deref(e1.tp) or e1.tp)
-print("code::Op1_*:",e1.tag,e1.val,e1.tp,tp,e1[1])
+--print("code::Op1_*:",e1.tag,e1.val,e1.tp,tp,e1[1])
 		ASR(not _TP.deref(_TP.deref(e1.tp)),me,'"**Var" is not implemented! ')
     ASR(_TP.isBasicType(tp),me,'type of "'..e1[1]..'" is not a basic type.')
     CONC(me,e1)
@@ -1388,8 +1388,8 @@ print("code::Op1_*:",e1.tag,e1.val,e1.tp,tp,e1[1])
     local op, e1, id = unpack(me)
     local field = _ENV.c[_TP.deref(e1.tp) or e1.tp].fields[id]
 --print('________________________________________________________')
-print('code:Op2_.::',me.val,me.tp, e1.tag,e1.val,e1.tp,id)
-print('code:Op2_.::',me.fst.val, id,field.offset,field.tp,field.arr)
+--print('code:Op2_.::',me.val,me.tp, e1.tag,e1.val,e1.tp,id)
+--print('code:Op2_.::',me.fst.val, id,field.offset,field.tp,field.arr)
 --print(print_r(me,'code::Op2_.:me'))
 --print('--------------------------------------------------------')
 
@@ -1409,7 +1409,7 @@ print('code:Op2_.::',me.fst.val, id,field.offset,field.tp,field.arr)
     
   ['Op1_&'] = function (me)
     local op, e1 = unpack(me)
-print("code::Op1_&",e1.tag)
+--print("code::Op1_&",e1.tag)
     if e1.tag == 'Var' then
       codeB = LINE(me,'push &'..e1[1],nil,'// push &Var ')
       BYTECODE(me,codeB,'op_push_c',e1.val)
@@ -1421,11 +1421,11 @@ print("code::Op1_&",e1.tag)
   Op_var = function (me)
     local op, exp = unpack(me)
     if exp.tag == 'Var' then
-print("code::Op_var: Var",op,exp.var.id,exp.var.val,exp.tp)
+--print("code::Op_var: Var",op,exp.var.id,exp.var.val,exp.tp)
       codeB = LINE(me,'push &'..exp[1],nil,'// push &Var ')
       BYTECODE(me,codeB,'op_push_c',exp.val)
     else
-print("code::Op_var: Var",op,exp[2][1],exp[3],exp.tp)
+--print("code::Op_var: Var",op,exp[2][1],exp[3],exp.tp)
       CONC(me,exp)
     end
     codeB = LINE(me,op..' '..exp.tp,nil,'// Op_var <type> ')
@@ -1454,7 +1454,7 @@ print("code::Op_var: Var",op,exp[2][1],exp[3],exp.tp)
   ['Var'] = function (me)
     --		ASR(typelen[me.var.tp] or _TP.deref(me.var.tp),me,'must use custom type only as pointer.')
     local tp = (_TP.deref(me.var.tp) and 'ushort') or me.var.tp
-print("Code::Var:",me.var.id,me.var.tp,tp,me.var.arr,_TP.isBasicType( _TP.deref(me.var.tp) or me.var.tp))
+--print("Code::Var:",me.var.id,me.var.tp,tp,me.var.arr,_TP.isBasicType( _TP.deref(me.var.tp) or me.var.tp))
     if _TP.isBasicType( (_TP.deref(me.var.tp) and _TP.deref(_TP.deref(me.var.tp))) or _TP.deref(me.var.tp) or me.var.tp) then
       if me.var.arr then -- needs addr
         codeB = LINE(me,'push_c &'..me.var.id..':'..me.var.tp,nil,'// push Var ')
@@ -1490,7 +1490,7 @@ print("Code::Var:",me.var.id,me.var.tp,tp,me.var.arr,_TP.isBasicType( _TP.deref(
   end,
 
   Exp = function (me)
-print("code::Exp:",me[1].tag,me[1].tp,(_TP.deref(me[1].tp) and 'ushort') or me[1].tp,me.tp,me[1].arr)
+--print("code::Exp:",me[1].tag,me[1].tp,(_TP.deref(me[1].tp) and 'ushort') or me[1].tp,me.tp,me[1].arr)
     local tp = (_TP.deref(me[1].tp) and 'ushort') or me[1].tp
 --    ASR(not me[1].arr,me,'missing array index.')
     if (me[1].code=="") then me[1].code='TODO' end
@@ -1512,10 +1512,11 @@ print("code::Exp:",me[1].tag,me[1].tp,(_TP.deref(me[1].tp) and 'ushort') or me[1
 --print("code::Func: args:",#me[2],#me.ext.args)
     ASR(#me[2]==#me.ext.args,me,'invalid number of arguments for function ['.. me.ext.id ..'], received '.. #me[2] .. ' and it was expecting '..#me.ext.args  )
     for k,arg in ipairs(me.ext.args) do
-      ASR(not _TP.tpCompat(arg,me[2][k].tp),me,'argument #'..k ..' in function ['.. me.ext.id ..'] must be compatible to ['.. arg ..'] type, it received ['.. me[2][k].tp .. '] type')
+      local error, cast, ntp1, ntp2, len1, len2 =  _TP.tpCompat(arg,me[2][k].tp)
+      ASR(not error ,me,'argument #'..k ..' in function ['.. me.ext.id ..'] must be compatible to "'.. arg.. '/'.. len1 ..'" type, it received "'.. me[2][k].tp..'/'.. len2 .. '" type')
+      WRN(not cast,me, 'Applying the minimum size: "'.. arg..'/'..len1 ..'" <--> "' .. me[2][k].tp ..'/'..len2 ..'". ')
     end
     CONC(me,me[2]);
-    codeB = LINE(me,'call func '.. me.ext.idx ..' - ' ..me.ext.id..':'..me.ext.tp,nil,'// call func ')
     BYTECODE(me,codeB,'op_func',me.ext.idx)
   end,
   
@@ -1523,8 +1524,8 @@ print("code::Exp:",me[1].tag,me[1].tp,(_TP.deref(me[1].tp) and 'ushort') or me[1
     local _, arr, idx = unpack(me)
     local idx_tp = (_TP.deref(idx.tp) and 'ushort') or idx.tp
 --print(print_r(me,"code::Op2_idx: me"))
-print("code::Op2_idx:",arr.tag,arr.tp,arr.arr,idx.val, idx_tp)
-print("code::Op2_idx:",idx.tag,arr.tp,me.tp,arr.val,idx.val,me[2][1],me[2][2])
+--print("code::Op2_idx:",arr.tag,arr.tp,arr.arr,idx.val, idx_tp)
+--print("code::Op2_idx:",idx.tag,arr.tp,me.tp,arr.val,idx.val,me[2][1],me[2][2])
     ASR(_TP.isBasicType( _TP.deref(_TP.deref(arr.tp)) or _TP.deref(arr.tp)),me,'Arrays can have only basic types.')
 
     if (arr.tag == 'Var') and (idx.tag=='CONST') then  -- push direct the addr+idx
@@ -1536,7 +1537,7 @@ print("code::Op2_idx:",idx.tag,arr.tp,me.tp,arr.val,idx.val,me[2][1],me[2][2])
         BYTECODE(me,codeB,'op_pusharr_v',arr.tp,idx.tp,idx.val,arr.arr*1,arr.val)  
     elseif (arr.tag == 'Op2_.')  and not(_TP.deref(arr[2].tp)) and (idx.tag=='CONST') then  -- push direct the var.field addr + idx
         ASR((idx.val*1 < arr.arr*1),me,'array index out of range, 0..'.. arr.arr-1 ..'.')
-print("code::Op2_idx: ",arr[2][1]..'.'..arr[3]..'['..idx.val..']', arr[2].val, arr[2].fst.fields[arr[3]].val, me.tp, (idx.val*_ENV.c[me.tp].len))
+--print("code::Op2_idx: ",arr[2][1]..'.'..arr[3]..'['..idx.val..']', arr[2].val, arr[2].fst.fields[arr[3]].val, me.tp, (idx.val*_ENV.c[me.tp].len))
       codeB = LINE(me,'push_c '..arr[2][1]..'.'..arr[3]..'['..idx.val..']',nil,'')
       BYTECODE(me,codeB,'op_push_c',arr[2].fst.fields[arr[3]].val + (idx.val*_ENV.c[me.tp].len))  
     else
@@ -1550,9 +1551,9 @@ print("code::Op2_idx: ",arr[2][1]..'.'..arr[3]..'['..idx.val..']', arr[2].val, a
           BYTECODE(me,codeB,'op2_any','add')
         end
       else
-        CONC(me,idx); -- idx
         codeB = LINE(me,'push idx max '..arr.arr,nil,'// push array max idx')
         BYTECODE(me,codeB,'op_push_c',arr.arr)
+        CONC(me,idx); -- idx
         codeB = LINE(me,'mod: limmit idx')
         BYTECODE(me,codeB,'op2_any','mod')
         codeB = LINE(me,'push var len '.._TP.deref(arr.tp),nil,'// push array var len')

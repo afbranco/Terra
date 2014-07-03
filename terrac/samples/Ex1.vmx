@@ -1,4 +1,4 @@
-192 898 6 6 0 0 48 6 48
+192 900 6 6 0 0 48 6 48
 00 | 0000 0 track 0
 00 | 0001 0
 00 | 0002 0
@@ -214,7 +214,7 @@ e5 | 0211 e5 set16_c ushort 70 2817        | config gate CUSTOM_A with 1 await(s
 46 | 0212 46 
 0b | 0213 0b 
 01 | 0214 01 
-19 | 0215 19 func 0                        | call func 0 - getNodeId:ushort
+19 | 0215 19 func 0                        | push nodeId:ushort
 00 | 0216 00 
 21 | 0217 21 popx ushort 75                | pop nodeId
 4b | 0218 4b 
@@ -382,9 +382,9 @@ c4 | 0378 c4 clken_e 3 0 52                | clock enable Awake_exp_52 (stack)ms
 01 | 0380 .00 addr:383
 7f | 0381 .34 
 01 | 0382 01 end                           | end
-28 | 0383 28 push_c 137                    | push &msgData
+28 | 0383 28 push_c 137                    | push_c &msgData:usrMsg2_t
 89 | 0384 89 
-19 | 0385 19 func 1                        | call func 1 - qPut:ubyte
+19 | 0385 19 func 1                        | push_c &msgData:usrMsg2_t
 01 | 0386 01 
 20 | 0387 20 popx ubyte 79                 | pop stat
 4f | 0388 4f 
@@ -451,9 +451,9 @@ cd | 0448 .42
 f4 | 0449 f4 set_v ushort 90 81            | msgTopo.target = father
 5a | 0450 5a 
 51 | 0451 51 
-28 | 0452 28 push_c 87                     | push &msgTopo
+28 | 0452 28 push_c 87                     | push_c &msgTopo:usrMsg2_t
 57 | 0453 57 
-19 | 0454 19 func 1                        | call func 1 - qPut:ubyte
+19 | 0454 19 func 1                        | push_c &msgTopo:usrMsg2_t
 01 | 0455 01 
 20 | 0456 20 popx ubyte 79                 | pop stat
 4f | 0457 4f 
@@ -513,9 +513,9 @@ f0 | 0508 f0 set_v ubyte 80 93             | hop = msgTopo.d8_2
 f4 | 0511 f4 set_v ushort 88 75            | msgTopo.source = nodeId
 58 | 0512 58 
 4b | 0513 4b 
-28 | 0514 28 push_c 87                     | push &msgTopo
+28 | 0514 28 push_c 87                     | push_c &msgTopo:usrMsg2_t
 57 | 0515 57 
-19 | 0516 19 func 1                        | call func 1 - qPut:ubyte
+19 | 0516 19 func 1                        | push_c &msgTopo:usrMsg2_t
 01 | 0517 01 
 20 | 0518 20 popx ubyte 79                 | pop stat
 4f | 0519 4f 
@@ -556,9 +556,9 @@ fe | 0544 fe
 f4 | 0554 f4 set_v ushort 90 81            | msgTopo.target = father
 5a | 0555 5a 
 51 | 0556 51 
-28 | 0557 28 push_c 87                     | push &msgTopo
+28 | 0557 28 push_c 87                     | push_c &msgTopo:usrMsg2_t
 57 | 0558 57 
-19 | 0559 19 func 1                        | call func 1 - qPut:ubyte
+19 | 0559 19 func 1                        | push_c &msgTopo:usrMsg2_t
 01 | 0560 01 
 20 | 0561 20 popx ubyte 79                 | pop stat
 4f | 0562 4f 
@@ -626,9 +626,9 @@ e0 | 0618 e0 set16_c ubyte 93 0            | msgTopo.d8_2 = 0
 f4 | 0624 f4 set_v ushort 98 83            | msgTopo.d16_2 = seqReq
 62 | 0625 62 
 53 | 0626 53 
-28 | 0627 28 push_c 87                     | push &msgTopo
+28 | 0627 28 push_c 87                     | push_c &msgTopo:usrMsg2_t
 57 | 0628 57 
-19 | 0629 19 func 1                        | call func 1 - qPut:ubyte
+19 | 0629 19 func 1                        | push_c &msgTopo:usrMsg2_t
 01 | 0630 01 
 20 | 0631 20 popx ubyte 79                 | pop stat
 4f | 0632 4f 
@@ -697,9 +697,9 @@ ff | 0691 ff
 f4 | 0695 f4 set_v ushort 98 83            | msgTopo.d16_2 = seqReq
 62 | 0696 62 
 53 | 0697 53 
-28 | 0698 28 push_c 87                     | push &msgTopo
+28 | 0698 28 push_c 87                     | push_c &msgTopo:usrMsg2_t
 57 | 0699 57 
-19 | 0700 19 func 1                        | call func 1 - qPut:ubyte
+19 | 0700 19 func 1                        | push_c &msgTopo:usrMsg2_t
 01 | 0701 01 
 20 | 0702 20 popx ubyte 79                 | pop stat
 4f | 0703 4f 
@@ -729,20 +729,20 @@ d8 | 0726 .7c
 01 | 0727 01 end                           | end
 28 | 0728 28 push_c 0                      | push 0
 00 | 0729 00 
-19 | 0730 19 func 3                        | call func 3 - qSize:ubyte
+19 | 0730 19 func 3                        | Awake_Q_READY_124:
 03 | 0731 03 
 14 | 0732 14 gt                            | gt
 7f | 0733 7f ifelse 154 155                | ifelse True_154 False_155
 02 | 0734 .00 addr:738
 e2 | 0735 .9a 
-03 | 0736 .00 addr:856
-58 | 0737 .9b 
+03 | 0736 .00 addr:858
+5a | 0737 .9b 
 e0 | 0738 e0 set16_c ubyte 163 0           | reply = 0
 a3 | 0739 a3 
 00 | 0740 00 
 28 | 0741 28 push_c 112                    | push &msgRadio
 70 | 0742 70 
-19 | 0743 19 func 2                        | call func 2 - qGet:ubyte
+19 | 0743 19 func 2                        | push &msgRadio
 02 | 0744 02 
 20 | 0745 20 popx ubyte 79                 | pop stat
 4f | 0746 4f 
@@ -756,144 +756,146 @@ ff | 0749 ff
 7f | 0754 7f ifelse 151 152                | ifelse True_151 False_152
 02 | 0755 .00 addr:759
 f7 | 0756 .97 
-03 | 0757 .00 addr:770
-02 | 0758 .98 
-71 | 0759 71 outevtx_v 8 112               | emit SEND len=2 var=&msgRadio
-08 | 0760 08 
-70 | 0761 70 
-e5 | 0762 e5 set16_c ushort 54 132         | await SEND_DONE[0]
-36 | 0763 36 
-02 | 0764 .00 addr:767
-ff | 0765 .84 
-01 | 0766 01 end                           | end
-75 | 0767 75 exec 153                      | goto  153
-03 | 0768 .00 addr:853
-55 | 0769 .99 
-38 | 0770 38 pushx_v ubyte 163             | push reply:ubyte
-a3 | 0771 a3 
-28 | 0772 28 push_c 117                    | push msgRadio.d8_1
-75 | 0773 75 
-94 | 0774 94 deref ubyte                   | deref ubyte
-07 | 0775 07 add                           | add
-20 | 0776 20 popx ubyte 117                | pop msgRadio.d8_1
-75 | 0777 75 
-71 | 0778 71 outevtx_v 9 112               | emit SEND_ACK len=2 var=&msgRadio
-09 | 0779 09 
+03 | 0757 .00 addr:771
+03 | 0758 .98 
+28 | 0759 28 push_c 112                    | push_c &msgRadio:usrMsg2_t
+70 | 0760 70 
+1b | 0761 1b outevt_e 8                    | emit SEND
+08 | 0762 08 
+e5 | 0763 e5 set16_c ushort 54 132         | await SEND_DONE[0]
+36 | 0764 36 
+03 | 0765 .00 addr:768
+00 | 0766 .84 
+01 | 0767 01 end                           | end
+75 | 0768 75 exec 153                      | goto  153
+03 | 0769 .00 addr:855
+57 | 0770 .99 
+38 | 0771 38 pushx_v ubyte 163             | push reply:ubyte
+a3 | 0772 a3 
+28 | 0773 28 push_c 117                    | push msgRadio.d8_1
+75 | 0774 75 
+94 | 0775 94 deref ubyte                   | deref ubyte
+07 | 0776 07 add                           | add
+20 | 0777 20 popx ubyte 117                | pop msgRadio.d8_1
+75 | 0778 75 
+28 | 0779 28 push_c 112                    | push_c &msgRadio:usrMsg2_t
 70 | 0780 70 
-e5 | 0781 e5 set16_c ushort 58 141         | await SEND_DONE_ACK[0]
-3a | 0782 3a 
-03 | 0783 .00 addr:786
-12 | 0784 .8d 
-01 | 0785 01 end                           | end
-50 | 0786 50 getextdt_v 162 1              | getExtData ack 1
-a2 | 0787 a2 
-01 | 0788 01 
-28 | 0789 28 push_c 163                    | push &reply
-a3 | 0790 a3 
-58 | 0791 58 inc ubyte                     | inc ubyte
-28 | 0792 28 push_c 20                     | push 20
-14 | 0793 14 
-38 | 0794 38 pushx_v ubyte 163             | push reply:ubyte
-a3 | 0795 a3 
-14 | 0796 14 gt                            | gt
-7f | 0797 7f ifelse 145 146                | ifelse True_145 EndIf_146
-03 | 0798 .00 addr:802
-22 | 0799 .91 
-03 | 0800 .00 addr:817
-31 | 0801 .92 
-e5 | 0802 e5 set16_c ushort 81 0xfffe      | father = 0xfffe
-51 | 0803 51 
-ff | 0804 ff 
-fe | 0805 fe 
-68 | 0806 68 outevt_c 18 1                 | emit REQ_CUSTOM_A len=1 const=1
-12 | 0807 12 
-01 | 0808 01 
-87 | 0809 87 tkins_z 1 17 135              | insert track Loop_out_135 tree 17
-11 | 0810 11 
-03 | 0811 .00 addr:844
-4c | 0812 .87 
-01 | 0813 01 end                           | end
-75 | 0814 75 exec 146                      | goto  146
-03 | 0815 .00 addr:817
-31 | 0816 .92 
-28 | 0817 28 push_c 1                      | push 1
-01 | 0818 01 
-38 | 0819 38 pushx_v ubyte 162             | push ack:ubyte
-a2 | 0820 a2 
-10 | 0821 10 eq                            | eq
-7f | 0822 7f ifelse 148 149                | ifelse True_148 EndIf_149
-03 | 0823 .00 addr:827
-3b | 0824 .94 
-03 | 0825 .00 addr:835
-43 | 0826 .95 
-87 | 0827 87 tkins_z 1 17 135              | insert track Loop_out_135 tree 17
-11 | 0828 11 
-03 | 0829 .00 addr:844
-4c | 0830 .87 
-01 | 0831 01 end                           | end
-75 | 0832 75 exec 149                      | goto  149
-03 | 0833 .00 addr:835
-43 | 0834 .95 
-a4 | 0835 a4 clken_c 5 50 150              | clock enable Awake_50_150 50msec
-05 | 0836 05 
-32 | 0837 32 
-03 | 0838 .00 addr:841
-49 | 0839 .96 
-01 | 0840 01 end                           | end
-75 | 0841 75 exec 133                      | goto  133
-03 | 0842 .00 addr:770
-02 | 0843 .85 
-78 | 0844 78 memclr 40 8                   | clear WClocks gates from 5 to 6
-28 | 0845 28 
-08 | 0846 08 
-78 | 0847 78 memclr 58 2                   | clear EXT gates for SEND_DONE_ACK
-3a | 0848 3a 
-02 | 0849 02 
-75 | 0850 75 exec 153                      | goto  153
-03 | 0851 .00 addr:853
-55 | 0852 .99 
-75 | 0853 75 exec 156                      | goto  156
-03 | 0854 .00 addr:864
-60 | 0855 .9c 
-87 | 0856 87 tkins_z 1 10 127              | insert track Loop_out_127 tree 10
-0a | 0857 0a 
-03 | 0858 .00 addr:867
-63 | 0859 .7f 
-01 | 0860 01 end                           | end
-75 | 0861 75 exec 156                      | goto  156
-03 | 0862 .00 addr:864
-60 | 0863 .9c 
-75 | 0864 75 exec 125                      | goto  125
-02 | 0865 .00 addr:728
-d8 | 0866 .7d 
-78 | 0867 78 memclr 40 8                   | clear WClocks gates from 5 to 6
-28 | 0868 28 
-08 | 0869 08 
-78 | 0870 78 memclr 54 2                   | clear EXT gates for SEND_DONE
-36 | 0871 36 
-02 | 0872 02 
-78 | 0873 78 memclr 58 2                   | clear EXT gates for SEND_DONE_ACK
-3a | 0874 3a 
-02 | 0875 02 
-75 | 0876 75 exec 121                      | goto  121
-02 | 0877 .00 addr:723
-d3 | 0878 .79 
-78 | 0879 78 memclr 40 8                   | clear WClocks gates from 5 to 6
-28 | 0880 28 
-08 | 0881 08 
-78 | 0882 78 memclr 54 2                   | clear EXT gates for SEND_DONE
-36 | 0883 36 
-02 | 0884 02 
-78 | 0885 78 memclr 58 2                   | clear EXT gates for SEND_DONE_ACK
-3a | 0886 3a 
-02 | 0887 02 
-78 | 0888 78 memclr 68 2                   | clear EXT gates for Q_READY
-44 | 0889 44 
-02 | 0890 02 
-01 | 0891 01 end                           | end
-01 | 0892 01 end                           | end
-78 | 0893 78 memclr 0 48                   | clear WClocks gates from 0 to 6
-00 | 0894 00 
-30 | 0895 30 
-01 | 0896 01 end                           | end program
-01 | 0897 01 end                           | end
+1b | 0781 1b outevt_e 9                    | emit SEND_ACK
+09 | 0782 09 
+e5 | 0783 e5 set16_c ushort 58 141         | await SEND_DONE_ACK[0]
+3a | 0784 3a 
+03 | 0785 .00 addr:788
+14 | 0786 .8d 
+01 | 0787 01 end                           | end
+50 | 0788 50 getextdt_v 162 1              | getExtData ack 1
+a2 | 0789 a2 
+01 | 0790 01 
+28 | 0791 28 push_c 163                    | push &reply
+a3 | 0792 a3 
+58 | 0793 58 inc ubyte                     | inc ubyte
+28 | 0794 28 push_c 20                     | push 20
+14 | 0795 14 
+38 | 0796 38 pushx_v ubyte 163             | push reply:ubyte
+a3 | 0797 a3 
+14 | 0798 14 gt                            | gt
+7f | 0799 7f ifelse 145 146                | ifelse True_145 EndIf_146
+03 | 0800 .00 addr:804
+24 | 0801 .91 
+03 | 0802 .00 addr:819
+33 | 0803 .92 
+e5 | 0804 e5 set16_c ushort 81 0xfffe      | father = 0xfffe
+51 | 0805 51 
+ff | 0806 ff 
+fe | 0807 fe 
+68 | 0808 68 outevt_c 18 1                 | emit REQ_CUSTOM_A len=1 const=1
+12 | 0809 12 
+01 | 0810 01 
+87 | 0811 87 tkins_z 1 17 135              | insert track Loop_out_135 tree 17
+11 | 0812 11 
+03 | 0813 .00 addr:846
+4e | 0814 .87 
+01 | 0815 01 end                           | end
+75 | 0816 75 exec 146                      | goto  146
+03 | 0817 .00 addr:819
+33 | 0818 .92 
+28 | 0819 28 push_c 1                      | push 1
+01 | 0820 01 
+38 | 0821 38 pushx_v ubyte 162             | push ack:ubyte
+a2 | 0822 a2 
+10 | 0823 10 eq                            | eq
+7f | 0824 7f ifelse 148 149                | ifelse True_148 EndIf_149
+03 | 0825 .00 addr:829
+3d | 0826 .94 
+03 | 0827 .00 addr:837
+45 | 0828 .95 
+87 | 0829 87 tkins_z 1 17 135              | insert track Loop_out_135 tree 17
+11 | 0830 11 
+03 | 0831 .00 addr:846
+4e | 0832 .87 
+01 | 0833 01 end                           | end
+75 | 0834 75 exec 149                      | goto  149
+03 | 0835 .00 addr:837
+45 | 0836 .95 
+a4 | 0837 a4 clken_c 5 50 150              | clock enable Awake_50_150 50msec
+05 | 0838 05 
+32 | 0839 32 
+03 | 0840 .00 addr:843
+4b | 0841 .96 
+01 | 0842 01 end                           | end
+75 | 0843 75 exec 133                      | goto  133
+03 | 0844 .00 addr:771
+03 | 0845 .85 
+78 | 0846 78 memclr 40 8                   | clear WClocks gates from 5 to 6
+28 | 0847 28 
+08 | 0848 08 
+78 | 0849 78 memclr 58 2                   | clear EXT gates for SEND_DONE_ACK
+3a | 0850 3a 
+02 | 0851 02 
+75 | 0852 75 exec 153                      | goto  153
+03 | 0853 .00 addr:855
+57 | 0854 .99 
+75 | 0855 75 exec 156                      | goto  156
+03 | 0856 .00 addr:866
+62 | 0857 .9c 
+87 | 0858 87 tkins_z 1 10 127              | insert track Loop_out_127 tree 10
+0a | 0859 0a 
+03 | 0860 .00 addr:869
+65 | 0861 .7f 
+01 | 0862 01 end                           | end
+75 | 0863 75 exec 156                      | goto  156
+03 | 0864 .00 addr:866
+62 | 0865 .9c 
+75 | 0866 75 exec 125                      | goto  125
+02 | 0867 .00 addr:728
+d8 | 0868 .7d 
+78 | 0869 78 memclr 40 8                   | clear WClocks gates from 5 to 6
+28 | 0870 28 
+08 | 0871 08 
+78 | 0872 78 memclr 54 2                   | clear EXT gates for SEND_DONE
+36 | 0873 36 
+02 | 0874 02 
+78 | 0875 78 memclr 58 2                   | clear EXT gates for SEND_DONE_ACK
+3a | 0876 3a 
+02 | 0877 02 
+75 | 0878 75 exec 121                      | goto  121
+02 | 0879 .00 addr:723
+d3 | 0880 .79 
+78 | 0881 78 memclr 40 8                   | clear WClocks gates from 5 to 6
+28 | 0882 28 
+08 | 0883 08 
+78 | 0884 78 memclr 54 2                   | clear EXT gates for SEND_DONE
+36 | 0885 36 
+02 | 0886 02 
+78 | 0887 78 memclr 58 2                   | clear EXT gates for SEND_DONE_ACK
+3a | 0888 3a 
+02 | 0889 02 
+78 | 0890 78 memclr 68 2                   | clear EXT gates for Q_READY
+44 | 0891 44 
+02 | 0892 02 
+01 | 0893 01 end                           | end
+01 | 0894 01 end                           | end
+78 | 0895 78 memclr 0 48                   | clear WClocks gates from 0 to 6
+00 | 0896 00 
+30 | 0897 30 
+01 | 0898 01 end                           | end program
+01 | 0899 01 end                           | end
