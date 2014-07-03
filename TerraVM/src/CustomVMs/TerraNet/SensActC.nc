@@ -23,7 +23,7 @@ implementation{
 	SensActP.S_TEMP -> S_TEMP;
 	SensActP.S_PHOTO -> S_PHOTO;
 	SensActP.S_VOLT -> S_VOLT;
-#elif defined(PLATFORM_MICAZ) || defined(PLATFORM_MICA2)
+#elif defined(PLATFORM_MICAZ) || defined(PLATFORM_MICA2) || defined(PLATFORM_MICA2DOT)
 	components new TempC() as S_TEMP;
 	components new PhotoC() as S_PHOTO;
 	components new VoltageC() as S_VOLT;

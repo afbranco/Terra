@@ -4,13 +4,14 @@
  * Author: A.Branco
  * abranco at inf.puc-rio.br
  * *********************************************/
-#include "VMCustom.h"
+#include "VMCustomNet.h"
 #include "usrMsg.h"
 
 module VMCustomP{
 	provides interface VMCustom as VM;
 	uses interface BSRadio;
 	uses interface SensAct as SA;
+	uses interface Random;
 
 	// usrMsg queue
 	uses interface dataQueue as usrDataQ;
@@ -77,7 +78,7 @@ void  proc_send_x(uint16_t id,uint16_t addr,uint8_t ack){
 	usrMsg = (usrMsg_t*)signal VM.getRealAddr(addr,2);
 	dbg(APPNAME,"Custom::proc_sendx(): id=%d, target=%d, addr=%d, realAddr=%x, ack=%d\n",
 		id,usrMsg->target,addr,usrMsg, ack);
-	call BSRadio.send(usrMsg->target, usrMsg, sizeof(usrMsg_t),ack);
+	call BSRadio.send(AM_SEND,usrMsg->target, usrMsg, sizeof(usrMsg_t),ack);
 }
 
 void  proc_send(uint16_t id, uint32_t addr){
@@ -137,6 +138,13 @@ void  func_getNodeId(uint16_t id){
 	dbg(APPNAME,"Custom::func_getNodeId(): id=%d, NodeId=%d\n",id,stat);
 	signal VM.push(stat);
 	}	
+void  func_random(uint16_t id){
+	uint16_t stat;
+	// return random16
+	stat = call Random.rand16();
+	dbg(APPNAME,"Custom::func_random(): func id=%d, Random=%d\n",id,stat);
+	signal VM.push(stat);
+	}
 void  func_qPut(uint16_t id){
 	error_t stat;
 	qData_t* qData_p;
@@ -208,6 +216,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		dbg(APPNAME,"Custom::VM.callFunction(%d)\n",id);
 		switch (id){
 			case F_GETNODEID: func_getNodeId(id); break;
+			case F_RANDOM 	: func_random(id); break;
 			case F_QPUT 	: func_qPut(id); break;
 			case F_QGET 	: func_qGet(id); break;
 			case F_QSIZE 	: func_qSize(id); break;
@@ -220,21 +229,33 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		signal VM.queueEvt(I_RECEIVE, &ExtDataRadioReceived);		
 	}
 
-	event void BSRadio.receive(message_t* msg, void* payload, uint8_t len){
-		dbg(APPNAME,"Custom::BSRadio.receive()\n");
-		memcpy(&ExtDataRadioReceived,payload,sizeof(usrMsg_t));
-		post BCRadio_receive();
+	event void BSRadio.receive(uint8_t am_id, message_t* msg, void* payload, uint8_t len){
+		dbg(APPNAME,"Custom::BSRadio.receive(): AM_ID = %d\n",am_id);
+		if (am_id == AM_SEND){
+			memcpy(&ExtDataRadioReceived,payload,sizeof(usrMsg_t));
+			post BCRadio_receive();
+		} else {
+			dbg(APPNAME,"Custom::BSRadio.receive(): Discarting AM_ID = %d\n",am_id);
+		}
 	}
 
-	event void BSRadio.sendDone(message_t *msg, error_t error){
-		dbg(APPNAME,"Custom::BSRadio.sendDone(): error=%d\n",error);
-		ExtDataSendDoneError = (uint8_t)error;
-		signal VM.queueEvt(I_SEND_DONE, &ExtDataSendDoneError);
+	event void BSRadio.sendDone(uint8_t am_id,message_t* msg,error_t error){
+		dbg(APPNAME,"Custom::BSRadio.sendDone(): AM_ID = %d, error=%d\n",am_id,error);
+		if (am_id == AM_SEND){
+			ExtDataSendDoneError = (uint8_t)error;
+			signal VM.queueEvt(I_SEND_DONE, &ExtDataSendDoneError);
+		} else {
+			dbg(APPNAME,"Custom::BSRadio.sendDone(): Discarting sendDone AM_ID = %d\n",am_id);
+		}
 	}
-	event void BSRadio.sendDoneAck(message_t *msg, error_t error, bool wasAcked){
-		dbg(APPNAME,"Custom::BSRadio.sendDone(): error=%d, ack=%d\n",error,wasAcked);
-		ExtDataWasAcked = (uint8_t)wasAcked;
-		signal VM.queueEvt(I_SEND_DONE_ACK, &ExtDataWasAcked);
+	event void BSRadio.sendDoneAck(uint8_t am_id,message_t* msg,error_t error, bool wasAcked){
+		dbg(APPNAME,"Custom::BSRadio.sendDoneAck(): AM_ID = %d, error=%d, ack=%d\n",am_id,error,wasAcked);
+		if (am_id == AM_SEND){
+			ExtDataWasAcked = (uint8_t)wasAcked;
+			signal VM.queueEvt(I_SEND_DONE_ACK, &ExtDataWasAcked);
+		} else {
+			dbg(APPNAME,"Custom::BSRadio.sendDoneAck(): Discarting sendDoneAck AM_ID = %d\n",am_id);
+		}
 	}
 
 	uint8_t wd2ceuSensorId(uint8_t wdId){

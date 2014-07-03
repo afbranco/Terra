@@ -10,53 +10,57 @@
 #include "../../VMData.h"
 
 enum{
-	// CEU Event IDs - OUT
-	O_INIT=0,
-	O_LEDS=1,
-	O_LED0=2,
-	O_LED1=3,
-	O_LED2=4,
-	O_TEMP=5,
-	O_PHOTO=6,
-	O_VOLTS=7,
-	O_SEND=8,
-	O_SEND_ACK=9,
-	O_PORT_A=10,
-	O_PORT_B=11,
-	O_CFG_PORT_A=12,
-	O_CFG_PORT_B=13,
-	O_REQ_PORT_A=14,
-	O_REQ_PORT_B=15,
-	O_CFG_INT_A=16,
-	O_CFG_INT_B=17,
-	O_CUSTOM_A=18,	
-//	Q_PUT = 19,
-//	Q_GET = 20,
-//	Q_SIZE = 21,
-//	Q_CLEAR = 22,
 	
+	AM_SEND = 145,
+		
+	// TerraNet local Output events
+	O_INIT			=0,
+	O_LEDS			=5,
+	O_LED0			=6,
+	O_LED1			=7,
+	O_LED2			=8,
+	O_TEMP			=9,
+	O_PHOTO			=10,
+	O_VOLTS			=22,
+	O_PORT_A		=12,
+	O_PORT_B		=13,
+	O_CFG_PORT_A	=14,
+	O_CFG_PORT_B	=15,
+	O_REQ_PORT_A	=16,
+	O_REQ_PORT_B	=17,
+	O_CFG_INT_A		=18,
+	O_CFG_INT_B		=19,
+	O_CUSTOM_A		=20,	
+	// TerraNet Custom Output events
+	O_SEND			=40,
+	O_SEND_ACK		=42,
 
-	// CEU Event IDs - IN	
-	I_TEMP=0,
-	I_PHOTO=1,
-	I_VOLTS=2,
-	I_SEND_DONE=3,
-	I_SEND_DONE_ACK=4,
-	I_RECEIVE=5,
-	I_Q_READY =6,
-	I_PORT_A=7,
-	I_PORT_B=8,
-	I_INT_A=9,
-	I_INT_B=10,
-	I_CUSTOM_A=11,
+
+	// TerraNet Local Input events
+	I_ERROR			=0,
+	I_TEMP			=5,
+	I_PHOTO			=6,
+	I_VOLTS			=7,
+	I_PORT_A		=8,
+	I_PORT_B		=9,
+	I_INT_A			=10,
+	I_INT_B			=11,
+	I_CUSTOM_A		=12,
+	// TerraNet Custom Input events
+	I_SEND_DONE		=40,
+	I_SEND_DONE_ACK	=41,
+	I_RECEIVE		=42,
+	I_Q_READY 		=43,
+
 	
-	// CEU Functions IDs
-	
-	F_GETNODEID = 0,
-	F_QPUT = 1,
-	F_QGET = 2,
-	F_QSIZE = 3,
-	F_QCLEAR = 4,
+	// TerraNet basic functions
+	F_GETNODEID 	= 0,
+	F_RAMDOM		= 1,
+	// TerraNet custom functions
+	F_QPUT 			= 10,
+	F_QGET 			= 11,
+	F_QSIZE 		= 12,
+	F_QCLEAR 		= 13,
 	
 	
 	// Event Type ID - 3 msb bits of EvtId

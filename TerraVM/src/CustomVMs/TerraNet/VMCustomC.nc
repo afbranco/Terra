@@ -17,6 +17,9 @@ implementation{
 	custom.BSRadio -> BS;
 	custom.SA -> SA;
 	
+	components RandomC;
+	custom.Random -> RandomC;
+
 	// Custom Queues
 	components new dataQueueC(qData_t,USRMSG_QSIZE,(char)unique("dataQueueC")) as usrDataQ;
 	custom.usrDataQ -> usrDataQ;
