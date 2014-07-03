@@ -16,19 +16,18 @@ implementation
 {
 	// Main modules
     components TerraVMC as terra;
-    components VMCustomC as custom;
     components BasicServicesC as BS;
+	terra.BSBoot -> BS;
+	terra.BSUpload -> BS;
+	terra.BSTimerVM -> BS.BSTimerVM;
+	terra.BSTimerAsync -> BS.BSTimerAsync;
+
 #ifdef PRINTF
 	components PrintfC, SerialStartC;
 #endif
-
-	terra.BSBoot -> BS;
-	terra.BSUpload -> BS;
+    components VMCustomC as custom;
 	terra.VMCustom -> custom; 
-	terra.BSTimerVM -> BS.BSTimerVM;
-	terra.BSTimerAsync -> BS.BSTimerAsync;
-	
-	// Support modules
+
 	components new QueueC(evtData_t,EVT_QUEUE_SIZE) as  evtQ;
 	terra.evtQ -> evtQ;
 	

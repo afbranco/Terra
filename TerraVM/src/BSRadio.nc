@@ -6,9 +6,13 @@
  * *********************************************/
 #include <message.h>  // force to find message.h
 interface BSRadio{
-	command error_t send(uint16_t target, void* dataMsg, uint8_t dataSize, uint8_t reqAck);
-	event void sendDone(message_t* msg,error_t error);
-	event void sendDoneAck(message_t* msg,error_t error, bool wasAcked);
-	event void receive(message_t* msg, void* payload, uint8_t len);
-
+	command error_t send(uint8_t am_id, uint16_t target, void* dataMsg, uint8_t dataSize, uint8_t reqAck);
+	event void sendDone(uint8_t am_id,message_t* msg,error_t error);
+	event void sendDoneAck(uint8_t am_id,message_t* msg,error_t error, bool wasAcked);
+	event void receive(uint8_t am_id, message_t* msg, void* payload, uint8_t len);
+	command uint16_t source(message_t* msg);
+#ifdef MODULE_CTP
+	command error_t sendBS(void* dataMsg, uint8_t dataSize);
+	event void sendBSDone(message_t* msg,error_t error);
+#endif
 }

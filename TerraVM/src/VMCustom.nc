@@ -18,5 +18,6 @@ interface VMCustom{
 	event int32_t getMVal(uint16_t Maddr, uint8_t v1_len);
 	event void setMVal(uint32_t value,uint16_t Maddr, uint8_t v1_len);
 	event void* getRealAddr(uint16_t Maddr, uint8_t v1_len);
+	event bool getHaltedFlag();
 
 }

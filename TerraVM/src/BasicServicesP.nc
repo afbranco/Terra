@@ -10,7 +10,7 @@
  * 
  */
 #include "BasicServices.h"
-#include "usrMsg.h"
+
 module BasicServicesP{
 	provides interface Boot as BSBoot;
 	provides interface BSTimer as BSTimerVM;
@@ -22,9 +22,48 @@ module BasicServicesP{
 	uses interface SplitControl as RadioControl;
 	uses interface Boot as TOSBoot;
 	uses interface Packet as RadioPacket;
-    uses interface AMSend as RadioSender[am_id_t id];
-    uses interface Receive as RadioReceiver[am_id_t id];
     uses interface PacketAcknowledgements as RadioAck;
+#ifndef MODULE_CTP
+    uses interface AMSend as RadioSender[am_id_t id];
+#else
+    uses interface AMSend as snd_NEWPROGVERSION;
+    uses interface AMSend as snd_NEWPROGBLOCK;
+    uses interface AMSend as snd_REQPROGBLOCK;
+    uses interface AMSend as snd_SETDATAND;
+    uses interface AMSend as snd_REQDATA;
+    uses interface AMSend as snd_PINGMSG;
+    uses interface AMSend as snd_CUSTOM_0;
+    uses interface AMSend as snd_CUSTOM_1;
+    uses interface AMSend as snd_CUSTOM_2;
+    uses interface AMSend as snd_CUSTOM_3;
+    uses interface AMSend as snd_CUSTOM_4;
+    uses interface AMSend as snd_CUSTOM_5;
+    uses interface AMSend as snd_CUSTOM_6;
+    uses interface AMSend as snd_CUSTOM_7;
+    uses interface AMSend as snd_CUSTOM_8;
+    uses interface AMSend as snd_CUSTOM_9;
+#endif
+#ifndef MODULE_CTP
+    uses interface Receive as RadioReceiver[am_id_t id];
+#else
+    uses interface Receive as rec_NEWPROGVERSION;
+    uses interface Receive as rec_NEWPROGBLOCK;
+    uses interface Receive as rec_REQPROGBLOCK;
+    uses interface Receive as rec_SETDATAND;
+    uses interface Receive as rec_REQDATA;
+    uses interface Receive as rec_PINGMSG;
+    uses interface Receive as rec_CUSTOM_0;
+    uses interface Receive as rec_CUSTOM_1;
+    uses interface Receive as rec_CUSTOM_2;
+    uses interface Receive as rec_CUSTOM_3;
+    uses interface Receive as rec_CUSTOM_4;
+    uses interface Receive as rec_CUSTOM_5;
+    uses interface Receive as rec_CUSTOM_6;
+    uses interface Receive as rec_CUSTOM_7;
+    uses interface Receive as rec_CUSTOM_8;
+    uses interface Receive as rec_CUSTOM_9;
+#endif
+
 
 	// Base Station
 #ifndef NO_BSTATION
@@ -58,6 +97,14 @@ module BasicServicesP{
 		interface Random;
 
 	}
+	// CTP
+#ifdef MODULE_CTP
+	uses interface Receive as recSendBS;		// BS
+	uses interface Send as sendBSNet;
+	uses interface StdControl as RoutingControl;
+	uses interface RootControl;
+#endif
+
 }
 implementation{
 
@@ -95,6 +142,14 @@ implementation{
 	nx_uint16_t maxSeenDataSeq;
 	uint8_t DataTimeOutCounter=0;
 	nx_uint16_t NewDataMoteSource;	
+
+#ifndef NO_BSTATION
+#ifdef MODULE_CTP
+	// Rec SendBS - last msg info used to test duplicated CTP events
+	nx_uint16_t recBS_last_Sender;
+	nx_uint16_t recBS_last_seq;
+#endif
+#endif
 	
 	
 /* **************************************************************\
@@ -161,6 +216,9 @@ implementation{
 	 */
 	event void RadioControl.startDone(error_t error) {
 		dbg(APPNAME, "BS::RadioControl.startDone().\n");
+#ifdef MODULE_CTP
+		call RoutingControl.start(); 		// CTP
+#endif
 		// Only for first initialization (boot)
 		if (firstInic && MoteID!=BStation){
 			reqProgBlock_t Data;
@@ -178,9 +236,13 @@ implementation{
 			 	// Wait next block up to time-out
 			 	call ProgReqTimer.startOneShot(REQUEST_TIMEOUT);
 		 	}
+#ifndef NO_BSTATION
+#ifdef MODULE_CTP
+		if (MoteID==BStation) { call RootControl.setRoot();}
+#endif
+#endif
 		signal BSBoot.booted();
 		}
-//		signal BSBoot.booted();
 	}
 	event void RadioControl.stopDone(error_t error) {
 		dbg(APPNAME, "BS::RadioControl.stopDone().\n");
@@ -379,20 +441,23 @@ implementation{
 	}
 
 
-	void recUsrMsgNet_receive(message_t *msg, void *payload, uint8_t len){
-		dbg(APPNAME,"BS::recUsrMsgNet.receive():\n");
+	void recCustomMsgNet_receive(message_t *msg, void *payload, uint8_t len){
+		uint8_t am_id= (uint8_t)call RadioAMPacket.type(msg);
+		dbg(APPNAME,"BS::recCustomMsgNet.receive():\n");
 		if (MoteID != BStation){ 
-			dbg("VMDBG","Radio: Received user msg from %d\n",call RadioAMPacket.source(msg));
-			signal BSRadio.receive(msg,payload,len);
+#ifdef NO_BSTATION
+			dbg("VMDBG","Radio: Received Custom Msg AM=%d from %d\n", am_id , call RadioAMPacket.source(msg));
+			signal BSRadio.receive(am_id,msg,payload,len);
+#endif
 		} else {
-			dbg(APPNAME, "BS::recUsrMsgNet(): insert in outQueue\n");		
+			dbg(APPNAME, "BS::recCustomMsgNet(): insert in outQueue\n");		
 			memcpy(&tempInputOutQ.Data,payload,len);
-			tempInputOutQ.AM_ID = AM_USRMSG;
+			tempInputOutQ.AM_ID = am_id;
 			tempInputOutQ.DataSize = len;
 			tempInputOutQ.sendToMote = AM_BROADCAST_ADDR;
 			tempInputOutQ.reqAck = FALSE;
 			if (call outQ.put(&tempInputOutQ)!= SUCCESS) {
-				dbg(APPNAME, "BS::recUsrMsgNet(): outQueue is full! Losting a message.\n");
+				dbg(APPNAME, "BS::recCustomMsgNet(): outQueue is full! Losting a message.\n");
 			}
 		}
 	}
@@ -416,7 +481,11 @@ implementation{
 	}
 
 	// Centralized receiver
+#ifndef MODULE_CTP
 	event message_t * RadioReceiver.receive[am_id_t id](message_t *msg, void *payload, uint8_t len){
+#else
+	message_t * RadioReceiver_receive(am_id_t id,message_t *msg, void *payload, uint8_t len){
+#endif
 		dbg(APPNAME, "BS::RadioReceiver.receive(). AM=%hhu from %hhu\n",id,call RadioAMPacket.source(msg));
 		// Switch AM_ID
 		switch (id){
@@ -435,17 +504,35 @@ implementation{
 			case AM_REQDATA :
 				recReqDataNet_receive(msg,payload,len);
 				break;	
-			case AM_USRMSG :
-				recUsrMsgNet_receive(msg,payload,len);
-				break;	
-			default :
-				dbg(APPNAME, "BS::RadioReceiver.receive(). Received a undefined AM=%hhu from %hhu\n",id,call RadioAMPacket.source(msg));	
-				break;	
-		
+			default:
+				if (id >= AM_CUSTOM_START && id <= AM_CUSTOM_END) { // AM_CUSTOM Range
+					recCustomMsgNet_receive(msg,payload,len);
+		 		} else {
+					dbg(APPNAME, "BS::RadioReceiver.receive(). Received a undefined AM=%hhu from %hhu\n",id,call RadioAMPacket.source(msg));	 		
+		 		}
+		 		break;
 		}
 		return msg;
 	}
 	
+#ifdef MODULE_CTP
+    event message_t * rec_NEWPROGVERSION.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_NEWPROGVERSION,msg,payload,len);}
+    event message_t * rec_NEWPROGBLOCK.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_NEWPROGBLOCK,msg,payload,len);}
+    event message_t * rec_REQPROGBLOCK.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_REQPROGBLOCK,msg,payload,len);}
+    event message_t * rec_SETDATAND.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_SETDATAND,msg,payload,len);}
+    event message_t * rec_REQDATA.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_REQDATA,msg,payload,len);}
+    event message_t * rec_PINGMSG.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_PINGMSG,msg,payload,len);}
+    event message_t * rec_CUSTOM_0.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_CUSTOM_0,msg,payload,len);}
+    event message_t * rec_CUSTOM_1.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_CUSTOM_1,msg,payload,len);}
+    event message_t * rec_CUSTOM_2.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_CUSTOM_2,msg,payload,len);}
+    event message_t * rec_CUSTOM_3.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_CUSTOM_3,msg,payload,len);}
+    event message_t * rec_CUSTOM_4.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_CUSTOM_4,msg,payload,len);}
+    event message_t * rec_CUSTOM_5.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_CUSTOM_5,msg,payload,len);}
+    event message_t * rec_CUSTOM_6.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_CUSTOM_6,msg,payload,len);}
+    event message_t * rec_CUSTOM_7.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_CUSTOM_7,msg,payload,len);}
+    event message_t * rec_CUSTOM_8.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_CUSTOM_8,msg,payload,len);}
+    event message_t * rec_CUSTOM_9.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_CUSTOM_9,msg,payload,len);}
+#endif
 
 /* ******************************************************************************
 *                       Upload control functions
@@ -839,10 +926,55 @@ implementation{
 /* *********************************************************************
 *              Messages send
 \* *********************************************************************/
-
+	/**
+	* Sends out a DataBS message to Radio
+	*/
+#ifdef MODULE_CTP
+	void sendBSN(){
+#ifndef ONLY_BSTATION
+		// Send to Radio
+		if (MoteID != BStation){
+			memcpy(call sendBSNet.getPayload(&sendBuff,call sendBSNet.maxPayloadLength()), &tempOutputOutQ.Data, tempOutputOutQ.DataSize);
+			dbg(APPNAME, "BS::sendBSNet(): Sending Message AM_ID=%hhu\n", tempOutputOutQ.AM_ID);
+			if (call sendBSNet.send(&sendBuff, tempOutputOutQ.DataSize) != SUCCESS) {
+				dbg(APPNAME,"BS::sendBSNet(): Error in Sending Message\n");
+				call sendTimer.startOneShot(reSendDelay);
+			}
+		}
+#endif
+	}
+#endif // MODULE_CTP
 	/**
 	* Sends out a xxxx message
 	*/
+
+
+		error_t RadioSender_send(uint8_t am_id, uint16_t target, message_t* msg, uint8_t len){
+#ifndef MODULE_CTP
+			return call RadioSender.send[tempOutputOutQ.AM_ID](tempOutputOutQ.sendToMote, &sendBuff, tempOutputOutQ.DataSize);
+#else
+			switch (am_id){
+				case AM_NEWPROGVERSION	: return call snd_NEWPROGVERSION.send(target, msg, len); break;
+				case AM_NEWPROGBLOCK 	: return call snd_NEWPROGBLOCK.send(target, msg, len); break;
+				case AM_REQPROGBLOCK 	: return call snd_REQPROGBLOCK.send(target, msg, len); break;
+				case AM_SETDATAND 		: return call snd_SETDATAND.send(target, msg, len); break;
+				case AM_REQDATA 		: return call snd_REQDATA.send(target, msg, len); break;
+				case AM_PINGMSG 		: return call snd_PINGMSG.send(target, msg, len); break;
+				case AM_CUSTOM_0 		: return call snd_CUSTOM_0.send(target, msg, len); break;
+				case AM_CUSTOM_1 		: return call snd_CUSTOM_1.send(target, msg, len); break;
+				case AM_CUSTOM_2 		: return call snd_CUSTOM_2.send(target, msg, len); break;
+				case AM_CUSTOM_3 		: return call snd_CUSTOM_3.send(target, msg, len); break;
+				case AM_CUSTOM_4 		: return call snd_CUSTOM_4.send(target, msg, len); break;
+				case AM_CUSTOM_5 		: return call snd_CUSTOM_5.send(target, msg, len); break;
+				case AM_CUSTOM_6 		: return call snd_CUSTOM_6.send(target, msg, len); break;
+				case AM_CUSTOM_7 		: return call snd_CUSTOM_7.send(target, msg, len); break;
+				case AM_CUSTOM_8 		: return call snd_CUSTOM_8.send(target, msg, len); break;
+				case AM_CUSTOM_9 		: return call snd_CUSTOM_9.send(target, msg, len); break;
+			}	
+			return FAIL;
+#endif
+		}
+
 	void sendRadioN(){
 		error_t err;
 		dbg(APPNAME,"BS::sendRadioN(): AM=%hhu to %hhu, reqAck=%s\n",tempOutputOutQ.AM_ID, tempOutputOutQ.sendToMote, _TFstr(tempOutputOutQ.reqAck));
@@ -850,7 +982,7 @@ implementation{
 		if ( tempOutputOutQ.reqAck == TRUE){
 			if (call RadioAck.requestAck(&sendBuff) != SUCCESS) dbg(APPNAME, "BS::sendRadioN()(): requestAck() error!\n");
 		}
-		err = call RadioSender.send[tempOutputOutQ.AM_ID](tempOutputOutQ.sendToMote, &sendBuff, tempOutputOutQ.DataSize);
+		err = RadioSender_send(tempOutputOutQ.AM_ID,tempOutputOutQ.sendToMote, &sendBuff, tempOutputOutQ.DataSize);
 		if (err != SUCCESS) {
 			dbg(APPNAME,"BS::sendRadioN(): Error %hhu in sending Message AM=%hhu to node=%hhu via radio\n",err,tempOutputOutQ.AM_ID, tempOutputOutQ.sendToMote);
 			call sendTimer.startOneShot(reSendDelay);
@@ -878,9 +1010,19 @@ implementation{
 	task void sendMessage(){
 		sendCounter++;
 		if (call outQ.read(&tempOutputOutQ)==SUCCESS) {
-		dbg(APPNAME, "BS::sendMessage():AM=%hhu, senToMote=%hhu.\n",tempOutputOutQ.AM_ID, tempOutputOutQ.sendToMote);
+		dbg(APPNAME, "BS::sendMessage():AM=%hhu, senToMote=%d.\n",tempOutputOutQ.AM_ID, tempOutputOutQ.sendToMote);
 //		printf("snd_%d.",tempOutputOutQ.AM_ID); printfflush();
 		switch (tempOutputOutQ.AM_ID) {
+#ifdef MODULE_CTP
+			case AM_SENDBS: sendBSN(); 
+				// Send to Radio/CTP or UART
+				if (MoteID != BStation){
+					sendBSN();
+				} else {
+					sendSerialN();
+				}			
+				break;
+#endif // MODULE_CTP
 			case AM_NEWPROGVERSION: sendRadioN(); break;
 			case AM_NEWPROGBLOCK: sendRadioN(); break;
 			case AM_REQPROGBLOCK: 
@@ -900,12 +1042,14 @@ implementation{
 					sendSerialN();
 				}
 				break;
-			case AM_USRMSG: 
-				// Send to Radio or UART
-				if (MoteID != BStation){
-					sendRadioN();
-				} else {
-					sendSerialN();
+			default: 
+				if (tempOutputOutQ.AM_ID >= AM_CUSTOM_START && tempOutputOutQ.AM_ID <= AM_CUSTOM_END) { // AM_CUSTOM Range
+					// Send to Radio or UART
+					if (MoteID != BStation){
+						sendRadioN();
+					} else {
+						sendSerialN();
+					}
 				}				
 				break;
 			} 
@@ -953,20 +1097,23 @@ implementation{
 	* Generic sendDone(). Called by originals *.sendDone().
 	* @param error Error status
 	*/
-
-
+#ifndef MODULE_CTP
 	event void RadioSender.sendDone[am_id_t id](message_t *msg, error_t error){
+#else
+	void RadioSender_sendDone(am_id_t id,message_t *msg, error_t error){
+#endif		
+	  if (id > AM_RESERVED_END) {
 		if (error == SUCCESS) {						// Get next message
 			dbg(APPNAME, "BS::sendDone(): SUCCESS SendCounter=%hhu\n",sendCounter);
 			call outQ.get(&tempOutputOutQ);
 			sendCounter=0;
 			call sendTimer.startOneShot(reSendDelay);
-			if ( tempOutputOutQ.AM_ID == AM_USRMSG){
+			if ( tempOutputOutQ.AM_ID >= AM_CUSTOM_START && tempOutputOutQ.AM_ID <= AM_CUSTOM_END){
 				dbg(APPNAME,"BS::sendDone(): UsrMsg err=%d ack=%d, \n",error,call RadioAck.wasAcked(msg));
 				if (tempOutputOutQ.reqAck == TRUE) 
-					signal BSRadio.sendDoneAck(msg,error, call RadioAck.wasAcked(msg));
+					signal BSRadio.sendDoneAck(tempOutputOutQ.AM_ID,msg,error, call RadioAck.wasAcked(msg));
 				else
-					signal BSRadio.sendDone(msg,error);
+					signal BSRadio.sendDone(tempOutputOutQ.AM_ID,msg,error);
 			}
 		} else {
 			dbg(APPNAME, "BS::sendDone(): FAIL\n");
@@ -980,8 +1127,56 @@ implementation{
 				call sendTimer.startOneShot(reSendDelay);
 			}
 		}
+	  }
 	}
-	
+
+
+#ifdef MODULE_CTP
+    event void snd_NEWPROGVERSION.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_NEWPROGVERSION,msg,error);}
+    event void snd_NEWPROGBLOCK.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_NEWPROGBLOCK,msg,error);}
+    event void snd_REQPROGBLOCK.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_REQPROGBLOCK,msg,error);}
+    event void snd_SETDATAND.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_SETDATAND,msg,error);}
+    event void snd_REQDATA.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_REQDATA,msg,error);}
+    event void snd_PINGMSG.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_PINGMSG,msg,error);}
+    event void snd_CUSTOM_0.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_CUSTOM_0,msg,error);}
+    event void snd_CUSTOM_1.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_CUSTOM_1,msg,error);}
+    event void snd_CUSTOM_2.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_CUSTOM_2,msg,error);}
+    event void snd_CUSTOM_3.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_CUSTOM_3,msg,error);}
+    event void snd_CUSTOM_4.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_CUSTOM_4,msg,error);}
+    event void snd_CUSTOM_5.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_CUSTOM_5,msg,error);}
+    event void snd_CUSTOM_6.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_CUSTOM_6,msg,error);}
+    event void snd_CUSTOM_7.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_CUSTOM_7,msg,error);}
+    event void snd_CUSTOM_8.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_CUSTOM_8,msg,error);}
+    event void snd_CUSTOM_9.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_CUSTOM_9,msg,error);}
+#endif
+
+#ifdef MODULE_CTP
+	event void sendBSNet.sendDone(message_t *msg, error_t error){
+#ifndef ONLY_BSTATION
+		if (error == SUCCESS) {						// Get next message
+			dbg(APPNAME, "BS::sendBSNet.sendDone(): SUCCESS SendCounter=%hhu\n",sendCounter);
+			call outQ.get(&tempOutputOutQ);
+			sendCounter=0;
+ 			// If sendDataBS then signal the caller
+ 			if ( tempOutputOutQ.AM_ID==AM_SENDBS ) signal BSRadio.sendBSDone(msg,SUCCESS);
+			call sendTimer.startOneShot(reSendDelay);
+		} else {
+			dbg(APPNAME, "BS::sendBSNet.sendDone(): FAIL\n");
+			if (sendCounter < MAX_SEND_RETRIES) { 	// Try to send again
+				dbg(APPNAME, "BS::sendBSNet.sendDone(): FAIL-Retry SendCounter=%hhu\n",sendCounter);
+				call sendTimer.startOneShot(reSendDelay);
+			} else {								// Discard message and get next message
+				dbg(APPNAME, "BS::sendBSNet.sendDone(): FAIL-Discard SendCounter=%hhu\n",sendCounter);
+				call outQ.get(&tempOutputOutQ);
+				sendCounter=0;
+ 				// If sendDataBS then signal the caller
+	 			if ( tempOutputOutQ.AM_ID==AM_SENDBS ) signal BSRadio.sendBSDone(msg,FAIL);
+				call sendTimer.startOneShot(reSendDelay);
+			}
+		}
+#endif
+	}
+#endif // MODULE_CTP	
 
 /* **************************************************************\
 *             Insert message in output Queue
@@ -1069,41 +1264,17 @@ implementation{
 		}
 	}	
 
-
-/* *****************************************************************************************
-*             User messages doesn't use queue and are discarded during code upload.
-\* *****************************************************************************************/
-
-uint8_t usrReqAck = FALSE;
-
-/*
-	task void BSRadio_send(){
-		usrReqAck = FALSE;
-		memcpy(call sendUsrMsgNet.getPayload(&usrMsgBuff,call sendUsrMsgNet.maxPayloadLength()), &usrMsgOut.Data, usrMsgOut.DataSize);
-		dbg(APPNAME, "BS::BSRadio.send(): Sending Message ID=%hhu, ReqMote=%hhu, d8_1=%hhu to %d\n", 
-				((usrMsg_t*)&usrMsgOut.Data)->id, ((usrMsg_t*)&usrMsgOut.Data)->source, ((usrMsg_t*)&usrMsgOut.Data)->d8_1,((usrMsg_t*)&usrMsgOut.Data)->target);
-		if (call sendUsrMsgNet.send(usrMsgOut.sendToMote, &usrMsgBuff, usrMsgOut.DataSize) != SUCCESS)
-					dbg(APPNAME,"BS::BSRadio.send(): ERROR!!! Try to send sendUsrMsgNet\n");
-	}
-	task void BSRadio_sendAck(){
-		usrReqAck = TRUE;
-		memcpy(call sendUsrMsgNet.getPayload(&usrMsgBuff,call sendUsrMsgNet.maxPayloadLength()), &usrMsgOut.Data, usrMsgOut.DataSize);
-		dbg(APPNAME, "BS::BSRadio.send(): Sending Message ID=%hhu, ReqMote=%hhu, d8_1=%hhu to %d\n", 
-				((usrMsg_t*)&usrMsgOut.Data)->id, ((usrMsg_t*)&usrMsgOut.Data)->source, ((usrMsg_t*)&usrMsgOut.Data)->d8_1,((usrMsg_t*)&usrMsgOut.Data)->target);
-		dbg(APPNAME,"BS::BSRadio.send(): Requesting ack\n");
-		if (call sendUsrMsgNetAck.requestAck(&usrMsgBuff) != SUCCESS) dbg(APPNAME, "BS::BSRadio.send()(): requestAck() error!\n");
- * 		if (call sendUsrMsgNet.send(usrMsgOut.sendToMote, &usrMsgBuff, usrMsgOut.DataSize) != SUCCESS)
-					dbg(APPNAME,"BS::BSRadio.send(): ERROR!!! Try to send sendUsrMsgNet\n");
-	}
-*/
-	command error_t BSRadio.send(uint16_t target, void* dataMsg, uint8_t dataSize, uint8_t reqAck){
-		dbg(APPNAME, "BS::BSRadio.send(): insert in outQueue. Target=%d\n",target);		
+	/**
+	 * Custom Send Message - queue the message to send via radio
+	 */
+	command error_t BSRadio.send(uint8_t am_id, uint16_t target, void* dataMsg, uint8_t dataSize, uint8_t reqAck){
+		dbg(APPNAME, "BS::BSRadio.send(): insert in outQueue. AM_ID=%d, Target=%d\n",am_id,target);		
 		memcpy(&tempInputOutQ.Data,dataMsg,dataSize);
-		tempInputOutQ.AM_ID = AM_USRMSG;
+		tempInputOutQ.AM_ID = am_id;
 		tempInputOutQ.DataSize = dataSize;
 		tempInputOutQ.sendToMote = target;
 		tempInputOutQ.reqAck = reqAck;
-		dbg("VMDBG","Radio: Sending user msg to node %d\n",target);		
+		dbg("VMDBG","Radio: Sending user msg AM_ID=%d to node %d\n",am_id, target);		
 		if (call outQ.put(&tempInputOutQ)!= SUCCESS) {
 			dbg(APPNAME, "BS::BSRadio.send(): outQueue is full! Losting a message.\n");
 			return FAIL;
@@ -1111,13 +1282,82 @@ uint8_t usrReqAck = FALSE;
 		return SUCCESS;
 	}
 
+	/**
+	* Insert a sendBS message in output queue
+	* @param Data 	Message data
+	* @param len 	Data len
+	*/
+#ifdef MODULE_CTP
+	command error_t BSRadio.sendBS(void *Data, uint8_t len){
+#ifndef ONLY_BSTATION
+		dbg(APPNAME, "BS::CM.sendBS(): insert in outQueue\n");		
+		memcpy(&tempInputOutQ.Data,Data,(len>MSG_BUFF_SIZE)?MSG_BUFF_SIZE:len);
+		tempInputOutQ.AM_ID = AM_SENDBS;
+		tempInputOutQ.DataSize = (nx_uint8_t)(len>MSG_BUFF_SIZE)?(uint8_t)MSG_BUFF_SIZE:len;
+		tempInputOutQ.sendToMote = 0; // Use the CTP
+		if (call outQ.put(&tempInputOutQ)!= SUCCESS) {
+			dbg(APPNAME, "BS::CM.sendBS(): outQueue is full! Losting a message.\n");
+			return FAIL;
+		}
+#endif // ONLY_BSTATION
+		return SUCCESS;
+	}
+#endif // MODULE_CTP
+	
+		command uint16_t BSRadio.source(message_t* msg){return call RadioAMPacket.source(msg);}
+
+
 /* *****************************************************************************************
 *             Base Station Events - Disabled when compiled for generic real Mote
 \* *****************************************************************************************/
 	void dummy(message_t *msg, void *payload, uint8_t len){}
 
+ 	/**
+ 	 * Process a received sendBS message
+ 	 * @param Data Message data
+ 	 */ 
+#ifdef MODULE_CTP
+	void procSendBS(sendBS_t* Data){
 #ifndef NO_BSTATION
-	
+		dbg(APPNAME, "BS::procSendBS():insert in outQueue\n");
+		if (MoteID == BStation){
+		memcpy(&tempInputOutQ.Data,Data,sizeof(sendBS_t));
+		tempInputOutQ.AM_ID = AM_SENDBS;
+		tempInputOutQ.DataSize = sizeof(sendBS_t);
+		tempInputOutQ.sendToMote = AM_BROADCAST_ADDR;
+		if (call outQ.put(&tempInputOutQ)!= SUCCESS) {
+			dbg(APPNAME, "BS::procSendBS(): outQueue is full! Losting a message.\n");
+		}		
+		}
+#endif
+	}
+#endif //MODULE_CTP	
+
+
+#ifdef MODULE_CTP
+	event message_t * recSendBS.receive(message_t *msg, void *payload, uint8_t len){
+#ifndef NO_BSTATION
+		sendBS_t* xData;
+		dbg(APPNAME, "BS::recSendBS.receive():\n");
+		// Copy data to temporarily buffer
+		memcpy(tempInputInQ.Data,payload,sizeof(sendBS_t));
+		xData = (sendBS_t*)payload;
+		if ( xData->Sender == recBS_last_Sender && xData->seq == recBS_last_seq) {
+			dbg(APPNAME, "BS::recSendBS.receive(): discarding duplicated message\n");
+			return msg;
+		}
+		recBS_last_Sender = xData->Sender; 
+		recBS_last_seq = xData->seq;		
+		tempInputInQ.AM_ID = AM_SENDBS;
+		tempInputInQ.DataSize = sizeof(sendBS_t);
+		// put the message in inQueue
+		if (call inQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recSendBS.receive(): inQueue is full! Losting a message.\n");
+#endif
+		return msg;
+	}
+#endif //MODULE_CTP	
+
+#ifndef NO_BSTATION
 	event void SerialControl.startDone(error_t error){
 		dbg(APPNAME, "BS::SerialControl.startDone():\n");		
 	}
@@ -1195,6 +1435,7 @@ uint8_t usrReqAck = FALSE;
 		}
 		return msg;
 	}
+
 
 #endif
 

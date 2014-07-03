@@ -66,7 +66,13 @@ class Network:
         if (self.sfFlag and self.liveFlag):
             self.throttle = Throttle(self.tossim, 10)
 
-        ##self.tossim.addChannel("AM", outDBG)
+		# CTP Channels
+        self.tossim.addChannel("Forwarder", outDBG)
+        self.tossim.addChannel("CtpForwarder", outDBG)
+        self.tossim.addChannel("Route", outDBG)
+        self.tossim.addChannel("TreeRoutingCtl", outDBG)
+
+        self.tossim.addChannel("AM", outDBG)
         ##self.tossim.addChannel("Acks", outDBG)
         ##self.tossim.addChannel("Packet", outDBG)
         ##self.tossim.addChannel("Serial", outDBG)

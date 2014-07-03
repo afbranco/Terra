@@ -1,3 +1,21 @@
 second:0.5
 second:1.0
 second:1.5
+second:2.0
+second:2.5
+second:3.0
+second:3.5
+second:4.0
+second:4.5
+second:5.0
+second:5.5
+second:6.0
+second:6.5
+second:7.0
+second:7.5
+DEBUG (11): VM:: mod operation: (0 %d) = 23 
+DEBUG (11): VM:: mult operation: (1 * 0) = 0 
+DEBUG (11): VM:: add operation: (0 + 41) = 41 
+DEBUG (11): VM:: add operation: (3 + 38) = 41 
+second:8.0
+second:8.5

@@ -1,22 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <buildTargets>
-    <default version="4">
-        <default>true</default>
-        <project/>
-        <target>micaz</target>
-        <make-extras/>
-        <includes/>
-        <excludes>
-            <exclude>.*\.svn.*</exclude>
-        </excludes>
-        <typedefs/>
-        <macros/>
-        <boards/>
-        <no-std-incl>false</no-std-incl>
-        <component/>
-        <component-file/>
-        <include-last-build>true</include-last-build>
-        <include-env-default-paths>true</include-env-default-paths>
-        <environment_variables/>
-    </default>
+<default version="4">
+<default>true</default>
+<project/>
+<target>micaz</target>
+<make-extras/>
+<includes>
+<include global="false" include="source" ncc="true" recursive="true">/opt/tinyos-2.1.2/tos/lib/net/ctp</include>
+</includes>
+<excludes>
+<exclude>.*\.svn.*</exclude>
+</excludes>
+<typedefs/>
+<macros>
+<macro content="0" name="MODULE_CTP" ncc="true" yeti="true"/>
+</macros>
+<boards>
+<board>mts300</board>
+</boards>
+<no-std-incl>false</no-std-incl>
+<component/>
+<component-file/>
+<include-last-build>true</include-last-build>
+<include-env-default-paths>true</include-env-default-paths>
+<environment_variables/>
+</default>
+<client-data/>
 </buildTargets>

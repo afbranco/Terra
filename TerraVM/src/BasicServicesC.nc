@@ -11,7 +11,6 @@
  */
  
 #include "BasicServices.h"
-#include "CustomVMs/TerraNet/usrMsg.h"
  
 configuration BasicServicesC{
 	provides interface Boot as BSBoot;
@@ -22,9 +21,12 @@ configuration BasicServicesC{
 }
 implementation{
 	components MainC;
-	components BasicServicesP as BS;
-
     BS.TOSBoot  -> MainC;
+    
+/*******************************************
+ * Basic Service components
+ *******************************************/
+	components BasicServicesP as BS;
    	// Provided interfaces wire
    	BSBoot = BS.BSBoot;	
 	BSTimerVM = BS.BSTimerVM;
@@ -37,9 +39,49 @@ implementation{
 	BS.RadioControl -> RadioAM.SplitControl;
 	BS.RadioAMPacket -> RadioAM;
 	BS.RadioPacket -> RadioAM.Packet;
-	BS.RadioSender -> RadioAM.AMSend;
 	BS.RadioAck -> RadioAM.PacketAcknowledgements;
+#ifndef MODULE_CTP
+	BS.RadioSender -> RadioAM.AMSend;
+#else
+	BS.snd_NEWPROGVERSION -> RadioAM.AMSend[AM_NEWPROGVERSION];
+	BS.snd_NEWPROGBLOCK -> RadioAM.AMSend[AM_NEWPROGBLOCK];
+	BS.snd_REQPROGBLOCK -> RadioAM.AMSend[AM_REQPROGBLOCK];
+	BS.snd_SETDATAND -> RadioAM.AMSend[AM_SETDATAND];
+	BS.snd_REQDATA -> RadioAM.AMSend[AM_REQDATA];
+	BS.snd_PINGMSG -> RadioAM.AMSend[AM_PINGMSG];
+	BS.snd_CUSTOM_0 -> RadioAM.AMSend[AM_CUSTOM_0];
+	BS.snd_CUSTOM_1 -> RadioAM.AMSend[AM_CUSTOM_1];
+	BS.snd_CUSTOM_2 -> RadioAM.AMSend[AM_CUSTOM_2];
+	BS.snd_CUSTOM_3 -> RadioAM.AMSend[AM_CUSTOM_3];
+	BS.snd_CUSTOM_4 -> RadioAM.AMSend[AM_CUSTOM_4];
+	BS.snd_CUSTOM_5 -> RadioAM.AMSend[AM_CUSTOM_5];
+	BS.snd_CUSTOM_6 -> RadioAM.AMSend[AM_CUSTOM_6];
+	BS.snd_CUSTOM_7 -> RadioAM.AMSend[AM_CUSTOM_7];
+	BS.snd_CUSTOM_8 -> RadioAM.AMSend[AM_CUSTOM_8];
+	BS.snd_CUSTOM_9 -> RadioAM.AMSend[AM_CUSTOM_9];
+#endif
+
+#ifndef MODULE_CTP
 	BS.RadioReceiver -> RadioAM.Receive;
+#else
+	BS.rec_NEWPROGVERSION -> RadioAM.Receive[AM_NEWPROGVERSION];
+	BS.rec_NEWPROGBLOCK -> RadioAM.Receive[AM_NEWPROGBLOCK];
+	BS.rec_REQPROGBLOCK -> RadioAM.Receive[AM_REQPROGBLOCK];
+	BS.rec_SETDATAND -> RadioAM.Receive[AM_SETDATAND];
+	BS.rec_REQDATA -> RadioAM.Receive[AM_REQDATA];
+	BS.rec_PINGMSG -> RadioAM.Receive[AM_PINGMSG];
+	BS.rec_CUSTOM_0 -> RadioAM.Receive[AM_CUSTOM_0];
+	BS.rec_CUSTOM_1 -> RadioAM.Receive[AM_CUSTOM_1];
+	BS.rec_CUSTOM_2 -> RadioAM.Receive[AM_CUSTOM_2];
+	BS.rec_CUSTOM_3 -> RadioAM.Receive[AM_CUSTOM_3];
+	BS.rec_CUSTOM_4 -> RadioAM.Receive[AM_CUSTOM_4];
+	BS.rec_CUSTOM_5 -> RadioAM.Receive[AM_CUSTOM_5];
+	BS.rec_CUSTOM_6 -> RadioAM.Receive[AM_CUSTOM_6];
+	BS.rec_CUSTOM_7 -> RadioAM.Receive[AM_CUSTOM_7];
+	BS.rec_CUSTOM_8 -> RadioAM.Receive[AM_CUSTOM_8];
+	BS.rec_CUSTOM_9 -> RadioAM.Receive[AM_CUSTOM_9];
+#endif
+
 
 	// Base Station
 #ifndef NO_BSTATION
@@ -82,6 +124,20 @@ implementation{
 	BS.Leds -> LedsC;
 	components RandomC;
 	BS.Random -> RandomC;
+
+
+/*******************************************
+ * Optional components
+ *******************************************/
+#ifdef MODULE_CTP
+	components CollectionC as Collector;
+	BS.RoutingControl -> Collector;
+	BS.RootControl -> Collector;
+	BS.recSendBS -> Collector.Receive[AM_SENDBS];
+	components new CollectionSenderC(AM_SENDBS) as sendBS;
+	BS.sendBSNet -> sendBS;
+#endif
+
 
 	
 }

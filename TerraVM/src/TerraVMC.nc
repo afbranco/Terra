@@ -110,32 +110,8 @@ implementation
 	}
 
 	uint16_t getLblAddr(uint16_t lbl){
-		uint16_t pos;
 		dbg(APPNAME,"VM::getLblAddr(%d):\n",lbl);	
 		return lbl;	
-/*
-		// Looking in 1x1 table 
-		for (pos=LblTab11; pos < LblTab12;pos=pos+2){ // +2 assuming 8bits labels and 8bits adrr
-//dbg(APPNAME,"VM::getLblAddr(%d): 1x1 - LblTab[%d]=%d -> value=%d\n",lbl,pos,*(uint8_t*)&CEU_data[pos],*(uint8_t*)(&CEU_data[pos+1]));
-			if (*(nx_uint8_t*)&CEU_data[pos] == lbl) return *(nx_uint8_t*)(&CEU_data[pos+1]);		
-		}
-		// Looking in 1x2 table 
-		for (pos=LblTab12; pos < LblTab21;pos=pos+3){ // +3 assuming 8bits labels and 16bits adrr
-//dbg(APPNAME,"VM::getLblAddr(%d): 1x2 - LblTab[%d]=%d -> value=%d\n",lbl,pos,*(uint8_t*)&CEU_data[pos],*(uint16_t*)(&CEU_data[pos+1]));
-			if (*(nx_uint8_t*)&CEU_data[pos] == lbl) return *(nx_uint16_t*)(&CEU_data[pos+1]);		
-		}
-		// Looking in 2x1 table 
-		for (pos=LblTab21; pos < LblTab22;pos=pos+3){ // +3 assuming 16bits labels and 8bits adrr
-//dbg(APPNAME,"VM::getLblAddr(%d): 2x1 - LblTab[%d]=%d -> value=%d\n",lbl,pos,*(uint16_t*)&CEU_data[pos],*(uint8_t*)(&CEU_data[pos+2]));
-			if (*(nx_uint16_t*)&CEU_data[pos] == lbl) return *(nx_uint8_t*)(&CEU_data[pos+2]);		
-		}
-		// Looking in 2x2 table 
-		for (pos=LblTab22; pos < LblTabEnd;pos=pos+4){ // +4 assuming 16bits labels and 16bits adrr
-//dbg(APPNAME,"VM::getLblAddr(%d): 2x2 - LblTab[%d]=%d -> value=%d\n",lbl,pos,*(uint16_t*)&CEU_data[pos],*(uint16_t*)(&CEU_data[pos+2]));
-			if (*(nx_uint16_t*)&CEU_data[pos] == lbl) return *(nx_uint16_t*)(&CEU_data[pos+2]);		
-		}
-		return 0;
-*/
  	}
 
 
@@ -1078,7 +1054,7 @@ void f_popx(uint8_t Modifier){
 }
 
 void f_poparr_v(uint8_t Modifier){
-	uint8_t v1_len,sig,p1_1len,v2_len,p2_1len,p3_1len,Aux;
+	uint8_t v1_len,p1_1len,v2_len,p2_1len,p3_1len,Aux;
 	uint16_t Maddr,Vidx,Max;
 	uint32_t Value;
 	v1_len = (uint8_t)(1<<((Modifier & 0x03)));
@@ -1237,7 +1213,7 @@ void f_outevt_e(uint8_t Modifier){
 }
 
 void f_outevt_c(uint8_t Modifier){
-	uint8_t Clen,Aux;
+	uint8_t Clen;
 	uint8_t Cevt;
 	uint32_t Const;
 	Clen = (uint8_t)((Modifier & 0x03)+1);
@@ -1249,7 +1225,7 @@ void f_outevt_c(uint8_t Modifier){
 
 void f_outevt_v(uint8_t Modifier){
 	uint8_t Cevt,tp_len;
-	uint16_t Clen,Maddr;
+	uint16_t Maddr;
 	tp_len = (uint8_t)(1<<(Modifier & 0x02));
 	Cevt  = getPar8(1);
 	Maddr = getPar16(2);
@@ -1259,7 +1235,7 @@ void f_outevt_v(uint8_t Modifier){
 }
 void f_outevtx_v(uint8_t Modifier){
 	uint8_t Cevt,tp_len;
-	uint16_t Clen,Maddr;
+	uint16_t Maddr;
 	tp_len = (uint8_t)(1<<(Modifier & 0x02));
 	Cevt  = getPar8(1);
 	Maddr = getPar16(1);
@@ -1593,6 +1569,9 @@ void f_tkins_z(uint8_t Modifier){
 		*(uint32_t*)(CEU_data+currStack)=value;
 #endif
 	}
+	event bool VMCustom.getHaltedFlag(){
+		return haltedFlag;
+	}
 
     event void BSTimerVM.fired()
     {
@@ -1606,6 +1585,7 @@ void f_tkins_z(uint8_t Modifier){
     }
     
 	bool hasAsync(){
+#ifndef ONLY_BSTATION
 		uint8_t i;
 	    tceu_nlbl* ASY0 = PTR(tceu_nlbl*,async0);
         for (i=0 ; i < asyncs ; i++) {
@@ -1613,6 +1593,7 @@ void f_tkins_z(uint8_t Modifier){
                 return TRUE;
             }
         }
+#endif
         return FALSE;
 	}
     

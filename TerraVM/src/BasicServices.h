@@ -9,7 +9,6 @@
 
 #include "VMData.h"
 
-
 enum{
 /*
  * AM_ID definitions for each message, used in TinyOS events dispatcher.
@@ -20,8 +19,25 @@ enum{
 	AM_SETDATAND 		= 131,
 	AM_REQDATA 			= 132,
 	AM_PINGMSG			= 133,
-	// AM_USRMSG is defined in usrMsg.h
-			
+
+	AM_CUSTOM_START		= 140,
+	AM_CUSTOM_END		= 149,
+	AM_CUSTOM_0			= 140,
+	AM_CUSTOM_1			= 141,
+	AM_CUSTOM_2			= 142,
+	AM_CUSTOM_3			= 143,
+	AM_CUSTOM_4			= 144,
+	AM_CUSTOM_5			= 145,
+	AM_CUSTOM_6			= 146,
+	AM_CUSTOM_7			= 147,
+	AM_CUSTOM_8			= 148,
+	AM_CUSTOM_9			= 149,
+
+#ifdef MODULE_CTP
+	AM_SENDBS = 150,
+#endif			
+	AM_RESERVED_END = 127,
+
 	BStation = 1, 				// Base Station Mote ID
 	// Send message control
 	RESEND_DELAY = 20L,
@@ -72,11 +88,6 @@ typedef nx_struct newProgVersion{
 	nx_uint8_t blockStart; 		// first block
 	nx_uint16_t startProg; 		// Start prog addr. 
 	nx_uint16_t endProg; 		// Start prog addr. 
-//	nx_uint16_t lblTable11; 	// Label 1x1 Table addr
-//	nx_uint16_t lblTable12; 	// Label 1x2 Table addr
-//	nx_uint16_t lblTable21; 	// Label 2x1 Table addr
-//	nx_uint16_t lblTable22; 	// Label 2x2 Table addr
-//	nx_uint16_t lblTableEnd;	// Label tables end addr
 	nx_uint16_t nTracks; 		// Tracks number
 	nx_uint16_t wClocks; 		// Clocks number
 	nx_uint16_t asyncs; 		// Asyncs number
@@ -124,12 +135,25 @@ typedef nx_struct setDataBuffer{
 	nx_uint8_t buffer[MSG_BUFF_SIZE];
 } setDataBuff_t;	
 
+typedef nx_struct sendBS{	
+	// CTP  
+	nx_uint16_t Sender; 
+	nx_uint16_t seq; 
+	// Msg Definition  
+	nx_uint8_t  evtId; // Event ID
+	nx_int8_t  Data[SEND_DATA_SIZE]; // Data buffer
+} sendBS_t;	
+
 typedef nx_struct GenericData {
 	nx_uint8_t AM_ID;
 	nx_uint8_t DataSize;
 	nx_uint16_t sendToMote;
 	nx_uint8_t reqAck;
-	nx_uint8_t Data[34];//[MSG_BUFF_SIZE];
+	nx_uint8_t Data[MSG_BUFF_SIZE];
 } GenericData_t;
+
+typedef nx_struct ctpMsg {
+	nx_uint8_t  data[MSG_BUFF_SIZE];
+} ctpMsg_t;
 
 #endif /* BASIC_SERVICES_H */
