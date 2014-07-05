@@ -79,7 +79,7 @@ local _V2NAME = {
 
     ID_version  = 'version identifier <num.num.num> ',
     CfgBlk = 'Config block declaration',
-    ID_field_type = 'a valid non pointer basic type',
+    ID_field_type = 'a valid non pointer basic type or payload[n]',
     _Dcl_struct = 'declaration',
 --    ID_evt  = 'identifier',
     Op_var = 'variable'
@@ -111,6 +111,11 @@ TYPES = -- P'void' +
        P'ubyte' + 'ushort' + 'ulong'
       + 'byte' + 'short' + 'long'
 
+PK_TYPES = -- P'void' +
+       P'ubyte' + 'ushort' + 'ulong'
+      + 'byte' + 'short' + 'long'
+      + 'payload'
+
 --KEYS = P'and'     
 --     + 'async'    
 --     + 'await'    + 'break'    + 'C'
@@ -132,6 +137,7 @@ KEYS = P'and'
      + 'par'      + 'par/and'  + 'par/or'                + 'pure'
      + 'return'   + 'sizeof'   + 'then'     + 'var'      + 'with'
      + 'function' + 'config'   + 'regtype'  + 'inc'      + 'dec'
+     + 'pktype'
      + TYPES
 
 KEYS = KEYS * -m.R('09','__','az','AZ','\127\255')
@@ -154,15 +160,18 @@ _GG = {
     , CfgStmts = (V'_CfgStmt' * (EK';'*K';'^0) +
                   V'_CfgStmtB' * (K';'^-1*K';'^0))^0 + EM'AAA'
 
-    , _CfgStmt = V'_Dcl_ext' + V'_Dcl_func'
-            + EM'config statement (usually a missing `input/output/function/regtype´)'
-    , _CfgStmtB = V'_Dcl_regt'
+    , _CfgStmt = V'_Dcl_ext' + V'_Dcl_func' 
+            + EM'config statement (usually a missing `input/output/function/regtype/packet´)'
+    , _CfgStmtB = V'_Dcl_regt' + V'_Dcl_packet'
             + EM'config statement (usually a missing `regtype varName with varDefs end´)'
     ,_Dcl_func = (CKEY'function' * (CK'pure'+CK'nohold'+Cc(false)) 
                   * (CKEY(TYPES) + EM'a basic type' ) 
                   * (V'ID_c' + EM'a valid function identifier') * K'(' * V'Arg_list' * K')') * PNUM
     
     , Arg_list = ( V'ID_type' * (EK',' * EV'ID_type')^0  )^-1
+    
+    , _Dcl_packet = KEY'packet' * EV'ID_var' * EKEY'with' * ((V'_Dcl_field' + V'_Dcl_payfield') * (EK';'*K';'^0))^0 * EKEY'end'
+    
 ------
     , _Block =  ( V'_Stmt' * ((EK';'*K';'^0) + EM'`;´') +
                  V'_StmtB' * ((K';'^-1*K';'^0) + EM'`;´') 
@@ -187,6 +196,7 @@ _GG = {
              + V'If'    + V'Loop'
 --             + V'Pause'
              + V'_Dcl_regt'
+             + V'_Dcl_pktype'
 
     , _LstStmt  = V'_Return' + V'Break' + V'AwaitN'
     , _LstStmtB = V'ParEver'
@@ -339,7 +349,12 @@ _GG = {
                     *    (V'ID_var' + EM'a valid identifier')  
                     * (K','*V'ID_var')^0
                         
-    , _Dcl_regt = KEY'regtype' * EV'ID_var' * EKEY'with' * (V'_Dcl_field' * (EK';'*K';'^0))^0 * EKEY'end'
+    , _Dcl_payfield  = CKEY'var' * EV'ID_pay_type' 
+                    *  K'['*PNUM*K']'
+                    *    (V'ID_var' + EM'a valid identifier')  
+                        
+    , _Dcl_regt   = KEY'regtype' * EV'ID_var' * EKEY'with' * (V'_Dcl_field' * (EK';'*K';'^0))^0 * EKEY'end'
+    , _Dcl_pktype = KEY'pktype' * EV'ID_var' * EKEY'of'  * EV'ID_var' * EKEY'with' * (V'_Dcl_field' * (EK';'*K';'^0))^0 * EKEY'end'
     
 --    , Func     = V'ID_var' * K'(' * Cc'call' * V'ExpList' * EK')'
     , Func     = V'ID_var' * K'(' * V'ExpList' * EK')'
@@ -375,6 +390,7 @@ _GG = {
                     return (string.gsub(id..star,' ',''))
                   end
     , ID_field_type = -K'void' * CKEY(TYPES)
+    , ID_pay_type = -K'void' * CKEY(PK_TYPES)
     
 --    , STRING = CK( CK'"' * (P(1)-'"'-'\n')^0 * EK'"' )
 

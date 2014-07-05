@@ -18,6 +18,7 @@ _ENV = {
 
         ubyte=1, ushort=2, ulong=4,
         byte=1, short=2, long=4,
+        payload=1,
 
         pointer   = 2, --_OPTS.tp_pointer,
         tceu_noff = 2, --_OPTS.tp_off,
@@ -29,6 +30,7 @@ _ENV = {
     },
     calls = {},     -- { _printf=true, _myf=true, ... }
 
+    packets = {},
     n_asyncs  = 0,
     n_wclocks = 0,
     n_emits   = 0,
@@ -84,7 +86,9 @@ function newvar (me, blk, pre, tp, dim, id)
           n_awaits = 0,
           fields ={},
           auxtag = z1.auxtag,
+          supertp = c.supertp
       }
+--print("env::newvar:",id,tp,c.supertp)
       blk.vars[#blk.vars+1] = var
       nvar[#nvar+1]=var
 --print(print_r(c.fields,'env::newvar: c.fields'))
@@ -197,6 +201,7 @@ F = {
             ASR(not (val.idx==idx), me, dir..' event numeric id "'..idx..'" is already in use at line '.. (val.ln or 0))
           end
         end
+        ASR(_ENV.c[tp] or _ENV.packets[tp],me,'type/packet not defined')
         ASR(idx<255, me, dir..' event numeric id must be less than 255')
         me.ext = {
             ln    = me.ln,
@@ -218,6 +223,7 @@ F = {
     Dcl_int = 'Dcl_var',
     Dcl_var = function (me)
         local pre, tp, dim, id, exp = unpack(me)
+        ASR(_ENV.c[tp] or _ENV.c[_TP.deref(tp)],me,'invalid type')
         local z =  _TP.getAuxTag(tp,dim)
         ASR( z.lvl <= 1, me,'invalid pointer to pointer type')
 --print("env::Dcl_var:",tp,dim, _TP.isBasicType(_TP.deref(tp) or tp),(not dim) or  _TP.isBasicType(_TP.deref(tp) or tp))
@@ -225,10 +231,11 @@ F = {
         me.var = newvar(me, _AST.iter'Block'(), pre, tp, dim, id)
     end,
 
-
     Dcl_regt = function(me)
 --print(print_r(me,"env::Dcl_regt: me"))
       local RegId = me[1]
+      ASR(not _ENV.c[RegId],me,'Register type `'.. RegId ..'´ is already declared as Register.')
+      ASR(not _ENV.packets[RegId],me,'Register type `'.. RegId ..'´ is already declared as Packet.')
       local RegFields= {}
       local memsize = 0
       local offset = 0
@@ -238,6 +245,7 @@ F = {
         local var = me[i]
 --print('env::Dcl_regt: var',var)
         local  pre, tp, dim, id = unpack(var)
+        ASR(not RegFields[id],var,'duplicated field id `'..id ..'´')
         local len = ((dim and dim*_ENV.c[var[2]].len) or _ENV.c[var[2]].len)
         lastSize = len
         RegFields[id]={pre=pre,tp=tp,dim=dim,id=id,len=len,offset=offset}
@@ -246,6 +254,83 @@ F = {
         memsize = memsize + len
       end
       _ENV.c[RegId] = { tag='type', id=RegId, len=memsize , fields=RegFields}
+    end,
+
+    Dcl_packet = function(me)
+--print(print_r(me,"env::Dcl_packet: me"))
+      local RegId = me[1]
+      ASR(not _ENV.packets[RegId],me,'Packet type `'.. RegId ..'´ is already declared as Packet.')
+      ASR(not _ENV.c[RegId],me,'Packet type `'.. RegId ..'´ is already declared as Register.')
+      local RegFields= {}
+      local memsize = 0
+      local offset = 0
+      local lastSize = 0
+      local payloadCount=0
+      for i=2, #me do
+        offset = offset + lastSize
+        local var = me[i]
+--print('env::Dcl_regt: var',var)
+        local  pre, tp, dim, id = unpack(var)
+        ASR(not RegFields[id],var,'duplicated field id `'..id ..'´')
+        local len = ((dim and dim*_ENV.c[var[2]].len) or _ENV.c[var[2]].len)
+        lastSize = len
+        RegFields[id]={pre=pre,tp=tp,dim=dim,id=id,len=len,offset=offset}
+        RegFields[i-1]=RegFields[id]
+--print('env::Dcl_regt:',tp,id)
+        memsize = memsize + len
+        if tp == 'payload' then payloadCount = payloadCount + 1 end
+      end
+      ASR(payloadCount == 1, me,'packet needs exactly one `payload´ type, it received '..payloadCount)
+      _ENV.packets[RegId] = { tag='type', id=RegId, len=memsize , fields=RegFields}
+    end,
+
+    Dcl_pktype = function(me)
+--print(print_r(me,"env::Dcl_pktype: me"))
+      local RegId = me[1]
+      local packet = me[2]
+      ASR(not _ENV.c[RegId],me,'Register type `'.. RegId ..'´ is already declared.')
+      ASR(_ENV.packets[packet],me,'packet type `'.. packet ..'´ is not defined.')
+      local RegFields= {}
+      local memsize = 0
+      local offset = 0
+      local lastSize = 0
+      local pos = 1
+--print('env::Dcl_pktype: subtype:supertype',RegId,packet,_ENV.packets[packet].fields)
+--print(print_r(RegFields,"env::Dcl_pktype: RegFields"))
+
+      for x, field in ipairs(_ENV.packets[packet].fields) do
+        if field.tp ~= 'payload' then
+          RegFields[field.id] = field
+          RegFields[pos] = field
+          pos = pos + 1
+        else
+          offset = field.offset
+          lastSize=0
+          for i=3, #me do
+            offset = offset + lastSize
+            local var = me[i]
+--print('env::Dcl_pktype: var',var)
+            local  pre, tp, dim, id = unpack(var)
+            ASR(not RegFields[id],var,'duplicated field id `'..id ..'´')
+            local len = ((dim and dim*_ENV.c[var[2]].len) or _ENV.c[var[2]].len)
+            lastSize = len
+            RegFields[id]={pre=pre,tp=tp,dim=dim,id=id,len=len,offset=offset}
+            RegFields[pos]=RegFields[id]
+            pos = pos + 1
+--print('env::Dcl_pktype:',tp,id)
+            memsize = memsize + len
+            ASR(memsize<=field.len,me,'subtype size '.. memsize ..' is  greater than payload size '..field.len)
+          end
+          if memsize < field.len then -- complete remain bytes
+            local dim = (field.len - memsize)
+            RegFields._remain={pre=field.pre,tp='ubyte',dim=dim,id='_remain',len=(dim*1),offset=offset + lastSize}
+            RegFields[pos]=RegFields._remain
+            pos = pos + 1
+          end
+        end
+      end
+--print(print_r(RegFields,"env::Dcl_pktype: RegFields"))
+      _ENV.c[RegId] = { tag='type', supertp=packet, id=RegId, len=_ENV.packets[packet].len , fields=RegFields}
     end,
 
     Dcl_func = function (me)
@@ -325,6 +410,7 @@ F = {
                   me.fst  = var
                   me.arr = var.arr
                   me.auxtag = var.auxtag
+                  me.supertp = var.supertp
                   return
                 end
             end
@@ -415,7 +501,7 @@ print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2
         me.tp = e1.ext.tp
 
         if e2 then
-          err, cast,_,_,len1,len2 = _TP.tpCompat(e1.ext.tp,e2.tp,nil,e2.arr)
+          err, cast,_,_,len1,len2 = _TP.tpCompat((e1.ext.supertp or e1.ext.tp),(e2.supertp or e2.tp),nil,e2.arr)
           ASR(not err,me,'type/size incompatibility: '.. e1.ext.tp..'/'..len1 ..' <--> '.. e2.tp..'/'..len2..'')
           WRN(not cast,me, 'Applying the minimum size: "'.. e1.ext.tp..'/'..len1 ..'" <--> "' .. e2.tp..'/'..len2 ..'". ')
 --          ASR(_TP.contains(e1.ext.tp,e2.tp,true),me, "non-matching types on `emit´")

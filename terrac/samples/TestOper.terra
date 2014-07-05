@@ -1,11 +1,6 @@
 #include "TerraNet.defs"
 
 
-loop do
-	await 500ms;
-	emit LED0(TOGGLE);
-end
-
 /*
 var long a1;
 var usrMsg_t msg;

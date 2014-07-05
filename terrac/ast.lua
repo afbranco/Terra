@@ -303,7 +303,27 @@ local C; C = {
       return node('Dcl_regt')(...)
     end,
 
+    _Dcl_packet   = function(...)
+--print('ast::_Dcl_packet',...)
+      return node('Dcl_packet')(...)
+    end,
+
+    _Dcl_pktype   = function(...)
+--print('ast::_Dcl_regsubt',...)
+      return node('Dcl_pktype')(...)
+    end,
+
     _Dcl_field = function (ln, pre, tp, dim, ...)
+        local ret = {}
+        local t = { ... }
+        for i=1, #t, 1 do
+            ret[#ret+1] = node('Dcl_field')(ln, pre, tp, dim, t[i])
+--print('ast::_Dcl_field:',i..'/'..#t,ln, pre, tp, dim,t[i],t[i+1])
+        end
+        return unpack(ret)
+    end,
+
+    _Dcl_payfield = function (ln, pre, tp, dim, ...)
         local ret = {}
         local t = { ... }
         for i=1, #t, 1 do

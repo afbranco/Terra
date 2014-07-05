@@ -51,7 +51,7 @@ function _TP.getAuxTag(tp1,arr1)
     while _TP.deref(aux.ntp) do aux.ntp = _TP.deref(aux.ntp); aux.lvl = aux.lvl+1 end
     aux.bType = _TP.isBasicType(aux.ntp)
 --    aux.len = (aux.arr and aux.arr*_ENV.c[aux.ntp].len) or (_TP.isBasicType(aux.ntp) and ((aux.lvl==0 and _ENV.c[aux.ntp].len) or 2)) or _ENV.c[aux.ntp].len 
-    aux.len = (aux.arr and aux.arr*_ENV.c[aux.ntp].len) or _ENV.c[aux.ntp].len 
+    aux.len = (aux.arr and aux.arr*_ENV.c[aux.ntp].len) or ((_ENV.packets[aux.ntp] and _ENV.packets[aux.ntp].len) or _ENV.c[aux.ntp].len) 
 
     aux.auxtag = 
           ((    aux.ntp == 'void'                       ) and 'void'    ) or
