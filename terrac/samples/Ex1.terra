@@ -80,7 +80,6 @@ if nodeId == baseNode then
 	seqReq = 1;
 end
 
-
 par do
 /**********************************************************
  * Send temperatura value
@@ -110,22 +109,24 @@ par do
 		end
 	end
 with 
+	/**************************
+	 * Data msg to root
+	 **************************/
 	loop do
-		msgTopo = await RECEIVE;
-		/**************************
-		 * Data msg to root
-		 **************************/
-		if msgTopo.type == ID_DATA then 	// Received a data Msg, then root it.
-			if father != NO_FATHER then
-				msgTopo.target = father;
-				stat = qPut(msgTopo);
-			end
+		msgTopo = await RECEIVE(ID_DATA);  	// Received a data Msg, then root it.
+		if father != NO_FATHER then
+			msgTopo.target = father;
+			stat = qPut(msgTopo);
 		end
-		if nodeId != baseNode then
+	end
+with
+	if nodeId != baseNode then
+		par do
 			/**************************
 			 * New topology msg(1) to broadcast
 			 **************************/
-			if msgTopo.type == ID_NEW_TOPO then
+			loop do
+				msgTopo = await RECEIVE(ID_NEW_TOPO);
 				if msgTopo.d16_2 > seqReq then
 					reqTopoBlind = FALSE;
 					seqReq = msgTopo.d16_2;
@@ -136,10 +137,12 @@ with
 					stat = qPut(msgTopo);
 				end
 			end
+		with
 			/**************************
 			 * Request new topology msg(3) to root
 			 **************************/
-			if msgTopo.type == ID_REQ_TOPO then 	
+			loop do
+				msgTopo = await RECEIVE(ID_REQ_TOPO);
 				if (father != NO_FATHER) and (reqTopoBlind==FALSE) then
 					//reqTopoBlind = TRUE;
 					msgTopo.target = father;
@@ -147,24 +150,20 @@ with
 				end
 			end
 		end
-	end
-with
-	if nodeId == baseNode then
+	else // nodeId == baseNode
+		/**************************
+		 * When receive Request Topo(3), Starts a new topology
+		 **************************/
 		loop do
-			msgTopo = await RECEIVE;
-			/**************************
-			 * When receive Request Topo(3), Starts a new topology
-			 **************************/
-			if msgTopo.type == ID_REQ_TOPO then // Start new topology
-				msgTopo.type = ID_NEW_TOPO;
-				msgTopo.source = nodeId;
-				msgTopo.target = BROADCAST;
-				msgTopo.d8_2 = 0;
-				inc seqReq;
-				msgTopo.d16_2 = seqReq;
-				stat = qPut(msgTopo);
-				await 2s; // Ignores recent requests
-			end	
+			msgTopo = await RECEIVE(ID_REQ_TOPO); // Start new topology
+			msgTopo.type = ID_NEW_TOPO;
+			msgTopo.source = nodeId;
+			msgTopo.target = BROADCAST;
+			msgTopo.d8_2 = 0;
+			inc seqReq;
+			msgTopo.d16_2 = seqReq;
+			stat = qPut(msgTopo);
+			await 2s; // Ignores recent requests
 		end
 	end
 with
@@ -198,12 +197,12 @@ with
 				stat = qGet(&msgRadio);
 				if msgRadio.target == BROADCAST then
 					emit SEND(msgRadio);
-					await SEND_DONE;
+					await SEND_DONE(msgRadio.type);
 				else
 					loop do
 						msgRadio.d8_1 = msgRadio.d8_1 + reply;
 						emit SEND_ACK(msgRadio);
-						ack = await SEND_DONE_ACK;
+						ack = await SEND_DONE_ACK(msgRadio.type);
 						inc reply;
 						if reply > 20 then
 							father = NO_FATHER;

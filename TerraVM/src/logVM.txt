@@ -7,15 +7,41 @@ second:3.0
 second:3.5
 second:4.0
 second:4.5
+DEBUG (11): VM:: await timer 500 for label 24
+DEBUG (11): VM:: timer fired for label 24
+DEBUG (11): VM:: executing trail: label=17.
+DEBUG (11): VM:: await timer 500 for label 24
 second:5.0
+DEBUG (11): VM:: timer fired for label 24
+DEBUG (11): VM:: executing trail: label=17.
+DEBUG (11): VM:: await timer 500 for label 24
+DEBUG (11): VM:: timer fired for label 24
+DEBUG (11): VM:: executing trail: label=17.
+DEBUG (11): VM:: await timer 500 for label 24
 second:5.5
+DEBUG (11): VM:: timer fired for label 24
+DEBUG (11): VM:: executing trail: label=17.
+DEBUG (11): VM:: await timer 500 for label 24
 second:6.0
+DEBUG (11): VM:: timer fired for label 24
+DEBUG (11): VM:: executing trail: label=17.
+DEBUG (11): VM:: await timer 500 for label 24
+DEBUG (11): VM:: timer fired for label 24
+DEBUG (11): VM:: executing trail: label=17.
+DEBUG (11): VM:: await timer 500 for label 24
 second:6.5
+DEBUG (11): VM:: timer fired for label 24
+DEBUG (11): VM:: executing trail: label=17.
+DEBUG (11): VM:: await timer 500 for label 24
 second:7.0
+DEBUG (11): VM:: timer fired for label 24
+DEBUG (11): VM:: executing trail: label=17.
+DEBUG (11): VM:: await timer 500 for label 24
+DEBUG (11): VM:: timer fired for label 24
+DEBUG (11): VM:: executing trail: label=17.
+DEBUG (11): VM:: await timer 500 for label 24
 second:7.5
-DEBUG (11): VM:: mod operation: (0 %d) = 23 
-DEBUG (11): VM:: mult operation: (1 * 0) = 0 
-DEBUG (11): VM:: add operation: (0 + 41) = 41 
-DEBUG (11): VM:: add operation: (3 + 38) = 41 
+DEBUG (11): VM:: timer fired for label 24
+DEBUG (11): VM:: executing trail: label=17.
+DEBUG (11): VM:: await timer 500 for label 24
 second:8.0
-second:8.5

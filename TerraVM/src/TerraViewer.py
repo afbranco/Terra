@@ -105,7 +105,7 @@ class gNode:
         self.led0 = pygame.draw.circle(screen,self.color0,[self.xx+4*zoom,self.yy+nodeSize-4*zoom],2*zoom,self.fill0)
         self.led1 = pygame.draw.circle(screen,self.color1,[self.xx+8*zoom,self.yy+nodeSize-4*zoom],2*zoom,self.fill1)
         self.led2 = pygame.draw.circle(screen,self.color2,[self.xx+12*zoom,self.yy+nodeSize-4*zoom],2*zoom,self.fill2)
-        pygame.display.update([self.xx,self.yy-6*zoom,self.xx+2*zoom,self.yy-8*zoom])
+        pygame.display.update([self.xx,self.yy+nodeSize-6*zoom,self.xx+14*zoom,self.yy+nodeSize-2*zoom])
     def getLinePoints(self,target):
         targetx = int(target/10);
         targety = target%10;
@@ -370,16 +370,16 @@ def leds(node,bitn,value):
     oldVal = gNodes[node].getLeds()
     if bitn < 3:
         if value < 2: # Set/Unset
-            newVal = (~(1<<bitn) & oldVal) | (value<<bitn)
-        else:
+            newVal = ( (~(1<<bitn) & 7) & oldVal) | (value<<bitn)
+        else: # Toggle
             if ((1<<bitn) & oldVal) == 0:
-                newVal = (~(1<<bitn) & oldVal) | (1<<bitn)
+                newVal = oldVal | (1<<bitn)
             else:
-                newVal = (~(1<<bitn) & oldVal)
+                newVal = ( (~(1<<bitn) & 7) & oldVal)
     else:
         newVal = value
     if gNodes[node]:
-        gNodes[node].setLeds(newVal)    
+        gNodes[node].setLeds(newVal & 7)    
     
 def radio(node,param,p2):
     if gNodes[node]:

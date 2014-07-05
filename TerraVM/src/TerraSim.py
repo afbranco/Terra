@@ -31,6 +31,7 @@ def wcmd(cmd,node=0,p1=0,p2=0):
     except IOError:
         wdbg("System closed!")
         exit(0)
+	sys.stdout.flush()
 
 def wdbg(text):
     print (text,file=outDBG)
@@ -64,7 +65,7 @@ class Network:
         
 
         if (self.sfFlag and self.liveFlag):
-            self.throttle = Throttle(self.tossim, 10)
+            self.throttle = Throttle(self.tossim, 1)
 
 		# CTP Channels
         self.tossim.addChannel("Forwarder", outDBG)
@@ -112,7 +113,7 @@ class Network:
         if (self.sfFlag):
             self.sf.process()
         if (self.sfFlag and self.liveFlag):
-            self.throttle = Throttle(self.tossim, 10)
+            self.throttle = Throttle(self.tossim, 1)
             self.throttle.initialize()
             
     def inicMote1(self):

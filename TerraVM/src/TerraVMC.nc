@@ -49,7 +49,6 @@ implementation
 	uint16_t inEvts;	
 	uint16_t async0;	
 	char* MEM;
-	uint16_t WD_TABLES=0; // nodeId, GrpTable and AggrTable configs.
 	
 	// Stack control
 	uint16_t currStack=(BLOCK_SIZE * CURRENT_MAX_BLOCKS)-1-4;
@@ -257,16 +256,19 @@ void U16toMU(uint16_t value, uint16_t Maddr,uint8_t v1_len){
 // Return CEU internal slot offset for EvtId
 uint16_t getEvtCeuId(uint8_t EvtId){
 	uint8_t i=0;
-//	uint16_t CeuId=gate0;
+	uint8_t slotSize; // Normal slot has 2 bytes.  Slot with auxId has 3 bytes. 
 	uint16_t currSlot=gate0;
-dbg(APPNAME,"VM::getEvtCeuId(): currSlot=%d, EvtId=%d, slotId=%d, i=%d, inEvts=%d\n", currSlot, EvtId,(*(nx_uint8_t*)(MEM+currSlot)),i,inEvts );
-	while (EvtId > (*(nx_uint8_t*)(MEM+currSlot)) && i < inEvts) {
+	slotSize = ((*(nx_uint8_t*)(MEM+currSlot)) <= 127)?2:3;
+dbg(APPNAME,"VM::getEvtCeuId(): EvtId?=%d : currSlot=%d,  slotId=%d, slotSize=%d, i=%d, inEvts=%d\n", EvtId, currSlot,(*(nx_uint8_t*)(MEM+currSlot)),slotSize,i,inEvts );
+//	while (EvtId > (*(nx_uint8_t*)(MEM+currSlot)) && i < inEvts) {
+	while (EvtId != (*(nx_uint8_t*)(MEM+currSlot)) && i < inEvts) {
 		i++;
-		currSlot = 	currSlot + 1 + ((*(nx_uint8_t*)(MEM+currSlot+1))*2) + 1;
-dbg(APPNAME,"VM::getEvtCeuId(): currSlot=%d, EvtId=%d, slotId=%d, i=%d, inEvts=%d\n", currSlot, EvtId,(*(nx_uint8_t*)(MEM+currSlot)),i,inEvts );
+		currSlot = 	currSlot + 1 + ((*(nx_uint8_t*)(MEM+currSlot+1))*slotSize) + 1;
+		slotSize = ((*(nx_uint8_t*)(MEM+currSlot)) <= 127)?2:3;
+dbg(APPNAME,"VM::getEvtCeuId(): EvtId?=%d : currSlot=%d,  slotId=%d, slotSize=%d, i=%d, inEvts=%d\n", EvtId, currSlot,(*(nx_uint8_t*)(MEM+currSlot)),slotSize,i,inEvts );
 	}
 	if (EvtId != (*(nx_uint8_t*)(MEM+currSlot))) { 
-		dbg(APPNAME,"WARNING: Not found a slot for event %d!\n",EvtId);
+		dbg(APPNAME,"WARNING: Not found slot for event %d!\n",EvtId);
 		return 0;
 	}
 	return currSlot+1; // Return addr of 'n' gates for EvtId
@@ -280,13 +282,6 @@ dbg(APPNAME,"VM::getEvtCeuId(): EvtId=%d, gate0=%d, i=%d ,CeuId=%d\n",EvtId,gate
 dbg(APPNAME,"VM::getEvtCeuId(): EvtId=%d, gate0=%d, i=%d ,CeuId=%d\n",EvtId,gate0,i,CeuId);
 	return CeuId;
 */
-}
-
-void  proc_set_wd_tables(uint16_t id, uint16_t len,uint32_t val, uint8_t cv){
-	dbg(APPNAME,"VM::f_set_wd_tables(): id=%d, len=%d, val=%d, cv=%d\n",id,len,val,cv);
-	if (cv==0) return; // if value is a constant, then return.
-	WD_TABLES = (uint16_t)getMVal((uint16_t)val,2);
-	setMVal(MoteID,WD_TABLES,2); // nodeID is the first 2 bytes from WD_TABLES
 }
 
 	// Get size from data type
@@ -384,7 +379,8 @@ void ceu_track_ins (u8 stack, u8 tree, int chk, tceu_nlbl lbl)
 					return;
 				}
 			}
-		}}
+		}
+	}
 
 	{
 		int i;
@@ -459,16 +455,24 @@ void ceu_spawn (tceu_nlbl* lbl)
     }
 }
 
-void ceu_trigger (tceu_noff off)
+void ceu_trigger (tceu_noff off, uint8_t auxId)
 {
     int i;
+    uint8_t slotSize, evtId, slotAuxId;
     int n = *(char*)(CEU->p_mem+off); //int n = CEU->mem[off];
-    dbg(APPNAME,"CEU::ceu_trigger(): gate addr=%d, nGates=%d\n",off,n);
-
-
+	evtId = *(char*)(CEU->p_mem+off-1);
+	slotSize = (evtId<=127)?2:3;
+    dbg(APPNAME,"CEU::ceu_trigger(): evtId=%d, auxId=%d, slotSize=%d, gate addr=%d, nGates=%d\n",evtId,auxId,slotSize,off,n);
     for (i=0 ; i<n ; i++) {
         //ceu_spawn((tceu_nlbl*)&CEU->mem[off+1+(i*sizeof(tceu_nlbl))]);
-        ceu_spawn((tceu_nlbl*)(CEU->p_mem+off+1+(i*sizeof(tceu_nlbl))));
+		if (evtId <= 127){
+        	ceu_spawn((tceu_nlbl*)(CEU->p_mem+off+1+(i*slotSize)));
+		} else {
+			slotAuxId = *(char*)(CEU->p_mem+off+1+(i*slotSize));
+			if (slotAuxId==auxId) {
+	        	ceu_spawn((tceu_nlbl*)(CEU->p_mem+off+2+(i*slotSize)));
+			}
+		}
     }
 }
 
@@ -527,12 +531,12 @@ int ceu_go_init (int* ret)
     return ceu_go(ret);
 }
 
-int ceu_go_event (int* ret, int id, void* data)
+int ceu_go_event (int* ret, int id, uint8_t auxId, void* data)
 {
-   dbg(APPNAME,"CEU::ceu_go_event(): halted=%s - id=%d\n",(haltedFlag)?"TRUE":"FALSE",id);
+   dbg(APPNAME,"CEU::ceu_go_event(): halted=%s - evt slotAddr=%d, auxId=%d\n",(haltedFlag)?"TRUE":"FALSE",id,auxId);
     CEU->ext_data = data;
     CEU->stack = CEU_STACK_MIN;
-    ceu_trigger(id);
+    ceu_trigger(id,auxId);
 
     CEU->wclk_late--;
 
@@ -1269,8 +1273,8 @@ void f_trg(uint8_t Modifier){
 	p1_1len = (uint8_t)(1<<(Modifier & 0x01));
 	gtAddr = getPar16(p1_1len);
 	dbg(APPNAME,"VM::f_trg(%02x): p1_1len=%d, gtAddr=%d, \n",Modifier,p1_1len,gtAddr);
-	dbg("VMDBG","VM:: trigger event gate=%d\n",gtAddr);
-	ceu_trigger(gtAddr);
+	dbg("VMDBG","VM:: trigger event gate=%d, auxId=0\n",gtAddr);
+	ceu_trigger(gtAddr,0);
 }
 
 void f_set16_c(uint8_t Modifier){
@@ -1496,12 +1500,13 @@ void f_tkins_z(uint8_t Modifier){
 	/**
 	 * Inserts an event in the event queue
 	 */
-	event void VMCustom.queueEvt(uint8_t evtId, void *data){
+	event void VMCustom.queueEvt(uint8_t evtId, uint8_t auxId, void *data){
 #ifndef ONLY_BSTATION
 		evtData_t evtData;
-		dbg(APPNAME,"VM::VMCustom.queueEvt(): queueing evtId=%d. procFlag=%s\n",evtId,(procFlag)?"TRUE":"FALSE");
+		dbg(APPNAME,"VM::VMCustom.queueEvt(): queueing evtId=%d, auxId=%d. procFlag=%s\n",evtId,auxId,(procFlag)?"TRUE":"FALSE");
 		// Queue the message event
 		evtData.evtId = evtId;
+		evtData.auxId = auxId;
 		evtData.data = data;
 		call evtQ.enqueue(evtData);
 		if (procFlag==FALSE) post procEvent();		
@@ -1522,12 +1527,13 @@ void f_tkins_z(uint8_t Modifier){
 			// Send next event to CEU
 			dbg(APPNAME,"VM::procEvent(): Dequeue an event and ...\n");
 			evtData=call evtQ.dequeue();
-			dbg(APPNAME,"VM::procEvent(): ... calling ceu_go_event() for evtId=%d\n", evtData.evtId );
+			dbg(APPNAME,"VM::procEvent(): ... calling ceu_go_event() for evtId=%d, auxId=%d\n", evtData.evtId,evtData.auxId );
 			ceuId = getEvtCeuId(evtData.evtId);
-			if (ceuId==0)
+			if (ceuId==0) {
 				dbg(APPNAME,"VM::procEvent(): Discarding event %d\n",evtData.evtId);
-			else
-				ceu_go_event(NULL,ceuId,evtData.data);
+				post procEvent(); // Try next event
+			} else
+				ceu_go_event(NULL,ceuId,evtData.auxId,evtData.data);
 		}
 		dbg(APPNAME,"VM::procEvent()...\n");
 	}
@@ -1620,11 +1626,6 @@ void f_tkins_z(uint8_t Modifier){
 	event void BSUpload.setEnv(newProgVersion_t* data){
 		ProgStart = (uint16_t)data->startProg;
 		ProgEnd = (uint16_t)data->endProg;
-//		LblTab11 = data->lblTable11;
-//		LblTab12 = data->lblTable12;
-//		LblTab21 = data->lblTable21;
-//		LblTab22 = data->lblTable22;
-//		LblTabEnd = data->lblTableEnd;
 		nTracks = data->nTracks;
 		wClocks = data->wClocks;
 		asyncs = data->asyncs;
@@ -1641,11 +1642,6 @@ void f_tkins_z(uint8_t Modifier){
 		dbg(APPNAME,"VM::BSUpload.getEnv()\n");
 		data->startProg = ProgStart;
 		data->endProg = ProgEnd;
-//		data->lblTable11 = LblTab11;
-//		data->lblTable12 = LblTab12;
-//		data->lblTable21 = LblTab21;
-//		data->lblTable22 = LblTab22;
-//		data->lblTableEnd = LblTabEnd;
 		data->nTracks = nTracks;
 		data->wClocks = wClocks;
 		data->asyncs = asyncs;
@@ -1666,11 +1662,11 @@ void f_tkins_z(uint8_t Modifier){
 			size = call evtQ.size();
 			for (i=0; i < size; i++) call evtQ.dequeue();
 		}
-		// Reset WD_TABLES address
-		WD_TABLES = 0;
 		haltedFlag = FALSE;	
 
 #ifndef ONLY_BSTATION
+		// Reset VMCustom
+		call VMCustom.reset();
 		// Give control do Ceu
 		ceu_boot();
 #endif

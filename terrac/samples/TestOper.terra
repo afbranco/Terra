@@ -1,5 +1,25 @@
 #include "TerraNet.defs"
 
+
+loop do
+	await 500ms;
+	emit LED0(TOGGLE);
+end
+
+/*
+var long a1;
+var usrMsg_t msg;
+
+await SEND_DONE(msg.type);
+await TEMP;
+await SEND_DONE(2);
+await TEMP;
+await SEND_DONE_ACK(3);
+
+//await SEND_DONE(10,a1);
+
+
+/*
 regtype radio_t with
    var ubyte	code;
    var ushort   target;
@@ -37,7 +57,7 @@ with
 end
 */
 
-
+/*
 v1_p = &v1;
 v1 = *v1_p;
 v1_p = msg.data; 	// WRN: 4 < 10

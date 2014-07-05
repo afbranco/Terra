@@ -358,10 +358,17 @@ F = {
     end,
 
     AwaitExt = function (me)
-        local e1,_ = unpack(me)
+        local e1,e2 = unpack(me)
         local ext = e1.ext
---print("env::AwaitExt:",e1.ext.id, e1.ext.pre)
+print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2 and e2.tp),(e2 and e2[1].tag))
         ASR(e1.ext.pre == 'input',me,'await expect an input event, a time expression, or a var event.')
+        if e1.ext.idx <= 127 then
+          ASR(not e2 ,me,'event '.. e1[1] ..' doesn´t expect any argument.')
+        else
+          ASR( e2 ,me,'event '.. e1[1] ..' expect an integer argument.')
+          ASR( e2.tp=='ubyte' or e2.tp=='byte' ,me,'event '.. e1[1] ..' expect an `ubyte´ argument.')          
+        end
+        
         me.gte = (_ENV.awaits[ext] or 0)
         _ENV.awaits[ext] = (_ENV.awaits[ext] or 0) + 1
     end,
@@ -600,8 +607,10 @@ F = {
 
     Op2_int_int = function (me)
         local op, e1, e2 = unpack(me)
-        ASR(_TP.isNumeric(e1.tp,true) and _TP.isNumeric(e2.tp,true),
-            me, 'invalid operands to binary "'..op..'"')
+--print("env::Op2_int_int:",e2.tag,e2[1])
+        ASR(_TP.isNumeric(e1.tp,true) and _TP.isNumeric(e2.tp,true),me, 'invalid operands to binary "'..op..'"')
+        ASR((e2.tag=='CONST' and tonumber(e2[1])>0) or (e2.tag~='CONST'),me, 'division by zero')
+            
         me.tp  = _TP.max(e1.tp,e2.tp,true)
     end,
     ['Op2_-']  = 'Op2_int_int',

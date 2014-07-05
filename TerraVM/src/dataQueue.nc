@@ -1,5 +1,9 @@
 
 
+/**
+ * dataQueue interface
+ */
+
 interface dataQueue{
 	command error_t put(void* Data);
 	command error_t get(void* Data);

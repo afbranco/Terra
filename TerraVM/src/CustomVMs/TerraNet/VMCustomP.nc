@@ -18,7 +18,6 @@ module VMCustomP{
 }
 implementation{
 
-
 // Keeps last data value for events (ExtDataxxx must be nx_ type. Because it is copied direct to VM memory.)
 nx_uint8_t ExtDataCustomA;				// last request custom event (internal loop-back)
 usrMsg_t ExtDataRadioReceived;	// last radio received msg
@@ -78,7 +77,7 @@ void  proc_send_x(uint16_t id,uint16_t addr,uint8_t ack){
 	usrMsg = (usrMsg_t*)signal VM.getRealAddr(addr,2);
 	dbg(APPNAME,"Custom::proc_sendx(): id=%d, target=%d, addr=%d, realAddr=%x, ack=%d\n",
 		id,usrMsg->target,addr,usrMsg, ack);
-	call BSRadio.send(AM_SEND,usrMsg->target, usrMsg, sizeof(usrMsg_t),ack);
+	call BSRadio.send(AM_USRMSG,usrMsg->target, usrMsg, sizeof(usrMsg_t),ack);
 }
 
 void  proc_send(uint16_t id, uint32_t addr){
@@ -122,10 +121,12 @@ void  proc_cfg_int_b(uint16_t id, uint32_t value){
 	call SA.setActuator(AID_INT2, (uint8_t)value);
 	}
 void  proc_req_custom_a(uint16_t id, uint32_t value){
+	uint8_t auxId ;
 	ExtDataCustomA = (uint8_t)value;
 	dbg(APPNAME,"Custom::proc_req_custom_a(): id=%d, ExtDataCustomA=%d\n",id,ExtDataCustomA);
+	auxId = (I_CUSTOM_A > 127)?(uint8_t)signal VM.pop():0;
 	// Queue the custom event
-	signal VM.queueEvt(I_CUSTOM_A, &ExtDataCustomA);
+	signal VM.queueEvt(I_CUSTOM_A,auxId, &ExtDataCustomA);
 	}
 	
 /*
@@ -224,14 +225,21 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		}
 	}
 
+	command void VM.reset(){
+		// Reset leds
+		call SA.setActuator(AID_LEDS, 0);
+	}
 
 	task void BCRadio_receive(){
-		signal VM.queueEvt(I_RECEIVE, &ExtDataRadioReceived);		
+		uint8_t auxId=0;
+		if (I_RECEIVE > 127) auxId = ExtDataRadioReceived.type;
+		signal VM.queueEvt(I_RECEIVE,auxId,&ExtDataRadioReceived);	
+		signal VM.queueEvt(I_RECEIVE_ANY,0,&ExtDataRadioReceived);	
 	}
 
 	event void BSRadio.receive(uint8_t am_id, message_t* msg, void* payload, uint8_t len){
 		dbg(APPNAME,"Custom::BSRadio.receive(): AM_ID = %d\n",am_id);
-		if (am_id == AM_SEND){
+		if (am_id == AM_USRMSG){
 			memcpy(&ExtDataRadioReceived,payload,sizeof(usrMsg_t));
 			post BCRadio_receive();
 		} else {
@@ -239,20 +247,26 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		}
 	}
 
-	event void BSRadio.sendDone(uint8_t am_id,message_t* msg,error_t error){
+	event void BSRadio.sendDone(uint8_t am_id,message_t* msg,void* dataMsg, error_t error){
 		dbg(APPNAME,"Custom::BSRadio.sendDone(): AM_ID = %d, error=%d\n",am_id,error);
-		if (am_id == AM_SEND){
+		if (am_id == AM_USRMSG){
+			uint8_t auxId = 0;
+			if (I_SEND_DONE > 127) auxId = ((usrMsg_t*)dataMsg)->type; 
 			ExtDataSendDoneError = (uint8_t)error;
-			signal VM.queueEvt(I_SEND_DONE, &ExtDataSendDoneError);
+			signal VM.queueEvt(I_SEND_DONE, auxId, &ExtDataSendDoneError);
+			signal VM.queueEvt(I_SEND_DONE_ANY, 0, &ExtDataSendDoneError);
 		} else {
 			dbg(APPNAME,"Custom::BSRadio.sendDone(): Discarting sendDone AM_ID = %d\n",am_id);
 		}
 	}
-	event void BSRadio.sendDoneAck(uint8_t am_id,message_t* msg,error_t error, bool wasAcked){
+	event void BSRadio.sendDoneAck(uint8_t am_id,message_t* msg,void* dataMsg,error_t error, bool wasAcked){
 		dbg(APPNAME,"Custom::BSRadio.sendDoneAck(): AM_ID = %d, error=%d, ack=%d\n",am_id,error,wasAcked);
-		if (am_id == AM_SEND){
+		if (am_id == AM_USRMSG){
+			uint8_t auxId = 0;
+			if (I_SEND_DONE_ACK > 127) auxId = ((usrMsg_t*)dataMsg)->type; 
 			ExtDataWasAcked = (uint8_t)wasAcked;
-			signal VM.queueEvt(I_SEND_DONE_ACK, &ExtDataWasAcked);
+			signal VM.queueEvt(I_SEND_DONE_ACK, auxId, &ExtDataWasAcked);
+			signal VM.queueEvt(I_SEND_DONE_ACK_ANY, 0, &ExtDataWasAcked);
 		} else {
 			dbg(APPNAME,"Custom::BSRadio.sendDoneAck(): Discarting sendDoneAck AM_ID = %d\n",am_id);
 		}
@@ -273,7 +287,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 	event void SA.Ready(uint8_t reqSource, uint8_t codeEvt_id){
 		dbg(APPNAME,"Custom::SA.Ready()\n");
 		switch (reqSource) {
-			case REQ_SOURCE1 : signal VM.queueEvt(wd2ceuSensorId(codeEvt_id), call SA.getDatap((uint8_t)(codeEvt_id & 0x1f))); break;			
+			case REQ_SOURCE1 : signal VM.queueEvt(wd2ceuSensorId(codeEvt_id), 0, call SA.getDatap((uint8_t)(codeEvt_id & 0x1f))); break;			
 //			case REQ_SOURCE2 : break;  // TBD
 //			case REQ_SOURCE3 : break;  // TBD
 //			case REQ_SOURCE4 : break;  // TBD
@@ -290,7 +304,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		dbg(APPNAME,"Custom::usrDataQ.dataReady()\n");
 		// Queue the custom event
 		ExtDataQReady = call usrDataQ.size();
-		signal VM.queueEvt(I_Q_READY, &ExtDataQReady);
+		signal VM.queueEvt(I_Q_READY, 0, &ExtDataQReady);
 	}
 
 }

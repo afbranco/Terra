@@ -59,9 +59,15 @@ F = {
         for _, ext in ipairs(_ENV.exts) do
             if ext.pre == 'input' and (_ENV.awaits[ext] or 0) > 0 then  -- only active events
 --print("mem::Root_pre: in evt",ext.id,_ENV.awaits[ext],(2 +(_ENV.awaits[ext] or 0)*_ENV.c.tceu_nlbl.len))
-                _MEM.gtes[ext.n] = alloc(2 + -- 1+2=2 -> idx, gates
-                                    (_ENV.awaits[ext] or 0)
-                                    *_ENV.c.tceu_nlbl.len)
+
+              if ext.idx <= 127 then
+                  _MEM.gtes[ext.n] = alloc(2 + -- 1+2=2 -> idx, gates
+                                      (_ENV.awaits[ext] or 0) * _ENV.c.tceu_nlbl.len) 
+              else
+                  _MEM.gtes[ext.n] = alloc(2 + -- 1+2=2 -> idx, gates
+                                      (_ENV.awaits[ext] or 0) * (_ENV.c.tceu_nlbl.len + 1)) -- (idAux,addr)*             
+              end
+
             else
               _MEM.gtes[ext.n] = alloc(0)
             end

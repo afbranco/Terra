@@ -1116,10 +1116,10 @@ F = {
 
           if(e2[1].tag=='CONST') then
             codeB = LINE(me,'emit '..e1.ext.id..' len='..par_len..' const='..e2[1].val,nil,'// EmitExtS:: const ')
-            BYTECODE(me,codeB,'op_outevt_c',e1.ext.seq,e2[1].val)
+            BYTECODE(me,codeB,'op_outevt_c',e1.ext.idx,e2[1].val)
           elseif (x1.auxtag2=='Var' or x1.auxtag2=='&Var*') then
             codeB = LINE(me,'emit '..e1.ext.id..' len='..par_len..' var='..x1.id,nil,'// EmitExtS:: var')
-            BYTECODE(me,codeB,'op_outevt_v',e1.ext.seq,x1.val, par_tp)
+            BYTECODE(me,codeB,'op_outevt_v',e1.ext.idx,x1.val, par_tp)
 
 
 --          elseif (e2[1].tag=='Var' and not _TP.deref(e2[1].tp)) then -- not pointer 
@@ -1139,7 +1139,7 @@ F = {
           end
         else
           codeB = LINE(me,'emit '..e1.ext.id ,nil,'// EmitExtS:: void ')
-          BYTECODE(me,codeB,'op_outevt_z',e1.ext.seq)
+          BYTECODE(me,codeB,'op_outevt_z',e1.ext.idx)
         end
 
      else
@@ -1335,11 +1335,20 @@ F = {
     end,
     
     AwaitExt = function (me)
-        local e1,_ = unpack(me)
---print("code::AwaitExt: ",e1.ext.n,me.gte,me.lbl.n,_MEM.gtes[e1.ext.n])
+        local e1,e2 = unpack(me)
+print("code::AwaitExt: ",e1.ext.idx,e1.ext.n,me.gte,me.lbl.n,_MEM.gtes[e1.ext.n])
 --        LINE(me, '//> *PTR_EXT(IN_'..e1.ext.id..','..me.gte..') = '..me.lbl.id..';')
-        codeB = LINE(me, 'await '..e1.ext.id..'['..me.gte..']',nil,'// AwaitExt:: ')
-		BYTECODE(me,codeB,'op_set_c','ushort',(_MEM.gtes[e1.ext.n]+2+(me.gte*2)),me.lbl.n,true)
+
+        if (e1.ext.idx <= 127) then -- evtId, nGtes, [addr]*
+          codeB = LINE(me, 'await '..e1.ext.id..'['..me.gte..']',nil,'// AwaitExt:: ')
+          BYTECODE(me,codeB,'op_set_c','ushort',(_MEM.gtes[e1.ext.n]+2+(me.gte*2)),me.lbl.n,true)
+        else -- evtId, nGtes, [idAux,addr]*
+          CONC(me,e2)
+          codeB = LINE(me, 'evt '..e1.ext.id..' auxId = pop',nil,'// AwaitExt:: ')
+          BYTECODE(me,codeB,'op_pop','ubyte', (_MEM.gtes[e1.ext.n]+2+(me.gte*3))) 
+          codeB = LINE(me, 'await '..e1.ext.id..'['..me.gte..']',nil,'// AwaitExt:: ')
+          BYTECODE(me,codeB,'op_set_c','ushort',(_MEM.gtes[e1.ext.n]+2+1+(me.gte*3)),me.lbl.n,true)
+        end
 
         HALT(me) 
         CASE(me, me.lbl)
@@ -1517,6 +1526,7 @@ F = {
       WRN(not cast,me, 'Applying the minimum size: "'.. arg..'/'..len1 ..'" <--> "' .. me[2][k].tp ..'/'..len2 ..'". ')
     end
     CONC(me,me[2]);
+    codeB = LINE(me,'func '..me.ext.id,nil,'')
     BYTECODE(me,codeB,'op_func',me.ext.idx)
   end,
   

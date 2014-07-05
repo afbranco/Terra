@@ -305,7 +305,7 @@ _GG = {
 
 --    , Pause    = KEY'pause/if' * EV'Var' * V'_Do'
 
-    , AwaitExt = KEY'await' * EV'Ext'
+    , AwaitExt = KEY'await' * EV'Ext' * ( (K'(' * V'Exp'^-1 * EK')') + Cc(false))
     , AwaitInt = KEY'await' * EV'Var'
     , AwaitN   = KEY'await' * KEY'FOREVER'
     , AwaitT   = KEY'await' * (V'WCLOCKK'+V'WCLOCKE')

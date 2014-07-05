@@ -11,8 +11,6 @@
 
 enum{
 	
-	AM_SEND = 145,
-		
 	// TerraNet local Output events
 	O_INIT			=0,
 	O_LEDS			=5,
@@ -33,7 +31,7 @@ enum{
 	O_CUSTOM_A		=20,	
 	// TerraNet Custom Output events
 	O_SEND			=40,
-	O_SEND_ACK		=42,
+	O_SEND_ACK		=41,
 
 
 	// TerraNet Local Input events
@@ -47,15 +45,18 @@ enum{
 	I_INT_B			=11,
 	I_CUSTOM_A		=12,
 	// TerraNet Custom Input events
-	I_SEND_DONE		=40,
-	I_SEND_DONE_ACK	=41,
-	I_RECEIVE		=42,
-	I_Q_READY 		=43,
+	I_SEND_DONE		=140,
+	I_SEND_DONE_ACK	=141,
+	I_RECEIVE		=142,
+	I_SEND_DONE_ANY		=40,
+	I_SEND_DONE_ACK_ANY	=41,
+	I_RECEIVE_ANY		=42,
+	I_Q_READY 			=43,
 
 	
 	// TerraNet basic functions
 	F_GETNODEID 	= 0,
-	F_RAMDOM		= 1,
+	F_RANDOM		= 1,
 	// TerraNet custom functions
 	F_QPUT 			= 10,
 	F_QGET 			= 11,

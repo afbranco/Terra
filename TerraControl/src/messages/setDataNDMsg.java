@@ -4,7 +4,6 @@
  * message type.
  */
 package messages;
-
 public class setDataNDMsg extends net.tinyos.message.Message {
 
     /** The default size of this message type in bytes. */
@@ -111,16 +110,16 @@ public class setDataNDMsg extends net.tinyos.message.Message {
 
     /////////////////////////////////////////////////////////
     // Accessor methods for field: versionId
-    //   Field type: int, unsigned
+    //   Field type: int, signed
     //   Offset (bits): 0
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'versionId' is signed (false).
+     * Return whether the field 'versionId' is signed (true).
      */
     public static boolean isSigned_versionId() {
-        return false;
+        return true;
     }
 
     /**
@@ -174,16 +173,16 @@ public class setDataNDMsg extends net.tinyos.message.Message {
 
     /////////////////////////////////////////////////////////
     // Accessor methods for field: seq
-    //   Field type: int, unsigned
+    //   Field type: int, signed
     //   Offset (bits): 16
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'seq' is signed (false).
+     * Return whether the field 'seq' is signed (true).
      */
     public static boolean isSigned_seq() {
-        return false;
+        return true;
     }
 
     /**
@@ -237,16 +236,16 @@ public class setDataNDMsg extends net.tinyos.message.Message {
 
     /////////////////////////////////////////////////////////
     // Accessor methods for field: targetMote
-    //   Field type: int, unsigned
+    //   Field type: int, signed
     //   Offset (bits): 32
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'targetMote' is signed (false).
+     * Return whether the field 'targetMote' is signed (true).
      */
     public static boolean isSigned_targetMote() {
-        return false;
+        return true;
     }
 
     /**
@@ -300,16 +299,16 @@ public class setDataNDMsg extends net.tinyos.message.Message {
 
     /////////////////////////////////////////////////////////
     // Accessor methods for field: nSections
-    //   Field type: short, unsigned
+    //   Field type: short, signed
     //   Offset (bits): 48
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'nSections' is signed (false).
+     * Return whether the field 'nSections' is signed (true).
      */
     public static boolean isSigned_nSections() {
-        return false;
+        return true;
     }
 
     /**
@@ -363,16 +362,16 @@ public class setDataNDMsg extends net.tinyos.message.Message {
 
     /////////////////////////////////////////////////////////
     // Accessor methods for field: Data
-    //   Field type: short[], unsigned
+    //   Field type: byte[], signed
     //   Offset (bits): 56
     //   Size of each element (bits): 8
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'Data' is signed (false).
+     * Return whether the field 'Data' is signed (true).
      */
     public static boolean isSigned_Data() {
-        return false;
+        return true;
     }
 
     /**
@@ -403,10 +402,10 @@ public class setDataNDMsg extends net.tinyos.message.Message {
     }
 
     /**
-     * Return the entire array 'Data' as a short[]
+     * Return the entire array 'Data' as a byte[]
      */
-    public short[] get_Data() {
-        short[] tmp = new short[18];
+    public byte[] get_Data() {
+        byte[] tmp = new byte[18];
         for (int index0 = 0; index0 < numElements_Data(0); index0++) {
             tmp[index0] = getElement_Data(index0);
         }
@@ -414,26 +413,26 @@ public class setDataNDMsg extends net.tinyos.message.Message {
     }
 
     /**
-     * Set the contents of the array 'Data' from the given short[]
+     * Set the contents of the array 'Data' from the given byte[]
      */
-    public void set_Data(short[] value) {
+    public void set_Data(byte[] value) {
         for (int index0 = 0; index0 < value.length; index0++) {
             setElement_Data(index0, value[index0]);
         }
     }
 
     /**
-     * Return an element (as a short) of the array 'Data'
+     * Return an element (as a byte) of the array 'Data'
      */
-    public short getElement_Data(int index1) {
-        return (short)getUIntBEElement(offsetBits_Data(index1), 8);
+    public byte getElement_Data(int index1) {
+        return (byte)getSIntBEElement(offsetBits_Data(index1), 8);
     }
 
     /**
      * Set an element of the array 'Data'
      */
-    public void setElement_Data(int index1, short value) {
-        setUIntBEElement(offsetBits_Data(index1), 8, value);
+    public void setElement_Data(int index1, byte value) {
+        setSIntBEElement(offsetBits_Data(index1), 8, value);
     }
 
     /**
@@ -496,9 +495,9 @@ public class setDataNDMsg extends net.tinyos.message.Message {
          int len = s.length();
          int i;
          for (i = 0; i < len; i++) {
-             setElement_Data(i, (short)s.charAt(i));
+             setElement_Data(i, (byte)s.charAt(i));
          }
-         setElement_Data(i, (short)0); //null terminate
+         setElement_Data(i, (byte)0); //null terminate
     }
 
     /**

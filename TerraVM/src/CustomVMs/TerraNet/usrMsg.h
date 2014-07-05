@@ -13,7 +13,7 @@
 
 enum{
 USRMSG_QSIZE = 10,
-AM_USRMSG = 151,
+AM_USRMSG = 145,
 
 };
 

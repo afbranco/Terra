@@ -10,7 +10,7 @@ public class usrMsg extends net.tinyos.message.Message {
     public static final int DEFAULT_MESSAGE_SIZE = 27;
 
     /** The Active Message type associated with this message. */
-    public static final int AM_TYPE = 151;
+    public static final int AM_TYPE = 145;
 
     /** Create a new usrMsg of size 27. */
     public usrMsg() {

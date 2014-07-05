@@ -87,10 +87,13 @@ config 00.01.00 do
 	input ubyte 	INT_B 			11;
 	input ubyte 	CUSTOM_A 		12;
 	// TerraNet Custom Input events
-	input ushort 	SEND_DONE 		40;
-	input ubyte 	SEND_DONE_ACK	41
-	input usrMsg_t	RECEIVE 		42;
-	input ubyte 	Q_READY 		43;
+	input ushort 	SEND_DONE 		140;
+	input ubyte 	SEND_DONE_ACK	141;
+	input usrMsg_t	RECEIVE 		142;
+	input ushort 	SEND_DONE_ANY 		40;
+	input ubyte 	SEND_DONE_ACK_ANY	41;
+	input usrMsg_t	RECEIVE_ANY 		42;
+	input ubyte 	Q_READY 			43;
 
 	// Terra basic functions
 	function pure ushort getNodeId()		0;

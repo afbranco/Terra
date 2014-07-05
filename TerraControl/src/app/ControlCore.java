@@ -296,7 +296,7 @@ public class ControlCore implements MessageListener
 				// Data
 				for (int j=0; j< Data.get(i).Len; j++) DataBytes[ix++] = Data.get(i).Values[j];
 			}
-			msg.set_Data(DataBytes);			
+			//msg.set_Data(DataBytes);	// comentei porque stava dando erro...
 			System.out.println(msg.toString());		
 			TCPtimer.schedule(new sendMsg("SetDataND",msg), 10);
 		}

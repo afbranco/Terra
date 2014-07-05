@@ -4,7 +4,6 @@
  * message type.
  */
 package messages;
-
 public class newProgVersionMsg extends net.tinyos.message.Message {
 
     /** The default size of this message type in bytes. */

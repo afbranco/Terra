@@ -158,6 +158,7 @@ enum {
 // VM input event structure
 typedef struct evtData{
 	uint8_t evtId;
+	uint8_t auxId;
 	void* data;
 } evtData_t;
 

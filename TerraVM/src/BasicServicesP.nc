@@ -445,11 +445,12 @@ implementation{
 		uint8_t am_id= (uint8_t)call RadioAMPacket.type(msg);
 		dbg(APPNAME,"BS::recCustomMsgNet.receive():\n");
 		if (MoteID != BStation){ 
-#ifdef NO_BSTATION
+#ifndef ONLY_BSTATION
 			dbg("VMDBG","Radio: Received Custom Msg AM=%d from %d\n", am_id , call RadioAMPacket.source(msg));
 			signal BSRadio.receive(am_id,msg,payload,len);
 #endif
 		} else {
+#ifndef NO_BSTATION
 			dbg(APPNAME, "BS::recCustomMsgNet(): insert in outQueue\n");		
 			memcpy(&tempInputOutQ.Data,payload,len);
 			tempInputOutQ.AM_ID = am_id;
@@ -459,6 +460,7 @@ implementation{
 			if (call outQ.put(&tempInputOutQ)!= SUCCESS) {
 				dbg(APPNAME, "BS::recCustomMsgNet(): outQueue is full! Losting a message.\n");
 			}
+#endif
 		}
 	}
 
@@ -977,14 +979,14 @@ implementation{
 
 	void sendRadioN(){
 		error_t err;
-		dbg(APPNAME,"BS::sendRadioN(): AM=%hhu to %hhu, reqAck=%s\n",tempOutputOutQ.AM_ID, tempOutputOutQ.sendToMote, _TFstr(tempOutputOutQ.reqAck));
+		dbg(APPNAME,"BS::sendRadioN(): AM=%hhu to %d, reqAck=%s\n",tempOutputOutQ.AM_ID, tempOutputOutQ.sendToMote, _TFstr(tempOutputOutQ.reqAck));
 		memcpy(call RadioPacket.getPayload(&sendBuff,call RadioPacket.maxPayloadLength()), &tempOutputOutQ.Data, tempOutputOutQ.DataSize);
 		if ( tempOutputOutQ.reqAck == TRUE){
 			if (call RadioAck.requestAck(&sendBuff) != SUCCESS) dbg(APPNAME, "BS::sendRadioN()(): requestAck() error!\n");
 		}
 		err = RadioSender_send(tempOutputOutQ.AM_ID,tempOutputOutQ.sendToMote, &sendBuff, tempOutputOutQ.DataSize);
 		if (err != SUCCESS) {
-			dbg(APPNAME,"BS::sendRadioN(): Error %hhu in sending Message AM=%hhu to node=%hhu via radio\n",err,tempOutputOutQ.AM_ID, tempOutputOutQ.sendToMote);
+			dbg(APPNAME,"BS::sendRadioN(): Error %hhu in sending Message AM=%hhu to node=%d via radio\n",err,tempOutputOutQ.AM_ID, tempOutputOutQ.sendToMote);
 			call sendTimer.startOneShot(reSendDelay);
 		} else {
 			TViewer("radio",tempOutputOutQ.sendToMote,0);
@@ -999,6 +1001,8 @@ implementation{
 		if ( err != SUCCESS) {
 			dbg(APPNAME,"BS::sendSerialN(): Error %hhu in sending Message AM=%hhu via UART\n",err,tempOutputOutQ.AM_ID);
 			call sendTimer.startOneShot(reSendDelay);	
+		} else {
+			TViewer("serial",0,0);
 		}
 #endif
 	}
@@ -1111,9 +1115,9 @@ implementation{
 			if ( tempOutputOutQ.AM_ID >= AM_CUSTOM_START && tempOutputOutQ.AM_ID <= AM_CUSTOM_END){
 				dbg(APPNAME,"BS::sendDone(): UsrMsg err=%d ack=%d, \n",error,call RadioAck.wasAcked(msg));
 				if (tempOutputOutQ.reqAck == TRUE) 
-					signal BSRadio.sendDoneAck(tempOutputOutQ.AM_ID,msg,error, call RadioAck.wasAcked(msg));
+					signal BSRadio.sendDoneAck(tempOutputOutQ.AM_ID,msg,tempOutputOutQ.Data,error, call RadioAck.wasAcked(msg));
 				else
-					signal BSRadio.sendDone(tempOutputOutQ.AM_ID,msg,error);
+					signal BSRadio.sendDone(tempOutputOutQ.AM_ID,msg,tempOutputOutQ.Data,error);
 			}
 		} else {
 			dbg(APPNAME, "BS::sendDone(): FAIL\n");
@@ -1420,6 +1424,7 @@ implementation{
 
 	event message_t * SerialReceiver.receive[am_id_t id](message_t *msg, void *payload, uint8_t len){
 		dbg(APPNAME, "BS::SerialReceiver.receive(): AM=%hhu\n",id);
+		TViewer("serial",1,0);
 		switch (id){
 			case AM_NEWPROGVERSION:
 				recSerialNewProgVersion_receive(msg,payload,len);

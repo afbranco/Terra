@@ -410,7 +410,10 @@ for _,ext in ipairs(_ENV.exts) do
     for x= 0, (_ENV.awaits[ext] or 0)-1,1 do 
 --print("terrac:: gate",x,xAddr)
 	    asmText = asmText .. '00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..'\n'; xAddr=xAddr+1;
-	    asmText = asmText .. '00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..'\n'; xAddr=xAddr+1;
+      asmText = asmText .. '00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..'\n'; xAddr=xAddr+1;
+      if (ext.idx > 127) then  -- more one line for auxId in events idx>127
+        asmText = asmText .. '00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..'\n'; xAddr=xAddr+1;
+      end
 	  end
   end
 end
