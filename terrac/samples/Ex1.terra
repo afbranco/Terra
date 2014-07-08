@@ -23,6 +23,19 @@ var ushort seqReq=0;
 var ubyte  seqData=0;
 var ubyte  reqTopoBlind=FALSE;
 
+pktype usrMsg2_t of radioMsg with
+	var ubyte d8_1;
+	var ubyte d8_2;
+	var ubyte d8_3;
+	var ubyte d8_4;
+	var ushort d16_1;
+	var ushort d16_2;
+	var ushort d16_3;
+	var ushort d16_4;
+	var ulong d32_1;
+	var ulong d32_2;
+end
+
 
 var usrMsg2_t msgTopo;
 var usrMsg2_t msgRadio;
@@ -113,7 +126,7 @@ with
 	 * Data msg to root
 	 **************************/
 	loop do
-		msgTopo = await RECEIVE(ID_DATA);  	// Received a data Msg, then root it.
+		msgTopo = await RECEIVE(ID_DATA);  	// Receive a data Msg, then root it.
 		if father != NO_FATHER then
 			msgTopo.target = father;
 			stat = qPut(msgTopo);
@@ -194,7 +207,7 @@ with
 		loop do
 			if qSize() > 0 then
 				reply=0;
-				stat = qGet(&msgRadio);
+				stat = qGet(msgRadio);
 				if msgRadio.target == BROADCAST then
 					emit SEND(msgRadio);
 					await SEND_DONE(msgRadio.type);

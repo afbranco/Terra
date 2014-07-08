@@ -140,21 +140,6 @@ function det2id (v)
     end
 end
 
-function set1stOper(e1,oper)
-    -- Define pointer "first" operation
---print('env::set1stOper:', e1[1],e1[1][1],e1.ln, oper)
-    local z1 = _TP.getAuxTag(e1.tp,e1[1].arr)
-    for i, var in ipairs(e1.fst.blk.vars) do
-        if var.id==(e1[1][1] or e1[1]) then
-          var.firstOper = var.firstOper or oper
-          var.firstOperLn = var.firstOperLn or e1.ln
---print('env::set1stOper_:', var.id,e1.ln, z1.auxtag, oper)
-          break                  
-        end
-    end
-end
-
-
 F = {
 
     Block_pos = function (me)
@@ -187,17 +172,20 @@ F = {
     end,
     
     Dcl_ext = function (me)
-        local dir, tp, id, idx = unpack(me)
---print("env::Dcl_ext:", dir, tp, id, idx)
+        local dir, retTp, id, argTp, idx = unpack(me)
 --print(print_r(_ENV.c,"ENV.c"))
 --        ASR(tp=='void' or _TP.deref(tp)) or _ENV.c[tp],me, 'invalid event type')
   
 --print("env::Dcl_ext:",id, tp, _TP.isBasicType(tp),_TP.deref(tp), (_TP.isBasicType(tp) or  _TP.deref(tp)) )
 --        ASR( (_TP.isBasicType(tp) or  _TP.deref(tp)),me, 'invalid event type')
+        local tp,idAux
+        idAux = id .. (( (dir=='input' and argTp~='void') and '()') or '')
+        tp = (dir=='output' and argTp) or retTp
+print("env::Dcl_ext:", dir, retTp, id, argTp, idx, '|', idAux,tp)
 
         for k,val in ipairs(_ENV.exts) do
           if val.pre==dir then 
-            ASR(not (val.id==id), me, 'event "'..id..'" is already declared at line '.. (val.ln or 0))
+            ASR(not (val.id==idAux), me, 'event "'..idAux..'" is already declared at line '.. (val.ln or 0))
             ASR(not (val.idx==idx), me, dir..' event numeric id "'..idx..'" is already in use at line '.. (val.ln or 0))
           end
         end
@@ -205,14 +193,15 @@ F = {
         ASR(idx<255, me, dir..' event numeric id must be less than 255')
         me.ext = {
             ln    = me.ln,
-            id    = id,
+            id    = idAux,
             n     = #_ENV.exts,
             tp    = tp,
             pre   = dir,
             isEvt = true,
             idx   = idx,
+            inArg = (dir=='input' and argTp~='void')
         }
-        _ENV.exts[id] = me.ext
+        _ENV.exts[idAux] = me.ext
         _ENV.exts[#_ENV.exts+1] = me.ext
         -- Force 0 or 1 args -- void or non void
         if dir == 'output' then 
@@ -348,8 +337,8 @@ F = {
 
         for k,tp in ipairs(args) do
 --print("env::Dcl_func: arg:",k, tp, (_TP.isBasicType(tp) or _TP.isBasicType(_TP.deref(tp))) or _TP.deref(tp))
-          ASR(not(tp=='void') and (_ENV.c[tp] or _ENV.c[_TP.deref(tp)]),me, '<'..tp..'> in position '..k..' is invalid argument type in function <'..id..'>')
-          ASR((_TP.isBasicType(tp) or _TP.isBasicType(_TP.deref(tp))) or _TP.deref(tp),me, 'register <'..tp..'> in position '..k..' in function <'..id..'> must be a pointer.')
+          ASR(not(tp=='void') and (_ENV.c[tp] or _ENV.c[_TP.deref(tp)] or _ENV.packets[tp]) ,me, '<'..tp..'> in position '..k..' is invalid argument type in function <'..id..'>')
+          ASR((_TP.isBasicType(tp) or _TP.isBasicType(_TP.deref(tp))) or not _TP.deref(tp),me, 'register <'..tp..'> in position '..k..' in function <'..id..'> can not be a pointer.')
         end
         me.ext = {
             ln    = me.ln,
@@ -369,7 +358,8 @@ F = {
 
     Ext = function (me)
         local id = unpack(me)
-        me.ext = ASR(_ENV.exts[id],me, 'event "'..id..'" is not declared')
+print("env::Ext:",id,_ENV.exts[id], _ENV.exts[id .. '()'])
+        me.ext = ASR(_ENV.exts[id] or _ENV.exts[id .. '()'],me, 'event "'..id..'" is not declared') -- moved to AwaitExt
     end,
 
     Func = function (me)
@@ -382,7 +372,7 @@ F = {
 
         if not (me.ext and (me.ext.mod=='pure' or me.ext.mod=='nohold')) then
             for pos, tp in ipairs(me.ext.args) do
-                if _TP.deref(tp)  then
+                if _TP.deref(tp) or not _TP.isBasicType(tp)  then
                     local blk = me.blk or _AST.iter('Block')()
                     ASR(blk.fin, me,
                         'block at line '..blk.ln..' must contain `finally´')
@@ -445,18 +435,23 @@ F = {
 
     AwaitExt = function (me)
         local e1,e2 = unpack(me)
-        local ext = e1.ext
+        local idAux = e1[1] .. ((e2 and '()') or '')
+print("env::AwaitExt:",idAux..'|'..((e2 and '()') or '')..'|')
+        me[1].ext =  _ENV.exts[idAux] or me[1].ext -- Try to overhide value got in 'Exp'
 print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2 and e2.tp),(e2 and e2[1].tag))
         ASR(e1.ext.pre == 'input',me,'await expect an input event, a time expression, or a var event.')
-        if e1.ext.idx <= 127 then
-          ASR(not e2 ,me,'event '.. e1[1] ..' doesn´t expect any argument.')
+
+        if e2 then
+          ASR(_ENV.exts[idAux],me,'event '.. e1[1] ..' doesn´t expect any argument.')
+          local err,cast = _TP.tpCompat('ubyte',e2.tp,nil,nil)
+          ASR(not err,me,'type/size incompatibility: '.. 'ubyte' ..' <--> '.. e2.tp..'')
+          WRN(not cast,me, 'Applying the minimum size: "'.. 'ubyte' ..'" <--> "' .. e2.tp ..'". ')
         else
-          ASR( e2 ,me,'event '.. e1[1] ..' expect an integer argument.')
-          ASR( e2.tp=='ubyte' or e2.tp=='byte' ,me,'event '.. e1[1] ..' expect an `ubyte´ argument.')          
+          ASR(_ENV.exts[idAux] ,me,'event '.. e1[1] ..' expect an `ubyte/byte´ argument.')
         end
         
-        me.gte = (_ENV.awaits[ext] or 0)
-        _ENV.awaits[ext] = (_ENV.awaits[ext] or 0) + 1
+        me.gte = (_ENV.awaits[e1.ext] or 0)
+        _ENV.awaits[e1.ext] = (_ENV.awaits[e1.ext] or 0) + 1
     end,
 
     AwaitInt = function (me)
@@ -574,12 +569,10 @@ print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2
           ASR(not (e1[1].tag=='CONST'),me,'constant at left side of attribution.')
           ASR(not (e1[1].tag=='Op1_&'),me,'VarAddr at left side of attribution.')
 
-        local error, cast, tp1,tp2,len1,len2 = _TP.tpCompat(e1.tp,e2.tp,e1[1].arr,e2[1].arr)
-          ASR(not error,me,'type/size incompatibility: '.. e1.tp..'/'..len1 ..' <--> '.. e2.tp..'/'..len2..'')
-          WRN(not cast,me, 'Applying the minimum size: "'.. e1.tp..'/'..len1 ..'" <--> "' .. e2.tp..'/'..len2 ..'". ')
+        local error, cast, tp1,tp2,len1,len2 = _TP.tpCompat((e1.supertp or e1.tp),(e2.supertp or e2.tp),e1[1].arr,e2[1].arr)
+          ASR(not error,me,'type incompatibility: `'.. e1.tp ..'´ <--> `'.. e2.tp..'´')
+          WRN(not cast,me, 'Automatic cast from `'.. e2.tp ..'´ to `' .. e2.tp..'´. ')
 
-        set1stOper(e1,"SetExp")
-           
         if no_fin then
             return              -- no `finally´ required
         end
@@ -610,8 +603,9 @@ print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2
             ASR(_TP.isNumeric(e1.tp,true), me, 'invalid attribution: not a numeric value')
         else    -- AwaitInt / AwaitExt
             local evt = awt.ret[1].var or awt.ret[1].ext
+--print("env::SetAwait:",e1.supertp, e1.tp)
             -- ASR(_TP.contains(e1.tp,evt.tp,true), me, 'invalid attribution: ['.. e1.tp ..'] can not contain [' .. evt.tp ..']')
-            local error, cast, tp1,tp2,len1,len2 = _TP.tpCompat(e1.tp,evt.tp,e1[1].arr,awt[1].arr)
+            local error, cast, tp1,tp2,len1,len2 = _TP.tpCompat((e1.supertp or e1.tp),evt.tp,e1[1].arr,awt[1].arr)
             ASR(not error,me,'type/size incompatibility: '.. e1.tp..'/'..len1 ..' <--> '.. evt.tp..'/'..len2..'')
             WRN(not cast,me, 'Applying the minimum size: "'.. e1.tp..'/'..len1 ..'" <--> "' .. evt.tp..'/'..len2 ..'". ')
         end
@@ -633,7 +627,7 @@ print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2
         me.lval = me[1].lval
         me.tp   = me[1].tp
         me.fst  = me[1].fst
-
+        me.supertp = me[1].supertp
     end,
 
     Exp = function (me)
@@ -643,7 +637,7 @@ print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2
         me.lval = me[1].lval
         me.tp   = me[1].tp
         me.fst  = me[1].fst
-        if me[1].auxtag then set1stOper(me,"Exp") end
+        me.supertp = me[1].supertp
     end,
 
     Op2_call = function (me)
@@ -740,42 +734,41 @@ print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2
     ['Op2_and'] = 'Op2_any',
     ['Op1_not'] = 'Op2_any',
 
-    ['Op1_*'] = function (me)
-        local op, e1 = unpack(me)
-        local tp
-        
---print("env::Op1_*:",e1.tp,e1.tag,e1[2])
-        ASR(_TP.deref(e1.tp, true) and e1.tag~='CONST', me, 'invalid operand to unary "*"')
-        me.tp   = _TP.deref(e1.tp, true)
-        me.lval = true
-        me.fst  = e1.fst
-        set1stOper(e1,"Exp")
-        
-----print(print_r(e1,"env::Op1_*: e1"))
---      if (e1.tag=='Var') then  -- single var/field (not array) 
---        if (e1[2]) then -- field
---          ASR(_TP.deref(e1.tp, true) and e1.tag=='Var', me, 'invalid operand to unary "*"')
---          ASR(_ENV.c[_TP.deref(e1.tp)].fields[e1[2]], me, 'invalid field "'.. e1[2] ..'" for "'.. _TP.deref(e1.tp) ..'" register type.')
---          tp   = _ENV.c[_TP.deref(e1.tp)].fields[e1[2]].tp
---          me.offset = _ENV.c[_TP.deref(e1.tp)].fields[e1[2]].offset
---        else  -- var
---          ASR(_TP.deref(e1.tp, true) and e1.tag=='Var', me, 'invalid operand to unary "*"')
---          tp   = _TP.deref(e1.tp, true)
---        end
---      else    -- Op2_idx
---print("env::Op1_*:",e1.tag,e1[2][1],e1[2][2])
---        if (e1[2][2]) then -- field array
-----print("env::Op1_*:",e1.tp,e1.tag,e1[2][2])--,_ENV.c[e1.tp].fields[e1[2][2]].tp,_ENV.c[e1.tp].fields[e1[2][2]].dim)
---          tp   = e1.tp
---          me.dim = e1.dim
---        else -- var array
---          tp = _TP.deref(e1.tp)
---        end
---      end
---      me.tp   = tp
---      me.lval = true
---      me.fst  = e1.fst        
-    end,
+--    ['Op1_*'] = function (me)
+--        local op, e1 = unpack(me)
+--        local tp
+--        
+----print("env::Op1_*:",e1.tp,e1.tag,e1[2])
+--        ASR(_TP.deref(e1.tp, true) and e1.tag~='CONST', me, 'invalid operand to unary "*"')
+--        me.tp   = _TP.deref(e1.tp, true)
+--        me.lval = true
+--        me.fst  = e1.fst
+--        
+------print(print_r(e1,"env::Op1_*: e1"))
+----      if (e1.tag=='Var') then  -- single var/field (not array) 
+----        if (e1[2]) then -- field
+----          ASR(_TP.deref(e1.tp, true) and e1.tag=='Var', me, 'invalid operand to unary "*"')
+----          ASR(_ENV.c[_TP.deref(e1.tp)].fields[e1[2]], me, 'invalid field "'.. e1[2] ..'" for "'.. _TP.deref(e1.tp) ..'" register type.')
+----          tp   = _ENV.c[_TP.deref(e1.tp)].fields[e1[2]].tp
+----          me.offset = _ENV.c[_TP.deref(e1.tp)].fields[e1[2]].offset
+----        else  -- var
+----          ASR(_TP.deref(e1.tp, true) and e1.tag=='Var', me, 'invalid operand to unary "*"')
+----          tp   = _TP.deref(e1.tp, true)
+----        end
+----      else    -- Op2_idx
+----print("env::Op1_*:",e1.tag,e1[2][1],e1[2][2])
+----        if (e1[2][2]) then -- field array
+------print("env::Op1_*:",e1.tp,e1.tag,e1[2][2])--,_ENV.c[e1.tp].fields[e1[2][2]].tp,_ENV.c[e1.tp].fields[e1[2][2]].dim)
+----          tp   = e1.tp
+----          me.dim = e1.dim
+----        else -- var array
+----          tp = _TP.deref(e1.tp)
+----        end
+----      end
+----      me.tp   = tp
+----      me.lval = true
+----      me.fst  = e1.fst        
+--    end,
 
     ['Op1_&'] = function (me)
         local op, e1 = unpack(me)
@@ -794,9 +787,6 @@ print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2
         me.lval = true
         me.fst  = e1.fst
         me.arr = field.dim
-
-        set1stOper(e1,"Exp")
-
     end,
 
     Op_var = function (me)
@@ -811,6 +801,8 @@ print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2
     Op1_cast = function (me)
         local tp, exp = unpack(me)
 --print("env::Op1_cast:", tp)
+        ASR(not _TP.deref(exp.tp),me,'can not cast an address value')
+        ASR(_TP.isBasicType(exp.tp),me,'can not cast register types')
         me.tp   = tp
         me.lval = exp.lval
         me.fst  = exp.fst

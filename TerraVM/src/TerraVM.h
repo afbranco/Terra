@@ -13,6 +13,7 @@
 #define TERRA_VM_H
 
 #include "VMData.h"
+#include "VMError.h"
 
 #define LIMIT_8BIT_OPER 0x1B
 #define LIMIT_6BIT_OPER 0x9F

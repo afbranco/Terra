@@ -23,84 +23,72 @@ config 00.01.00 do
 #define pOUT 1
 // Message
 #define BROADCAST 0xffff
+// VM Error codes
+#define E_DIVZERO 10 // Division by zero
+#define E_IDXOFV  11 // Array index overflow
 
 
 /*
  * Define custom registers
  */
 
-	// usrMsg_t - Radio/Queue Data Message Register
-	regtype usrMsg_t with
+	// radioMsg - Radio/Queue Data Message Register
+	packet radioMsg with
 		var ubyte type;
 		var ushort source;
 		var ushort target;
-		var ubyte[20] data;
-	end
-
-	// Alternative fixed values data message
-	regtype usrMsg2_t with
-		var ubyte type;
-		var ushort source;
-		var ushort target;
-		var ubyte d8_1;
-		var ubyte d8_2;
-		var ubyte d8_3;
-		var ubyte d8_4;
-		var ushort d16_1;
-		var ushort d16_2;
-		var ushort d16_3;
-		var ushort d16_4;
-		var ulong d32_1;
-		var ulong d32_2;
+		var payload[20] data;
 	end
 
 	// TerraNet local Output events
-	output ubyte		INIT			0;
-	output ubyte		LEDS			5;
-	output ubyte		LED0			6;
-	output ubyte		LED1			7;
-	output ubyte		LED2			8;
-	output void			REQ_TEMP		9;
-	output void			REQ_PHOTO		10;
-	output void			REQ_VOLTS		11;
-	output ubyte		SET_PORT_A		12;
-	output ubyte		SET_PORT_B		13;
-	output ubyte 		CFG_PORT_A		14;
-	output ubyte 		CFG_PORT_B		15;
-	output ubyte 		REQ_PORT_A		16;
-	output ubyte 		REQ_PORT_B		17;
-	output ubyte 		CFG_INT_A		18;
-	output ubyte 		CFG_INT_B		19;
-	output ubyte 		REQ_CUSTOM_A	20;
+	output void		INIT			ubyte 0;
+	output void		LEDS			ubyte 5;
+	output void		LED0			ubyte 6;
+	output void		LED1			ubyte 7;
+	output void		LED2			ubyte 8;
+	output void		REQ_TEMP		void 9;
+	output void		REQ_PHOTO		void 10;
+	output void		REQ_VOLTS		void 11;
+	output void		SET_PORT_A		ubyte 12;
+	output void		SET_PORT_B		ubyte 13;
+	output void 	CFG_PORT_A		ubyte 14;
+	output void 	CFG_PORT_B		ubyte 15;
+	output void 	REQ_PORT_A		ubyte 16;
+	output void 	REQ_PORT_B		ubyte 17;
+	output void 	CFG_INT_A		ubyte 18;
+	output void 	CFG_INT_B		ubyte 19;
+	output void 	REQ_CUSTOM_A	ubyte 20;
 	// TerraNet Custom Output events
-	output usrMsg_t 	SEND			40;
-	output usrMsg_t 	SEND_ACK		41;
+	output void 	SEND			radioMsg 40;
+	output void 	SEND_ACK		radioMsg 41;
 
 	// TerraNet Local Input events
-	input ubyte 	ERROR 			0;
-	input ushort 	TEMP 			5;
-	input ushort 	PHOTO 			6;
-	input ushort	VOLTS 			7;
-	input ubyte 	PORT_A 			8;
-	input ubyte 	PORT_B 			9;
-	input ubyte 	INT_A 			10;
-	input ubyte 	INT_B 			11;
-	input ubyte 	CUSTOM_A 		12;
+	input ubyte 	ERROR 		 	ubyte 	0;
+	input ubyte 	ERROR 			void	1;
+	input ushort 	TEMP 			void 	5;
+	input ushort 	PHOTO 			void 	6;
+	input ushort	VOLTS 			void 	7;
+	input ubyte 	PORT_A 			void 	8;
+	input ubyte 	PORT_B 			void 	9;
+	input ubyte 	INT_A 			void 	10;
+	input ubyte 	INT_B 			void 	11;
+	input ubyte 	CUSTOM_A_ID		ubyte 	12;
+	input ubyte 	CUSTOM_A 		void 	13;
 	// TerraNet Custom Input events
-	input ushort 	SEND_DONE 		140;
-	input ubyte 	SEND_DONE_ACK	141;
-	input usrMsg_t	RECEIVE 		142;
-	input ushort 	SEND_DONE_ANY 		40;
-	input ubyte 	SEND_DONE_ACK_ANY	41;
-	input usrMsg_t	RECEIVE_ANY 		42;
-	input ubyte 	Q_READY 			43;
+	input ubyte 	SEND_DONE 		ubyte	40;
+	input ushort 	SEND_DONE 		void 	41;
+	input ubyte 	SEND_DONE_ACK	ubyte	42;
+	input ubyte 	SEND_DONE_ACK	void	43;
+	input radioMsg	RECEIVE 		ubyte 	44;
+	input radioMsg	RECEIVE 		void 	45;
+	input ubyte 	Q_READY 		void 	46;
 
 	// Terra basic functions
 	function pure ushort getNodeId()		0;
 	function pure ushort random()			1;
 	// TerraNet custom functions
-	function nohold ubyte qPut(usrMsg_t*) 	10;
-	function nohold ubyte qGet(usrMsg_t*) 	11;
+	function nohold ubyte qPut(radioMsg) 	10;
+	function nohold ubyte qGet(radioMsg) 	11;
 	function pure ubyte qSize()				12;
 	function pure ubyte qClear()			13;
 

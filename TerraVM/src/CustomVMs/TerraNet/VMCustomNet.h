@@ -8,6 +8,8 @@
 #define VMCUSTOM_H
 
 #include "../../VMData.h"
+#include "../../VMError.h"
+
 
 enum{
 	
@@ -35,23 +37,25 @@ enum{
 
 
 	// TerraNet Local Input events
-	I_ERROR			=0,
-	I_TEMP			=5,
+//	I_ERROR_id		=0,  // Defined in VMError.h
+//	I_ERROR			=1,  // Defined in VMError.h
+	I_TEMP			=5, 
 	I_PHOTO			=6,
 	I_VOLTS			=7,
 	I_PORT_A		=8,
 	I_PORT_B		=9,
 	I_INT_A			=10,
 	I_INT_B			=11,
-	I_CUSTOM_A		=12,
+	I_CUSTOM_A_ID	=12,
+	I_CUSTOM_A		=13,
 	// TerraNet Custom Input events
-	I_SEND_DONE		=140,
-	I_SEND_DONE_ACK	=141,
-	I_RECEIVE		=142,
-	I_SEND_DONE_ANY		=40,
-	I_SEND_DONE_ACK_ANY	=41,
-	I_RECEIVE_ANY		=42,
-	I_Q_READY 			=43,
+	I_SEND_DONE_ID		=40,
+	I_SEND_DONE			=41,
+	I_SEND_DONE_ACK_ID	=42,
+	I_SEND_DONE_ACK		=43,
+	I_RECEIVE_ID		=44,
+	I_RECEIVE			=45,
+	I_Q_READY 			=46,
 
 	
 	// TerraNet basic functions

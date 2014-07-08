@@ -60,7 +60,7 @@ F = {
             if ext.pre == 'input' and (_ENV.awaits[ext] or 0) > 0 then  -- only active events
 --print("mem::Root_pre: in evt",ext.id,_ENV.awaits[ext],(2 +(_ENV.awaits[ext] or 0)*_ENV.c.tceu_nlbl.len))
 
-              if ext.idx <= 127 then
+              if not ext.inArg then
                   _MEM.gtes[ext.n] = alloc(2 + -- 1+2=2 -> idx, gates
                                       (_ENV.awaits[ext] or 0) * _ENV.c.tceu_nlbl.len) 
               else
@@ -373,14 +373,14 @@ F = {
 
     ['Op1_not'] = 'Op1_any',
 
-    ['Op1_*'] = function (me)
-        local op, e1 = unpack(me)
-        ASR(e1.val,me,'invalid operand to unary "*"')
-        me.val = '('..ceu2c(op)..e1.val..')'
-        me.accs = e1.accs
-        me.accs[1][3] = _TP.deref(me.accs[1][3], true)
-        me.accs[1][4] = true
-    end,
+--    ['Op1_*'] = function (me)
+--        local op, e1 = unpack(me)
+--        ASR(e1.val,me,'invalid operand to unary "*"')
+--        me.val = '('..ceu2c(op)..e1.val..')'
+--        me.accs = e1.accs
+--        me.accs[1][3] = _TP.deref(me.accs[1][3], true)
+--        me.accs[1][4] = true
+--    end,
     ['Op1_&'] = function (me)
         local op, e1 = unpack(me)
         me.val = ' '
@@ -404,8 +404,9 @@ F = {
 
     Op1_cast = function (me)
         local tp, exp = unpack(me)
-        me.val = '(('.._TP.c(tp)..')'..exp.val..')'
+        me.val = exp.val
         me.accs = exp.accs
+        me.tp = tp
     end,
 
     WCLOCKK = function (me)

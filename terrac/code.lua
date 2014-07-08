@@ -494,61 +494,62 @@ function SetExp(me)
 -- *** SetExp operation
 -- **********************************************
 -----------------------------------------------------
--- Var*,arr   = Var*,arr  -> [memcpy]
---+ data      = data
--- Var*,~arr  = Var*      -> [set_v]
---+ pointer   = pointer
--- Var*,~arr  = Reg|&Var|&Var*|Var*,arr -> [set_c]
---+ pointer   = data | pointer
+--R  Var*,arr   = Var*,arr  -> [memcpy]
+--R+ data      = data
+--R Var*,~arr  = Var*      -> [set_v]
+--R+ pointer   = pointer
+--R Var*,~arr  = Reg|&Var|&Var*|Var*,arr -> [set_c]
+--R+ pointer   = data | pointer
 -- Var        = Const     -> [set_c] | [CONC(e2),pop]
 --+ var       = var
 -- Var        = Var       -> [set_v]
 --+ var       = var
 -- Var        = AwaitInt  -> [Conc(e2),set_v]
 --+ var       = var
--- Var*,~arr  = Exp       -> [Conc(e2),pop]
---+ pointer   = pointer
+--R Var*,~arr  = Exp       -> [Conc(e2),pop]
+--R+ pointer   = pointer
 -- Var        = Exp       -> [Conc(e2),pop]
 --+ var       = var
 -- Var[Var]   = Var       -> [setarr_vv]
 --+ var       = var
 -- Var[Var]   = AwaitInt  -> [Conc(e2),setarr_vv]
 --+ var       = var
--- Var*[Var]  = Var*      -> [setarr_vv]
---+ pointer   = pointer
+--R Var*[Var]  = Var*      -> [setarr_vv]
+--R+ pointer   = pointer
 -- Var[Var]   = Const     -> [setarr_vc]
 --+ var       = var
 -- Var[Var]   = Exp       -> [poparr_v]
 --+ var       = var
 -- Reg        = Reg       -> [memcpy]
 --+ data      = data
--- Reg        = Var*,arr  -> [memcpy]
---+ data      = data
--- Var*,arr   = Reg       -> [memcpy]
---+ data      = data
+--R Reg        = Var*,arr  -> [memcpy]
+--R+ data      = data
+--R Var*,arr   = Reg       -> [memcpy]
+--R+ data      = data
 
 --
 --
 -----------------------------------------------------
 -- pending...
--- Exp:*varp  = Const       -> [push_c,push_v,set_e]
---+ var       = var
--- Exp:*varp  = Var         -> [push_v,push_v,set_e]
---+ var       = var
--- Var* ~arr  = Var* & Arr
---+ pointer   = data
+--R Exp:*varp  = Const       -> [push_c,push_v,set_e]
+--R+ var       = var
+--R Exp:*varp  = Var         -> [push_v,push_v,set_e]
+--R+ var       = var
+--R Var* ~arr  = Var* & Arr
+--R+ pointer   = data
 
 
-    if x1.auxtag2 == 'Var*' and x2.auxtag2 == 'Var*' and x1.arr and x2.arr then
-        codeB = LINE(me,'memcpy '..math.min(_ENV.c[_TP.deref(x2.tp)].len*x1.arr,_ENV.c[_TP.deref(x2.tp)].len*x2.arr)..'B. '..x2.id..' -> '..x1.id,nil,'// memcpy v2[] v1[]')        
-        BYTECODE(me,codeB,'op_memcpy',math.min(_ENV.c[_TP.deref(x1.tp)].len*x1.arr,_ENV.c[_TP.deref(x2.tp)].len*x2.arr),x2.val,x1.val)      
-    elseif x1.auxtag2 == 'Var*' and x2.auxtag2 == 'Var*' and not x1.arr and not x2.arr then
-        codeB = LINE(me,x1.id ..'(pointer) = '.. x2.id..'(pointer)',nil,'// SetExp:: set pointer = pointer')        
-        BYTECODE(me,codeB,'op_set_v',x1.ntp,x1.val,x2.val)
-    elseif x1.auxtag2 == 'Var*' and not x1.arr and (x2.auxtag2 == '&Var' or x2.auxtag2 == '&Var*' or x2.auxtag2 == 'Reg' or (x2.auxtag2 == 'Var*' and x2.arr)) then
-          codeB = LINE(me,x1.id ..' = '.. x2.id,nil,'// SetExp:: set var*=&var' )        
-          BYTECODE(me,codeB,'op_set_c',x1.ntp,x1.val,x2.val)
-    elseif x1.auxtag2 == 'Var' and x2.auxtag2 == 'Const' then
+--    if x1.auxtag2 == 'Var*' and x2.auxtag2 == 'Var*' and x1.arr and x2.arr then
+--        codeB = LINE(me,'memcpy '..math.min(_ENV.c[_TP.deref(x2.tp)].len*x1.arr,_ENV.c[_TP.deref(x2.tp)].len*x2.arr)..'B. '..x2.id..' -> '..x1.id,nil,'// memcpy v2[] v1[]')        
+--        BYTECODE(me,codeB,'op_memcpy',math.min(_ENV.c[_TP.deref(x1.tp)].len*x1.arr,_ENV.c[_TP.deref(x2.tp)].len*x2.arr),x2.val,x1.val)      
+--    elseif x1.auxtag2 == 'Var*' and x2.auxtag2 == 'Var*' and not x1.arr and not x2.arr then
+--        codeB = LINE(me,x1.id ..'(pointer) = '.. x2.id..'(pointer)',nil,'// SetExp:: set pointer = pointer')        
+--        BYTECODE(me,codeB,'op_set_v',x1.ntp,x1.val,x2.val)
+--    elseif x1.auxtag2 == 'Var*' and not x1.arr and (x2.auxtag2 == '&Var' or x2.auxtag2 == '&Var*' or x2.auxtag2 == 'Reg' or (x2.auxtag2 == 'Var*' and x2.arr)) then
+--          codeB = LINE(me,x1.id ..' = '.. x2.id,nil,'// SetExp:: set var*=&var' )        
+--          BYTECODE(me,codeB,'op_set_c',x1.ntp,x1.val,x2.val)
+
+    if x1.auxtag2 == 'Var' and x2.auxtag2 == 'Const' then
         codeB = LINE(me,x1.id ..' = '.. x2.id,nil,'// SetExp:: set var=const' )        
         BYTECODE(me,codeB,'op_set_c',x1.tp,x1.val,x2.val)
     elseif x1.auxtag2 == 'Var' and x2.auxtag2 == 'Var' then
@@ -558,10 +559,11 @@ function SetExp(me)
         CONC(me,e2)
         codeB = LINE(me,x1.id ..' = '.. x2.id..'',nil,'// SetExp:: set var = var')        
         BYTECODE(me,codeB,'op_set_v',x1.ntp,x1.val,x2.val)
-    elseif x1.auxtag2 == 'Var*' and x2.auxtag2 == 'Exp' then
-        CONC(me,e2)
-        codeB = LINE(me,'pop_ *'..x1.id,nil,'// SetExp:: pop to pointer')
-        BYTECODE(me,codeB,'op_pop','ushort',x1.val) 
+
+--    elseif x1.auxtag2 == 'Var*' and x2.auxtag2 == 'Exp' then
+--        CONC(me,e2)
+--        codeB = LINE(me,'pop_ *'..x1.id,nil,'// SetExp:: pop to pointer')
+--        BYTECODE(me,codeB,'op_pop','ushort',x1.val) 
     elseif x1.auxtag2 == 'Var' and x2.auxtag2 == 'Exp' then
         CONC(me,e2)
         codeB = LINE(me,'pop '..x1.id,nil,'// SetExp:: pop to var')
@@ -573,9 +575,11 @@ function SetExp(me)
         CONC(me,e2)
         codeB = LINE(me,''..x1.id..' = '..x2.id,nil,'// set array[var] with var')        
         BYTECODE(me,codeB,'op_setarr_vv',x1.ntp,x1.val,x1.idxtp,x1.idxval,x1.idxmax,x2.tp,x2.val)
-    elseif x1.auxtag2 == 'Var*[Var]' and x2.auxtag2 == 'Var*' then
-        codeB = LINE(me,''..x1.id..' = '..x2.id,nil,'// set array*[var] with var')        
-        BYTECODE(me,codeB,'op_setarr_vv',x1.ntp,x1.val,x1.idxtp,x1.idxval,x1.idxmax,x2.ntp,x2.val)
+
+--    elseif x1.auxtag2 == 'Var*[Var]' and x2.auxtag2 == 'Var*' then
+--        codeB = LINE(me,''..x1.id..' = '..x2.id,nil,'// set array*[var] with var')        
+--        BYTECODE(me,codeB,'op_setarr_vv',x1.ntp,x1.val,x1.idxtp,x1.idxval,x1.idxmax,x2.ntp,x2.val)
+
     elseif x1.auxtag2 == 'Var[Var]' and x2.auxtag2 == 'Const' then
         codeB = LINE(me,''..x1.id..' = '..x2.id,nil,'// set array[var] with Const')        
         BYTECODE(me,codeB,'op_setarr_vc',x1.ntp,x1.val,x1.idxtp,x1.idxval,x1.idxmax,x2.val)
@@ -583,19 +587,23 @@ function SetExp(me)
         CONC(me,e2)
         codeB = LINE(me,'pop to '..x1.id,nil,'// pop to array[var] ')        
         BYTECODE(me,codeB,'op_poparr_v',x1.ntp,x1.idxtp,x1.idxval,x1.idxmax,x1.val)
-    elseif x1.auxtag2 == 'Var*[Var]' and x2.auxtag2 == 'Exp' then
-        CONC(me,e2)
-        codeB = LINE(me,'pop to '..x1.id,nil,'// pop to array*[var]')        
-        BYTECODE(me,codeB,'op_poparr_v',x1.ntp,x1.idxtp,x1.idxval,x1.idxmax,x1.val)
+
+--    elseif x1.auxtag2 == 'Var*[Var]' and x2.auxtag2 == 'Exp' then
+--        CONC(me,e2)
+--        codeB = LINE(me,'pop to '..x1.id,nil,'// pop to array*[var]')        
+--        BYTECODE(me,codeB,'op_poparr_v',x1.ntp,x1.idxtp,x1.idxval,x1.idxmax,x1.val)
+
     elseif x1.auxtag2 == 'Reg' and x2.auxtag2 == 'Reg' then
         codeB = LINE(me,'memcpy '..math.min(_ENV.c[x1.tp].len,_ENV.c[x2.tp].len)..'B. '..x2.id..' -> '..x1.id,nil,'// memcpy v2 v1')        
         BYTECODE(me,codeB,'op_memcpy',math.min(_ENV.c[x1.tp].len,_ENV.c[x2.tp].len),x2.val,x1.val)
-    elseif x1.auxtag2 == 'Reg' and x2.auxtag2 == 'Var*' and x2.arr then
-        codeB = LINE(me,'memcpy '..math.min(_ENV.c[x1.tp].len,_ENV.c[x2.ntp].len*x2.arr)..'B. '..x2.id..' -> '..x1.id,nil,'// memcpy v2[] v1')        
-        BYTECODE(me,codeB,'op_memcpy',math.min(_ENV.c[x1.tp].len,_ENV.c[x2.ntp].len*x2.arr),x2.val,x1.val)
-    elseif x1.auxtag2 == 'Var*' and x2.auxtag2 == 'Reg' and x1.arr then
-        codeB = LINE(me,'memcpy '..math.min(_ENV.c[x1.ntp].len*x1.arr,_ENV.c[x2.tp].len)..'B. '..x2.id..' -> '..x1.id,nil,'// memcpy v2 v1[]')        
-        BYTECODE(me,codeB,'op_memcpy',math.min(_ENV.c[x1.ntp].len*x1.arr,_ENV.c[x2.tp].len),x2.val,x1.val)
+
+--    elseif x1.auxtag2 == 'Reg' and x2.auxtag2 == 'Var*' and x2.arr then
+--        codeB = LINE(me,'memcpy '..math.min(_ENV.c[x1.tp].len,_ENV.c[x2.ntp].len*x2.arr)..'B. '..x2.id..' -> '..x1.id,nil,'// memcpy v2[] v1')        
+--        BYTECODE(me,codeB,'op_memcpy',math.min(_ENV.c[x1.tp].len,_ENV.c[x2.ntp].len*x2.arr),x2.val,x1.val)
+--    elseif x1.auxtag2 == 'Var*' and x2.auxtag2 == 'Reg' and x1.arr then
+--        codeB = LINE(me,'memcpy '..math.min(_ENV.c[x1.ntp].len*x1.arr,_ENV.c[x2.tp].len)..'B. '..x2.id..' -> '..x1.id,nil,'// memcpy v2 v1[]')        
+--        BYTECODE(me,codeB,'op_memcpy',math.min(_ENV.c[x1.ntp].len*x1.arr,_ENV.c[x2.tp].len),x2.val,x1.val)
+
     else
       -- ??) All other cases
       CONC(me,e2)
@@ -603,155 +611,6 @@ function SetExp(me)
       codeB = LINE(me,'set ('.. e1.tp ..')*(pop1) = pop2',nil,'// SetExp:: pop stk1 to stk2')         
       BYTECODE(me,codeB,'op_set_e',x1.ntp)  
   end
-
-
-
---    if e1[1].tag == 'Var' then
---      codeB = LINE(me,'push &'..e1[1][1],nil,'// Op1_&(push var/array address):: ')
---      BYTECODE(me,codeB,'op_push_c',e1[1].val)
---    elseif e1[1].tag == 'Op2_idx' then
---      idx = e1[1][3]
---      arrvar = e1[1][2]
---      tp = _TP.deref(arrvar.tp) or arrvar.tp 
---      if _TP.deref(tp) then tp = 'ushort' end -- tp is a pointer
---print("code::SetExp: op2_idx",arrvar[1], arrvar.tag,arrvar.tp,arrvar.fst.arr,idx.tag)
---      if (idx.tag == 'CONST') then
---        ASR(tonumber(idx.val) < tonumber(arrvar.fst.arr),me,'index >= array size')
---        codeB = LINE(me,'push &'..arrvar.fst.id ..'['..idx[1] ..']',nil,'//  push array')
---        BYTECODE(me,codeB,'op_push_c',arrvar.val+(idx.val*_ENV.c[tp].len))
---      else -- Use stak operation
---        codeB = LINE(me,'push &'..arrvar[1],nil,'// base addr')
---        BYTECODE(me,codeB,'op_push_c',arrvar.val)
---        CONC(me,idx);
---        codeB = LINE(me,'push idx max '..arrvar.fst.arr,nil,'// push array max idx')
---        BYTECODE(me,codeB,'op_push_c',arrvar.fst.arr)
---        codeB = LINE(me,'mod: limmit idx')
---        BYTECODE(me,codeB,'op2_any','mod')
---        codeB = LINE(me,'push var len '..tp,nil,'// push array var len')
---        BYTECODE(me,codeB,'op_push_c',_ENV.c[tp].len)
---        codeB = LINE(me,'mult: varlen * idx')
---        BYTECODE(me,codeB,'op2_any','mult')
---        codeB = LINE(me,'add: array base addr + len position')
---        BYTECODE(me,codeB,'op2_any','add')
---      end    
---    elseif e1[1].tag == 'Op2_.' then
---      reg = e1[1][2]
---      id = e1[1][3]
---print("code::SetExp: op2_.",reg.tag, id)
---      if (reg.tag == 'Var') then
---        codeB = LINE(me,'push '..id ..' offset',nil,'// (push field position offset):: ')
---        BYTECODE(me,codeB,'op_push_c',reg.fst.fields[id].var)
---        codeB = LINE(me,'push '..reg[1] ..' addr',nil,'// (push reg addr):: ')
---        BYTECODE(me,codeB,'op_push_c',e1[1].fst.val)
---        codeB = LINE(me,'add: reg addr + field offset')
---        BYTECODE(me,codeB,'op2_any','add')
---      elseif (id.tag == 'Op2_idx') then
---        codeB = LINE(me,'push '..id ..' offset',nil,'// (push field position offset):: ')
---        BYTECODE(me,codeB,'op_push_c',reg.fst.fields[id].var)
---  
---        CONC(me,id)
---        codeB = LINE(me,'push idx max '..e1[1].fst.arr,nil,'// push array max idx')
---        BYTECODE(me,codeB,'op_push_c',e1[1].fst.arr)
---        codeB = LINE(me,'mod: limmit idx')
---        BYTECODE(me,codeB,'op2_any','mod')
---        codeB = LINE(me,'push var len '..reg.tp,nil,'// push array var len')
---        BYTECODE(me,codeB,'op_push_c',_ENV.c[reg.tp].len)
---        codeB = LINE(me,'mult: varlen * idx')
---        BYTECODE(me,codeB,'op2_any','mult')
---        codeB = LINE(me,'add: array base addr + len position')
---        BYTECODE(me,codeB,'op2_any','add')
---  
---        codeB = LINE(me,'add: reg-idx addr + field offset')
---        BYTECODE(me,codeB,'op2_any','add')
---      else
---        ASR(false,me,'invalid var.field ')
---      end
---    else
---      CONC(me,e1)
---    end
-
---    local tp = (_TP.deref(x1.tp) and 'ushort') or x1.tp
---    codeB = LINE(me,'set ('.. x1.tp ..')*(pop1) = pop2',nil,'// SetExp:: pop stk1 to stk2')         
---    BYTECODE(me,codeB,'op_set_e',tp)  
---
-
---    if (_TP.deref(e1.tp)) then x1.tp='ushort' end
---    if (e2[1].tag=='CONST' or e2[1].tag=='Var') then
---      x2={} x2.tp = e2.tp x2.val = e2.val
---      if (_TP.deref(e2.tp)) then x2.tp=_TP.getConstType(e2.fst.off,me) x2.val=e2.fst.off end
---
---      if (e1.fst.arr) then
---        idx={} idx.tp = e1[1][3].tp idx.tag = e1[1][3].tag idx.val = e1[1][3].val idx.max = e1.fst.arr
---        if (e2[1].tag=='CONST') then
---          if (idx.tag == 'CONST') then
---            --afb         codeB = LINE(me,'setarr_cc '..x1.tp..' '..x1.val..' '..x2.tp..' '..x2.val,nil,'// SetExp:: '.. e1.fst.id ..' '..e1[1][3].val ..'='.. e2[1][1] ..' | set array <type> <base addr> <idx> <arr size> <value>')
---            --            BYTECODE(me,codeB,'op_setarr_cc',x1.tp,x1.val,idx.val,idx.max,x2.val)
---            -- it uses 'set_c' for constant index
---            codeB = LINE(me,''..e1.fst.id..'['..idx.val..'] = '..x2.val,nil,'// set array[idx] with constant')        
---            BYTECODE(me,codeB,'op_set_c',x1.tp,x1.val+(idx.val*_ENV.c[x1.tp].len),x2.val)
---          else
---            --            codeB = LINE(me,'setarr_vc '..x1.tp..' '..x1.val..' '..x2.tp..' '..x2.val,nil,'// SetExp:: '.. e1.fst.id ..' ['..e1[1][3].val ..']='.. e2[1][1] ..' | set array <type> <base addr> <idx> <arr size> <value>')
---            codeB = LINE(me,''..e1.fst.id..'['..e1[1][3][1]..'] = '..x2.val,nil,'// set array[var] with constant')        
---            BYTECODE(me,codeB,'op_setarr_vc',x1.tp,x1.val,idx.tp,idx.val,idx.max,x2.val)
---          end
---        else
---          if (e1[1][3].tag == 'CONST') then
---            --afb         codeB = LINE(me,'setarr_cv '..x1.tp..' '..x1.val..' '..x2.tp..' '..x2.val,nil,'// SetExp:: '.. e1.fst.id ..' '..e1[1][3].val ..'='.. e2[1][1] ..' | set array <type> <base addr> <idx> <arr size> <value>')
---            --            BYTECODE(me,codeB,'op_setarr_cv',x1.tp,x1.val,idx.val,idx.max,x2.tp,x2.val)
---            -- it uses 'set_v' for constant index
---            codeB = LINE(me,''..e1.fst.id..'['..idx.val..'] = '..e2[1][1],nil,'// set array[idx] with var')        
---            BYTECODE(me,codeB,'op_set_v',x1.tp,x1.val+(idx.val*_ENV.c[x1.tp].len),x2.val)
---          else
---            codeB = LINE(me,''..e1.fst.id..'['..e1[1][3][1]..'] = '..e2[1][1],nil,'// set array[var] with var')        
---            BYTECODE(me,codeB,'op_setarr_vv',x1.tp,x1.val,idx.tp,idx.val,idx.max,x2.tp,x2.val)
---          end
---        end
---      else
---        if (e2[1].tag=='CONST') then
---          if (typelen[x1.tp] >= typelen[x2.tp]) then
---            codeB = LINE(me,e1.fst.id ..' = '.. e2[1][1],nil,'// SetExp:: set var=const' )        
---            BYTECODE(me,codeB,'op_set_c',x1.tp,x1.val,x2.val)
---          else
---            CONC(me,e2)
---            codeB = LINE(me,'pop '..e1.fst.id,nil,'// SetExp:: pop to var')
---            BYTECODE(me,codeB,'op_pop',x1.tp,x1.val)  
---          end
---        else
---          if (typelen[x1.tp] == typelen[x2.tp]) then
---            codeB = LINE(me,e1.fst.id ..'='.. e2[1][1],nil,'// SetExp:: set var=var')        
---            BYTECODE(me,codeB,'op_set_v',x1.tp,x1.val,x2.val)
---          else
---            CONC(me,e2)
---            codeB = LINE(me,'pop '..e1.fst.id,nil,'// SetExp:: pop to var')         
---            BYTECODE(me,codeB,'op_pop',x1.tp,x1.val)  
---          end
---        end
---      end
---    else
---      if (e1.fst.arr) then
---        CONC(me,me[2])
---        idx={} idx.tp = e1[1][3].tp idx.tag = e1[1][3].tag idx.val = e1[1][3].val idx.max = e1.fst.arr
---        if (idx.tag=='CONST') then
---          --afb       codeB = LINE(me,'poparr_c '..x1.tp..' '..x1.val..' '..idx.tp..' '..idx.val..' '..idx.max,nil,'// SetExp:: '..e1.fst.id..'[?] | pop array <type> <base addr> <idx> <array size>')
---          --          BYTECODE(me,codeB,'op_poparr_c',x1.tp,idx.val,idx.max,x1.val)
---          -- it uses 'pop' for constant index
---          codeB = LINE(me,'pop '..e1.fst.id..'['..idx.val..']',nil,'// pop to var[idx]')
---          BYTECODE(me,codeB,'op_pop',x1.tp,x1.val+(idx.val*_ENV.c[x1.tp].len))  
---        else
---          codeB = LINE(me,'pop '..e1.fst.id..'[ '..e1[1][3][1]..']',nil,'// pop to var[var]')
---          BYTECODE(me,codeB,'op_poparr_v',x1.tp,idx.tp,idx.val,idx.max,x1.val)
---        end
---      else
---        CONC(me,me[2])
---        if (_TP.deref(e1.tp)) then
---          codeB = LINE(me,'pop *'..e1.fst.id,nil,'// SetExp:: pop to pointer')
---          BYTECODE(me,codeB,'op_pop','ushort',x1.val) 
---        else
---          codeB = LINE(me,'pop '..e1.fst.id,nil,'// SetExp:: pop to var')
---          BYTECODE(me,codeB,'op_pop',x1.tp,x1.val)  
---        end
---      end
---    end
 
 end
 
@@ -779,7 +638,7 @@ F = {
         --                            ..(_ENV.awaits[ext] or 0)..';')
 
         -- event Id + nGates
-        local Id_nGts = (ext.idx*256) + ((_ENV.awaits[ext] or 0) * 1)
+        local Id_nGts = (ext.idx*256) + ((_ENV.awaits[ext] or 0) * 1) + ((ext.inArg and 128) or 0) -- if auxId set bit 7 in nGts
         local nGtsText = string.format("0x%04x = %d",Id_nGts,Id_nGts)
         codeB = LINE(me, 'config gate '..ext.id..' with '..(_ENV.awaits[ext] or 0)..' await(s) - '..nGtsText,nil,'// Config gate')
         BYTECODE(me,codeB,'op_set_c','ushort',_MEM.gtes[ext.n],Id_nGts)
@@ -823,20 +682,21 @@ F = {
 --      CONC(me,e1)
 --      codeB = LINE(me,'set ('.. e1.tp ..')*(pop1) = pop2',nil,'// SetExp:: pop stk1 to stk2')         
 --      BYTECODE(me,codeB,'op_set_e',e1.tp)     
-    else
+    else -- e2.tag == AwaitExt
       CONC(me, e2)
-      if (e1[1].tag=='Var' and _TP.deref(e1.tp)) then
-        codeB = LINE(me,'getExtData *'..e1[1][1]..' '..(_ENV.c[_TP.deref(e1.tp)].len),nil,'// getExtDtp <localVar pointer> <len>')
-        BYTECODE(me,codeB,'op_getextdt_p',e1.val,_ENV.c[_TP.deref(e1.tp)].len)
-      elseif (e1[1].tag=='Var' and not _TP.deref(e1.tp)) then
+--      if (e1[1].tag=='Var' and _TP.deref(e1.tp)) then
+--        codeB = LINE(me,'getExtData *'..e1[1][1]..' '..(_ENV.c[_TP.deref(e1.tp)].len),nil,'// getExtDtp <localVar pointer> <len>')
+--        BYTECODE(me,codeB,'op_getextdt_p',e1.val,_ENV.c[_TP.deref(e1.tp)].len)
+--      elseif (e1[1].tag=='Var' and not _TP.deref(e1.tp)) then
+      if e1[1].tag=='Var' then
         local x1 = getAuxValues(e1)
 --print("code::SetAwait: var:",x1.auxtag1,x1.auxtag2, x1.tp, x1.ntp, x1.val,x1.id)
         codeB = LINE(me,'getExtData '..x1.id..' '.._ENV.c[e1.tp].len,nil,'// getExtDt <localVarAddr> <len>')
         BYTECODE(me,codeB,'op_getextdt_v',x1.val,_ENV.c[e1.tp].len)
-      elseif (e1[1].tag=='Op1_*' and e1[1][2].tag == 'Var') then
---print("code::SetAwait: *var:",e1[1][2].tag,e1[1][2][1],e1[1][2].val,e1[1][2].tp)
-        codeB = LINE(me,'getExtData *'..e1[1][2][1]..' '..(_ENV.c[_TP.deref(e1[1][2].tp)].len),nil,'// getExtDtp <localVar pointer> <len>')
-        BYTECODE(me,codeB,'op_getextdt_p',e1[1][2].val,_ENV.c[_TP.deref(e1[1][2].tp)].len)
+--      elseif (e1[1].tag=='Op1_*' and e1[1][2].tag == 'Var') then
+----print("code::SetAwait: *var:",e1[1][2].tag,e1[1][2][1],e1[1][2].val,e1[1][2].tp)
+--        codeB = LINE(me,'getExtData *'..e1[1][2][1]..' '..(_ENV.c[_TP.deref(e1[1][2].tp)].len),nil,'// getExtDtp <localVar pointer> <len>')
+--        BYTECODE(me,codeB,'op_getextdt_p',e1[1][2].val,_ENV.c[_TP.deref(e1[1][2].tp)].len)
       else
         CONC(me,e1)
         codeB = LINE(me,'getExtData stack len='.._ENV.c[e1.tp].len,nil,'// getExtDt <Stack:localVar Addr> <len>')
@@ -1117,10 +977,12 @@ F = {
           if(e2[1].tag=='CONST') then
             codeB = LINE(me,'emit '..e1.ext.id..' len='..par_len..' const='..e2[1].val,nil,'// EmitExtS:: const ')
             BYTECODE(me,codeB,'op_outevt_c',e1.ext.idx,e2[1].val)
-          elseif (x1.auxtag2=='Var' or x1.auxtag2=='&Var*') then
+          elseif (x1.auxtag2=='Var' and _TP.deref(e1.ext.tp)) then
             codeB = LINE(me,'emit '..e1.ext.id..' len='..par_len..' var='..x1.id,nil,'// EmitExtS:: var')
             BYTECODE(me,codeB,'op_outevt_v',e1.ext.idx,x1.val, par_tp)
-
+          elseif (_ENV.packets[e1.ext.tp]) then
+            codeB = LINE(me,'emit '..e1.ext.id..' len='..par_len..' var='..x1.id,nil,'// EmitExtS:: var')
+            BYTECODE(me,codeB,'op_outevt_v',e1.ext.idx,e2.val, 'ushort')
 
 --          elseif (e2[1].tag=='Var' and not _TP.deref(e2[1].tp)) then -- not pointer 
 --            codeB = LINE(me,'emit '..e1.ext.id..' len='..par_len..' var='..e2[1][1],nil,'// EmitExtS:: var')
@@ -1339,7 +1201,7 @@ F = {
 print("code::AwaitExt: ",e1.ext.idx,e1.ext.n,me.gte,me.lbl.n,_MEM.gtes[e1.ext.n])
 --        LINE(me, '//> *PTR_EXT(IN_'..e1.ext.id..','..me.gte..') = '..me.lbl.id..';')
 
-        if (e1.ext.idx <= 127) then -- evtId, nGtes, [addr]*
+        if not e1.ext.inArg then -- evtId, nGtes, [addr]*
           codeB = LINE(me, 'await '..e1.ext.id..'['..me.gte..']',nil,'// AwaitExt:: ')
           BYTECODE(me,codeB,'op_set_c','ushort',(_MEM.gtes[e1.ext.n]+2+(me.gte*2)),me.lbl.n,true)
         else -- evtId, nGtes, [idAux,addr]*
@@ -1382,16 +1244,16 @@ print("code::AwaitExt: ",e1.ext.idx,e1.ext.n,me.gte,me.lbl.n,_MEM.gtes[e1.ext.n]
     ['Op1_-']   = function (me) Op1_any(me,'neg') end, 
     ['Op1_not']  = function (me) Op1_any(me,'lnot') end,
 
-    ['Op1_*'] = function (me)
-        local op, e1, e2 = unpack(me)
-        local tp = (_TP.deref(_TP.deref(e1.tp)) and 'ushort') or (_TP.deref(e1.tp) or e1.tp)
---print("code::Op1_*:",e1.tag,e1.val,e1.tp,tp,e1[1])
-		ASR(not _TP.deref(_TP.deref(e1.tp)),me,'"**Var" is not implemented! ')
-    ASR(_TP.isBasicType(tp),me,'type of "'..e1[1]..'" is not a basic type.')
-    CONC(me,e1)
-    codeB = LINE(me,'deref_ *'..e1[1],nil,'// Op1_*(push pointer content):: ')
-    BYTECODE(me,codeB,'op_deref',tp)
-    end,
+--    ['Op1_*'] = function (me)
+--        local op, e1, e2 = unpack(me)
+--        local tp = (_TP.deref(_TP.deref(e1.tp)) and 'ushort') or (_TP.deref(e1.tp) or e1.tp)
+----print("code::Op1_*:",e1.tag,e1.val,e1.tp,tp,e1[1])
+--		ASR(not _TP.deref(_TP.deref(e1.tp)),me,'"**Var" is not implemented! ')
+--    ASR(_TP.isBasicType(tp),me,'type of "'..e1[1]..'" is not a basic type.')
+--    CONC(me,e1)
+--    codeB = LINE(me,'deref_ *'..e1[1],nil,'// Op1_*(push pointer content):: ')
+--    BYTECODE(me,codeB,'op_deref',tp)
+--    end,
     
   ['Op2_.'] = function (me)
     local op, e1, id = unpack(me)
@@ -1443,6 +1305,7 @@ print("code::AwaitExt: ",e1.ext.idx,e1.ext.n,me.gte,me.lbl.n,_MEM.gtes[e1.ext.n]
 
   Op1_cast = function (me)
     local tp, exp = unpack(me)
+print("code::Op1_cast:",tp)
     CONC(me,exp)
     codeB = LINE(me,'cast '..tp,nil,'// cast <type> ')
     BYTECODE(me,codeB,'op_cast',tp)
@@ -1486,13 +1349,13 @@ print("code::AwaitExt: ",e1.ext.idx,e1.ext.n,me.gte,me.lbl.n,_MEM.gtes[e1.ext.n]
   LExp = function (me)
 --print("code::LExp:",me[1].tag,me[1].tp,(_TP.deref(me[1].tp) and 'ushort') or me[1].tp,me.tp,me[1][2].tag,me.val)
     local tp = (_TP.deref(me[1].tp) and 'ushort') or me[1].tp
-    if (me[1].code=="") then me[1].code='TODO' end
+    if (me[1].code=="") then me[1].code='TODO' end -- ???? very old!! why??
 
     if me[1].tag=='Var' then
         codeB = LINE(me,'push_c &'..me[1][1]..':'..tp,nil,'// push Var ')
         BYTECODE(me,codeB,'op_push_c',me.val)
-    elseif me[1].tag == 'Op1_*' then
-      CONC(me,me[1][2]); -- Ignore this "Op1_*"  
+--    elseif me[1].tag == 'Op1_*' then
+--      CONC(me,me[1][2]); -- Ignore this "Op1_*"  
     else
       CONC(me,me[1]);
     end
@@ -1521,7 +1384,7 @@ print("code::AwaitExt: ",e1.ext.idx,e1.ext.n,me.gte,me.lbl.n,_MEM.gtes[e1.ext.n]
 --print("code::Func: args:",#me[2],#me.ext.args)
     ASR(#me[2]==#me.ext.args,me,'invalid number of arguments for function ['.. me.ext.id ..'], received '.. #me[2] .. ' and it was expecting '..#me.ext.args  )
     for k,arg in ipairs(me.ext.args) do
-      local error, cast, ntp1, ntp2, len1, len2 =  _TP.tpCompat(arg,me[2][k].tp)
+      local error, cast, ntp1, ntp2, len1, len2 =  _TP.tpCompat(arg,(me[2][k].supertp or me[2][k].tp))
       ASR(not error ,me,'argument #'..k ..' in function ['.. me.ext.id ..'] must be compatible to "'.. arg.. '/'.. len1 ..'" type, it received "'.. me[2][k].tp..'/'.. len2 .. '" type')
       WRN(not cast,me, 'Applying the minimum size: "'.. arg..'/'..len1 ..'" <--> "' .. me[2][k].tp ..'/'..len2 ..'". ')
     end

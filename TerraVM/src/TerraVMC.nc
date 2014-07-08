@@ -36,6 +36,8 @@ implementation
 	bool haltedFlag=TRUE;
 	// VM Processing Flag
 	bool procFlag=FALSE;
+	// last system error code
+	nx_uint8_t ExtDataSysError;				
 
 	// Ceu Environment vars
 	uint16_t ProgStart;
@@ -115,7 +117,32 @@ implementation
 
 
 //------------------------ auxiliary functions --------
+/**
+ * Simulator viewer command
+ */
+void TViewer(char* cmd,uint16_t p1, uint16_t p2){
+	dbg("TVIEW","<<: %s %d %d %d :>>\n",cmd,TOS_NODE_ID,p1,p2);
+	}	
 
+/**
+ * Generate an error event
+ */
+ void evtError(uint8_t ecode){
+	evtData_t evtData;
+	dbg(APPNAME,"ERROR VM::evtError: error code=%d\n",ecode);
+	// Queue message event
+	ExtDataSysError = ecode;
+	evtData.evtId = I_ERROR_ID;
+	evtData.auxId = ecode;
+	evtData.data = &ExtDataSysError;
+	call evtQ.enqueue(evtData);
+	evtData.evtId = I_ERROR;
+	evtData.auxId = 0;
+	call evtQ.enqueue(evtData);
+	if (procFlag==FALSE) post procEvent();
+	TViewer("error",ecode,0);
+
+}
 
 	/*
 	 * Get constant values from program memory. Convert big-endian to the local type endian.
@@ -258,13 +285,13 @@ uint16_t getEvtCeuId(uint8_t EvtId){
 	uint8_t i=0;
 	uint8_t slotSize; // Normal slot has 2 bytes.  Slot with auxId has 3 bytes. 
 	uint16_t currSlot=gate0;
-	slotSize = ((*(nx_uint8_t*)(MEM+currSlot)) <= 127)?2:3;
+	slotSize = ((*(nx_uint8_t*)(MEM+currSlot+1)) & 0x80)?3:2; // Test bit7 of nGates to find slotSize
 dbg(APPNAME,"VM::getEvtCeuId(): EvtId?=%d : currSlot=%d,  slotId=%d, slotSize=%d, i=%d, inEvts=%d\n", EvtId, currSlot,(*(nx_uint8_t*)(MEM+currSlot)),slotSize,i,inEvts );
 //	while (EvtId > (*(nx_uint8_t*)(MEM+currSlot)) && i < inEvts) {
 	while (EvtId != (*(nx_uint8_t*)(MEM+currSlot)) && i < inEvts) {
 		i++;
-		currSlot = 	currSlot + 1 + ((*(nx_uint8_t*)(MEM+currSlot+1))*slotSize) + 1;
-		slotSize = ((*(nx_uint8_t*)(MEM+currSlot)) <= 127)?2:3;
+		currSlot = 	currSlot + 1 + (((*(nx_uint8_t*)(MEM+currSlot+1)) & 0x7f)*slotSize) + 1;
+		slotSize = ((*(nx_uint8_t*)(MEM+currSlot+1)) & 0x80)?3:2; // Test bit7 of nGates to find slotSize
 dbg(APPNAME,"VM::getEvtCeuId(): EvtId?=%d : currSlot=%d,  slotId=%d, slotSize=%d, i=%d, inEvts=%d\n", EvtId, currSlot,(*(nx_uint8_t*)(MEM+currSlot)),slotSize,i,inEvts );
 	}
 	if (EvtId != (*(nx_uint8_t*)(MEM+currSlot))) { 
@@ -459,15 +486,15 @@ void ceu_trigger (tceu_noff off, uint8_t auxId)
 {
     int i;
     uint8_t slotSize, evtId, slotAuxId;
-    int n = *(char*)(CEU->p_mem+off); //int n = CEU->mem[off];
+    int n = *(char*)(CEU->p_mem+off) & 0x7f; //int n = CEU->mem[off];
 	evtId = *(char*)(CEU->p_mem+off-1);
-	slotSize = (evtId<=127)?2:3;
+	slotSize = (*(char*)(CEU->p_mem+off) & 0x80)?3:2;
     dbg(APPNAME,"CEU::ceu_trigger(): evtId=%d, auxId=%d, slotSize=%d, gate addr=%d, nGates=%d\n",evtId,auxId,slotSize,off,n);
     for (i=0 ; i<n ; i++) {
         //ceu_spawn((tceu_nlbl*)&CEU->mem[off+1+(i*sizeof(tceu_nlbl))]);
-		if (evtId <= 127){
+		if (slotSize==2){ // doesn't test auxId
         	ceu_spawn((tceu_nlbl*)(CEU->p_mem+off+1+(i*slotSize)));
-		} else {
+		} else { // must test auxId
 			slotAuxId = *(char*)(CEU->p_mem+off+1+(i*slotSize));
 			if (slotAuxId==auxId) {
 	        	ceu_spawn((tceu_nlbl*)(CEU->p_mem+off+2+(i*slotSize)));
@@ -752,7 +779,8 @@ void f_mod(uint8_t Modifier){
 	v2 = pop();
 	dbg(APPNAME,"VM::f_mod(%02x): v1=%d, v2=%d, mod=%d\n",Modifier,v1,v2,v1%v2);
 	dbg("VMDBG","VM:: mod operation: (%d % %d) = %d \n",v1,v2,v1%v2);
-	push(v1%v2);
+	push((v2==0)?0:v1%v2);
+	if (v2==0) evtError(E_DIVZERO);
  }
  
 void f_mult(uint8_t Modifier){
@@ -771,6 +799,7 @@ void f_div(uint8_t Modifier){
 	dbg(APPNAME,"VM::f_div(%02x): v1=%d, v2=%d, div=%d\n",Modifier,v1,v2,(v2==0)?0:v1/v2);
 	dbg("VMDBG","VM:: div operation: (%d / %d) = %d \n",v1,v2,(v2==0)?0:v1/v2);
 	push((v2==0)?0:v1/v2);
+	if (v2==0) evtError(E_DIVZERO);
  }
  
 void f_bor(uint8_t Modifier){ 
@@ -1028,11 +1057,14 @@ void f_pusharr_v(uint8_t Modifier){
 	Maddr = getPar16(p1_1len);
  	Vidx  = getPar16(p2_1len);
 	Max   = getPar16(p3_1len);
-	dbg(APPNAME,"VM::f_pusharr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, Val=%d, IDX OVERFLOW=%s idx=%d newIdx=%d\n",Modifier,Maddr,Vidx,Max,
-			(getMVal(Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len)),_TFstr(getMVal(Vidx,v2_len) > Max),getMVal(Vidx,v2_len),getMVal(Vidx,v2_len)%Max);
+	dbg(APPNAME,"VM::f_pusharr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, Val=%d, IDX OVERFLOW=%s idx=%d\n",Modifier,Maddr,Vidx,Max,
+			(getMVal(Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len)),_TFstr(getMVal(Vidx,v2_len) > Max),getMVal(Vidx,v2_len));
 //	(getMVal(Vidx,v2_len)<Max)?push(getMVal(Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len)):0;
 // Alterado para fazer push de Addr+Id
-	push(Maddr+((getMVal(Vidx,v2_len)%Max)*v1_len));
+	if (getMVal(Vidx,v2_len) >= Max) 
+		evtError(E_IDXOFV);
+	else
+		push(Maddr+((getMVal(Vidx,v2_len)%Max)*v1_len));
 }
 
 void f_pop(uint8_t Modifier){ 
@@ -1071,9 +1103,12 @@ void f_poparr_v(uint8_t Modifier){
  	Vidx  = getPar16(p2_1len);
 	Max   = getPar16(p3_1len);
 	Value=pop();
-	dbg(APPNAME,"VM::f_poparr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, Value=%d, IDX OVERFLOW=%s idx=%d newIdx=%d\n",
-			Modifier,Maddr,Vidx,Max,Value,_TFstr(getMVal(Vidx,v2_len) > Max),getMVal(Vidx,v2_len),getMVal(Vidx,v2_len)%Max);
-	setMVal(Value,Maddr+((getMVal(Vidx,v2_len)%Max)*v1_len),v1_len);
+	dbg(APPNAME,"VM::f_poparr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, Value=%d, IDX OVERFLOW=%s idx=%d\n",
+			Modifier,Maddr,Vidx,Max,Value,_TFstr(getMVal(Vidx,v2_len) > Max),getMVal(Vidx,v2_len));
+	if (getMVal(Vidx,v2_len) >= Max) 
+		evtError(E_IDXOFV);
+	else
+		setMVal(Value,Maddr+((getMVal(Vidx,v2_len)%Max)*v1_len),v1_len);
 }
 
 
@@ -1092,9 +1127,12 @@ void f_setarr_vc(uint8_t Modifier){
  	Vidx  = getPar16(p2_1len);
 	Max   = getPar16(p3_1len);
 	Const = getPar32(p4_len);
-	dbg(APPNAME,"VM::f_setarr_vc(%02x):Maddr=%d, Vidx=%d, Max=%d, Const=%d, IDX OVERFLOW=%s idx=%d newIdx=%d\n",
-			Modifier,Maddr,Vidx,Max,Const,_TFstr(getMVal(Vidx,v2_len) > Max),getMVal(Vidx,v2_len),getMVal(Vidx,v2_len)%Max);
-	memcpy((MEM+Maddr+((getMVal(Vidx,v2_len)%Max)*v1_len)),&Const,v1_len);
+	dbg(APPNAME,"VM::f_setarr_vc(%02x):Maddr=%d, Vidx=%d, Max=%d, Const=%d, IDX OVERFLOW=%s idx=%d\n",
+			Modifier,Maddr,Vidx,Max,Const,_TFstr(getMVal(Vidx,v2_len) > Max),getMVal(Vidx,v2_len));
+	if (getMVal(Vidx,v2_len) >= Max) 
+		evtError(E_IDXOFV);
+	else
+		memcpy((MEM+Maddr+((getMVal(Vidx,v2_len)%Max)*v1_len)),&Const,v1_len);
 }
 void f_setarr_vv(uint8_t Modifier){
 	uint8_t v1_len,p1_1len,p2_1len,v2_len,p3_1len,p4_1len,v4_len,Aux;
@@ -1111,9 +1149,12 @@ void f_setarr_vv(uint8_t Modifier){
  	Vidx   = getPar16(p2_1len);
 	Max    = getPar16(p3_1len);
 	Maddr2 = getPar16(p4_1len);
-	dbg(APPNAME,"VM::f_setarr_vv(%02x):Maddr1=%d, Vidx=%d, Max=%d, Madr2=%d, IDX OVERFLOW=%s idx=%d newIdx=%d\n",
-				Modifier,Maddr1,Vidx,Max,Maddr2,_TFstr(getMVal(Vidx,v2_len) > Max),getMVal(Vidx,v2_len),getMVal(Vidx,v2_len)%Max);
-	memcpy((MEM+Maddr1+((getMVal(Vidx,v2_len)%Max)*v1_len)),(MEM+Maddr2),v1_len);
+	dbg(APPNAME,"VM::f_setarr_vv(%02x):Maddr1=%d, Vidx=%d, Max=%d, Madr2=%d, IDX OVERFLOW=%s idx=%d\n",
+				Modifier,Maddr1,Vidx,Max,Maddr2,_TFstr(getMVal(Vidx,v2_len) > Max),getMVal(Vidx,v2_len));
+	if (getMVal(Vidx,v2_len) >= Max) 
+		evtError(E_IDXOFV);
+	else
+		memcpy((MEM+Maddr1+((getMVal(Vidx,v2_len)%Max)*v1_len)),(MEM+Maddr2),v1_len);
 }
 
 void f_memclr(uint8_t Modifier){
@@ -1667,6 +1708,7 @@ void f_tkins_z(uint8_t Modifier){
 #ifndef ONLY_BSTATION
 		// Reset VMCustom
 		call VMCustom.reset();
+		TViewer("error",0,0); // Reset simulator viewer error flag
 		// Give control do Ceu
 		ceu_boot();
 #endif

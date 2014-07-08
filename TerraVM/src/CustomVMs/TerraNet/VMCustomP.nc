@@ -19,6 +19,7 @@ module VMCustomP{
 implementation{
 
 // Keeps last data value for events (ExtDataxxx must be nx_ type. Because it is copied direct to VM memory.)
+nx_uint8_t ExtDataSysError;				// last system error code
 nx_uint8_t ExtDataCustomA;				// last request custom event (internal loop-back)
 usrMsg_t ExtDataRadioReceived;	// last radio received msg
 nx_uint8_t ExtDataSendDoneError;
@@ -124,9 +125,10 @@ void  proc_req_custom_a(uint16_t id, uint32_t value){
 	uint8_t auxId ;
 	ExtDataCustomA = (uint8_t)value;
 	dbg(APPNAME,"Custom::proc_req_custom_a(): id=%d, ExtDataCustomA=%d\n",id,ExtDataCustomA);
-	auxId = (I_CUSTOM_A > 127)?(uint8_t)signal VM.pop():0;
+	auxId = (uint8_t)signal VM.pop();
 	// Queue the custom event
-	signal VM.queueEvt(I_CUSTOM_A,auxId, &ExtDataCustomA);
+	signal VM.queueEvt(I_CUSTOM_A_ID,auxId, &ExtDataCustomA);
+	signal VM.queueEvt(I_CUSTOM_A   ,    0, &ExtDataCustomA);
 	}
 	
 /*
@@ -231,10 +233,8 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 	}
 
 	task void BCRadio_receive(){
-		uint8_t auxId=0;
-		if (I_RECEIVE > 127) auxId = ExtDataRadioReceived.type;
-		signal VM.queueEvt(I_RECEIVE,auxId,&ExtDataRadioReceived);	
-		signal VM.queueEvt(I_RECEIVE_ANY,0,&ExtDataRadioReceived);	
+		signal VM.queueEvt(I_RECEIVE_ID, ExtDataRadioReceived.type, &ExtDataRadioReceived);	
+		signal VM.queueEvt(I_RECEIVE   ,                         0, &ExtDataRadioReceived);	
 	}
 
 	event void BSRadio.receive(uint8_t am_id, message_t* msg, void* payload, uint8_t len){
@@ -250,11 +250,9 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 	event void BSRadio.sendDone(uint8_t am_id,message_t* msg,void* dataMsg, error_t error){
 		dbg(APPNAME,"Custom::BSRadio.sendDone(): AM_ID = %d, error=%d\n",am_id,error);
 		if (am_id == AM_USRMSG){
-			uint8_t auxId = 0;
-			if (I_SEND_DONE > 127) auxId = ((usrMsg_t*)dataMsg)->type; 
 			ExtDataSendDoneError = (uint8_t)error;
-			signal VM.queueEvt(I_SEND_DONE, auxId, &ExtDataSendDoneError);
-			signal VM.queueEvt(I_SEND_DONE_ANY, 0, &ExtDataSendDoneError);
+			signal VM.queueEvt(I_SEND_DONE_ID, ((usrMsg_t*)dataMsg)->type, &ExtDataSendDoneError);
+			signal VM.queueEvt(I_SEND_DONE   ,                          0, &ExtDataSendDoneError);
 		} else {
 			dbg(APPNAME,"Custom::BSRadio.sendDone(): Discarting sendDone AM_ID = %d\n",am_id);
 		}
@@ -262,11 +260,9 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 	event void BSRadio.sendDoneAck(uint8_t am_id,message_t* msg,void* dataMsg,error_t error, bool wasAcked){
 		dbg(APPNAME,"Custom::BSRadio.sendDoneAck(): AM_ID = %d, error=%d, ack=%d\n",am_id,error,wasAcked);
 		if (am_id == AM_USRMSG){
-			uint8_t auxId = 0;
-			if (I_SEND_DONE_ACK > 127) auxId = ((usrMsg_t*)dataMsg)->type; 
 			ExtDataWasAcked = (uint8_t)wasAcked;
-			signal VM.queueEvt(I_SEND_DONE_ACK, auxId, &ExtDataWasAcked);
-			signal VM.queueEvt(I_SEND_DONE_ACK_ANY, 0, &ExtDataWasAcked);
+			signal VM.queueEvt(I_SEND_DONE_ACK_ID, ((usrMsg_t*)dataMsg)->type, &ExtDataWasAcked);
+			signal VM.queueEvt(I_SEND_DONE_ACK   ,                          0, &ExtDataWasAcked);
 		} else {
 			dbg(APPNAME,"Custom::BSRadio.sendDoneAck(): Discarting sendDoneAck AM_ID = %d\n",am_id);
 		}

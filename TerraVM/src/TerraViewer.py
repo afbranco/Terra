@@ -228,6 +228,14 @@ class gNode:
         pygame.display.update(pygame.draw.lines(screen,color,False,points,1))
         eraseQueue.append((pygame.time.get_ticks()+eraseTime,points))
 
+    def error(self,ecode):
+        if ecode == 0 : # error reset
+            pygame.draw.rect(screen,BLUE,self.node,1)
+            pygame.display.update(self.node)
+        else:
+            pygame.draw.rect(screen,RED,self.node,1)
+            pygame.display.update(self.node)
+
   
 ##################
 #
@@ -245,6 +253,7 @@ class gNode:
 # "<<: sensor 11 photo :>>"
 # "<<: serial 0 0 :>>"
 # "<<: serial 1 0 :>>"
+# "<<: error 1 10 :>>"
 ###################
 def procCMD(cmd,node,p1,p2):
     return {
@@ -258,7 +267,8 @@ def procCMD(cmd,node,p1,p2):
       'leds': leds,
       'radio': radio,
       'sensor': sensor,
-      'serial': serial
+      'serial': serial,
+      'error': error
     }[cmd](int(node),int(p1),int(p2))
 
 def clock(node,param,p2):
@@ -398,6 +408,10 @@ def sensor(node,param,p2):
 def serial(node,param,p2):
     if gNodes[node]:
         gNodes[node].serial(param)    
+
+def error(node,param,p2):
+    if gNodes[node]:
+        gNodes[node].error(param)    
     
 def update(ScreenSize):
     global screen

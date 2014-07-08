@@ -1,5 +1,44 @@
 #include "TerraNet.defs"
 
+pktype msg of radioMsg with
+	var byte[4] data1;
+end
+var msg a;
+a = await RECEIVE(1);
+
+
+//var ushort x = await TEMP(1);
+
+/*
+var byte[4] x;
+var byte a;
+	emit LEDS(a);
+
+regtype sss with
+	var byte data;
+end
+
+
+/*
+pktype msg of radioMsg with
+	var byte data1;
+end
+var msg a;
+a.type=1;
+a.target=1;
+
+
+loop idx, 8 do
+	await 2s;
+	emit LEDS(idx);
+	a.data1= idx;
+	emit SEND(a);
+	await SEND_DONE_ANY();
+//	x[idx]=idx;
+end
+x[2]=0;
+x[0] = x[1]/x[2];
+
 
 /*
 var long a1;

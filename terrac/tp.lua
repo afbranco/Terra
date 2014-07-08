@@ -95,26 +95,23 @@ function _TP.tpCompat(tp1,tp2,arr1,arr2)
 -- *** Valid operations ***
 -- auxtag1  = auxtag2;  arr/data;   size limit;     cast
 -------------------------------------------------------------
--- pointer  = pointer;  addr copy;  len1 <= len2;   len1 < len2
--- pointer  = data;     addr copy;  len1 <= len2;   len1 < len2
+--R pointer  = pointer;  addr copy;  len1 <= len2;   len1 < len2
+--R pointer  = data;     addr copy;  len1 <= len2;   len1 < len2
 -- data     = data;     data copy;  min(len1,len2); len1 <> len2
 -- var      = var;      data copy;  min(len1,len2); len1 < len2
 -- ???      = void;     default 'invalid'
 -------------------------------------------------------------
 
     if
-        (z1.auxtag == 'pointer'  and z2.auxtag == 'pointer')  and (z1.len <= z2.len) or
-        (z1.auxtag == 'pointer2' and z2.auxtag == 'pointer2') and (z1.len <= z2.len) or
-        (z1.auxtag == 'pointer'  and z2.auxtag == 'data'   )  and (z1.len <= z2.len) or
         (z1.auxtag == 'var'      and z2.auxtag == 'var'    )                    
     then
         error = false
         cast = (z1.len < z2.len)
     elseif
-        (z1.auxtag == 'data'     and z2.auxtag == 'data'   )                    
+        (z1.auxtag == 'data'     and z2.auxtag == 'data'   ) and (z1.tp == z2.tp)                   
     then
         error = false
-        cast = (z1.len ~= z2.len)
+        cast = false
     else
         error = true
         cast = false

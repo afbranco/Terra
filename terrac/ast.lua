@@ -354,8 +354,8 @@ local C; C = {
         return node(tag)(ln, e1, e2, op==':=')
     end,
 
-    _Dcl_ext = function (ln, dir, tp, name, id)
-            return node('Dcl_ext')(ln, dir, tp, name, id)
+    _Dcl_ext = function (ln, dir, retTp, name, argTp, id)
+            return node('Dcl_ext')(ln, dir, retTp, name, argTp, id)
     end,
 
     _Dcl_func = function (ln, op, mod, tp,id,...)
@@ -391,19 +391,60 @@ local C; C = {
 --print("ast::_Exp2:", v1.tag, v2, v3.tag)
 --print("ast::_Exp2:", v1[1], v2, v3[1])
             -- v1=e1, v2=op, v3=e2, v4=?
-            if v1.tag=='CONST' and v3.tag=='CONST' and 
-              (v2=='+' or v2=='-' or v2=='/' or v2=='*' or v2 == '%')
-            then
-
-              if v2=='/' and (v3[1]*1)==0 then
-                ASR(false,v3,'division by zero.')
+            if v1.tag=='CONST' and v3.tag=='CONST' then
+              local boolT = {}
+              boolT[true]=1; boolT[false]=0;
+              if (v2=='+' or v2=='-' or v2=='/' or v2=='*' or v2 == '%') then
+                if (v2=='/' or v2=='%') and (v3[1]*1)==0 then
+                  ASR(false,v3,'division by zero.')
+                else
+                  loadstring('newConst = '..v1[1]..' '..v2..' '..v3[1])()
+                end
+                return C._Exp(ln,
+                        node('CONST')(ln, math.floor(newConst)),
+                      select(4,...)
+                  )
+              elseif (v2=='==' or v2=='!=' or v2=='>' or v2=='<' or v2 == '>=' or v2 == '<=') then
+                local relat_op = string.gsub(v2,'!','~')
+                loadstring('relat_result = '..v1[1]..' '.. relat_op ..' '..v3[1])()
+                return C._Exp(ln,
+                        node('CONST')(ln, boolT[relat_result]),
+                      select(4,...)
+                  )
+              elseif (v2=='<<') then
+                  loadstring('newConst = '.. v1[1].. ' * math.pow( 2,'..v3[1] ..')')()
+                  local newConst2 = tonumber(string.format("0x%08x",newConst))
+--print("ast::_Exp: `<<´:",string.format("0x%08x",newConst),tonumber(string.format("0x%08x",newConst)))
+                  return C._Exp(ln,
+                          node('CONST')(ln, math.floor(newConst2)),
+                        select(4,...)
+                    )
+              elseif (v2=='>>') then
+                  loadstring('newConst = '.. v1[1].. ' / math.pow( 2,'..v3[1] ..')')()
+                  return C._Exp(ln,
+                          node('CONST')(ln, math.floor(newConst)),
+                        select(4,...)
+                    )
+              elseif (v2=='and') then
+                  newConst = boolT[tonumber(v1[1])~=0 and tonumber(v3[1])~=0]  
+print("ast::_Exp: `and´:",tonumber(v1[1]),tonumber(v3[1]),tonumber(v1[1])~=0 and tonumber(v3[1])~=0,newConst)
+                  return C._Exp(ln,
+                          node('CONST')(ln, math.floor(newConst)),
+                        select(4,...)
+                    )
+              elseif (v2=='or') then
+                  newConst = boolT[tonumber(v1[1])~=0 or tonumber(v3[1])~=0]  
+print("ast::_Exp: `or´:",tonumber(v1[1]),tonumber(v3[1]),tonumber(v1[1])~=0 or tonumber(v3[1])~=0,newConst)
+                  return C._Exp(ln,
+                          node('CONST')(ln, math.floor(newConst)),
+                        select(4,...)
+                    )
               else
-                loadstring('newConst = '..v1[1]..' '..v2..' '..v3[1])()
+                  return C._Exp(ln,
+                      node('Op2_'..v2)(ln, v2, v1, v3),
+                      select(4,...)
+                  )
               end
-              return C._Exp(ln,
-                      node('CONST')(ln, math.ceil(newConst)),
-                    select(4,...)
-                )
             else
                 return C._Exp(ln,
                     node('Op2_'..v2)(ln, v2, v1, v3),
