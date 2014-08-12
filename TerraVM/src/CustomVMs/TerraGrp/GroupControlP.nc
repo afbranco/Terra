@@ -11,6 +11,7 @@
  */
 
 #include "VMCustomGrp.h"
+#include "BasicServices.h"
 
 module GroupControlP{
 	provides interface GroupControl as GrCtl;
@@ -24,17 +25,6 @@ implementation{
 	NHopsList_t NHopsList;	// Control list to avoid duplicated NHops events
 	uint16_t MoteID;
 
-	/**
-	 * Initialize the data  (reset all data)
-	 */
-	command void GrCtl.init(){
-		dbg(APPNAME, "GrCtl:GrCtl.initComm().\n");
-		MoteID = TOS_NODE_ID;
-		// Only for first initialization (boot)
-		if (firstInic){
-			sendSeq = 0;
-		}
-	}
 
 	/**
 	* Insert a NHops id in NHopsList. Return FAIL if already exists.
@@ -77,7 +67,33 @@ implementation{
 		dbg(APPNAME, "CM::getNHopsList(): Target=%hhu. Next not found!\n",TargetMote);
 		return FAIL;
 	}
+	/**
+	 * Clear the routing information
+	 */
+	void clearNHopsList(){
+		int i;
+		i=0;
+		while (i<NHOPS_LIST_SIZE) {
+			NHopsList.TargetMote[i] =0;
+			NHopsList.PrevMote[i]=0;
+			i++;
+			}
+		dbg(APPNAME, "CM::clearNHopsList(): \n");
+	}
 	
+	/**
+	 * Initialize the data  (reset all data)
+	 */
+	command void GrCtl.init(){
+		dbg(APPNAME, "GrCtl:GrCtl.initComm().\n");
+		MoteID = TOS_NODE_ID;
+		clearNHopsList();
+		// Only for first initialization (boot)
+		if (firstInic){
+			sendSeq = 0;
+		}
+	}
+
 /* ****************************************************************************
  *         Send commands
 \* ***************************************************************************/
@@ -93,9 +109,9 @@ implementation{
 	 * @param dataSize Data structure size
 	 * @param data Pointer to data structure
   	 */
- 	command void GrCtl.sendGR(uint8_t grId, uint8_t grParam, uint8_t maxHops, uint16_t targetNode, uint8_t evtId, uint8_t dataSize, uint8_t* data){
+ 	command uint8_t GrCtl.sendGR(uint8_t grId, uint8_t grParam, uint8_t maxHops, uint16_t targetNode, uint8_t evtId, uint8_t dataSize, uint8_t* data){
  		sendGR_t xData;
- 		uint8_t i=0;
+ 		uint8_t i=0,reqRetryAck;
 		bool toGr=TRUE;
 		nx_uint16_t sendToMote;
 		dbg(APPNAME, "GrCtl:GrCtl.sendGR(): dataSize=%d\n",dataSize);
@@ -122,17 +138,20 @@ implementation{
 
 		if ((grId & (1<<GRND_BIT)) > 0) toGr = FALSE;
 		sendToMote = AM_BROADCAST_ADDR;
+		reqRetryAck= (1<<REQ_RETRY_BIT) | (1<< REQ_ACK_BIT);
 		if (toGr==FALSE){
 			if (getNHopsList(targetNode,&sendToMote)!=SUCCESS ) {
 				dbg(APPNAME, "GrCtl:GrCtl.sendGR(): Can't find sendToMote. Broadcasting the message!\n");
 				sendToMote = AM_BROADCAST_ADDR;
+				reqRetryAck=0;
 			}
 		} else {
 			sendToMote = AM_BROADCAST_ADDR;
+			reqRetryAck=0;
 		}
-		dbg(APPNAME, "GrCtl:GrCtl.sendGR(): [toGr=%s] senToMote=%hhu, grId=%hhu[%hhu], grParam=%hhu\n",(toGr)?"true":"false",sendToMote,grId,grId&0x01f,grParam );  
+		dbg(APPNAME, "GrCtl:GrCtl.sendGR(): [toGr=%s] senToMote=%d, grId=%hhu[%hhu], grParam=%d\n",(toGr)?"true":"false",sendToMote,grId,grId&0x01f,grParam );  
 		// Send via BSRadio Custom Message
-		call BSRadio.send(AM_SENDGR, sendToMote, &xData, sizeof(sendGR_t), FALSE);
+		return call BSRadio.send(AM_SENDGR, sendToMote, &xData, sizeof(sendGR_t), reqRetryAck);
 
  	}
 
@@ -160,8 +179,8 @@ implementation{
 		memcpy(xData.Data,reqData,sizeof(aggReqData_t));
  		// Populate message control values
  		xData.HopNumber=1;
- 		xData.ReqMote = TOS_NODE_ID;
- 		xData.ReqSeq = sendSeq++;
+ 		xData.ReqMote = (nx_uint16_t)TOS_NODE_ID;
+ 		xData.ReqSeq = (nx_uint16_t)sendSeq++;
 
 		dbg(APPNAME, "GrCtl:GrCtl.aggreg(): grId=%hhu[%hhu], grParam=%hhu\n",grId,grId&0x01f,grParam );  
 		// Send via BSRadio Custom Message
@@ -179,7 +198,7 @@ implementation{
 	 * @param data Pointer to data structure
 	 */
 #ifdef MODULE_CTP
-	command void GrCtl.sendBS(uint8_t evtId, uint8_t dataSize, uint8_t* data){
+	command uint8_t GrCtl.sendBS(uint8_t evtId, uint8_t dataSize, uint8_t* data){
 		sendBS_t xData;
 		uint8_t i=0;
 		dbg(APPNAME, "GrCtl:GrCtl.sendBS(): evtId=%d, dataSize=%d, data[0]=%d\n", evtId,dataSize, *(uint8_t*)data);
@@ -187,14 +206,14 @@ implementation{
  		for (i=0; i < dataSize; i++) xData.Data[i] = data[i];
 		xData.Sender = TOS_NODE_ID;
  		xData.seq = sendSeq++;
- 		call BSRadio.sendBS(&xData, sizeof(sendBS_t));
+ 		return call BSRadio.sendBS(&xData, sizeof(sendBS_t));
 	}
 #endif // MODULE_CTP
-	event void BSRadio.sendDone(uint8_t am_id,message_t* msg,error_t error){
-		// Do nothing by now!
+	event void BSRadio.sendDone(uint8_t am_id,message_t* msg,void* dataMsg,error_t error) {
+	// Do nothing by now!
 		// In future may return an event to VM.
 	}
-	event void BSRadio.sendDoneAck(uint8_t am_id,message_t* msg,error_t error, bool wasAcked){
+	event void BSRadio.sendDoneAck(uint8_t am_id,message_t* msg,void* dataMsg,error_t error, bool wasAcked) {
 		// Do nothing by now!
 		// In future may return an event to VM.
 	}
@@ -208,7 +227,7 @@ implementation{
 	event void BSRadio.receive(uint8_t am_id, message_t* msg, void* payload, uint8_t len){
 		nx_uint16_t prevMote,sendToMote;
 		uint8_t lData[SEND_DATA_SIZE];
-		uint8_t i=0;
+		uint8_t i=0,reqRetryAck;
 		dbg(APPNAME, "GrCtl::BSRadio.receive(): AM_ID =%d.\n",am_id);
 
 		if (am_id == AM_SENDGR) { // receiving a SendGrp message	
@@ -219,7 +238,7 @@ implementation{
 			/*
 			 * Manipulate input message
 			 */
-	
+			dbg(APPNAME, "GrCtl::BSRadio.receive(): Data->grId=0x%02x, Data->TargetMote=%d\n",Data->grId,Data->TargetMote); 	
 			// Save NHopsList data, discard message if is already there.
 			if (insertNHopsList(Data->ReqMote,prevMote,Data->ReqSeq)==FAIL) { dbg(APPNAME, "GrCtl::BSRadio.receive(): Discarding duplicated message!\n"); return;}
 			// IF sendGR or sendGRND
@@ -237,12 +256,14 @@ implementation{
 					dbg(APPNAME, "GrCtl::BSRadio.receive(): toGr=%s\n",(Data->grId & (1<<GRND_BIT))?"true":"false");
 					// SendGRND - Forward to getNHopsList mote
 					sendToMote = AM_BROADCAST_ADDR;
+					reqRetryAck= (1<<REQ_RETRY_BIT) | (1<< REQ_ACK_BIT);
 					if (getNHopsList(Data->TargetMote,&sendToMote)!=SUCCESS ) {
 						dbg(APPNAME, "GrCtl::BSRadio.receive(): Can't find sendToMote. Broadcasting the message!\n");
 						sendToMote = AM_BROADCAST_ADDR;
+						reqRetryAck=0;
 					}
 					Data->HopNumber++;
-					call BSRadio.send(AM_SENDGR, sendToMote, Data, sizeof(sendGR_t), FALSE);
+					call BSRadio.send(AM_SENDGR, sendToMote, Data, sizeof(sendGR_t), reqRetryAck);
 					return;
 				}
 			}
@@ -270,6 +291,8 @@ implementation{
 					signal GrCtl.electionMsg((uint8_t) Data->evtId, elctData);							
 				} else {
 					// Copy data from nx_uint8_t to uint8_t
+				// Discard others message
+				if (Data->TargetMote !=AM_BROADCAST_ADDR && Data->TargetMote != MoteID) { dbg(APPNAME, "GrCtl::BSRadio.receive(): Discarding others message!\n"); return;}
 					for (i=0; i < SEND_DATA_SIZE; i++) lData[i] = (uint8_t)Data->Data[i];
 					signal GrCtl.evtReady((uint8_t) Data->evtId, lData, (uint8_t)Data->grId,(uint16_t)Data->ReqMote);						
 				}

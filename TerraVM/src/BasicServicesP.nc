@@ -132,6 +132,7 @@ implementation{
 	nx_uint16_t ProgMoteSource;
 	nx_uint8_t ProgBlockStart;
 	nx_uint8_t ProgBlockLen;
+	uint8_t loadingProgramFlag=FALSE;
 	
 	uint8_t ProgTimeOutCounter=0;
 	uint8_t DsmBlockCount=0;
@@ -236,13 +237,15 @@ implementation{
 			 	// Wait next block up to time-out
 			 	call ProgReqTimer.startOneShot(REQUEST_TIMEOUT);
 		 	}
+		}
 #ifndef NO_BSTATION
 #ifdef MODULE_CTP
-		if (MoteID==BStation) { call RootControl.setRoot();}
+		if (MoteID==BStation) { 
+			call RootControl.setRoot();
+		}
 #endif
 #endif
 		signal BSBoot.booted();
-		}
 	}
 	event void RadioControl.stopDone(error_t error) {
 		dbg(APPNAME, "BS::RadioControl.stopDone().\n");
@@ -456,7 +459,7 @@ implementation{
 			tempInputOutQ.AM_ID = am_id;
 			tempInputOutQ.DataSize = len;
 			tempInputOutQ.sendToMote = AM_BROADCAST_ADDR;
-			tempInputOutQ.reqAck = FALSE;
+			tempInputOutQ.reqAck = 0;
 			if (call outQ.put(&tempInputOutQ)!= SUCCESS) {
 				dbg(APPNAME, "BS::recCustomMsgNet(): outQueue is full! Losting a message.\n");
 			}
@@ -508,7 +511,7 @@ implementation{
 				break;	
 			default:
 				if (id >= AM_CUSTOM_START && id <= AM_CUSTOM_END) { // AM_CUSTOM Range
-					recCustomMsgNet_receive(msg,payload,len);
+					if (loadingProgramFlag == FALSE) recCustomMsgNet_receive(msg,payload,len);
 		 		} else {
 					dbg(APPNAME, "BS::RadioReceiver.receive(). Received a undefined AM=%hhu from %hhu\n",id,call RadioAMPacket.source(msg));	 		
 		 		}
@@ -571,6 +574,7 @@ implementation{
 	 	ReqState = RO_DATA_FULL;
 	 	xData.versionId = ProgVersion;
 	 	xData.blockId = ProgBlockStart;
+	 	loadingProgramFlag = TRUE;
 	 	sendReqProgBlock(&xData);
 	 	// Wait next block up to time-out
 		if (MoteID != BStation)
@@ -603,6 +607,7 @@ implementation{
 		 // Check if it was the last block
 		 if ( call BM.isAllBitSet()) {
 		 	call Leds.set(0);
+		 	loadingProgramFlag = FALSE;
 		 	if (MoteID != BStation){
 			 	// Start the VM
 	 			ReqState=ST_IDLE;
@@ -863,7 +868,7 @@ implementation{
 			call setDataQ.element(idx,&xData);
 			sendSetDataND(&xData);				
 		} else {
-		dbg(APPNAME, "BS::procReqData(). idx=%hhu >= SET_DATA_LIST_SIZE=%hhu\n",idx,SET_DATA_LIST_SIZE);
+			dbg(APPNAME, "BS::procReqData(). idx=%hhu >= SET_DATA_LIST_SIZE=%hhu\n",idx,SET_DATA_LIST_SIZE);
 		}
 	}
 	/**
@@ -934,12 +939,14 @@ implementation{
 #ifdef MODULE_CTP
 	void sendBSN(){
 #ifndef ONLY_BSTATION
+		error_t stat;
 		// Send to Radio
 		if (MoteID != BStation){
 			memcpy(call sendBSNet.getPayload(&sendBuff,call sendBSNet.maxPayloadLength()), &tempOutputOutQ.Data, tempOutputOutQ.DataSize);
-			dbg(APPNAME, "BS::sendBSNet(): Sending Message AM_ID=%hhu\n", tempOutputOutQ.AM_ID);
-			if (call sendBSNet.send(&sendBuff, tempOutputOutQ.DataSize) != SUCCESS) {
-				dbg(APPNAME,"BS::sendBSNet(): Error in Sending Message\n");
+			dbg(APPNAME, "BS::sendBSNet(): Sending Message AM_ID=%d, size=%d, maxSize=%d\n", tempOutputOutQ.AM_ID,tempOutputOutQ.DataSize,call sendBSNet.maxPayloadLength());
+			stat = call sendBSNet.send(&sendBuff, tempOutputOutQ.DataSize);
+			if (stat != SUCCESS) {
+				dbg(APPNAME,"BS::sendBSNet(): Error in Sending Message(%d))\n",stat);
 				call sendTimer.startOneShot(reSendDelay);
 			}
 		}
@@ -979,9 +986,9 @@ implementation{
 
 	void sendRadioN(){
 		error_t err;
-		dbg(APPNAME,"BS::sendRadioN(): AM=%hhu to %d, reqAck=%s\n",tempOutputOutQ.AM_ID, tempOutputOutQ.sendToMote, _TFstr(tempOutputOutQ.reqAck));
+		dbg(APPNAME,"BS::sendRadioN(): AM=%hhu to %d, reqAck=%s\n",tempOutputOutQ.AM_ID, tempOutputOutQ.sendToMote, _TFstr((tempOutputOutQ.reqAck & (1<<REQ_ACK_BIT)) > 0));
 		memcpy(call RadioPacket.getPayload(&sendBuff,call RadioPacket.maxPayloadLength()), &tempOutputOutQ.Data, tempOutputOutQ.DataSize);
-		if ( tempOutputOutQ.reqAck == TRUE){
+		if ( (tempOutputOutQ.reqAck & (1<<REQ_ACK_BIT)) > 0){
 			if (call RadioAck.requestAck(&sendBuff) != SUCCESS) dbg(APPNAME, "BS::sendRadioN()(): requestAck() error!\n");
 		}
 		err = RadioSender_send(tempOutputOutQ.AM_ID,tempOutputOutQ.sendToMote, &sendBuff, tempOutputOutQ.DataSize);
@@ -1018,7 +1025,7 @@ implementation{
 //		printf("snd_%d.",tempOutputOutQ.AM_ID); printfflush();
 		switch (tempOutputOutQ.AM_ID) {
 #ifdef MODULE_CTP
-			case AM_SENDBS: sendBSN(); 
+			case AM_SENDBS: 
 				// Send to Radio/CTP or UART
 				if (MoteID != BStation){
 					sendBSN();
@@ -1105,16 +1112,23 @@ implementation{
 	event void RadioSender.sendDone[am_id_t id](message_t *msg, error_t error){
 #else
 	void RadioSender_sendDone(am_id_t id,message_t *msg, error_t error){
-#endif		
+#endif
+	  bool doneStatus, reqRetry, reqAck;
+	  //GenericData_t tempBuff;		
 	  if (id > AM_RESERVED_END) {
-		if (error == SUCCESS) {						// Get next message
+	  	call outQ.read(&tempOutputOutQ);
+	  	doneStatus = (error == SUCCESS);
+	  	reqAck   = (tempOutputOutQ.reqAck & (1<<REQ_ACK_BIT)) > 0; 
+	  	reqRetry = (tempOutputOutQ.reqAck & (1<<REQ_RETRY_BIT)) > 0; 
+	  	if (doneStatus && reqAck) doneStatus = (uint8_t)call RadioAck.wasAcked(msg);  
+		if (doneStatus) {						// Get next message
 			dbg(APPNAME, "BS::sendDone(): SUCCESS SendCounter=%hhu\n",sendCounter);
-			call outQ.get(&tempOutputOutQ);
+			call outQ.get(&tempOutputOutQ); 
 			sendCounter=0;
 			call sendTimer.startOneShot(reSendDelay);
 			if ( tempOutputOutQ.AM_ID >= AM_CUSTOM_START && tempOutputOutQ.AM_ID <= AM_CUSTOM_END){
 				dbg(APPNAME,"BS::sendDone(): UsrMsg err=%d ack=%d, \n",error,call RadioAck.wasAcked(msg));
-				if (tempOutputOutQ.reqAck == TRUE) 
+				if (reqAck == TRUE) 
 					signal BSRadio.sendDoneAck(tempOutputOutQ.AM_ID,msg,tempOutputOutQ.Data,error, call RadioAck.wasAcked(msg));
 				else
 					signal BSRadio.sendDone(tempOutputOutQ.AM_ID,msg,tempOutputOutQ.Data,error);
@@ -1129,6 +1143,13 @@ implementation{
 				call outQ.get(&tempOutputOutQ);
 				sendCounter=0;
 				call sendTimer.startOneShot(reSendDelay);
+				if ( tempOutputOutQ.AM_ID >= AM_CUSTOM_START && tempOutputOutQ.AM_ID <= AM_CUSTOM_END){
+					dbg(APPNAME,"BS::sendDone(): FAIL-UsrMsg err=%d ack=%d, \n",error,call RadioAck.wasAcked(msg));
+					if (reqAck == TRUE) 
+						signal BSRadio.sendDoneAck(tempOutputOutQ.AM_ID,msg,tempOutputOutQ.Data,error, call RadioAck.wasAcked(msg));
+					else
+						signal BSRadio.sendDone(tempOutputOutQ.AM_ID,msg,tempOutputOutQ.Data,error);
+				}
 			}
 		}
 	  }
@@ -1197,7 +1218,7 @@ implementation{
 		tempInputOutQ.AM_ID = AM_NEWPROGVERSION;
 		tempInputOutQ.DataSize = sizeof(newProgVersion_t);
 		tempInputOutQ.sendToMote = AM_BROADCAST_ADDR;
-		tempInputOutQ.reqAck = FALSE;
+		tempInputOutQ.reqAck = 0;
 		if (call outQ.put(&tempInputOutQ)!= SUCCESS) {
 			dbg(APPNAME, "BS::sendNewProgVersion(): outQueue is full! Losting a message.\n");
 		}
@@ -1213,7 +1234,7 @@ implementation{
 		tempInputOutQ.AM_ID = AM_NEWPROGBLOCK;
 		tempInputOutQ.DataSize = sizeof(newProgBlock_t);
 		tempInputOutQ.sendToMote = AM_BROADCAST_ADDR;
-		tempInputOutQ.reqAck = FALSE;
+		tempInputOutQ.reqAck = 0;
 		if (call outQ.put(&tempInputOutQ)!= SUCCESS) {
 			dbg(APPNAME, "BS::sendNewProgBlock(): outQueue is full! Losting a message.\n");
 		}
@@ -1230,7 +1251,7 @@ implementation{
 		tempInputOutQ.AM_ID = AM_REQPROGBLOCK;
 		tempInputOutQ.DataSize = sizeof(reqProgBlock_t);
 		tempInputOutQ.sendToMote = ProgMoteSource;
-		tempInputOutQ.reqAck = FALSE;
+		tempInputOutQ.reqAck = 0;
 		if (call outQ.put(&tempInputOutQ)!= SUCCESS) {
 			dbg(APPNAME, "BS::sendReqProgBlock(): outQueue is full! Losting a message.\n");
 		}
@@ -1246,7 +1267,7 @@ implementation{
 		tempInputOutQ.AM_ID = AM_REQDATA;
 		tempInputOutQ.DataSize = sizeof(reqData_t);
 		tempInputOutQ.sendToMote = NewDataMoteSource;
-		tempInputOutQ.reqAck = FALSE;
+		tempInputOutQ.reqAck = 0;
 		if (call outQ.put(&tempInputOutQ)!= SUCCESS) {
 			dbg(APPNAME, "BS::sendReqData(): outQueue is full! Losting a message.\n");
 		}
@@ -1262,7 +1283,7 @@ implementation{
 		tempInputOutQ.AM_ID = AM_SETDATAND;
 		tempInputOutQ.DataSize = sizeof(setDataND_t);
 		tempInputOutQ.sendToMote = AM_BROADCAST_ADDR;
-		tempInputOutQ.reqAck = FALSE;
+		tempInputOutQ.reqAck = 0;
 		if (call outQ.put(&tempInputOutQ)!= SUCCESS) {
 			dbg(APPNAME, "BS::sendSetDataND(): outQueue is full! Losting a message.\n");
 		}
@@ -1281,7 +1302,7 @@ implementation{
 		dbg("VMDBG","Radio: Sending user msg AM_ID=%d to node %d\n",am_id, target);		
 		if (call outQ.put(&tempInputOutQ)!= SUCCESS) {
 			dbg(APPNAME, "BS::BSRadio.send(): outQueue is full! Losting a message.\n");
-			return FAIL;
+			return EBUSY;
 		}
 		return SUCCESS;
 	}
@@ -1301,7 +1322,7 @@ implementation{
 		tempInputOutQ.sendToMote = 0; // Use the CTP
 		if (call outQ.put(&tempInputOutQ)!= SUCCESS) {
 			dbg(APPNAME, "BS::CM.sendBS(): outQueue is full! Losting a message.\n");
-			return FAIL;
+			return EBUSY;
 		}
 #endif // ONLY_BSTATION
 		return SUCCESS;
@@ -1355,7 +1376,8 @@ implementation{
 		tempInputInQ.AM_ID = AM_SENDBS;
 		tempInputInQ.DataSize = sizeof(sendBS_t);
 		// put the message in inQueue
-		if (call inQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recSendBS.receive(): inQueue is full! Losting a message.\n");
+//		if (call inQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recSendBS.receive(): inQueue is full! Losting a message.\n");
+		if (call outQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recSendBS.receive(): outQueue is full! Losting a message.\n");
 #endif
 		return msg;
 	}

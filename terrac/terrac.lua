@@ -3,9 +3,13 @@ _CEU = true
 _OPTS = {
     input     = nil,
     output    = '_ceu_code.cterra',
-    output2    = '_ceu_opcode.vmx',
+    output2   = '_ceu_opcode.vmx',
 
+    opt       = true,
     join      = true,
+    warn      = true,
+    wstrong   = true,
+    wweak     = false,
 
 }
 
@@ -13,8 +17,11 @@ _OPTS_NPARAMS = {
     input     = nil,
     output    = 1,
 
+    opt       = 0,
     join      = 0,
-
+    warn      = 0,
+    wstrong   = 0,
+    wweak     = 0,
 }
 
 function trim (s)
@@ -23,11 +30,12 @@ end
 
 local params = {...}
 local i = 1
+--print("terrac::params:",#params)
 while i <= #params
 do
     local p = params[i]
-    i = i + 1
 
+--print("terrac::param:",params[i])
     if p == '-' then
         _OPTS.input = '-'
 
@@ -38,34 +46,77 @@ do
             no = true
             opt = string.sub(opt, 4)
         end
+        if _OPTS[opt]==nil then
+          _OPTS.input = nil
+          break
+        end
         if _OPTS_NPARAMS[opt] == 0 then
             _OPTS[opt] = not no
         else
             local opt = string.gsub(string.sub(p,3), '%-', '_')
             _OPTS[opt] = string.match(params[i], "%'?(.*)%'?")
-            i = i + 1
+            --i = i + 1
         end
 
     else
         _OPTS.input = p
     end
+    i = i + 1
 end
+
+--os.exit(0)
+
 if not _OPTS.input then
     io.stderr:write([[
 
-    ./terrac <filename>        # Terra input file, or `-´ for stdin
-        --output <filename>    # vmx output file (input.vmx)
-        --join (--no-join)     # join lines enclosed by /*{-{*/ and /*}-}*/ (join)
+    ./terrac <filename>          # Terra input file, or `-´ for stdin
+        --output <filename>      # vmx output file (input.vmx)
+        --join    (--no-join)    # join lines enclosed by /*{-{*/ and /*}-}*/ (join)
+        --opt     (--no-opt)     # activate code optimization (opt)
+        --warn    (--no-warn)    # activate warnings (warn)
+        --wstrong (--no-wstrong) # warning strong nondeterminism (wstrong)
+        --wweak   (--no-wweak)   # warning weak nondeterminism (no-wweak)
 
 ]])
     os.exit(1)
+end
+if not string.match(_OPTS.input, "(.*)%.terra") then 
+  io.stderr:write([[
+  Invalid input file name. It needs a `.terra´ sufix.
+  
+]])
+  os.exit(1)
+end
+
+local test_file = io.open(_OPTS.input)
+if  test_file then
+   io.close(test_file)
+else
+  io.stderr:write([[
+  File `]].. _OPTS.input .. [[´ not found.
+  
+]])
+  os.exit(1)
 end
 
 
 local cpp_file = 'precomp.terra'
 -- Pre-processor phase
+--    local cpp = assert(io.popen('cpp -C '.._OPTS.input..' ' ..cpp_file, 'w'))
     local cpp = assert(io.popen('cpp -C '.._OPTS.input..' ' ..cpp_file, 'w'))
     cpp:close()
+
+local test_file = io.open(cpp_file)
+if  test_file then
+   io.close(test_file)
+else
+  io.stderr:write([[
+  Preprocessor error!
+  
+]])
+  os.exit(1)
+end
+
 
 -- INPUT
 local inp
@@ -92,11 +143,12 @@ do
     dofile 'env.lua'
 --    _AST.dump(_AST.root)
     dofile 'props.lua'
+    dofile 'ana.lua'
+    dofile 'acc.lua'
 --print(print_r(_AST.root,"terrac: root"))
     dofile 'mem.lua'
     dofile 'tight.lua'
     dofile 'labels.lua'
---    dofile 'analysis.lua'
 --    _AST.dump(_AST.root)
 --print(print_r(_AST.root,"terrac: root"))
     dofile 'asm.lua'
@@ -238,7 +290,13 @@ else
 end
 --out:write(tpl)
 
--- Print OPCODES
+-- run code optimization routine
+do
+  if _OPTS.opt then
+    dofile 'optm.lua'
+  end
+end
+-- Count Opcode address
 _AST.root.op_addr={}
 
 codeAddr = ((ALL.n_tracks+1)*4) + ALL.n_mem
@@ -247,28 +305,34 @@ codeAddr = ((ALL.n_tracks+1)*4) + ALL.n_mem
 pos = codeAddr
 nLbl=0
 for x,op in ipairs(_AST.root.opcode) do
-	_AST.root.op_addr[x]=pos
-	if (string.sub(op,1,1) ~= 'L') then 
-		pos = pos + 1
-	else
-		nLbl=nLbl+1
-	end	
+--print(x,op)
+  _AST.root.op_addr[x]=pos
+  if string.sub(op,1,1) ~= '_' then
+    if string.sub(op,1,1) ~= 'L'  then 
+      pos = pos + 1
+    else
+      nLbl=nLbl+1
+    end 
+  end
 end
 endCode = pos;
+
+
 
 -- build Label x Addr Table
 _AST.root.labeltable={}
 for x,op in ipairs(_AST.root.opcode) do
 	if (string.sub(op,1,1) == 'L') then 
-		_AST.root.labeltable[tonumber('0x'..string.sub(op,2,5))]=_AST.root.op_addr[x];
+		_AST.root.labeltable[tonumber('0x'..string.sub(op,2,5))]={addr=_AST.root.op_addr[x]};
 	end	
 end
 
--- Rebuild 'op' with addrs in opcode_aux field
+
+-- Rebuild 'op' with real addrs lbls in opcode_aux field
 _AST.root.opcode_aux={}
 local lblL,lblH;
 for x,op in pairs(_AST.root.opcode) do
-  if (string.sub(op,1,1) ~= 'L') then 
+  if (string.sub(op,1,1) ~= 'L') then
     _AST.root.opcode_aux[x] = op
     if (string.sub(op,1,1) == '.') then
       if (lblH==nil) then
@@ -276,7 +340,7 @@ for x,op in pairs(_AST.root.opcode) do
       else
         lblL = string.sub(op,2,3)
         local lbl = tonumber(('0x'..lblH))*256 + tonumber('0x'..lblL)
-        local addr = (_AST.root.labeltable[lbl] or 0)
+        local addr = (_AST.root.labeltable[lbl].addr or 0)
 --print(string.format('%04d',_AST.root.op_addr[x-1]),lbl,addr,_TP.getConstBytes(addr,2))
         _AST.root.opcode_aux[x-1]=string.format('%02x',addr / 256)
         _AST.root.opcode_aux[x]=string.format('%02x',addr % 256)
@@ -290,80 +354,6 @@ end
 
 pos=endCode
 idx=table.getn(_AST.root.opcode)+1
-
-
---[[
--- Code for LblTable11 :: label(1byte) x Addr(1byte)
-LblTable11_addr=pos;
-for lbl,addr in pairs(_AST.root.labeltable) do
-	if (lbl<=0xff and addr<=0xff) then
-		_AST.root.opcode[idx]=string.format('%02x',lbl)		
-		_AST.root.opcode[idx+1]=string.format('%02x',addr)		
-		_AST.root.code2[idx]='L'..lbl..'(0x'..string.format('%02x',lbl)..') => '..addr..' (0x'..string.format('%02x',addr)..')'		
-		_AST.root.code2[idx+1]=''
-		_AST.root.op_addr[idx]=pos
-		_AST.root.op_addr[idx+1]=pos+1
-		idx=idx+2; 
-		pos=pos+2;
-	end
-end
--- Code for LblTable12 :: label(1byte) x Addr(2byte)
-LblTable12_addr=pos;
-for lbl,addr in pairs(_AST.root.labeltable) do
-	if (lbl<=0xff and addr>0xff) then
-		_AST.root.opcode[idx]=string.format('%02x',lbl)		
-		_AST.root.opcode[idx+2]=string.format('%02x',(addr%0x100))		
-		_AST.root.opcode[idx+1]=string.format('%02x',math.floor(addr/0x100))		
-		_AST.root.code2[idx]='L'..lbl..'(0x'..string.format('%02x',lbl)..') => '..addr..' (0x'..string.format('%04x',addr)..')'		
-		_AST.root.code2[idx+1]=''
-		_AST.root.code2[idx+2]=''
-		_AST.root.op_addr[idx]=pos
-		_AST.root.op_addr[idx+1]=pos+1
-		_AST.root.op_addr[idx+2]=pos+2
-		idx=idx+3; 
-		pos=pos+3;
-	end
-end
--- Code for LblTable21 :: label(2byte) x Addr(1byte)
-LblTable21_addr=pos;
-for lbl,addr in pairs(_AST.root.labeltable) do
-	if (lbl>0xff and addr<=0xff) then
-		_AST.root.opcode[idx+1]=string.format('%02x',lbl%0x100)		
-		_AST.root.opcode[idx]=string.format('%02x',math.floor(lbl/0x100))		
-		_AST.root.opcode[idx+2]=string.format('%02x',addr)		
-		_AST.root.code2[idx]='L'..lbl..'(0x'..string.format('%04x',lbl)..') => '..addr..' (0x'..string.format('%02x',addr)..')'		
-		_AST.root.code2[idx+1]=''
-		_AST.root.code2[idx+2]=''
-		_AST.root.op_addr[idx]=pos
-		_AST.root.op_addr[idx+1]=pos+1
-		_AST.root.op_addr[idx+2]=pos+2
-		idx=idx+3; 
-		pos=pos+3;
-	end
-end
--- Code for LblTable22 :: label(2byte) x Addr(2byte)
-LblTable22_addr=pos;
-for lbl,addr in pairs(_AST.root.labeltable) do
-	if (lbl>0xff and addr>0xff) then
-		_AST.root.opcode[idx+1]=string.format('%02x',lbl%0x100)		
-		_AST.root.opcode[idx]=string.format('%02x',math.floor(lbl/0x100))		
-		_AST.root.opcode[idx+3]=string.format('%02x',(addr%0x100))		
-		_AST.root.opcode[idx+2]=string.format('%02x',math.floor(addr/0x100))		
-		_AST.root.code2[idx]='L'..lbl..'(0x'..string.format('%04x',lbl)..') => '..addr..' (0x'..string.format('%04x',addr)..')'		
-		_AST.root.code2[idx+1]=''
-		_AST.root.code2[idx+2]=''
-		_AST.root.code2[idx+3]=''
-		_AST.root.op_addr[idx]=pos
-		_AST.root.op_addr[idx+1]=pos+1
-		_AST.root.op_addr[idx+2]=pos+2
-		_AST.root.op_addr[idx+3]=pos+3
-		idx=idx+4; 
-		pos=pos+4;
-	end
-end
-LblTableEnd_addr=pos;
-
---]]
 
 
 -- ====  Environment parameters  ====
@@ -429,7 +419,7 @@ _AST.root.x_stack = 0;
 _AST.root.max_stack = 0;
 for x,op in pairs(_AST.root.opcode) do
   if x > endCode then break end
-	if (string.sub(op,1,1) ~= 'L') then 
+	if (string.sub(op,1,1) ~= 'L' and string.sub(op,1,1) ~= '_') then 
 		_AST.root.x_stack = _AST.root.x_stack + (_AST.root.n_stack[x] or 0);
 		_AST.root.max_stack = math.max(_AST.root.max_stack,_AST.root.x_stack);
 --    asmText = asmText ..trim(op)..' | '..string.format('%04d',_AST.root.op_addr[x])..' '..op..' '..(_AST.root.code2[x] or '')..'\n'
@@ -451,7 +441,7 @@ local RadioMsgs = ((codeAddr%24) == 0 and math.ceil((CodeSize)/24)) or 1+math.ce
 print('---------------------------------------------------------------------')
 print('--   <<<<      Terra Compiler -- VM Version: '.. string.format('%12s',_ENV.vm_version) .. '    >>>>  --')
 print('---------------------------------------------------------------------')
-print('--   Memory allocation:                                            --')
+print('--   Memory allocation:  '.. ((_OPTS.opt and '(code optimized)    ') or '(code not optimized)') ..'                      --')
 print('--   Total =  Code + Ctl/Vars + Stack           |    Radio Msgs    --')
 print(string.format('--    %4d    %4d     %4d     %4d            |      %4d        --',
                     TotalMem,CodeSize,CtlVars,Stack,RadioMsgs))
@@ -461,21 +451,20 @@ if (lastBytes+_AST.root.max_stack*4 > (60*24)) then
   WRN(false,_AST.root,'Program may be too long for VM memory. Please check target VM memory capacity!')
 end
 
-if _ENV.n_wrns > 0 then
-  if _ENV.n_wrns > 1 then
-    print('** Found '.. _ENV.n_wrns ..' warning messages **')
+if _WRN.n_wrns > 0 then
+  if _WRN.n_wrns > 1 then
+    print('** Found '.. _WRN.n_wrns ..' warning messages **')
   else
-    print('** Found '.. _ENV.n_wrns ..' warning message **')
+    print('** Found '.. _WRN.n_wrns ..' warning message **')
   end
 end
 
 -- OUTPUT_ASM
-
 local out2
 if _OPTS.output2 == '-' then
     out2 = io.stdout
 else
-	out2_fname = string.match(params[1], "(.*)%.terra")..'.vmx'
+	out2_fname = string.match(_OPTS.input, "(.*)%.terra")..'.vmx'
     out2 = assert(io.open(out2_fname,'w'))
 end
 out2:write(asmText)

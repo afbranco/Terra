@@ -10,6 +10,11 @@ function _AST.isNode (node)
     return (getmetatable(node) == MT) and node.tag
 end
 
+function _AST.isChild (n1, n2)
+    return n1 == n2
+        or n2.__par and _AST.isChild(n1, n2.__par)
+end
+
 function node (tag, min)
     min = min or 0
     return function (ln, ...)
@@ -112,6 +117,7 @@ function visit_aux (me, F)
     if F.Node_pre then me=(F.Node_pre(me) or me) end
     if pre then me=(pre(me) or me) end
 
+    me.__par = STACK[#STACK]
     STACK[#STACK+1] = me
 
     for i, sub in ipairs(me) do
@@ -140,6 +146,7 @@ local C; C = {
         for i=1, FIN do
             blk[#blk+1] = node('Dcl_int')(ln,true,'ubyte',false,'$fin_'..i)
         end
+
         blk[#blk+1] = node('SetBlock')(ln,
                         EXP(node('Var')(ln, '$ret')),
                         ...)  -- ...=Block
@@ -212,7 +219,7 @@ local C; C = {
 --print(print_r(_AST,"ast::Loop: _AST"))
 --print(print_r(_j,"ast::Loop: _j"))
         if _j and _j[1].tag=='CONST' then -- Var type is not defined yet here
-          ctype = _TP.getConstType(_j[1][1],ln)
+          ctype = _TP.getConstType(_j[1][1],ln,true)
         elseif _j and _j[1].tag=='Var' then
 --print("ast::Loop: _j", _j[1].tag,_j[1][1])
           ctype = 'ulong'        
@@ -252,6 +259,8 @@ local C; C = {
                 node('BlockN')(ln, blk, nxt_i)))
         loop.isBounded = true
         loop[1].isBounded = true    -- remind that the If is "artificial"
+        loop.isFor = true
+        loop[1][1].isFor = true
 
         return node('Block')(ln,
                 dcl_i, set_i,
@@ -280,7 +289,7 @@ local C; C = {
 --        return unpack(ret)
 --    end,
 
---    Dcl_det = node('Dcl_det'),
+    Dcl_det = node('Dcl_det'),
 
     _Dcl_var = function (ln, pre, tp, dim, ...)
         local ret = {}
@@ -354,8 +363,8 @@ local C; C = {
         return node(tag)(ln, e1, e2, op==':=')
     end,
 
-    _Dcl_ext = function (ln, dir, retTp, name, argTp, id)
-            return node('Dcl_ext')(ln, dir, retTp, name, argTp, id)
+    _Dcl_ext = function (ln, dir, mod, retTp, name, argTp, id)
+            return node('Dcl_ext')(ln, dir, mod, retTp, name, argTp, id)
     end,
 
     _Dcl_func = function (ln, op, mod, tp,id,...)
@@ -663,6 +672,7 @@ F = {
         blk[#blk+1] = me
         return blk
     end,
+
 }
 
 _AST.visit(F)

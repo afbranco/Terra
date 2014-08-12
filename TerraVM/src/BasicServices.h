@@ -75,6 +75,11 @@ enum{
 	RO_DATA_FULL = 2,
 	RO_DATA_SINGLE = 3,
 	RO_IDLE = 4,
+
+	// Ack & Retry bits
+	REQ_ACK_BIT   = 0,
+	REQ_RETRY_BIT = 1,
+	
 };
 
 

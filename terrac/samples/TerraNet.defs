@@ -7,6 +7,9 @@ config 00.01.00 do
  * Define constants
  */
 
+// error_t
+#define SUCCESS 0 
+     // FAIL > 0
 // Boolean
 #define TRUE 1
 #define FALSE 0
@@ -23,9 +26,11 @@ config 00.01.00 do
 #define pOUT 1
 // Message
 #define BROADCAST 0xffff
+#define SEND_DATA_SIZE 16
 // VM Error codes
 #define E_DIVZERO 10 // Division by zero
-#define E_IDXOFV  11 // Array index overflow
+#define E_IDXOVF  11 // Array index overflow
+#define E_STKOVF  20 // Stack overflow -- fatal
 
 
 /*
@@ -41,7 +46,7 @@ config 00.01.00 do
 	end
 
 	// TerraNet local Output events
-	output void		INIT			ubyte 0;
+//	output void		INIT			ubyte 0;
 	output void		LEDS			ubyte 5;
 	output void		LED0			ubyte 6;
 	output void		LED1			ubyte 7;
@@ -92,6 +97,28 @@ config 00.01.00 do
 	function pure ubyte qSize()				12;
 	function pure ubyte qClear()			13;
 
+// Determinist
+
+unsafe LEDS 		with LEDS, LED0, LED1, LED2;
+unsafe LED0 		with LEDS, LED0, LED1, LED2;
+unsafe LED1 		with LEDS, LED0, LED1, LED2;
+unsafe LED2 		with LEDS, LED0, LED1, LED2;
+unsafe REQ_TEMP 	with REQ_TEMP, REQ_PHOTO,REQ_VOLTS;
+unsafe REQ_PHOTO 	with REQ_TEMP, REQ_PHOTO,REQ_VOLTS;
+unsafe REQ_VOLTS 	with REQ_TEMP, REQ_PHOTO,REQ_VOLTS;
+unsafe REQ_CUSTOM_A with REQ_CUSTOM_A;
+unsafe SEND			with SEND,SEND_ACK;
+unsafe SEND_ACK		with SEND,SEND_ACK;
+
+unsafe SET_PORT_A	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
+unsafe SET_PORT_B	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
+unsafe CFG_PORT_A	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
+unsafe CFG_PORT_B	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
+unsafe REQ_PORT_A	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
+unsafe REQ_PORT_B	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
+unsafe CFG_INT_A	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
+unsafe CFG_INT_B	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
+					
 // Request/await macros
 #define getTemp(var)  emit REQ_TEMP();  var=await TEMP 
 #define getPhoto(var) emit REQ_PHOTO(); var=await PHOTO 

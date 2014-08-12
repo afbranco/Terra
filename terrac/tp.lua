@@ -1,3 +1,6 @@
+_WRN = {
+    n_wrns = 0;       --afb Count warning messages
+}
 _TP = {}
 
 local types = {
@@ -70,11 +73,11 @@ end
 function _TP.tpCompat(tp1,tp2,arr1,arr2)
     -- error == true -> incompatible types
     -- cast == true -> need cast
---print("tp::tpCompat:",tp1,tp2)
     local error = true 
     local cast = false
     local z1 = _TP.getAuxTag(tp1,arr1)
     local z2 = _TP.getAuxTag(tp2,arr2)
+--print("tp::tpCompat:",tp1,tp2,arr1,arr2,z1.auxtag,z2.auxtag,z1.tp,z2.tp,z1.len,z2.len)
 
 -- *************************
 -- * Type Compatibility
@@ -107,6 +110,11 @@ function _TP.tpCompat(tp1,tp2,arr1,arr2)
     then
         error = false
         cast = (z1.len < z2.len)
+    elseif
+        (z1.auxtag == 'pointer'     and z2.auxtag == 'pointer'   ) and (z1.len == z2.len)                   
+    then
+        error = false
+        cast = false
     elseif
         (z1.auxtag == 'data'     and z2.auxtag == 'data'   ) and (z1.tp == z2.tp)                   
     then
@@ -147,13 +155,13 @@ function _TP.max (tp1, tp2, c)
     end
 end
 
-function _TP.getConstType(val,me)
+function _TP.getConstType(val,me,no_wrn)
 	local nval = tonumber(val)
 --print("tp::getConstType:",val,nval)
 	if (nval <= 0xff) then return 'ubyte' end
   if (nval <= 0xffff) then return 'ushort' end
   if (nval <= 0xffffffff) then return 'ulong' end
-  WRN(flase,me,'Constant too large, got: "'.. val ..'", max value must be (2^32)-1')
+  WRN(no_wrn,me,'Constant too large, got: "'.. val ..'", max value must be (2^32)-1')
 	return 'ulong'
 end
 

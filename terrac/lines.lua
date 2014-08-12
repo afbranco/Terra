@@ -17,10 +17,14 @@ function MAX (v1, v2)
 end
 
 function WRN (cond, me, msg)
-    local ln = (type(me)=='number' and me) or me.ln
-    if not cond then
+    local ln = (me and ((type(me)=='number' and me) or me.ln) or 0)
+    if not cond  and _OPTS.warn then
+      if me then
         DBG('WRN : line '..ln..' : '..msg)
-        _ENV.n_wrns = _ENV.n_wrns + 1;
+      else
+        DBG('WRN : '..msg)
+      end
+        _WRN.n_wrns = _WRN.n_wrns + 1;
     end
     return cond
 end

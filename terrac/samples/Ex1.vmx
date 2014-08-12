@@ -83,7 +83,7 @@
 00 | 0081 0049           : 01 gates
 00 | 0082 0050
 00 | 0083 0051
-00 | 0084 0052 inEvt 012 : CUSTOM_A
+00 | 0084 0052 inEvt 013 : CUSTOM_A
 00 | 0085 0053           : 01 gates
 00 | 0086 0054
 00 | 0087 0055
@@ -209,9 +209,9 @@ e5 | 0206 e5 set16_c ushort 48 1281        | config gate TEMP with 1 await(s) - 
 30 | 0207 30 
 05 | 0208 05 
 01 | 0209 01 
-e5 | 0210 e5 set16_c ushort 52 3073        | config gate CUSTOM_A with 1 await(s) - 0x0c01 = 3073
+e5 | 0210 e5 set16_c ushort 52 3329        | config gate CUSTOM_A with 1 await(s) - 0x0d01 = 3329
 34 | 0211 34 
-0c | 0212 0c 
+0d | 0212 0d 
 01 | 0213 01 
 e5 | 0214 e5 set16_c ushort 56 10369       | config gate SEND_DONE() with 1 await(s) - 0x2881 = 10369
 38 | 0215 38 

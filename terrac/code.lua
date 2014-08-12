@@ -406,10 +406,11 @@ function tryDerefCode(me,tag,tp)
 end
 
 function Op1_any(me,mnemonic)
-        local op, e1 = unpack(me)
+    local op, e1 = unpack(me)
 		CONC(me,e1)
-       	codeB = LINE(me,mnemonic,nil,'// stack0 = '..mnemonic..'(stack0)')
-       	BYTECODE(me,codeB,'op1_any',mnemonic)
+print("code::Op1_any",e1.tag)
+    codeB = LINE(me,mnemonic,nil,'// stack0 = '..mnemonic..'(stack0)')
+    BYTECODE(me,codeB,'op1_any',mnemonic)
 end
 
 function Op2_any(me,mnemonic)
@@ -423,7 +424,7 @@ function Op2_any(me,mnemonic)
 	CONC(me,me[2])
   tryDerefCode(me,e1.tag,e1.tp)
 	codeB = LINE(me,mnemonic,nil,'// stack0 = stack0 '..mnemonic..' stack1')
-   	BYTECODE(me,codeB,'op2_any',mnemonic)
+  BYTECODE(me,codeB,'op2_any',mnemonic)
 end
 
 function INC_STACK()
@@ -549,28 +550,33 @@ function SetExp(me)
 --          codeB = LINE(me,x1.id ..' = '.. x2.id,nil,'// SetExp:: set var*=&var' )        
 --          BYTECODE(me,codeB,'op_set_c',x1.ntp,x1.val,x2.val)
 
-    if x1.auxtag2 == 'Var' and x2.auxtag2 == 'Const' then
+    if     x1.auxtag2 == 'Var' and x2.auxtag2 == 'Const' then
         codeB = LINE(me,x1.id ..' = '.. x2.id,nil,'// SetExp:: set var=const' )        
         BYTECODE(me,codeB,'op_set_c',x1.tp,x1.val,x2.val)
+
     elseif x1.auxtag2 == 'Var' and x2.auxtag2 == 'Var' then
         codeB = LINE(me,x1.id ..' = '.. x2.id..'',nil,'// SetExp:: set var = var')        
-        BYTECODE(me,codeB,'op_set_v',x1.ntp,x1.val,x2.val)
+        BYTECODE(me,codeB,'op_set_v',x1.ntp,x2.ntp,x1.val,x2.val)
+
     elseif x1.auxtag2 == 'Var' and x2.auxtag2 == 'AwaitInt' then
         CONC(me,e2)
         codeB = LINE(me,x1.id ..' = '.. x2.id..'',nil,'// SetExp:: set var = var')        
-        BYTECODE(me,codeB,'op_set_v',x1.ntp,x1.val,x2.val)
+        BYTECODE(me,codeB,'op_set_v',x1.ntp,x2.ntp,x1.val,x2.val)
 
 --    elseif x1.auxtag2 == 'Var*' and x2.auxtag2 == 'Exp' then
 --        CONC(me,e2)
 --        codeB = LINE(me,'pop_ *'..x1.id,nil,'// SetExp:: pop to pointer')
 --        BYTECODE(me,codeB,'op_pop','ushort',x1.val) 
+
     elseif x1.auxtag2 == 'Var' and x2.auxtag2 == 'Exp' then
         CONC(me,e2)
         codeB = LINE(me,'pop '..x1.id,nil,'// SetExp:: pop to var')
         BYTECODE(me,codeB,'op_pop',x1.tp,x1.val)  
+
     elseif x1.auxtag2 == 'Var[Var]' and x2.auxtag2 == 'Var' then
         codeB = LINE(me,''..x1.id..' = '..x2.id,nil,'// set array[var] with var')        
         BYTECODE(me,codeB,'op_setarr_vv',x1.ntp,x1.val,x1.idxtp,x1.idxval,x1.idxmax,x2.tp,x2.val)
+
     elseif x1.auxtag2 == 'Var[Var]' and x2.auxtag2 == 'AwaitInt' then
         CONC(me,e2)
         codeB = LINE(me,''..x1.id..' = '..x2.id,nil,'// set array[var] with var')        
@@ -583,6 +589,7 @@ function SetExp(me)
     elseif x1.auxtag2 == 'Var[Var]' and x2.auxtag2 == 'Const' then
         codeB = LINE(me,''..x1.id..' = '..x2.id,nil,'// set array[var] with Const')        
         BYTECODE(me,codeB,'op_setarr_vc',x1.ntp,x1.val,x1.idxtp,x1.idxval,x1.idxmax,x2.val)
+
     elseif x1.auxtag2 == 'Var[Var]' and x2.auxtag2 == 'Exp' then
         CONC(me,e2)
         codeB = LINE(me,'pop to '..x1.id,nil,'// pop to array[var] ')        
@@ -677,26 +684,13 @@ F = {
 
     if (e2.tag =="AwaitInt") then
       SetExp(me)
---      codeB = LINE(me,'push '..e2.id..':'..e2.tp,nil,'// push Var ')
---      BYTECODE(me,codeB,'op_push_v',e2.tp,e2.val)
---      CONC(me,e1)
---      codeB = LINE(me,'set ('.. e1.tp ..')*(pop1) = pop2',nil,'// SetExp:: pop stk1 to stk2')         
---      BYTECODE(me,codeB,'op_set_e',e1.tp)     
     else -- e2.tag == AwaitExt
       CONC(me, e2)
---      if (e1[1].tag=='Var' and _TP.deref(e1.tp)) then
---        codeB = LINE(me,'getExtData *'..e1[1][1]..' '..(_ENV.c[_TP.deref(e1.tp)].len),nil,'// getExtDtp <localVar pointer> <len>')
---        BYTECODE(me,codeB,'op_getextdt_p',e1.val,_ENV.c[_TP.deref(e1.tp)].len)
---      elseif (e1[1].tag=='Var' and not _TP.deref(e1.tp)) then
       if e1[1].tag=='Var' then
         local x1 = getAuxValues(e1)
 --print("code::SetAwait: var:",x1.auxtag1,x1.auxtag2, x1.tp, x1.ntp, x1.val,x1.id)
         codeB = LINE(me,'getExtData '..x1.id..' '.._ENV.c[e1.tp].len,nil,'// getExtDt <localVarAddr> <len>')
         BYTECODE(me,codeB,'op_getextdt_v',x1.val,_ENV.c[e1.tp].len)
---      elseif (e1[1].tag=='Op1_*' and e1[1][2].tag == 'Var') then
-----print("code::SetAwait: *var:",e1[1][2].tag,e1[1][2][1],e1[1][2].val,e1[1][2].tp)
---        codeB = LINE(me,'getExtData *'..e1[1][2][1]..' '..(_ENV.c[_TP.deref(e1[1][2].tp)].len),nil,'// getExtDtp <localVar pointer> <len>')
---        BYTECODE(me,codeB,'op_getextdt_p',e1[1][2].val,_ENV.c[_TP.deref(e1[1][2].tp)].len)
       else
         CONC(me,e1)
         codeB = LINE(me,'getExtData stack len='.._ENV.c[e1.tp].len,nil,'// getExtDt <Stack:localVar Addr> <len>')
@@ -879,7 +873,7 @@ F = {
 --print(print_r(n.new,"code:Async_pos: n.new"))
 --print("code::Async_pos:",n.new[1].id,n.new[1].tp,n.new[1].val,n[1].var.tp,n[1].var.id,n[1].var.val)
             codeB = LINE(me,n.new[1].id .."'=".. n[1].var.id,nil,'// SetExp:: set var=var')        
-            BYTECODE(me,codeB,'op_set_v',n.new[1].tp,n.new[1].val,n[1].var.val)
+            BYTECODE(me,codeB,'op_set_v',n.new[1].tp,n[1].var.tp,n.new[1].val,n[1].var.val)
         end
 --        LINE(me, 'ceu_async_enable('..me.gte..', '..me.lbl.id..');')
         codeB = LINE(me, 'ceu_async_enable '..me.gte..' '..me.lbl.id,nil,'// async enable')      
@@ -1073,7 +1067,7 @@ F = {
       elseif (exp[1].tag == "Var") then
         if (typelen[int.tp] == typelen[exp.tp]) then
           codeB = LINE(me,'emit '..int.var.id..'('..exp[1][1]..')',nil,'// EmitInt:: Var')
-          BYTECODE(me,codeB,'op_set_v',int.tp,int.val,exp.val)
+          BYTECODE(me,codeB,'op_set_v',int.tp,exp.tp,int.val,exp.val)
         else
           CONC(me,exp)
           codeB = LINE(me,'emit '..int.fst.id..' from stack',nil,'// EmitInt:: pop to ')          
@@ -1198,7 +1192,7 @@ F = {
     
     AwaitExt = function (me)
         local e1,e2 = unpack(me)
-print("code::AwaitExt: ",e1.ext.idx,e1.ext.n,me.gte,me.lbl.n,_MEM.gtes[e1.ext.n])
+--print("code::AwaitExt: ",e1.ext.idx,e1.ext.n,me.gte,me.lbl.n,_MEM.gtes[e1.ext.n])
 --        LINE(me, '//> *PTR_EXT(IN_'..e1.ext.id..','..me.gte..') = '..me.lbl.id..';')
 
         if not e1.ext.inArg then -- evtId, nGtes, [addr]*
@@ -1305,7 +1299,7 @@ print("code::AwaitExt: ",e1.ext.idx,e1.ext.n,me.gte,me.lbl.n,_MEM.gtes[e1.ext.n]
 
   Op1_cast = function (me)
     local tp, exp = unpack(me)
-print("code::Op1_cast:",tp)
+--print("code::Op1_cast:",tp)
     CONC(me,exp)
     codeB = LINE(me,'cast '..tp,nil,'// cast <type> ')
     BYTECODE(me,codeB,'op_cast',tp)
@@ -1326,10 +1320,10 @@ print("code::Op1_cast:",tp)
   ['Var'] = function (me)
     --		ASR(typelen[me.var.tp] or _TP.deref(me.var.tp),me,'must use custom type only as pointer.')
     local tp = (_TP.deref(me.var.tp) and 'ushort') or me.var.tp
---print("Code::Var:",me.var.id,me.var.tp,tp,me.var.arr,_TP.isBasicType( _TP.deref(me.var.tp) or me.var.tp))
+print("Code::Var:",me.var.id,me.var.tp,tp,me.var.arr,_TP.isBasicType( _TP.deref(me.var.tp) or me.var.tp))
     if _TP.isBasicType( (_TP.deref(me.var.tp) and _TP.deref(_TP.deref(me.var.tp))) or _TP.deref(me.var.tp) or me.var.tp) then
       if me.var.arr then -- needs addr
-        codeB = LINE(me,'push_c &'..me.var.id..':'..me.var.tp,nil,'// push Var ')
+        codeB = LINE(me,'push_c &'..me.var.id..':'..me.var.tp,nil,'// push &Var ')
         BYTECODE(me,codeB,'op_push_c',me.var.val)
       else -- needs value
         codeB = LINE(me,'push '..me.var.id..':'..me.var.tp,nil,'// push Var ')
@@ -1337,10 +1331,10 @@ print("code::Op1_cast:",tp)
       end
     else -- is a register var/pointer
       if _TP.deref(me.var.tp) then -- is a register pointer
-      codeB = LINE(me,'push '..me.var.id..':'..me.var.tp,nil,'// push Var ')
-      BYTECODE(me,codeB,'op_push_v',tp,me.var.val)
+        codeB = LINE(me,'push '..me.var.id..':'..me.var.tp,nil,'// push Var ')
+        BYTECODE(me,codeB,'op_push_v',tp,me.var.val)
       else -- is a register var = addr
-        codeB = LINE(me,'push_c &'..me.var.id..':'..me.var.tp,nil,'// push Var ')
+        codeB = LINE(me,'push_c &'..me.var.id..':'..me.var.tp,nil,'// push &Var ')
         BYTECODE(me,codeB,'op_push_c',me.var.val)
       end
     end

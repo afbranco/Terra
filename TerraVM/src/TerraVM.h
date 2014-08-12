@@ -89,7 +89,7 @@ enum {
 	// OpCodes
 	op_nop=0,
 	op_end=1,
-
+	
 	op_bnot=3,
 	op_lnot=4,
 	op_neg=5,
@@ -119,15 +119,15 @@ enum {
 	op_popx=32,
 	op_poparr_v=36,
 	op_push_c=40,
-	op_push_p=44,
-	op_push_v=48,
-	op_pushx_p=52,
-	op_pushx_v=56,
-	op_pusharr_v=60,
+	op_push_v=44,
+	op_pushx_v=48,
+	op_pusharr_v=52,
+	op_deref=56,
+	
 	op_set_e=64,
 	op_setarr_vc=68,
 	op_setarr_vv=72,
-	op_getextdt_p=76,
+	op_getextdt_e=76,
 	op_getextdt_v=80,
 	op_cast=84,
 	op_inc=88,
@@ -145,14 +145,15 @@ enum {
 	op_tkclr=136,
 	op_chkret=140,
 	op_asen=144,
-	op_deref=148,
-	op_getextdt_e=152,
+	op_tkins_max=148,
+	
+	
 	op_clken_c=160,
-	op_clken_v=176,
-	op_clken_e=192,
-	op_tkins_max=208,
-	op_set16_c=224,
-	op_set_v=240,
+	op_clken_ve=176,
+	op_set16_c=192,
+	op_set8_v=208,
+	op_set16_v=224,
+	op_set32_v=240,
 
 };
 

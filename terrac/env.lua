@@ -39,7 +39,6 @@ _ENV = {
     n_ins     = 0; --afb
     n_outs     = 0; --afb
     n_ins_active = 0; --afb	
-    n_wrns = 0;       --afb Count warning messages
     vm_version = '0';
     extOut_nArgs={},
     func_nArgs={},
@@ -50,7 +49,7 @@ for k, v in pairs(_ENV.c) do
     _ENV.c[k] = { tag='type', id=k, len=v }
 end
 
-function newvar (me, blk, pre, tp, dim, id)
+function newvar (me, blk, pre, tp, dim, id, read_only)
     for stmt in _AST.iter() do
         if stmt.tag == 'Async' then
             break
@@ -123,6 +122,7 @@ function newvar (me, blk, pre, tp, dim, id)
             arr   = dim,
             n_awaits = 0,
             auxtag = z1.auxtag,
+            read_only = read_only,
         }
         blk.vars[#blk.vars+1] = var
         nvar[#nvar+1]=var
@@ -172,7 +172,7 @@ F = {
     end,
     
     Dcl_ext = function (me)
-        local dir, retTp, id, argTp, idx = unpack(me)
+        local dir, mod, retTp, id, argTp, idx = unpack(me)
 --print(print_r(_ENV.c,"ENV.c"))
 --        ASR(tp=='void' or _TP.deref(tp)) or _ENV.c[tp],me, 'invalid event type')
   
@@ -181,7 +181,7 @@ F = {
         local tp,idAux
         idAux = id .. (( (dir=='input' and argTp~='void') and '()') or '')
         tp = (dir=='output' and argTp) or retTp
-print("env::Dcl_ext:", dir, retTp, id, argTp, idx, '|', idAux,tp)
+--print("env::Dcl_ext:", dir, retTp, id, argTp, idx, '|', idAux,tp)
 
         for k,val in ipairs(_ENV.exts) do
           if val.pre==dir then 
@@ -199,7 +199,8 @@ print("env::Dcl_ext:", dir, retTp, id, argTp, idx, '|', idAux,tp)
             pre   = dir,
             isEvt = true,
             idx   = idx,
-            inArg = (dir=='input' and argTp~='void')
+            inArg = (dir=='input' and argTp~='void'),
+            mod = mod
         }
         _ENV.exts[idAux] = me.ext
         _ENV.exts[#_ENV.exts+1] = me.ext
@@ -215,9 +216,9 @@ print("env::Dcl_ext:", dir, retTp, id, argTp, idx, '|', idAux,tp)
         ASR(_ENV.c[tp] or _ENV.c[_TP.deref(tp)],me,'invalid type')
         local z =  _TP.getAuxTag(tp,dim)
         ASR( z.lvl <= 1, me,'invalid pointer to pointer type')
---print("env::Dcl_var:",tp,dim, _TP.isBasicType(_TP.deref(tp) or tp),(not dim) or  _TP.isBasicType(_TP.deref(tp) or tp))
+--print("env::Dcl_var:",tp,dim,id, _TP.isBasicType(_TP.deref(tp) or tp),(not dim) or  _TP.isBasicType(_TP.deref(tp) or tp),me.read_only)
         ASR( (not dim) or  _TP.isBasicType(_TP.deref(tp) or tp),me,'Arrays can have only basic types')
-        me.var = newvar(me, _AST.iter'Block'(), pre, tp, dim, id)
+        me.var = newvar(me, _AST.iter'Block'(), pre, tp, dim, id,me.read_only)
     end,
 
     Dcl_regt = function(me)
@@ -358,7 +359,7 @@ print("env::Dcl_ext:", dir, retTp, id, argTp, idx, '|', idAux,tp)
 
     Ext = function (me)
         local id = unpack(me)
-print("env::Ext:",id,_ENV.exts[id], _ENV.exts[id .. '()'])
+--print("env::Ext:",id,_ENV.exts[id], _ENV.exts[id .. '()'])
         me.ext = ASR(_ENV.exts[id] or _ENV.exts[id .. '()'],me, 'event "'..id..'" is not declared') -- moved to AwaitExt
     end,
 
@@ -369,7 +370,7 @@ print("env::Ext:",id,_ENV.exts[id], _ENV.exts[id .. '()'])
         ASR(_ENV.exts[id],me, 'function "'..id..'" is not declared')
         me.ext = _ENV.exts[id]
         me.tp = _ENV.exts[id].tp
-
+        
         if not (me.ext and (me.ext.mod=='pure' or me.ext.mod=='nohold')) then
             for pos, tp in ipairs(me.ext.args) do
                 if _TP.deref(tp) or not _TP.isBasicType(tp)  then
@@ -389,10 +390,12 @@ print("env::Ext:",id,_ENV.exts[id], _ENV.exts[id .. '()'])
 --print("env::Var:",id)
 --print(print_r(me,"env::Var: me"))
         local blk = me.blk or _AST.iter('Block')()
+--print(print_r(blk.vars,"env::Var: blk.vars"))
         while blk do
             for i=#blk.vars, 1, -1 do   -- n..1 (hidden vars)
                 local var = blk.vars[i]
                 if var.id == id then
+--print("env::Var:",id,me.read_only)
 --print(print_r(var,"env::Var: var"))
                   me.var  = var
                   me.tp   = var.tp
@@ -401,6 +404,8 @@ print("env::Ext:",id,_ENV.exts[id], _ENV.exts[id .. '()'])
                   me.arr = var.arr
                   me.auxtag = var.auxtag
                   me.supertp = var.supertp
+                  me.ref = me
+                  me.read_only = var.read_only
                   return
                 end
             end
@@ -416,10 +421,12 @@ print("env::Ext:",id,_ENV.exts[id], _ENV.exts[id .. '()'])
 
     Dcl_det = function (me)                 -- TODO: verify in _ENV.c
         local id1 = det2id(me[1])
+        ASR(_ENV.exts[id1],me,'event or function `' .. id1 .. '´ was not found.')
         local t1 = _ENV.dets[id1] or {}
         _ENV.dets[id1] = t1
         for i=2, #me do
             local id2 = det2id(me[i])
+            ASR(_ENV.exts[id2],me,'event or function `' .. id2 .. '´ was not found.')
             local t2 = _ENV.dets[id2] or {}
             _ENV.dets[id2] = t2
             t1[id2] = true
@@ -436,16 +443,16 @@ print("env::Ext:",id,_ENV.exts[id], _ENV.exts[id .. '()'])
     AwaitExt = function (me)
         local e1,e2 = unpack(me)
         local idAux = e1[1] .. ((e2 and '()') or '')
-print("env::AwaitExt:",idAux..'|'..((e2 and '()') or '')..'|')
+--print("env::AwaitExt:",idAux..'|'..((e2 and '()') or '')..'|')
         me[1].ext =  _ENV.exts[idAux] or me[1].ext -- Try to overhide value got in 'Exp'
-print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2 and e2.tp),(e2 and e2[1].tag))
+--print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2 and e2.tp),(e2 and e2[1].tag))
         ASR(e1.ext.pre == 'input',me,'await expect an input event, a time expression, or a var event.')
 
         if e2 then
           ASR(_ENV.exts[idAux],me,'event '.. e1[1] ..' doesn´t expect any argument.')
           local err,cast = _TP.tpCompat('ubyte',e2.tp,nil,nil)
           ASR(not err,me,'type/size incompatibility: '.. 'ubyte' ..' <--> '.. e2.tp..'')
-          WRN(not cast,me, 'Applying the minimum size: "'.. 'ubyte' ..'" <--> "' .. e2.tp ..'". ')
+          WRN(not cast,me, 'Automatic casting from `'.. e2.tp ..'´ to `' .. 'ubyte' ..'´. ')
         else
           ASR(_ENV.exts[idAux] ,me,'event '.. e1[1] ..' expect an `ubyte/byte´ argument.')
         end
@@ -477,7 +484,7 @@ print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2
 --print("env::EmitInt:",e1.var.tp,e2.tp)
           err, cast,_,_, len1, len2 = _TP.tpCompat(e1.var.tp,e2.tp)
           ASR(not err,me,'type/size incompatibility: '.. e1.var.tp..'/'..len1 ..' <--> '.. e2.tp..'/'..len2..'')
-          WRN(not cast,me, 'Applying the minimum size: "'.. e1.var.tp..'/'..len1 ..'" <--> "' .. e2.tp..'/'..len2 ..'". ')
+          WRN(not cast,me, 'Automatic casting from `'.. e2.tp ..'´ to `' .. e1.var.tp ..'´. ')
         end
         me.gte = _ENV.n_emits
         _ENV.n_emits = _ENV.n_emits + 2     -- (cnt/awk)
@@ -498,8 +505,7 @@ print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2
         if e2 then
           err, cast,_,_,len1,len2 = _TP.tpCompat((e1.ext.supertp or e1.ext.tp),(e2.supertp or e2.tp),nil,e2.arr)
           ASR(not err,me,'type/size incompatibility: '.. e1.ext.tp..'/'..len1 ..' <--> '.. e2.tp..'/'..len2..'')
-          WRN(not cast,me, 'Applying the minimum size: "'.. e1.ext.tp..'/'..len1 ..'" <--> "' .. e2.tp..'/'..len2 ..'". ')
---          ASR(_TP.contains(e1.ext.tp,e2.tp,true),me, "non-matching types on `emit´")
+          WRN(not cast,me, 'Automatic casting from `'.. e2.tp ..'´ to `' .. e1.ext.tp ..'´. ')
         else
             ASR(e1.ext.tp=='void',me, "missing parameters on `emit´")
         end
@@ -570,8 +576,8 @@ print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2
           ASR(not (e1[1].tag=='Op1_&'),me,'VarAddr at left side of attribution.')
 
         local error, cast, tp1,tp2,len1,len2 = _TP.tpCompat((e1.supertp or e1.tp),(e2.supertp or e2.tp),e1[1].arr,e2[1].arr)
-          ASR(not error,me,'type incompatibility: `'.. e1.tp ..'´ <--> `'.. e2.tp..'´')
-          WRN(not cast,me, 'Automatic cast from `'.. e2.tp ..'´ to `' .. e2.tp..'´. ')
+          ASR(not error,me,'type incompatibility: `'.. (e1.supertp or e1.tp) ..'´ <--> `'.. (e2.supertp or e2.tp) ..'´')
+          WRN(not cast,me, 'Automatic casting from `'.. (e2.supertp or e2.tp) ..'´ to `' .. (e1.supertp or e1.tp) ..'´. ')
 
         if no_fin then
             return              -- no `finally´ required
@@ -607,7 +613,7 @@ print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2
             -- ASR(_TP.contains(e1.tp,evt.tp,true), me, 'invalid attribution: ['.. e1.tp ..'] can not contain [' .. evt.tp ..']')
             local error, cast, tp1,tp2,len1,len2 = _TP.tpCompat((e1.supertp or e1.tp),evt.tp,e1[1].arr,awt[1].arr)
             ASR(not error,me,'type/size incompatibility: '.. e1.tp..'/'..len1 ..' <--> '.. evt.tp..'/'..len2..'')
-            WRN(not cast,me, 'Applying the minimum size: "'.. e1.tp..'/'..len1 ..'" <--> "' .. evt.tp..'/'..len2 ..'". ')
+            WRN(not cast,me, 'Automatic casting from `'.. evt.tp ..'´ to `' .. e1.tp ..'´. ')
         end
         me.fst = awt.fst
     end,
@@ -621,9 +627,11 @@ print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2
     --------------------------------------------------------------------------
 
     LExp = function (me)
---print("env::LExp:",me.tag,me[1].auxtag,me[1].tag, me[1].arr, me[1][1])
+--print("env::LExp:",me.tag,me[1].auxtag,me[1].tag, me[1].arr, me[1][1],me[1].read_only)
 --print(print_r(me,"env::Exp: me"))
 --        ASR(not(me[1].tag=='Var' and (me[1].arr)),me,'missing array index for "'..me[1][1]..'".')
+        ASR(not(me[1].read_only),me,'`'.. me[1][1] .. '´ is a read only variable')
+
         me.lval = me[1].lval
         me.tp   = me[1].tp
         me.fst  = me[1].fst
@@ -683,13 +691,14 @@ print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2
         me.tp   = _arr
         me.lval = true
         me.fst  = arr.fst
+        me.ref = arr.ref
     end,
 
     Op2_int_int = function (me)
         local op, e1, e2 = unpack(me)
 --print("env::Op2_int_int:",e2.tag,e2[1])
         ASR(_TP.isNumeric(e1.tp,true) and _TP.isNumeric(e2.tp,true),me, 'invalid operands to binary "'..op..'"')
-        ASR((e2.tag=='CONST' and tonumber(e2[1])>0) or (e2.tag~='CONST'),me, 'division by zero')
+--        ASR((e2.tag=='CONST' and tonumber(e2[1])>0) or (e2.tag~='CONST'),me, 'division by zero')
             
         me.tp  = _TP.max(e1.tp,e2.tp,true)
     end,
@@ -776,6 +785,7 @@ print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2
         me.tp   = e1.tp..'*'
         me.lval = false
         me.fst  = e1.fst
+        me.ref = e1.ref
     end,
 
     ['Op2_.'] = function (me)
@@ -787,6 +797,7 @@ print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2
         me.lval = true
         me.fst  = e1.fst
         me.arr = field.dim
+        me.ref = e1.ref
     end,
 
     Op_var = function (me)
@@ -796,6 +807,7 @@ print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2
         me.tp   = exp.tp
         me.lval = exp.lval
         me.fst  = exp.fst
+        me.ref = exp.ref
      end,
 
     Op1_cast = function (me)
@@ -806,6 +818,7 @@ print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2
         me.tp   = tp
         me.lval = exp.lval
         me.fst  = exp.fst
+        me.ref = exp.ref
      end,
 
     C = function (me)

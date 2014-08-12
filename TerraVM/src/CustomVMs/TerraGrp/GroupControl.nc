@@ -36,7 +36,7 @@ interface GroupControl{
 	 * @param dataSize Data structure size
 	 * @param data Pointer to data structure
   	 */
- 	command void sendGR(uint8_t grId, uint8_t grParam, uint8_t maxHops, uint16_t targetNode, uint8_t evtId, uint8_t dataSize, uint8_t* data);
+ 	command uint8_t sendGR(uint8_t grId, uint8_t grParam, uint8_t maxHops, uint16_t targetNode, uint8_t evtId, uint8_t dataSize, uint8_t* data);
 
 	/**
 	 * Process an aggregation value for a specific group
@@ -58,7 +58,7 @@ interface GroupControl{
 	 * @param data Pointer to data structure
 	 */
 #ifdef MODULE_CTP
-	command void sendBS(uint8_t evtId, uint8_t dataSize, uint8_t* data);
+	command uint8_t sendBS(uint8_t evtId, uint8_t dataSize, uint8_t* data);
 #endif // MODULE_CTP
 
 	// Signals a received message event

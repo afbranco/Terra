@@ -16,59 +16,70 @@ enum{
 	AM_SENDGRND 		= 141,
 	
 #ifdef SHORT_QUEUES
-	AGG_QUEUE_SIZE = 1,
-	ELCT_QUEUE_SIZE = 1,
-	AGGREQ_QUEUE_SIZE = 1,
+	AGG_QUEUE_SIZE = 3,
+	ELCT_QUEUE_SIZE = 3,
+	AGGREQ_QUEUE_SIZE = 3,
+	NHOPS_LIST_SIZE = 20,
 #else
 	AGG_QUEUE_SIZE = 8,
 	ELCT_QUEUE_SIZE = 32,
 	AGGREQ_QUEUE_SIZE = 5,
+	NHOPS_LIST_SIZE = 90,
 #endif
 	
-	// Terra Local output events IDs
-	O_INIT=0,
-	O_LEDS=1,
-	O_LED0=2,
-	O_LED1=3,
-	O_LED2=4,
-	O_TEMP=5,
-	O_PHOTO=6,
-	O_VOLTS=7,
-	O_PORT_A=10,
-	O_PORT_B=11,
-	O_CFG_PORT_A=12,
-	O_CFG_PORT_B=13,
-	O_REQ_PORT_A=14,
-	O_REQ_PORT_B=15,
-	O_CFG_INT_A=16,
-	O_CFG_INT_B=17,
-	O_CUSTOM_A=18,	
+	// TerraGrp local Output events
+//	O_INIT			=0,
+	O_LEDS			=5,
+	O_LED0			=6,
+	O_LED1			=7,
+	O_LED2			=8,
+	O_TEMP			=9,
+	O_PHOTO			=10,
+	O_VOLTS			=22,
+	O_PORT_A		=12,
+	O_PORT_B		=13,
+	O_CFG_PORT_A	=14,
+	O_CFG_PORT_B	=15,
+	O_REQ_PORT_A	=16,
+	O_REQ_PORT_B	=17,
+	O_CFG_INT_A		=18,
+	O_CFG_INT_B		=19,
+	O_CUSTOM_A		=20,	
 	// TerraGrp custom output events IDs
-	O_SEND_BS=20,
-	O_SEND_GR=21,
-	O_AGGREG=22,	
+	O_SEND_BS		=40,
+	O_SEND_GR		=41,
+	O_AGGREG		=42,	
 
-	// Terra Local input events IDs
-	I_TEMP=0,
-	I_PHOTO=1,
-	I_VOLTS=2,
-
-	I_PORT_A=7,
-	I_PORT_B=8,
-	I_INT_A=9,
-	I_INT_B=10,
-	I_CUSTOM_A=11,
+	// TerraNet Local Input events
+//	I_ERROR_id		=0,  // Defined in VMError.h
+//	I_ERROR			=1,  // Defined in VMError.h
+	I_TEMP			=5, 
+	I_PHOTO			=6,
+	I_VOLTS			=7,
+	I_PORT_A		=8,
+	I_PORT_B		=9,
+	I_INT_A			=10,
+	I_INT_B			=11,
+	I_CUSTOM_A_ID	=12,
+	I_CUSTOM_A		=13,
 	// TerraGrp custom input events IDs
-	I_REC_GR=20,
-	I_SENDBS_DONE=21,
-	I_AGGREG_DONE=22,
+	I_REC_GR_ID		=40,
+	I_REC_GR		=41,
+	I_SENDBS_DONE_ID=42,
+	I_SENDBS_DONE	=43,
+	I_AGGREG_DONE_ID=44,
+	I_AGGREG_DONE	=45,
+	I_LEADER_NEW_ID	=46,
+	I_LEADER_NEW	=47,
+	I_LEADER_LOST_ID=48,
+	I_LEADER_LOST	=49,
 	
-	// Terra Local functions IDs
-	F_GETNODEID = 0,
-	F_RANDOM = 1,
+	// TerraNet basic functions
+	F_GETNODEID 	= 0,
+	F_RANDOM		= 1,
 	// TerraGrp Custom functions
-	F_GROUPINIT = 10,
-	F_AGGREGINIT = 11,
+	F_GROUPINIT 	= 10,
+	F_AGGREGINIT 	= 11,
 	
 	
 	// Event Type ID - 3 msb bits of EvtId
@@ -183,13 +194,13 @@ enum{
 	// GroupData structure
 	GRD_SIZE = 8, 
 	GRD_id_idx = 0,		GRD_id_len = 1,
-	GRD_param_idx = 1,	GRD_param_len = 2,
-	GRD_nHops_idx = 3,	GRD_nHops_len = 1,
-	GRD_status_idx = 4,	GRD_status_len = 1,
-	GRD_elFlag_idx = 5,	GRD_elFlag_len = 1,
-	GRD_elState_idx = 6,GRD_elState_len = 1,
-	GRD_leader_idx = 7,	GRD_leader_len = 2,
-	GRD_nextGrp_idx =9,	GRD_nextGrp_len = 2,
+	GRD_param_idx = 1,	GRD_param_len = 1,
+	GRD_nHops_idx = 2,	GRD_nHops_len = 1,
+	GRD_status_idx = 3,	GRD_status_len = 1,
+	GRD_elFlag_idx = 4,	GRD_elFlag_len = 1,
+	GRD_elState_idx = 5,GRD_elState_len = 1,
+	GRD_leader_idx = 6,	GRD_leader_len = 2,
+	GRD_nextGrp_idx =8,	GRD_nextGrp_len = 2,
 	
 	// group Flag bits/mask
 	GR_ENABLED_BIT = 5, 
@@ -241,9 +252,6 @@ enum{
 	ELCT_DELTA_TIMEOUT = 200,
 	// Renew Leader (re-election timeout)
 	ELCT_RENEW_TIMEOUT = 1000L * 60L * 5L, // 30 min = 1000 * 60 * 30 
-
-	// Duplicate ID List Size
-	NHOPS_LIST_SIZE = 20
 	
 };
 
@@ -254,7 +262,7 @@ enum{
 // Group control structure
 typedef nx_struct groupCtl {
 	nx_uint8_t   grId;
-	nx_uint16_t  param;
+	nx_uint8_t  param;
 	nx_uint8_t   nhops;
 	nx_uint8_t   status;
 	nx_uint8_t   elFlag;

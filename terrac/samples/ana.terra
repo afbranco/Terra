@@ -1,0 +1,82 @@
+config 00.01.00 do
+
+regtype xxxx with var byte x; end
+
+output void REQ_TEMP void 1;
+output void REQ_TEMP2 void 2;
+output pure void LEDS byte 10;
+output void LED0 byte 11;
+input ushort TEMP ubyte 1;
+input ushort TEMP void 3;
+input ushort TEMP2 void 2;
+function pure short getX(short) 1;
+function nohold short getY(short) 2;
+function nohold byte getXa(short*) 3;
+function nohold short getYa(short*) 4;
+
+//safe REQ_TEMP with REQ_TEMP2;
+//safe LEDS with LED0, REQ_TEMP2, REQ_TEMP2;
+//safe getX with getX;
+
+end
+
+
+
+event byte a1;
+event byte a2;
+var byte x1,x2;
+var ushort s1,s2;
+
+
+par/or do
+//	inc s1;
+//	s1 = 1;
+with
+	await 1s;
+	s1 = await TEMP;
+//	s1=1;
+with
+	s1=await TEMP2;
+	s2=1;
+end
+
+/*
+event byte a1;
+event byte a2;
+
+//var byte x;
+var ushort y,z,w;
+
+y = do
+par/and do
+	await TEMP2;
+	emit a1;
+	z=1;
+	await 1s;
+	//var byte z=0;
+	w = z;
+with
+	emit a2;
+	await TEMP;
+//	z=10;
+	w = z;		
+end
+return 0;
+end;
+
+/*
+par/and do
+	emit REQ_TEMP();
+	y = await TEMP;
+	z = 2 * y;
+with
+	emit REQ_TEMP2();
+	y = await TEMP;
+	z = 1;
+end
+
+//	y = z + 2;
+/*
+*/
+
+

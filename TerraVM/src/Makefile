@@ -146,10 +146,10 @@ ifeq ($(VM),NET)
   MB_LONG_ALL = 46
   MB_LONG_NOBS = 54
 else ifeq ($(VM),GRP)
-  MB_SHORT_ALL = 18
-  MB_SHORT_NOBS = 25
-  MB_LONG_ALL = 2
-  MB_LONG_NOBS = 2
+  MB_SHORT_ALL = 16
+  MB_SHORT_NOBS = 22
+  MB_LONG_ALL = 12
+  MB_LONG_NOBS = 12
 endif
 
 ifeq ($(HYB),YES) # Same value for all types
@@ -221,7 +221,7 @@ $(info TOSVERSION  = $(TOSVERSION))
 $(info ***********************)
 
 PFLAGS += -fno-strict-aliasing # required for accessing VARS
-MSG_SIZE = 28
+MSG_SIZE = 29
 #MSG_SIZE = 34
 
 CFLAGS += -DNO_DEBUG 

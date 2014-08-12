@@ -23,7 +23,7 @@ var ushort seqReq=0;
 var ubyte  seqData=0;
 var ubyte  reqTopoBlind=FALSE;
 
-pktype usrMsg2_t of radioMsg with
+pktype usrMsg2_t from radioMsg with
 	var ubyte d8_1;
 	var ubyte d8_2;
 	var ubyte d8_3;
@@ -95,7 +95,7 @@ end
 
 par do
 /**********************************************************
- * Send temperatura value
+ * Send temperature value
  **********************************************************/
 	await 2s;
 	emit REQ_CUSTOM_A(1);
@@ -181,7 +181,7 @@ with
 	end
 with
 /**********************************************************
- * Node != baseNode - If father==0, Requests a new toplogy
+ * Node != baseNode - If father==0, Requests a new topology
  **********************************************************/
 	if nodeId != baseNode then
 		loop do

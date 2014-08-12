@@ -11,7 +11,6 @@ function subst (name)
 end
 
 subst 'tp.lua'
-
 subst 'lines.lua'
 subst 'parser.lua'
 subst 'ast.lua'
@@ -20,9 +19,11 @@ subst 'props.lua'
 subst 'mem.lua'
 subst 'tight.lua'
 subst 'labels.lua'
---subst 'analysis.lua'
+subst 'ana.lua'
+subst 'acc.lua'
 subst 'asm.lua'
 subst 'code.lua'
+subst 'optm.lua'
 
 -- template.c
 --do

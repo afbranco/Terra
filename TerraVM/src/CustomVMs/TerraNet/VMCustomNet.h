@@ -14,7 +14,7 @@
 enum{
 	
 	// TerraNet local Output events
-	O_INIT			=0,
+//	O_INIT			=0,
 	O_LEDS			=5,
 	O_LED0			=6,
 	O_LED1			=7,

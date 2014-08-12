@@ -6,6 +6,7 @@
  * *********************************************/
 #include "VMCustomNet.h"
 #include "usrMsg.h"
+#include "BasicServices.h"
 
 module VMCustomP{
 	provides interface VMCustom as VM;
@@ -30,11 +31,13 @@ nx_uint32_t ExtDataTimeStamp;		// last SLPL_FIRED - timestamp
 /*
  * Output Events implementation
  */
+/*
 void  proc_init(uint16_t id, uint32_t value){
 	uint32_t val = signal VM.pop();
 	dbg(APPNAME,"Custom::proc_init(): id=%d, val=%d\n",id,(uint16_t)val);
 	signal VM.setMVal(TOS_NODE_ID,(uint16_t)val,2);
 }
+*/
 void  proc_leds(uint16_t id, uint32_t value){
 	dbg(APPNAME,"Custom::proc_leds(): id=%d, val=%d\n",id,(uint8_t)value);
 	call SA.setActuator(AID_LEDS, (uint8_t)(value & 0x07));
@@ -75,10 +78,12 @@ void  proc_req_volts(uint16_t id, uint32_t value){
 
 void  proc_send_x(uint16_t id,uint16_t addr,uint8_t ack){
 	usrMsg_t* usrMsg;
+	uint8_t reqRetryAck;
 	usrMsg = (usrMsg_t*)signal VM.getRealAddr(addr,2);
 	dbg(APPNAME,"Custom::proc_sendx(): id=%d, target=%d, addr=%d, realAddr=%x, ack=%d\n",
 		id,usrMsg->target,addr,usrMsg, ack);
-	call BSRadio.send(AM_USRMSG,usrMsg->target, usrMsg, sizeof(usrMsg_t),ack);
+	reqRetryAck = (ack)?(1<<REQ_ACK_BIT):0; // Define only ack without retry.
+	call BSRadio.send(AM_USRMSG,usrMsg->target, usrMsg, sizeof(usrMsg_t),reqRetryAck);
 }
 
 void  proc_send(uint16_t id, uint32_t addr){
@@ -192,7 +197,7 @@ void  func_qClear(uint16_t id){
 command void VM.procOutEvt(uint8_t id,uint32_t value){
 	dbg(APPNAME,"Custom::procOutEvt(): id=%d\n",id);
 	switch (id){
-		case O_INIT 		: proc_init(id,value); break;
+//		case O_INIT 		: proc_init(id,value); break;
 		case O_LEDS 		: proc_leds(id,value); break;
 		case O_LED0 		: proc_led0(id,value); break;
 		case O_LED1 		: proc_led1(id,value); break;

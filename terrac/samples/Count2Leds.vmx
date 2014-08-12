@@ -1,4 +1,4 @@
-18 44 54 54 54 54 1 1 0 0 8 0 8
+18 47 1 1 0 0 8 0 8
 00 | 0000 0 track 0
 00 | 0001 0
 00 | 0002 0
@@ -20,36 +20,29 @@
 e0 | 0018 e0 set16_c byte 9 0              | counter = 0
 09 | 0019 09 
 00 | 0020 00 
-70 | 0021 70 outevtx_v 1 9                 | emit LEDS len=1 var=counter
-01 | 0022 01 
-09 | 0023 09 
-28 | 0024 28 push_c 9                      | push &counter
-09 | 0025 09 
-58 | 0026 58 inc byte                      | inc byte
-a1 | 0027 a1 clken_c 0 500 12              | clock enable Awake_500_12 500msec
-00 | 0028 00 
-01 | 0029 01 
-f4 | 0030 f4 
-0c | 0031 0c 
-01 | 0032 01 end                           | end
-74 | 0033 74 exec 6                        | goto ubyte 6
-06 | 0034 06 
-78 | 0035 78 memclr 0 8                    | clear WClocks gates from 0 to 1
-00 | 0036 00 
-08 | 0037 08 
-01 | 0038 01 end                           | end
-78 | 0039 78 memclr 0 8                    | clear WClocks gates from 0 to 1
-00 | 0040 00 
-08 | 0041 08 
-01 | 0042 01 end                           | end program
-01 | 0043 01 end                           | end
-01 | 0044 01 L1(0x01) => 18 (0x12)
-12 | 0045 12 
-08 | 0046 08 L8(0x08) => 35 (0x23)
-23 | 0047 23 
-06 | 0048 06 L6(0x06) => 21 (0x15)
-15 | 0049 15 
-0c | 0050 0c L12(0x0c) => 33 (0x21)
-21 | 0051 21 
-03 | 0052 03 L3(0x03) => 39 (0x27)
-27 | 0053 27 
+38 | 0021 38 pushx_v byte 9                | push counter:byte
+09 | 0022 09 
+1b | 0023 1b outevt_e 5                    | emit LEDS
+05 | 0024 05 
+28 | 0025 28 push_c 9                      | push &counter
+09 | 0026 09 
+58 | 0027 58 inc byte                      | inc byte
+a5 | 0028 a5 clken_c 0 500 12              | clock enable Awake_500_12 500msec
+00 | 0029 00 
+01 | 0030 01 
+f4 | 0031 f4 
+00 | 0032 .00 addr:35
+23 | 0033 .0c 
+01 | 0034 01 end                           | end
+75 | 0035 75 exec 6                        | goto  6
+00 | 0036 .00 addr:21
+15 | 0037 .06 
+78 | 0038 78 memclr 0 8                    | clear WClocks gates from 0 to 1
+00 | 0039 00 
+08 | 0040 08 
+01 | 0041 01 end                           | end
+78 | 0042 78 memclr 0 8                    | clear WClocks gates from 0 to 1
+00 | 0043 00 
+08 | 0044 08 
+01 | 0045 01 end                           | end program
+01 | 0046 01 end                           | end

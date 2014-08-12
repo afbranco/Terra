@@ -1,4 +1,4 @@
-41 108 3 3 0 0 24 0 24
+41 106 3 3 0 0 24 0 24
 00 | 0000 0 track 0
 00 | 0001 0
 00 | 0002 0
@@ -40,13 +40,13 @@
 00 | 0038 0022
 00 | 0039 0023
 00 | 0040 0024 $ret:1, 
-d1 | 0041 d1 tkins_max 0 5                 | insert track ParEver_sub_1_5
+94 | 0041 94 tkins_max 0 5                 | insert track ParEver_sub_1_5
 00 | 0042 .00 addr:51
 33 | 0043 .05 
-d1 | 0044 d1 tkins_max 0 6                 | insert track ParEver_sub_2_6
+94 | 0044 94 tkins_max 0 6                 | insert track ParEver_sub_2_6
 00 | 0045 .00 addr:68
 44 | 0046 .06 
-d1 | 0047 d1 tkins_max 0 7                 | insert track ParEver_sub_3_7
+94 | 0047 94 tkins_max 0 7                 | insert track ParEver_sub_3_7
 00 | 0048 .00 addr:85
 55 | 0049 .07 
 01 | 0050 01 end                           | end
@@ -101,9 +101,7 @@ d0 | 0088 d0
 10 | 0099 10 
 08 | 0100 08 
 01 | 0101 01 end                           | end
-01 | 0102 01 end                           | end
-78 | 0103 78 memclr 0 24                   | clear WClocks gates from 0 to 3
-00 | 0104 00 
-18 | 0105 18 
-01 | 0106 01 end                           | end program
-01 | 0107 01 end                           | end
+78 | 0102 78 memclr 0 24                   | clear WClocks gates from 0 to 3
+00 | 0103 00 
+18 | 0104 18 
+01 | 0105 01 end                           | end

@@ -1,5 +1,13 @@
 #include "TerraNet.defs"
 
+
+
+var ubyte x1, x2;
+
+x1 = x2;
+
+/*
+
 pktype msg of radioMsg with
 	var byte[4] data1;
 end

@@ -68,10 +68,11 @@ class Network:
             self.throttle = Throttle(self.tossim, 1)
 
 		# CTP Channels
-        self.tossim.addChannel("Forwarder", outDBG)
-        self.tossim.addChannel("CtpForwarder", outDBG)
-        self.tossim.addChannel("Route", outDBG)
-        self.tossim.addChannel("TreeRoutingCtl", outDBG)
+        #self.tossim.addChannel("Forwarder", outDBG)
+        #self.tossim.addChannel("CtpForwarder", outDBG)
+        #self.tossim.addChannel("Route", outDBG)
+        #self.tossim.addChannel("TreeRouting", outDBG)
+        #self.tossim.addChannel("TreeRoutingCtl", outDBG)
 
         self.tossim.addChannel("AM", outDBG)
         ##self.tossim.addChannel("Acks", outDBG)

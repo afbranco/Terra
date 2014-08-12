@@ -131,7 +131,7 @@ PK_TYPES = -- P'void' +
 KEYS = P'and'     
      + 'async'    
      + 'await'    + 'break'    
-                                            + 'do'       + 'else'
+     + 'safe'     + 'unsafe'   + 'do'       + 'else'
      + 'else/if'  + 'emit'     + 'end'      + 'event'   
      + 'finally'  + 'FOREVER'  + 'if'       + 'input'    + 'loop'
      + 'nohold'   + 'not'      + 'null'     + 'or'       + 'output'
@@ -154,19 +154,20 @@ PNUM = -K'-'*CK(m.R'09'^1) / tonumber + EM'a positive integer number'
 _GG = { 
       [1] = CK'' * V'Prog' * P(-1)-- + EM'expected EOF')
 
-      , Prog = CK'' * EV'CfgBlk' * EV'Block' * P(-1) + EM'config block + program'
+      , Prog = (CK'' * EV'CfgBlk' * EV'Block' * P(-1)) + EM'config block + program'
 
 ------
-    , CfgBlk = (KEY'config') * V'ID_version' * EKEY'do' * V'CfgStmts' * EKEY'end'
+    , CfgBlk = KEY'config' * V'ID_version' * EKEY'do' * V'CfgStmts' * EKEY'end'
     , CfgStmts = ((V'_CfgStmt' * (EK';'*K';'^0) + EM'`;´') +
                   (V'_CfgStmtB' * (K';'^-1*K';'^0) + EM'`;´' ) )^0 
 
-    , _CfgStmt = V'_Dcl_ext' + V'_Dcl_func' 
+    , _CfgStmt =  V'_Dcl_ext' + V'_Dcl_func'
+                + V'Dcl_det'  
             --+ EM'config statement (usually a missing `input/output/function/regtype/packet´)'
     , _CfgStmtB = V'_Dcl_regt' + V'_Dcl_packet'
             --+ EM'config statement (usually a missing `regtype varName with varDefs end´)'
     ,_Dcl_func = ((CKEY'function' * (CKEY'pure'+CKEY'nohold'+Cc(false)) * (CKEY(TYPES) + EM'a basic type' )) 
-                  * ((V'ID_c' + EM'a valid function identifier') * K'(' * V'Arg_list' * K')') + EM'a function definition') * PNUM
+                  * ((V'ID_c' + EM'a valid function identifier') * K'(' * V'Arg_list' * K')') ) * PNUM
     
     , Arg_list = ( V'ID_arg_type' * (EK',' * EV'ID_type')^0  )^-1
     
@@ -185,7 +186,7 @@ _GG = {
     , _Stmt = V'AwaitT'   + V'AwaitExt'  + V'AwaitInt'
             + V'EmitT'    + V'EmitExtS'  + V'EmitInt'
             + V'_Dcl_int' + V'_Dcl_var'
---            + V'Dcl_det'  
+--afb            + V'Dcl_det'  
             + V'_Set'     --+ V'CallStmt' -- must be after Set
             + V'Op_var' + EM'statement (not last statement as `return´ or `break´) ' 
 
@@ -206,8 +207,8 @@ _GG = {
                     + V'ParEver' + V'If'    + V'Loop' )
 
     , __ID      = V'ID_c' + V'ID_ext' + V'Var'
---afb    , Dcl_det   = KEY'deterministic' * EV'__ID' * EKEY'with' *
---                     EV'__ID' * (K',' * EV'__ID')^0
+--    , Dcl_det   = KEY'safe' * EV'__ID' * EKEY'with' * EV'__ID' * (K',' * EV'__ID')^0
+    , Dcl_det   = KEY'unsafe' * EV'__ID' * EKEY'with' * EV'__ID' * (K',' * EV'__ID')^0
 
     , _Set  = V'LExp' * V'_Sets'
     , _Sets = (CK'=' + CK':=') * (
@@ -329,8 +330,8 @@ _GG = {
     , EmitInt  = KEY'emit' * EV'Var' * (K'(' * V'Exp'^-1 * EK')')^-1
 
 --    , _Dcl_ext = (CKEY'input'+CKEY'output') * (EV'ID_type' + EV'ID_tvoid') * EV'ID_ext' * PNUM
-    , _Dcl_ext =  (CKEY'output' * (CKEY'void' + EM'always `void´') * EV'ID_ext' * (EV'ID_type'  + EV'ID_tvoid') * PNUM) +
-                  (CKEY'input'  * (EV'ID_typenp' + EV'ID_tvoid') * EV'ID_ext' * (CKEY'ubyte' + CKEY'void' + EM'`ubyte´ or `void´ type') * PNUM)
+    , _Dcl_ext =  (CKEY'output' * (CKEY'pure'+CKEY'nohold'+Cc(false)) * (CKEY'void' + EM'always `void´') * EV'ID_ext' * (EV'ID_type'  + EV'ID_tvoid') * PNUM) +
+                  (CKEY'input'  * Cc(false) * (EV'ID_typenp' + EV'ID_tvoid') * EV'ID_ext' * (CKEY'ubyte' + CKEY'void' + EM'`ubyte´ or `void´ type') * PNUM)
 
     , _Dcl_int  = CKEY'event' * (CKEY(TYPES) + EM'a basic type') * Cc(false) *
                     V'__Dcl_int' * (K','*V'__Dcl_int')^0
@@ -354,7 +355,7 @@ _GG = {
                     *    (V'ID_var' + EM'a valid identifier')  
                         
     , _Dcl_regt   = KEY'regtype' * EV'ID_var' * EKEY'with' * (V'_Dcl_field' * (EK';'*K';'^0))^0 * EKEY'end'
-    , _Dcl_pktype = KEY'pktype' * EV'ID_var' * EKEY'of'  * EV'ID_var' * EKEY'with' * (V'_Dcl_field' * (EK';'*K';'^0))^0 * EKEY'end'
+    , _Dcl_pktype = KEY'pktype' * EV'ID_var' * EKEY'from'  * EV'ID_var' * EKEY'with' * (V'_Dcl_field' * (EK';'*K';'^0))^0 * EKEY'end'
     
 --    , Func     = V'ID_var' * K'(' * Cc'call' * V'ExpList' * EK')'
     , Func     = V'ID_var' * K'(' * V'ExpList' * EK')'
@@ -391,7 +392,7 @@ _GG = {
                   end
     , ID_field_type = -K'void' * CKEY(TYPES)
     , ID_pay_type = -K'void' * CKEY(PK_TYPES)
-    , ID_arg_type = (CKEY(TYPES) * C(K'*'^0))  + ((V'ID_c'*K'*')* EM'a non pointer Packet/Register') + V'ID_c' /
+    , ID_arg_type = ((CKEY(TYPES) * C(K'*'^0))  + V'ID_c') /
                   function (id, star)
                     return (string.gsub(id..(star or ''),' ',''))
                   end

@@ -33,7 +33,8 @@ nx_uint8_t  ExtDataCustomA;			// last request custom event (internal loop-back)
 usrSendGR_t ExtDataRecGR;			// last received radio group msg
 aggDone_t   ExtDataAggDone; 			// last AggregDone calculation
 nx_uint8_t  ExtDataQReady;			// last queue ready - queue size 
-
+uint8_t 	ExtDataError;			// last error event
+nx_uint16_t	ExtDataLeader;			// last leader identifier
 
 // Maintain pointer to first and last Group/Aggreg Control
 groupCtl_t* firstGrp = NULL;
@@ -42,6 +43,7 @@ uint8_t countGrp = 0;
 aggregCtl_t* firstAgg = NULL;
 aggregCtl_t* lastAgg  = NULL;
 uint8_t countAgg = 0;
+uint8_t firstElectionPend = TRUE;
 
 
 // Aggregation Processing Flag and ...
@@ -73,6 +75,8 @@ bool getGrpDefValue(uint8_t grpId, bool* inGrp, uint8_t* electionFlag, uint8_t* 
 bool isGrpAddrInitated(groupCtl_t* grCtl);
 bool isAggAddrInitated(aggregCtl_t* agCtl);
 uint8_t wd2ceuSensorId(uint8_t wdId);
+void tryFirstElection();
+task void procAggreg();
 // Aggregation internal functions
 void agAvgP1(uint32_t Value);
 void agSumP1(uint32_t Value);
@@ -98,11 +102,13 @@ void setMVal(uint32_t value, uint16_t Maddr, uint8_t len){signal VM.setMVal(valu
 /*
  * Output Events implementation
  */
+/*
 void  proc_init(uint16_t id, uint32_t value){
 	uint32_t val = signal VM.pop();
 	dbg(APPNAME,"Custom::proc_init(): evt id=%d, val=%d\n",id,(uint16_t)val);
 	setMVal(TOS_NODE_ID,(uint16_t)val,2);
 }
+*/
 void  proc_leds(uint16_t id, uint32_t value){
 	dbg(APPNAME,"Custom::proc_leds(): evt id=%d, val=%d\n",id,(uint8_t)value);
 	call SA.setActuator(AID_LEDS, (uint8_t)(value & 0x07));
@@ -173,41 +179,51 @@ void  proc_cfg_int_b(uint16_t id, uint32_t value){
 	call SA.setActuator(AID_INT2, (uint8_t)value);
 	}
 void  proc_req_custom_a(uint16_t id, uint32_t value){
+	uint8_t auxId ;
 	ExtDataCustomA = (uint8_t)value;
-	dbg(APPNAME,"Custom::proc_req_custom_a(): evt id=%d, ExtDataCustomA=%d\n",id,ExtDataCustomA);
+	dbg(APPNAME,"Custom::proc_req_custom_a(): id=%d, ExtDataCustomA=%d\n",id,ExtDataCustomA);
+	auxId = (uint8_t)signal VM.pop();
 	// Queue the custom event
-	signal VM.queueEvt(I_CUSTOM_A, &ExtDataCustomA);
+	signal VM.queueEvt(I_CUSTOM_A_ID,auxId, &ExtDataCustomA);
+	signal VM.queueEvt(I_CUSTOM_A   ,    0, &ExtDataCustomA);
 	}
 
 void  proc_send_bs(uint16_t id, uint32_t addr){
 	usrSendBS_t *usrMsg;
+	uint8_t stat;
 	usrMsg = (usrSendBS_t*)signal VM.getRealAddr((nx_uint16_t)addr,2);
 	dbg(APPNAME,"Custom::proc_send_bs(): evt id=%d, addr=%d\n",id,addr);
-	call GrCtl.sendBS(usrMsg->evtId, SEND_DATA_SIZE, (uint8_t*)usrMsg->Data);
+	stat = call GrCtl.sendBS(usrMsg->evtId, SEND_DATA_SIZE, (uint8_t*)usrMsg->Data);
+	if (stat != SUCCESS) {		// Queue an error event
+		ExtDataError = stat;
+		signal VM.queueEvt(I_ERROR_ID, stat, &ExtDataError);	
+		signal VM.queueEvt(I_ERROR   ,    0, &ExtDataError);	
+		}	
 	}
 void  proc_send_gr(uint16_t id, uint32_t addr){
 	usrSendGR_t *usrMsg;
 	uint8_t inGrp,electionFlag,grParam, maxHops;
+	uint8_t stat;
 	usrMsg = (usrSendGR_t*)signal VM.getRealAddr((nx_uint16_t)addr,2);
 	dbg(APPNAME,"Custom::proc_send_gr(): evt id=%d, addr=%d\n",id,addr);
 	getGrpDefValue(usrMsg->grId, &inGrp, &electionFlag, &grParam, &maxHops);
-	call GrCtl.sendGR(usrMsg->grId, grParam, maxHops, usrMsg->node, usrMsg->evtId, SEND_DATA_SIZE, (uint8_t*)usrMsg->Data);	
+	stat = call GrCtl.sendGR(usrMsg->grId, grParam, maxHops, usrMsg->node, usrMsg->evtId, SEND_DATA_SIZE, (uint8_t*)usrMsg->Data);	
+	if (stat != SUCCESS) {		// Queue an error event
+		ExtDataError = stat;
+		signal VM.queueEvt(I_ERROR_ID, stat, &ExtDataError);	
+		signal VM.queueEvt(I_ERROR   ,    0, &ExtDataError);	
+		}
 	}
 void  proc_aggreg(uint16_t id, uint32_t addr){
 	aggregCtl_t *agCtl;
-	aggReqData_t agReqData;
-	uint8_t inGrp,electionFlag,grParam, maxHops;
 	agCtl = (aggregCtl_t*)signal VM.getRealAddr((nx_uint16_t)addr,2);
 	dbg(APPNAME,"Custom::proc_aggreg(): evt id=%d addr=%d\n",id,addr);
-	getGrpDefValue(agCtl->grId, &inGrp, &electionFlag, &grParam, &maxHops);
-	agReqData.aggId = agCtl->agId;
-	agReqData.grId = agCtl->grId;
-	agReqData.sensorId = agCtl->sensorId;
-	agReqData.vType = S32;
-	agReqData.value = 0;
-	call GrCtl.aggreg(agCtl->grId, grParam, maxHops, agCtl->agId, &agReqData);
-	}
-
+	// insert queue
+	AggSeq++;
+	dbg(APPNAME,"Custom::proc_aggreg(): aggId=%d, aggSeq=%d\n",agCtl->agId,AggSeq);
+	call aggQ.enqueue((uint32_t)agCtl->agId + ((uint32_t)AggSeq<<16));
+	if (aggFlag==FALSE) post procAggreg();
+  	}
 	
 /*
  * Function implementation
@@ -228,18 +244,29 @@ void  func_random(uint16_t id){
 	signal VM.push(stat);
 	}	
 
-
 void func_groupInit(uint16_t id){
 	groupCtl_t *grCtl;
-	uint16_t value = (uint16_t)signal VM.pop();
+	uint8_t elFlag,status,nhops,param,grId;
+	uint16_t value,leader;
 	dbg(APPNAME,"Custom::func_groupInit(): func id=%d\n",id);
+	// pop values
+	leader = (uint16_t)signal VM.pop();
+	elFlag = (uint8_t)signal VM.pop();
+	status = (uint8_t)signal VM.pop();
+	nhops = (uint8_t)signal VM.pop();
+	param = (uint8_t)signal VM.pop();
+	grId = (uint8_t)signal VM.pop();
+	value = (uint16_t)signal VM.pop();
 	grCtl = (groupCtl_t*)signal VM.getRealAddr(value,2);
-	grCtl->grId = (uint8_t)signal VM.pop();
-	grCtl->param = (uint8_t)signal VM.pop();
-	grCtl->nhops = (uint8_t)signal VM.pop();
-	grCtl->status = (uint8_t)signal VM.pop();
-	grCtl->elFlag = (uint8_t)signal VM.pop();
-	grCtl->leader = (uint16_t)signal VM.pop();
+	// set struct
+	grCtl->leader = leader;
+	grCtl->elFlag = elFlag;
+	grCtl->status = status;
+	grCtl->nhops = nhops;
+	grCtl->param = param;
+	grCtl->grId = grId;
+
+	dbg(APPNAME,"Custom::func_groupInit(): addr=%d, realAddr=%x, firstGrp->nextGrp=%d\n",value,grCtl,(firstGrp!=NULL)?firstGrp->nextGrp:0);
 	if (isGrpAddrInitated(grCtl)==FALSE){ // Only update nextGrp if it is new
 		grCtl->nextGrp = (uint16_t)NULL;
 		countGrp++;
@@ -247,39 +274,50 @@ void func_groupInit(uint16_t id){
 			firstGrp = grCtl;
 			lastGrp = grCtl;
 		} else {
-			lastGrp->nextGrp = (uint16_t)grCtl;
+			lastGrp->nextGrp = (uint16_t)value; // mem addr
 			lastGrp = grCtl;
 		}
 	}
+	dbg(APPNAME,"Custom::func_groupInit(): addr=%d, realAddr=%x, firstGrp->nextGrp=%d\n",value,grCtl,(firstGrp!=NULL)?firstGrp->nextGrp:0);
 	signal VM.push(SUCCESS);
+	tryFirstElection();
 	}		
 void func_aggregInit(uint16_t id){
 	aggregCtl_t *agCtl;
 	groupCtl_t *grCtl;
+	uint8_t agComp,agOper,sensorId;
 	uint16_t value;
+	uint32_t refVal;
 	dbg(APPNAME,"Custom::func_aggregInit(): func id=%d\n",id);
-	value = (uint16_t)signal VM.pop(); // Agg addr
-	agCtl = (aggregCtl_t*)signal VM.getRealAddr(value,2);
+	// pop values
+	refVal = (uint32_t)signal VM.pop();
+	agComp = (uint8_t)signal VM.pop();
+	agOper = (uint8_t)signal VM.pop();
+	sensorId = (uint8_t)signal VM.pop();
 	value = (uint16_t)signal VM.pop(); // Grp Addr
 	grCtl = (groupCtl_t*)signal VM.getRealAddr(value,2);
+	value = (uint16_t)signal VM.pop(); // Agg addr
+	agCtl = (aggregCtl_t*)signal VM.getRealAddr(value,2);
+	// set struct
+	agCtl->refVal = refVal;
+	agCtl->agComp = agComp;
+	agCtl->agOper = agOper;
+	agCtl->sensorId = sensorId;
+	agCtl->grId = grCtl->grId;
+
 	if (isGrpAddrInitated(grCtl)==FALSE){
 		signal VM.push(EINVAL); // EINVAL 6 -- An invalid parameter was passed 
 		dbg(APPNAME,"ERROR Custom::func_aggregInit(): Group not initiated!\n",id);
 		return;
 	}
-	agCtl->grId = grCtl->grId;
-	agCtl->sensorId = (uint8_t)signal VM.pop();
-	agCtl->agOper = (uint8_t)signal VM.pop();
-	agCtl->agComp = (uint8_t)signal VM.pop();
-	agCtl->refVal = (uint32_t)signal VM.pop();
 	if (isAggAddrInitated(agCtl)==FALSE){ // Only update nextAgg if it is new
 		agCtl->nextAgg = (uint16_t)NULL;
-		countGrp++;
+		countAgg++;
 		if (firstAgg==NULL) {
 			firstAgg = agCtl;
 			lastAgg = agCtl;
 		} else {
-			lastAgg->nextAgg = (uint16_t)agCtl;
+			lastAgg->nextAgg = (uint16_t)value; // mem addr
 			lastAgg = agCtl;
 		}
 	}
@@ -299,7 +337,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 #ifndef ONLY_BSTATION
 	switch (id){
 		/* Terra Local output events */
-		case O_INIT 		: proc_init(id,value); break;
+//		case O_INIT 		: proc_init(id,value); break;
 		case O_LEDS 		: proc_leds(id,value); break;
 		case O_LED0 		: proc_led0(id,value); break;
 		case O_LED1 		: proc_led1(id,value); break;
@@ -339,6 +377,31 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 #endif
 	}
 
+	command void VM.reset(){
+#ifndef ONLY_BSTATION
+		// reset Grp and Agg control vars
+		// Maintain pointer to first and last Group/Aggreg Control
+		firstGrp = NULL;
+		lastGrp  = NULL;
+		countGrp = 0;
+		firstAgg = NULL;
+		lastAgg  = NULL;
+		countAgg = 0;	
+		// Aggregation Processing Flag and ...
+		aggFlag=FALSE;
+		CurrentAggreg = 0;
+		CurrAggStructAddr = 0;
+		AggTotal=0;
+		AggSeq=0;
+		firstElectionPend = TRUE;
+		call renewTmr.stop();
+		call ElectionTmr.stop();
+		call AggTmr.stop();
+		call GrCtl.init();
+		// Reset leds
+		call SA.setActuator(AID_LEDS, 0);
+#endif
+	}
 
 #ifndef ONLY_BSTATION
 
@@ -346,27 +409,27 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		uint8_t n;
 		groupCtl_t* next = firstGrp;
 		for (n=0; n < countGrp; n++)
-			if (grCtl==next) return TRUE; else next = (void*)next->nextGrp;
+			if (grCtl==next) return TRUE; else next = (void*)signal VM.getRealAddr(next->nextGrp,2);
 		return FALSE;
 	}
 	bool isAggAddrInitated(aggregCtl_t* agCtl){
 		uint8_t n;
 		aggregCtl_t* next = firstAgg;
 		for (n=0; n < countAgg; n++)
-			if (agCtl==next) return TRUE; else next = (void*)next->nextAgg;
+			if (agCtl==next) return TRUE; else next = (void*)signal VM.getRealAddr(next->nextAgg,2);
 		return FALSE;
 	}
 
 	uint16_t findGroupAddr(uint8_t grpId){
 		uint8_t n;
 		groupCtl_t* next = firstGrp;
-		dbg(APPNAME,"VM::findGroupAddr(): grpId=%d/%d, countGrp=%d, firstGrp addr=%x\n",(grpId & 0x1F),grpId,countGrp,(uint16_t)firstGrp);
+		dbg(APPNAME,"VM::findGroupAddr(): grpId=%d/%d, countGrp=%d, firstGrp addr=%x\n",(grpId & 0x1F),grpId,countGrp,firstGrp);
 		for (n=0; n < countGrp; n++){
 			dbg(APPNAME,"VM::findGroupAddr(): n=%d of %d, Id=%d\n",n,countGrp,next->grId);
 			if (next->grId == (grpId & 0x1F))
 				return ((void*)next - (void*)signal VM.getRealAddr(0,2)); // Var VM addr = (Var Real Addr) - (MEM Real Addr)
 			else
-				next = (void*)next->nextGrp;
+				next = (void*)signal VM.getRealAddr(next->nextGrp,2);
 		}
 		return 0;
 	}
@@ -374,13 +437,13 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 	uint16_t findAggregAddr(uint8_t aggId){
 		uint8_t n;
 		aggregCtl_t* next = firstAgg;
-		dbg(APPNAME,"VM::findAggregAddr(): aggId=%d/%d, countAgg=%d, firstAgg addr=%x\n",(aggId & 0x07),aggId,countGrp,(uint16_t)firstAgg);
+		dbg(APPNAME,"VM::findAggregAddr(): aggId=%d/%d, countAgg=%d, firstAgg addr=%x\n",(aggId & 0x07),aggId,countGrp,firstAgg);
 		for (n=0; n < countAgg; n++){
 			dbg(APPNAME,"VM::findAggregAddr(): n=%d of %d, Id=%d\n",n,countAgg,next->agId);
 			if (next->agId == (aggId & 0x07))
 				return ((void*)next - (void*)signal VM.getRealAddr(0,2)); // Var VM addr = (Var Real Addr) - (MEM Real Addr)
 			else
-				next = (void*)next->nextAgg;
+				next = (void*)signal VM.getRealAddr(next->nextAgg,2);
 		}
 		return 0;
 	}
@@ -395,7 +458,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		*electionFlag = (uint8_t)getMVal(grAddr+GRD_elFlag_idx,GRD_elFlag_len);
 		*maxHops = 		(uint8_t)getMVal(grAddr+GRD_nHops_idx,GRD_nHops_len);
 		*grParam = 		(uint8_t)getMVal(grAddr+GRD_param_idx,GRD_param_len);
-		dbg(APPNAME,"VM::getGrpDefValue():TRUE\n");
+		dbg(APPNAME,"VM::getGrpDefValue(): inGrp=%d, electionFlag=%d, grParam%d, maxHops=%d\n",*inGrp, *electionFlag, *grParam, *maxHops);
 		return TRUE;
 	}
 
@@ -428,6 +491,15 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		dbg(APPNAME,"VM::setGrpLeader():grpId=%d, grAddr=%d\n",grpId,grAddr);
 		if (grAddr==0) return FALSE;
 		setMVal(leaderId,grAddr+GRD_leader_idx,GRD_leader_len);
+			// Queue the message event
+		ExtDataLeader = leaderId;
+		if (leaderId==0){
+			signal VM.queueEvt(I_LEADER_LOST_ID,grpId,&ExtDataLeader);
+			signal VM.queueEvt(I_LEADER_LOST   ,    0,&ExtDataLeader);			
+		} else {
+			signal VM.queueEvt(I_LEADER_NEW_ID,grpId,&ExtDataLeader);
+			signal VM.queueEvt(I_LEADER_NEW   ,    0,&ExtDataLeader);			
+		}
 		return TRUE;
 	}
 #endif
@@ -465,15 +537,16 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 #ifndef ONLY_BSTATION
 		uint8_t EvtId;
 		EvtId = (uint8_t)((Id & 0x07) | TID_MSG_REC);
-		dbg(APPNAME,"VM::GrCtl.evtReady(): EvtId=%d[%d]\n",EvtId,Id);
+		dbg(APPNAME,"VM::GrCtl.evtReady(): EvtId=%d[%d], grId=%d, reqId=%d\n",EvtId,Id,grId,reqId);
 		if (signal VM.getHaltedFlag() == TRUE) return;		
 		// Save data value in temp global ext_data
-		ExtDataRecGR.evtId = EvtId;
+		ExtDataRecGR.evtId = Id;
 		ExtDataRecGR.grId = grId;
 		ExtDataRecGR.node = reqId;
 		memcpy(ExtDataRecGR.Data,msgData,SEND_DATA_SIZE);
 		// Queue the message event
-		signal VM.queueEvt(I_REC_GR,&ExtDataRecGR);
+		signal VM.queueEvt(I_REC_GR_ID,grId,&ExtDataRecGR);
+		signal VM.queueEvt(I_REC_GR   ,   0,&ExtDataRecGR);
 #endif
 	}
 
@@ -585,7 +658,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		dbg(APPNAME,"VM::SA.evtReady(): Id=%d, EvtId=%d\n",Id,EvtId);
 		if (signal VM.getHaltedFlag() == TRUE) return;
 		// Queue the sensor event
-		signal VM.queueEvt(wd2ceuSensorId(Id), call SA.getDatap(Id));	
+		signal VM.queueEvt(wd2ceuSensorId(Id), 0, call SA.getDatap(Id));	
 	}
 
  	void SA_voteReady(uint8_t codeEvt_id){
@@ -702,7 +775,8 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 			ExtDataAggDone.countFalse = CurrAggData.countFalse;
 			ExtDataAggDone.value = (int32_t)CurrAggData.value;
  			// Queue the message event
-			signal VM.queueEvt(I_AGGREG_DONE, &ExtDataAggDone);
+			signal VM.queueEvt(I_AGGREG_DONE_ID, EvtId, &ExtDataAggDone);
+			signal VM.queueEvt(I_AGGREG_DONE   ,     0, &ExtDataAggDone);
 			// Try next aggregation
 			post procAggreg();
 		}		
@@ -816,21 +890,34 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 	}
 
 
+	task void firstElection(){
+		// queue all groups id to process initLeader (bit=1)
+		queueLeaderProc(1);
+		// re-start renew election periodic timer
+		call renewTmr.startPeriodic(ELCT_RENEW_TIMEOUT);
+	}
+	void tryFirstElection(){
+		dbg(APPNAME,"VM::tryFirstElection: firstElectionPend=%s\n",_TFstr(firstElectionPend));
+		if (firstElectionPend) post firstElection();
+		firstElectionPend = FALSE;
+	}
+
 	void queueLeaderProc(uint8_t bitValue){
 		uint8_t n;
 		groupCtl_t* next = firstGrp;
 		uint8_t electionFlag, electionState;
 
-		dbg(APPNAME,"VM::queueLeaderProc():  countGrp=%d, firstGrp addr=%x\n",(next->grId & 0x1F),next->grId,countGrp,(uint16_t)firstGrp);
+		dbg(APPNAME,"VM::queueLeaderProc():  countGrp=%d, firstGrp = %x\n",countGrp,(uint16_t)firstGrp);
 		for (n=0; n < countGrp; n++){
 			// Test if leader is enabled and queue a init/review Leader evt.
+			dbg(APPNAME,"VM::queueLeaderProc(): n=%d of %d, Id=%d, bitValue=%d\n",n,countGrp,next->grId,bitValue);
 			getGrpElctState(next->grId, &electionFlag, &electionState);
 			dbg(APPNAME,"VM::queueLeaderProc(): n=%d of %d, Id=%d, bitValue=%d, electionFlag=%d\n",n,countGrp,next->grId,bitValue,electionFlag);
 			if (electionFlag!=ELCT_OFF){
 				removeElectionQ(next->grId);
 				call electionQ.enqueue((uint8_t)(next->grId | (bitValue<<ELCT_INIT_BIT)));
 			}
-			next = (void*)next->nextGrp;
+			next = (void*)signal VM.getRealAddr(next->nextGrp,2);
 		}
 		post procLeaderQ();
 	}
