@@ -156,11 +156,13 @@ ifeq ($(VM),NET)
   MB_SHORT_NOBS = 72
   MB_LONG_ALL = 46
   MB_LONG_NOBS = 54
+  MB_TELOSB    =300
 else ifeq ($(VM),GRP)
-  MB_SHORT_ALL = 16
+  MB_SHORT_ALL = 300 #16
   MB_SHORT_NOBS = 22
   MB_LONG_ALL = 12
   MB_LONG_NOBS = 12
+  MB_TELOSB    = 250
 endif
 
 ifeq ($(HYB),YES) # Same value for all types
@@ -196,7 +198,7 @@ else # HYB=NO
   endif
 # TelosB
   ifeq ($(MOTE),telosb)
-    MBLOCKS = 128               # Telos; NO HYB
+    MBLOCKS = $(MB_TELOSB)               # Telos; NO HYB
   endif
 endif
 

@@ -215,7 +215,7 @@ public class ControlCore implements MessageListener
 	 * Send a specific program block
 	 * @param BlockId	Requested data block number
 	 */
-	void sendNewProgBlock(short BlockId){
+	void sendNewProgBlock(int BlockId){
 		controlform.appendControlMsg("ControlCore: sendNewProgBlock()");
 
 		newProgBlockMsg msg = new newProgBlockMsg();

@@ -89,8 +89,8 @@ enum{
  
 typedef nx_struct newProgVersion{
 	nx_uint16_t versionId; 		// Version ID
-	nx_uint8_t blockLen; 		// Number of program blocks
-	nx_uint8_t blockStart; 		// first block
+	nx_uint16_t blockLen; 		// Number of program blocks
+	nx_uint16_t blockStart; 	// first block
 	nx_uint16_t startProg; 		// Start prog addr. 
 	nx_uint16_t endProg; 		// Start prog addr. 
 	nx_uint16_t nTracks; 		// Tracks number
@@ -100,23 +100,18 @@ typedef nx_struct newProgVersion{
 	nx_uint16_t gate0;	 		// Gate0 addr
 	nx_uint16_t inEvts;	 		// In Evts number
 	nx_uint16_t async0;	 		// Async0 addr
-	nx_uint32_t refTA1; 		// Reference time on TX out (wrote at 'newProgVersion' sending)
 } newProgVersion_t;	
 	
 typedef nx_struct newProgBlock{	
 	nx_uint16_t versionId; // Version ID
-	nx_uint8_t blockId; // Block number
+	nx_uint16_t blockId; // Block number
 	nx_uint8_t data[BLOCK_SIZE]; // Data buffer
-	nx_uint8_t childDelay; // Delay to be considered as Global by child node
 } newProgBlock_t;	
 	
 typedef nx_struct reqProgBlock{	
 	nx_uint8_t reqOper; 	// Request operation: Request newVersion, full data or single data
 	nx_uint16_t versionId; 	// Version ID
-	nx_uint8_t blockId; 	// Block number
-	nx_uint32_t refTA1; 	// Reference time on TX out (received inside 'newProgVersion')
-	nx_uint32_t refTB1; 	// Reference time on RX in  (stored at 'newProgVersion' receiving)
-	nx_uint32_t refTB2; 	// Reference time on RX out (wrote at 'reqProgBlock' sending)
+	nx_uint16_t blockId; 	// Block number
 } reqProgBlock_t;	
 
 	

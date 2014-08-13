@@ -97,9 +97,6 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
         }
         s += "]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
-      try {
-        s += "  [childDelay=0x"+Long.toHexString(get_childDelay())+"]\n";
-      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       return s;
     }
 
@@ -170,9 +167,9 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
 
     /////////////////////////////////////////////////////////
     // Accessor methods for field: blockId
-    //   Field type: short, unsigned
+    //   Field type: int, unsigned
     //   Offset (bits): 16
-    //   Size (bits): 8
+    //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
     /**
@@ -204,37 +201,37 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
     }
 
     /**
-     * Return the value (as a short) of the field 'blockId'
+     * Return the value (as a int) of the field 'blockId'
      */
-    public short get_blockId() {
-        return (short)getUIntBEElement(offsetBits_blockId(), 8);
+    public int get_blockId() {
+        return (int)getUIntBEElement(offsetBits_blockId(), 16);
     }
 
     /**
      * Set the value of the field 'blockId'
      */
-    public void set_blockId(short value) {
-        setUIntBEElement(offsetBits_blockId(), 8, value);
+    public void set_blockId(int value) {
+        setUIntBEElement(offsetBits_blockId(), 16, value);
     }
 
     /**
      * Return the size, in bytes, of the field 'blockId'
      */
     public static int size_blockId() {
-        return (8 / 8);
+        return (16 / 8);
     }
 
     /**
      * Return the size, in bits, of the field 'blockId'
      */
     public static int sizeBits_blockId() {
-        return 8;
+        return 16;
     }
 
     /////////////////////////////////////////////////////////
     // Accessor methods for field: data
     //   Field type: short[], unsigned
-    //   Offset (bits): 24
+    //   Offset (bits): 32
     //   Size of each element (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -256,7 +253,7 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'data'
      */
     public static int offset_data(int index1) {
-        int offset = 24;
+        int offset = 32;
         if (index1 < 0 || index1 >= 24) throw new ArrayIndexOutOfBoundsException();
         offset += 0 + index1 * 8;
         return (offset / 8);
@@ -266,7 +263,7 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
      * Return the offset (in bits) of the field 'data'
      */
     public static int offsetBits_data(int index1) {
-        int offset = 24;
+        int offset = 32;
         if (index1 < 0 || index1 >= 24) throw new ArrayIndexOutOfBoundsException();
         offset += 0 + index1 * 8;
         return offset;
@@ -382,69 +379,6 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
              carr[i] = (char)getElement_data(i);
          }
          return new String(carr,0,i);
-    }
-
-    /////////////////////////////////////////////////////////
-    // Accessor methods for field: childDelay
-    //   Field type: short, unsigned
-    //   Offset (bits): 216
-    //   Size (bits): 8
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'childDelay' is signed (false).
-     */
-    public static boolean isSigned_childDelay() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'childDelay' is an array (false).
-     */
-    public static boolean isArray_childDelay() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'childDelay'
-     */
-    public static int offset_childDelay() {
-        return (216 / 8);
-    }
-
-    /**
-     * Return the offset (in bits) of the field 'childDelay'
-     */
-    public static int offsetBits_childDelay() {
-        return 216;
-    }
-
-    /**
-     * Return the value (as a short) of the field 'childDelay'
-     */
-    public short get_childDelay() {
-        return (short)getUIntBEElement(offsetBits_childDelay(), 8);
-    }
-
-    /**
-     * Set the value of the field 'childDelay'
-     */
-    public void set_childDelay(short value) {
-        setUIntBEElement(offsetBits_childDelay(), 8, value);
-    }
-
-    /**
-     * Return the size, in bytes, of the field 'childDelay'
-     */
-    public static int size_childDelay() {
-        return (8 / 8);
-    }
-
-    /**
-     * Return the size, in bits, of the field 'childDelay'
-     */
-    public static int sizeBits_childDelay() {
-        return 8;
     }
 
 }

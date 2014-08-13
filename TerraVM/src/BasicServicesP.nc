@@ -130,12 +130,12 @@ implementation{
 	// Program load control
 	nx_uint16_t ProgVersion;
 	nx_uint16_t ProgMoteSource;
-	nx_uint8_t ProgBlockStart;
-	nx_uint8_t ProgBlockLen;
+	nx_uint16_t ProgBlockStart;
+	nx_uint16_t ProgBlockLen;
 	uint8_t loadingProgramFlag=FALSE;
 	
 	uint8_t ProgTimeOutCounter=0;
-	uint8_t DsmBlockCount=0;
+	uint16_t DsmBlockCount=0;
 	nx_uint16_t lastRecNewProgVersion;
 
 	// New Data load control	
@@ -290,8 +290,8 @@ implementation{
 	 * Get next bit that is '0'. Return MAX_BLOCKS if all bits are set.
 	 * @return Block id
 	 */
-	uint8_t getNextEmptyBlock(){
-		uint8_t i;
+	uint16_t getNextEmptyBlock(){
+		uint16_t i;
 		for (i=0;i<CURRENT_MAX_BLOCKS;i++){
 			if (!call BM.get(i)) return i;
 			}
@@ -317,7 +317,7 @@ implementation{
 	 * @param seq Sequence number to be checked
 	 */
 	uint8_t hasDataSeq(uint16_t seq){
-		uint8_t i=0;
+		uint16_t i=0;
 		setDataBuff_t Buff;
 		for (i=0; i < call setDataQ.size(); i++){
 			call setDataQ.element(i,&Buff);
@@ -587,7 +587,8 @@ implementation{
  	 * @param Data Message data
  	 */ 
 	 void procNewProgBlock(newProgBlock_t* Data){
-		 uint8_t lData[BLOCK_SIZE],i;
+		 uint8_t lData[BLOCK_SIZE];
+		 uint16_t i;
 		 uint16_t Addr=0;
 		 newProgVersion_t xVersion;
 		 dbg(APPNAME, "BS::procNewProgBlock(). version=%hhu, blockId=%hhu, ReqState=%d\n",Data->versionId,Data->blockId,ReqState);
@@ -645,7 +646,7 @@ implementation{
 		 newProgVersion_t xVersion;
 		 newProgBlock_t xBlock;
 		 uint8_t* mem;
-		 uint8_t i=0;
+		 uint16_t i=0;
 		 dbg(APPNAME, "BS::procRecReqProgBlock(). Local version=%hhu, Req Version %hhu Oper=%hhu, BM.isAllBitSet=%s\n", ProgVersion, Data->versionId, Data->reqOper,_TFstr(call BM.isAllBitSet()));
 		switch (Data->reqOper){
 			case RO_NEW_VERSION: 
@@ -686,7 +687,7 @@ implementation{
  	 * Request a missing data block
  	 */  	
 	 event void ProgReqTimer.fired(){
-		 uint8_t nextBlock=CURRENT_MAX_BLOCKS;
+		 uint16_t nextBlock=CURRENT_MAX_BLOCKS;
 		 reqProgBlock_t Data;
 		 uint32_t timeout=REQUEST_TIMEOUT;
 		 nextBlock = getNextEmptyBlock();
@@ -764,9 +765,10 @@ implementation{
 		 dbg(APPNAME, "BS::SendDataFullTimer.fired().\n");
 		// Disseminating Prog blocks
 		if (call BM.get(DsmBlockCount+ProgBlockStart)){
-			uint8_t *mem, i;
+			uint8_t *mem;
+			uint16_t i;
 			xBlock.versionId = ProgVersion;
-			xBlock.blockId = (uint8_t)(DsmBlockCount + ProgBlockStart);
+			xBlock.blockId = (uint16_t)(DsmBlockCount + ProgBlockStart);
 			mem = signal BSUpload.getSection(((DsmBlockCount+ProgBlockStart) * BLOCK_SIZE));
 			for (i=0; i < BLOCK_SIZE; i++) xBlock.data[i] = *(nx_uint8_t*)(mem+i);
 			sendNewProgBlock(&xBlock);
@@ -787,8 +789,8 @@ implementation{
  	 */ 	
 	void procSetDataND(setDataND_t* Data){
  		setDataBuff_t buff;
-		uint8_t lData[SET_DATA_SIZE],i,x,secp=0,secLen;
-		uint16_t secAddr;
+		uint8_t lData[SET_DATA_SIZE],secp=0,secLen;
+		uint16_t secAddr,x,i;
 		reqData_t xData;
 		maxDataSeq(Data->seq);
 		dbg(APPNAME, "BS::procSetDataND(): Seq=%hhu. localSeq+1=%hhu.\n",Data->seq,NewDataSeq+1);
@@ -902,7 +904,7 @@ implementation{
 				call inQ.get(&tempOutputInQ);
 //				printf("inEvt%d.",tempOutputInQ.AM_ID);printfflush();
 				switch (tempOutputInQ.AM_ID) {
-					case AM_NEWPROGVERSION: procNewProgVersion((newProgVersion_t*) &tempOutputInQ.Data); break;
+					case AM_NEWPROGVERSION: procNewProgVersion((newProgVersion_t*)&tempOutputInQ.Data); break;
 					case AM_NEWPROGBLOCK: procNewProgBlock((newProgBlock_t*) &tempOutputInQ.Data); break;
 					case AM_REQPROGBLOCK: procRecReqProgBlock((reqProgBlock_t*) &tempOutputInQ.Data); break;
 					case AM_SETDATAND: procSetDataND((setDataND_t*) &tempOutputInQ.Data); break;

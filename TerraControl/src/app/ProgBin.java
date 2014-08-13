@@ -7,13 +7,13 @@ import java.io.InputStreamReader;
 
 public class ProgBin {
 	static short BLOCK_SIZE = 24;
-	static short MAX_BLOCKS = 80; //16;
+	static int MAX_BLOCKS = 500; //16;
 	static int MAX_TABLE_LEN = BLOCK_SIZE * MAX_BLOCKS;
 
 	private String lastError;
 	
-	private short numBlocks;
-	private short blockStart;
+	private int numBlocks;
+	private int blockStart;
 	private int startProg;
 	private int endProg;
 	private int nTracks;
@@ -34,14 +34,14 @@ public class ProgBin {
 	}
 
 	private void resetProgData(){
-		for (short blk=0; blk<MAX_BLOCKS; blk++)
-			for (short x=0; x<BLOCK_SIZE; x++)
+		for (int blk=0; blk<MAX_BLOCKS; blk++)
+			for (int x=0; x<BLOCK_SIZE; x++)
 				ProgData[blk][x]=0;
 	}
 	
-	public short getNumBlocks(){return numBlocks;}
-	public short[] getProgBlock(short Block){return ProgData[Block];}
-	public short getBlockStart() {return blockStart;}
+	public int getNumBlocks(){return numBlocks;}
+	public short[] getProgBlock(int Block){return ProgData[Block];}
+	public int getBlockStart() {return blockStart;}
 	public int getStartProg() {return startProg;}
 	public int getEndProg() {return endProg;}
 	public int getNTracks() {return nTracks;}
@@ -55,7 +55,7 @@ public class ProgBin {
 	public String getLastError() {return lastError;}
 	
 	public String ReadFile(String FileName) {
-		short blockCount = 0;
+		int blockCount = 0;
 		int byteCount;
 		try {
 			FileInputStream fstream = new FileInputStream(FileName);
@@ -86,16 +86,16 @@ public class ProgBin {
 
 			
 			//Read File Line By Line
-			blockStart = (short)Math.floor(startProg/BLOCK_SIZE);
+			blockStart = (int)Math.floor(startProg/BLOCK_SIZE);
 			while ((strLine = br.readLine()) != null)   {
 				short xByte = Short.decode("0x"+strLine.substring(0,2));
-				short xAddr = (short) (Short.decode("1"+strLine.substring(5,9)) - 10000);
+				int xAddr = (int) (Integer.decode("1"+strLine.substring(5,10)) - 100000);
 				System.out.println(xAddr+" "+xByte+" |"+strLine);
-				blockCount = (short)Math.floor(xAddr/BLOCK_SIZE);
-				byteCount = (short) (xAddr%BLOCK_SIZE);
+				blockCount = (int)Math.floor(xAddr/BLOCK_SIZE);
+				byteCount = (int) (xAddr%BLOCK_SIZE);
 				ProgData[blockCount][byteCount]=xByte;;
 			}
-			numBlocks = (short)(blockCount+1-blockStart);
+			numBlocks = (int)(blockCount+1-blockStart);
 			//Close the input stream
 			in.close();
 		} catch (Exception e) {

@@ -364,45 +364,45 @@ asmText = asmText ..' '.._ENV.gate0..' '.._ENV.n_ins_active..' '.._MEM.gtes.asyn
 -- === Tracks ===
 xAddr=0
 for x=1,ALL.n_tracks+1,1 do
-  asmText = asmText ..'00 | '..string.format('%04d',xAddr)..' '.. 0 ..' '..'track '.. x-1 ..'\n'; xAddr=xAddr+1;
+  asmText = asmText ..'00 | '..string.format('%05d',xAddr)..' '.. 0 ..' '..'track '.. x-1 ..'\n'; xAddr=xAddr+1;
   for y=1,(4-1),1 do
-    asmText = asmText ..'00 | '..string.format('%04d',xAddr)..' '.. 0 ..'\n'; xAddr=xAddr+1;
+    asmText = asmText ..'00 | '..string.format('%05d',xAddr)..' '.. 0 ..'\n'; xAddr=xAddr+1;
   end
 end
 xMemAddr=(ALL.n_tracks+1)*4;
 -- === WClocks ===
 for x=1,_ENV.n_wclocks,1 do
-  asmText = asmText ..'00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..' '..'wClock '.. x-1 ..'\n'; xAddr=xAddr+1;
+  asmText = asmText ..'00 | '..string.format('%05d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..' '..'wClock '.. x-1 ..'\n'; xAddr=xAddr+1;
   for y=1,_ENV.c.tceu_wclock.len-1,1 do
-    asmText = asmText ..'00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..'\n'; xAddr=xAddr+1;
+    asmText = asmText ..'00 | '..string.format('%05d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..'\n'; xAddr=xAddr+1;
   end
 end
 -- === Asyncs ===
 for x=1,_ENV.n_asyncs,1 do
-  asmText = asmText ..'00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..' '..'async_'.. x-1 ..'\n'; xAddr=xAddr+1;
+  asmText = asmText ..'00 | '..string.format('%05d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..' '..'async_'.. x-1 ..'\n'; xAddr=xAddr+1;
   for y=1,_ENV.c.tceu_nlbl.len-1,1 do
-    asmText = asmText ..'00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..'\n'; xAddr=xAddr+1;
+    asmText = asmText ..'00 | '..string.format('%05d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..'\n'; xAddr=xAddr+1;
   end
 end
 -- === Emits ===
 for x=1,_ENV.n_emits,1 do
-  asmText = asmText ..'00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..' '..'emits '.. x-1 ..'\n'; xAddr=xAddr+1;
+  asmText = asmText ..'00 | '..string.format('%05d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..' '..'emits '.. x-1 ..'\n'; xAddr=xAddr+1;
   for y=1,_ENV.c.tceu_nlbl.len-1,1 do
-    asmText = asmText ..'00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..'\n'; xAddr=xAddr+1;
+    asmText = asmText ..'00 | '..string.format('%05d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..'\n'; xAddr=xAddr+1;
   end
 end
 -- === Gates ===
 for _,ext in ipairs(_ENV.exts) do
   if (ext.pre == 'input') and (_ENV.awaits[ext] or 0) > 0 then  -- save code to write 0
 --print("terrac:: gates",_ENV.awaits[ext],xAddr)
-    asmText = asmText ..'00 | '..string.format('%04d',xAddr)..' '..string.format('%04d',xAddr-xMemAddr)..' inEvt '.. string.format('%03d',ext.idx) ..' : '.. ext.id  ..'\n'; xAddr=xAddr+1;
-    asmText = asmText ..'00 | '..string.format('%04d',xAddr)..' '..string.format('%04d',xAddr-xMemAddr)..'           : '.. string.format('%02d',(_ENV.awaits[ext] or 0)) ..' gates\n'; xAddr=xAddr+1;
+    asmText = asmText ..'00 | '..string.format('%05d',xAddr)..' '..string.format('%04d',xAddr-xMemAddr)..' inEvt '.. string.format('%03d',ext.idx) ..' : '.. ext.id  ..'\n'; xAddr=xAddr+1;
+    asmText = asmText ..'00 | '..string.format('%05d',xAddr)..' '..string.format('%04d',xAddr-xMemAddr)..'           : '.. string.format('%02d',(_ENV.awaits[ext] or 0)) ..' gates\n'; xAddr=xAddr+1;
     for x= 0, (_ENV.awaits[ext] or 0)-1,1 do 
 --print("terrac:: gate",x,xAddr)
-	    asmText = asmText .. '00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..'\n'; xAddr=xAddr+1;
-      asmText = asmText .. '00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..'\n'; xAddr=xAddr+1;
+	    asmText = asmText .. '00 | '..string.format('%05d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..'\n'; xAddr=xAddr+1;
+      asmText = asmText .. '00 | '..string.format('%05d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..'\n'; xAddr=xAddr+1;
       if (ext.inArg) then  -- more one line for auxId in events with one arg
-        asmText = asmText .. '00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..'\n'; xAddr=xAddr+1;
+        asmText = asmText .. '00 | '..string.format('%05d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr) ..'\n'; xAddr=xAddr+1;
       end
 	  end
   end
@@ -410,7 +410,7 @@ end
 -- === Vars ===
 --print("terrac:: $ret offset",_AST.root[1][1].var[1].val+xMemAddr,xAddr)
 for x=xAddr,codeAddr-1,1 do
-	  asmText = asmText .. '00 | '..string.format('%04d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr)..' '..(_MEM.vars[xAddr-xMemAddr] or '')..'\n'; xAddr=xAddr+1;
+	  asmText = asmText .. '00 | '..string.format('%05d',xAddr)..' '.. string.format('%04d',xAddr-xMemAddr)..' '..(_MEM.vars[xAddr-xMemAddr] or '')..'\n'; xAddr=xAddr+1;
 end
 -- === Opcodes ===
 nlines=0;
@@ -422,8 +422,8 @@ for x,op in pairs(_AST.root.opcode) do
 	if (string.sub(op,1,1) ~= 'L' and string.sub(op,1,1) ~= '_') then 
 		_AST.root.x_stack = _AST.root.x_stack + (_AST.root.n_stack[x] or 0);
 		_AST.root.max_stack = math.max(_AST.root.max_stack,_AST.root.x_stack);
---    asmText = asmText ..trim(op)..' | '..string.format('%04d',_AST.root.op_addr[x])..' '..op..' '..(_AST.root.code2[x] or '')..'\n'
-    asmText = asmText .. (_AST.root.opcode_aux[x] or '--') ..' | '..string.format('%04d',_AST.root.op_addr[x])..' '..op..' '..(_AST.root.code2[x] or '')..'\n'
+--    asmText = asmText ..trim(op)..' | '..string.format('%05d',_AST.root.op_addr[x])..' '..op..' '..(_AST.root.code2[x] or '')..'\n'
+    asmText = asmText .. (_AST.root.opcode_aux[x] or '--') ..' | '..string.format('%05d',_AST.root.op_addr[x])..' '..op..' '..(_AST.root.code2[x] or '')..'\n'
 		nlines=nlines+1;
 		lastBytes=_AST.root.op_addr[x];
 	else

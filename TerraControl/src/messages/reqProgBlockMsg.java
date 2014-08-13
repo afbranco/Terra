@@ -7,12 +7,12 @@ package messages;
 public class reqProgBlockMsg extends net.tinyos.message.Message {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 16;
+    public static final int DEFAULT_MESSAGE_SIZE = 5;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 162;
 
-    /** Create a new reqProgBlockMsg of size 16. */
+    /** Create a new reqProgBlockMsg of size 5. */
     public reqProgBlockMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -92,15 +92,6 @@ public class reqProgBlockMsg extends net.tinyos.message.Message {
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [blockId=0x"+Long.toHexString(get_blockId())+"]\n";
-      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
-      try {
-        s += "  [refTA1=0x"+Long.toHexString(get_refTA1())+"]\n";
-      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
-      try {
-        s += "  [refTB1=0x"+Long.toHexString(get_refTB1())+"]\n";
-      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
-      try {
-        s += "  [refTB2=0x"+Long.toHexString(get_refTB2())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       return s;
     }
@@ -235,9 +226,9 @@ public class reqProgBlockMsg extends net.tinyos.message.Message {
 
     /////////////////////////////////////////////////////////
     // Accessor methods for field: blockId
-    //   Field type: short, unsigned
+    //   Field type: int, unsigned
     //   Offset (bits): 24
-    //   Size (bits): 8
+    //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
     /**
@@ -269,220 +260,31 @@ public class reqProgBlockMsg extends net.tinyos.message.Message {
     }
 
     /**
-     * Return the value (as a short) of the field 'blockId'
+     * Return the value (as a int) of the field 'blockId'
      */
-    public short get_blockId() {
-        return (short)getUIntBEElement(offsetBits_blockId(), 8);
+    public int get_blockId() {
+        return (int)getUIntBEElement(offsetBits_blockId(), 16);
     }
 
     /**
      * Set the value of the field 'blockId'
      */
-    public void set_blockId(short value) {
-        setUIntBEElement(offsetBits_blockId(), 8, value);
+    public void set_blockId(int value) {
+        setUIntBEElement(offsetBits_blockId(), 16, value);
     }
 
     /**
      * Return the size, in bytes, of the field 'blockId'
      */
     public static int size_blockId() {
-        return (8 / 8);
+        return (16 / 8);
     }
 
     /**
      * Return the size, in bits, of the field 'blockId'
      */
     public static int sizeBits_blockId() {
-        return 8;
-    }
-
-    /////////////////////////////////////////////////////////
-    // Accessor methods for field: refTA1
-    //   Field type: long, unsigned
-    //   Offset (bits): 32
-    //   Size (bits): 32
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'refTA1' is signed (false).
-     */
-    public static boolean isSigned_refTA1() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'refTA1' is an array (false).
-     */
-    public static boolean isArray_refTA1() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'refTA1'
-     */
-    public static int offset_refTA1() {
-        return (32 / 8);
-    }
-
-    /**
-     * Return the offset (in bits) of the field 'refTA1'
-     */
-    public static int offsetBits_refTA1() {
-        return 32;
-    }
-
-    /**
-     * Return the value (as a long) of the field 'refTA1'
-     */
-    public long get_refTA1() {
-        return (long)getUIntBEElement(offsetBits_refTA1(), 32);
-    }
-
-    /**
-     * Set the value of the field 'refTA1'
-     */
-    public void set_refTA1(long value) {
-        setUIntBEElement(offsetBits_refTA1(), 32, value);
-    }
-
-    /**
-     * Return the size, in bytes, of the field 'refTA1'
-     */
-    public static int size_refTA1() {
-        return (32 / 8);
-    }
-
-    /**
-     * Return the size, in bits, of the field 'refTA1'
-     */
-    public static int sizeBits_refTA1() {
-        return 32;
-    }
-
-    /////////////////////////////////////////////////////////
-    // Accessor methods for field: refTB1
-    //   Field type: long, unsigned
-    //   Offset (bits): 64
-    //   Size (bits): 32
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'refTB1' is signed (false).
-     */
-    public static boolean isSigned_refTB1() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'refTB1' is an array (false).
-     */
-    public static boolean isArray_refTB1() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'refTB1'
-     */
-    public static int offset_refTB1() {
-        return (64 / 8);
-    }
-
-    /**
-     * Return the offset (in bits) of the field 'refTB1'
-     */
-    public static int offsetBits_refTB1() {
-        return 64;
-    }
-
-    /**
-     * Return the value (as a long) of the field 'refTB1'
-     */
-    public long get_refTB1() {
-        return (long)getUIntBEElement(offsetBits_refTB1(), 32);
-    }
-
-    /**
-     * Set the value of the field 'refTB1'
-     */
-    public void set_refTB1(long value) {
-        setUIntBEElement(offsetBits_refTB1(), 32, value);
-    }
-
-    /**
-     * Return the size, in bytes, of the field 'refTB1'
-     */
-    public static int size_refTB1() {
-        return (32 / 8);
-    }
-
-    /**
-     * Return the size, in bits, of the field 'refTB1'
-     */
-    public static int sizeBits_refTB1() {
-        return 32;
-    }
-
-    /////////////////////////////////////////////////////////
-    // Accessor methods for field: refTB2
-    //   Field type: long, unsigned
-    //   Offset (bits): 96
-    //   Size (bits): 32
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'refTB2' is signed (false).
-     */
-    public static boolean isSigned_refTB2() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'refTB2' is an array (false).
-     */
-    public static boolean isArray_refTB2() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'refTB2'
-     */
-    public static int offset_refTB2() {
-        return (96 / 8);
-    }
-
-    /**
-     * Return the offset (in bits) of the field 'refTB2'
-     */
-    public static int offsetBits_refTB2() {
-        return 96;
-    }
-
-    /**
-     * Return the value (as a long) of the field 'refTB2'
-     */
-    public long get_refTB2() {
-        return (long)getUIntBEElement(offsetBits_refTB2(), 32);
-    }
-
-    /**
-     * Set the value of the field 'refTB2'
-     */
-    public void set_refTB2(long value) {
-        setUIntBEElement(offsetBits_refTB2(), 32, value);
-    }
-
-    /**
-     * Return the size, in bytes, of the field 'refTB2'
-     */
-    public static int size_refTB2() {
-        return (32 / 8);
-    }
-
-    /**
-     * Return the size, in bits, of the field 'refTB2'
-     */
-    public static int sizeBits_refTB2() {
-        return 32;
+        return 16;
     }
 
 }
