@@ -5,6 +5,7 @@
  * abranco at inf.puc-rio.br
  * *********************************************/
 #include "VMCustomGrp.h"
+#include "SensAct.h"
 
 module VMCustomP{
 	provides interface VMCustom as VM;

@@ -7,6 +7,7 @@
 #include "VMCustomNet.h"
 #include "usrMsg.h"
 #include "BasicServices.h"
+#include "SensAct.h"
 
 module VMCustomP{
 	provides interface VMCustom as VM;

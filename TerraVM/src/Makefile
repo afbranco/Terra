@@ -65,15 +65,26 @@ ifeq ($(findstring $(RFPOWER), 03 07 11 15 19 23 27 31),)
 endif
 
 #
+# define root APP dir
+#
+APPDIR = $(shell pwd)
+
+#
 # Define VM path
 #
 ifeq ($(VM),NET)
-	VMDIR = CustomVMs/TerraNet/
+	VMDIR = $(APPDIR)/CustomVMs/TerraNet
 endif
 ifeq ($(VM),GRP)
-	VMDIR = CustomVMs/TerraGrp/
+	VMDIR = $(APPDIR)/CustomVMs/TerraGrp
 	PFLAGS += -DMODULE_CTP
 endif
+
+#
+# Define XComps path
+#
+XCOMPSDIR = $(APPDIR)/XComps
+
 
 # build TinyOS Version ID (211 ... 212)
 TOSVERSION = $(subst .,,$(subst /opt/tinyos-,,$(TOSROOT)))
@@ -225,7 +236,7 @@ MSG_SIZE = 29
 #MSG_SIZE = 34
 
 CFLAGS += -DNO_DEBUG 
-CFLAGS += -I. -I$(VMDIR) 
+CFLAGS += -I. -I$(VMDIR) -I$(XCOMPSDIR)
 CFLAGS += -I$(TOSDIR)/lib/net/ -I$(TOSDIR)/lib/net/4bitle -I$(TOSDIR)/lib/net/ctp 
 #CFLAGS += -DPRINTF
 #CFLAGS += -I$(TOSDIR)/lib/printf

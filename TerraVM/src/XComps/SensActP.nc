@@ -10,7 +10,8 @@
  * 
  */
 
-#include "VMCustomNet.h"
+//#include "VMCustomNet.h"
+#include "SensAct.h"
 
 module SensActP{
 	provides interface SensAct as SA;
