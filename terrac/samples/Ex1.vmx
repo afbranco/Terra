@@ -1,912 +1,864 @@
-206 911 7 6 0 0 48 6 48
-00 | 0000 0 track 0
-00 | 0001 0
-00 | 0002 0
-00 | 0003 0
-00 | 0004 0 track 1
-00 | 0005 0
-00 | 0006 0
-00 | 0007 0
-00 | 0008 0 track 2
-00 | 0009 0
-00 | 0010 0
-00 | 0011 0
-00 | 0012 0 track 3
-00 | 0013 0
-00 | 0014 0
-00 | 0015 0
-00 | 0016 0 track 4
-00 | 0017 0
-00 | 0018 0
-00 | 0019 0
-00 | 0020 0 track 5
-00 | 0021 0
-00 | 0022 0
-00 | 0023 0
-00 | 0024 0 track 6
-00 | 0025 0
-00 | 0026 0
-00 | 0027 0
-00 | 0028 0 track 7
-00 | 0029 0
-00 | 0030 0
-00 | 0031 0
-00 | 0032 0000 wClock 0
-00 | 0033 0001
-00 | 0034 0002
-00 | 0035 0003
-00 | 0036 0004
-00 | 0037 0005
-00 | 0038 0006
-00 | 0039 0007
-00 | 0040 0008 wClock 1
-00 | 0041 0009
-00 | 0042 0010
-00 | 0043 0011
-00 | 0044 0012
-00 | 0045 0013
-00 | 0046 0014
-00 | 0047 0015
-00 | 0048 0016 wClock 2
-00 | 0049 0017
-00 | 0050 0018
-00 | 0051 0019
-00 | 0052 0020
-00 | 0053 0021
-00 | 0054 0022
-00 | 0055 0023
-00 | 0056 0024 wClock 3
-00 | 0057 0025
-00 | 0058 0026
-00 | 0059 0027
-00 | 0060 0028
-00 | 0061 0029
-00 | 0062 0030
-00 | 0063 0031
-00 | 0064 0032 wClock 4
-00 | 0065 0033
-00 | 0066 0034
-00 | 0067 0035
-00 | 0068 0036
-00 | 0069 0037
-00 | 0070 0038
-00 | 0071 0039
-00 | 0072 0040 wClock 5
-00 | 0073 0041
-00 | 0074 0042
-00 | 0075 0043
-00 | 0076 0044
-00 | 0077 0045
-00 | 0078 0046
-00 | 0079 0047
-00 | 0080 0048 inEvt 005 : TEMP
-00 | 0081 0049           : 01 gates
-00 | 0082 0050
-00 | 0083 0051
-00 | 0084 0052 inEvt 013 : CUSTOM_A
-00 | 0085 0053           : 01 gates
-00 | 0086 0054
-00 | 0087 0055
-00 | 0088 0056 inEvt 040 : SEND_DONE()
-00 | 0089 0057           : 01 gates
-00 | 0090 0058
-00 | 0091 0059
-00 | 0092 0060
-00 | 0093 0061 inEvt 042 : SEND_DONE_ACK()
-00 | 0094 0062           : 01 gates
-00 | 0095 0063
-00 | 0096 0064
-00 | 0097 0065
-00 | 0098 0066 inEvt 044 : RECEIVE()
-00 | 0099 0067           : 04 gates
-00 | 0100 0068
-00 | 0101 0069
-00 | 0102 0070
-00 | 0103 0071
-00 | 0104 0072
-00 | 0105 0073
-00 | 0106 0074
-00 | 0107 0075
-00 | 0108 0076
-00 | 0109 0077
-00 | 0110 0078
-00 | 0111 0079
-00 | 0112 0080 inEvt 046 : Q_READY
-00 | 0113 0081           : 01 gates
-00 | 0114 0082
-00 | 0115 0083
-00 | 0116 0084 $ret:1, 
-00 | 0117 0085 nodeId:2, 
-00 | 0118 0086 
-00 | 0119 0087 baseNode:2, 
-00 | 0120 0088 
-00 | 0121 0089 stat:1, 
-00 | 0122 0090 hop:1, 
-00 | 0123 0091 father:2, 
-00 | 0124 0092 
-00 | 0125 0093 seqReq:2, 
-00 | 0126 0094 
-00 | 0127 0095 seqData:1, 
-00 | 0128 0096 reqTopoBlind:1, 
-00 | 0129 0097 msgTopo:25, 
-00 | 0130 0098 
-00 | 0131 0099 
-00 | 0132 0100 
-00 | 0133 0101 
-00 | 0134 0102 
-00 | 0135 0103 
-00 | 0136 0104 
-00 | 0137 0105 
-00 | 0138 0106 
-00 | 0139 0107 
-00 | 0140 0108 
-00 | 0141 0109 
-00 | 0142 0110 
-00 | 0143 0111 
-00 | 0144 0112 
-00 | 0145 0113 
-00 | 0146 0114 
-00 | 0147 0115 
-00 | 0148 0116 
-00 | 0149 0117 
-00 | 0150 0118 
-00 | 0151 0119 
-00 | 0152 0120 
-00 | 0153 0121 
-00 | 0154 0122 msgRadio:25, 
-00 | 0155 0123 
-00 | 0156 0124 
-00 | 0157 0125 
-00 | 0158 0126 
-00 | 0159 0127 
-00 | 0160 0128 
-00 | 0161 0129 
-00 | 0162 0130 
-00 | 0163 0131 
-00 | 0164 0132 
-00 | 0165 0133 
-00 | 0166 0134 
-00 | 0167 0135 
-00 | 0168 0136 
-00 | 0169 0137 
-00 | 0170 0138 
-00 | 0171 0139 
-00 | 0172 0140 
-00 | 0173 0141 
-00 | 0174 0142 
-00 | 0175 0143 
-00 | 0176 0144 
-00 | 0177 0145 
-00 | 0178 0146 
-00 | 0179 0147 msgData:25, 
-00 | 0180 0148 
-00 | 0181 0149 
-00 | 0182 0150 
-00 | 0183 0151 
-00 | 0184 0152 
-00 | 0185 0153 
-00 | 0186 0154 
-00 | 0187 0155 
-00 | 0188 0156 
-00 | 0189 0157 
-00 | 0190 0158 
-00 | 0191 0159 
-00 | 0192 0160 
-00 | 0193 0161 
-00 | 0194 0162 
-00 | 0195 0163 
-00 | 0196 0164 
-00 | 0197 0165 
-00 | 0198 0166 
-00 | 0199 0167 
-00 | 0200 0168 
-00 | 0201 0169 
-00 | 0202 0170 
-00 | 0203 0171 
-00 | 0204 0172 ack:1, 
-00 | 0205 0173 reply:1, 
-e5 | 0206 e5 set16_c ushort 48 1281        | config gate TEMP with 1 await(s) - 0x0501 = 1281
-30 | 0207 30 
-05 | 0208 05 
-01 | 0209 01 
-e5 | 0210 e5 set16_c ushort 52 3329        | config gate CUSTOM_A with 1 await(s) - 0x0d01 = 3329
-34 | 0211 34 
-0d | 0212 0d 
-01 | 0213 01 
-e5 | 0214 e5 set16_c ushort 56 10369       | config gate SEND_DONE() with 1 await(s) - 0x2881 = 10369
-38 | 0215 38 
-28 | 0216 28 
-81 | 0217 81 
-e5 | 0218 e5 set16_c ushort 61 10881       | config gate SEND_DONE_ACK() with 1 await(s) - 0x2a81 = 10881
-3d | 0219 3d 
-2a | 0220 2a 
-81 | 0221 81 
-e5 | 0222 e5 set16_c ushort 66 11396       | config gate RECEIVE() with 4 await(s) - 0x2c84 = 11396
-42 | 0223 42 
-2c | 0224 2c 
-84 | 0225 84 
-e5 | 0226 e5 set16_c ushort 80 11777       | config gate Q_READY with 1 await(s) - 0x2e01 = 11777
-50 | 0227 50 
-2e | 0228 2e 
-01 | 0229 01 
-19 | 0230 19 func 0                        | func getNodeId
-00 | 0231 00 
-21 | 0232 21 popx ushort 85                | pop nodeId
-55 | 0233 55 
-e4 | 0234 e4 set16_c ushort 87 2           | baseNode = 2
-57 | 0235 57 
-02 | 0236 02 
-28 | 0237 28 push_c 10                     | push 10
-0a | 0238 0a 
-39 | 0239 39 pushx_v ushort 85             | push nodeId:ushort
-55 | 0240 55 
-14 | 0241 14 gt                            | gt
-7f | 0242 7f ifelse 8 9                    | ifelse True_8 EndIf_9
-00 | 0243 .00 addr:247
-f7 | 0244 .08 
-00 | 0245 .00 addr:253
-fd | 0246 .09 
-e4 | 0247 e4 set16_c ushort 87 11          | baseNode = 11
-57 | 0248 57 
-0b | 0249 0b 
-75 | 0250 75 exec 9                        | goto  9
-00 | 0251 .00 addr:253
-fd | 0252 .09 
-e5 | 0253 e5 set16_c ushort 91 0xfffe      | father = 0xfffe
-5b | 0254 5b 
-ff | 0255 ff 
-fe | 0256 fe 
-e4 | 0257 e4 set16_c ushort 93 0           | seqReq = 0
-5d | 0258 5d 
-00 | 0259 00 
-e0 | 0260 e0 set16_c ubyte 95 0            | seqData = 0
-5f | 0261 5f 
-00 | 0262 00 
-e0 | 0263 e0 set16_c ubyte 96 0            | reqTopoBlind = 0
-60 | 0264 60 
-00 | 0265 00 
-e0 | 0266 e0 set16_c ubyte 147 2           | msgData.type = 2
-93 | 0267 93 
-02 | 0268 02 
-f4 | 0269 f4 set_v ushort 148 85           | msgData.source = nodeId
-94 | 0270 94 
-55 | 0271 55 
-f4 | 0272 f4 set_v ushort 160 85           | msgData.d16_3 = nodeId
-a0 | 0273 a0 
-55 | 0274 55 
-f4 | 0275 f4 set_v ushort 98 85            | msgTopo.source = nodeId
-62 | 0276 62 
-55 | 0277 55 
-39 | 0278 39 pushx_v ushort 87             | push baseNode:ushort
-57 | 0279 57 
-39 | 0280 39 pushx_v ushort 85             | push nodeId:ushort
-55 | 0281 55 
-10 | 0282 10 eq                            | eq
-7f | 0283 7f ifelse 19 20                  | ifelse True_19 EndIf_20
-01 | 0284 .00 addr:288
-20 | 0285 .13 
-01 | 0286 .00 addr:297
-29 | 0287 .14 
-e4 | 0288 e4 set16_c ushort 91 1           | father = 1
-5b | 0289 5b 
-01 | 0290 01 
-e4 | 0291 e4 set16_c ushort 93 1           | seqReq = 1
-5d | 0292 5d 
-01 | 0293 01 
-75 | 0294 75 exec 20                       | goto  20
-01 | 0295 .00 addr:297
-29 | 0296 .14 
-d1 | 0297 d1 tkins_max 0 21                | insert track ParEver_sub_1_21
-01 | 0298 .00 addr:313
-39 | 0299 .15 
-d1 | 0300 d1 tkins_max 0 22                | insert track ParEver_sub_2_22
-01 | 0301 .00 addr:435
-b3 | 0302 .16 
-d1 | 0303 d1 tkins_max 0 23                | insert track ParEver_sub_3_23
-01 | 0304 .00 addr:477
-dd | 0305 .17 
-d1 | 0306 d1 tkins_max 0 24                | insert track ParEver_sub_4_24
-02 | 0307 .00 addr:659
-93 | 0308 .18 
-d1 | 0309 d1 tkins_max 0 25                | insert track ParEver_sub_5_25
-02 | 0310 .00 addr:720
-d0 | 0311 .19 
-01 | 0312 01 end                           | end
-a5 | 0313 a5 clken_c 0 2000 29             | clock enable Awake_2000_29 2000msec
-00 | 0314 00 
-07 | 0315 07 
-d0 | 0316 d0 
-01 | 0317 .00 addr:320
-40 | 0318 .1d 
-01 | 0319 01 end                           | end
-68 | 0320 68 outevt_c 20 1                 | emit REQ_CUSTOM_A len=1 const=1
-14 | 0321 14 
-01 | 0322 01 
-d1 | 0323 d1 tkins_max 0 35                | insert track ParOr_sub_1_35
-01 | 0324 .00 addr:330
-4a | 0325 .23 
-d1 | 0326 d1 tkins_max 0 36                | insert track ParOr_sub_2_36
-01 | 0327 .00 addr:341
-55 | 0328 .24 
-01 | 0329 01 end                           | end
-a5 | 0330 a5 clken_c 1 30000 38            | clock enable Awake_30000_38 30000msec
-01 | 0331 01 
-75 | 0332 75 
-30 | 0333 30 
-01 | 0334 .00 addr:337
-51 | 0335 .26 
-01 | 0336 01 end                           | end
-d1 | 0337 d1 tkins_max 0 37                | insert track ParOr_out_37
-01 | 0338 .00 addr:419
-a3 | 0339 .25 
-01 | 0340 01 end                           | end
-a5 | 0341 a5 clken_c 2 10000 39            | clock enable Awake_10000_39 10000msec
-02 | 0342 02 
-27 | 0343 27 
-10 | 0344 10 
-01 | 0345 .00 addr:348
-5c | 0346 .27 
-01 | 0347 01 end                           | end
-1a | 0348 1a outevt_z 9                    | emit REQ_TEMP
-09 | 0349 09 
-e5 | 0350 e5 set16_c ushort 50 42          | await TEMP[0]
-32 | 0351 32 
-01 | 0352 .00 addr:355
-63 | 0353 .2a 
-01 | 0354 01 end                           | end
-28 | 0355 28 push_c 156                    | push msgData.d16_1
-9c | 0356 9c 
-98 | 0357 98 getextdt_e 2                  | getExtData stack len=2
-02 | 0358 02 
-29 | 0359 29 push_c 0xfffe                 | push 0xfffe
-ff | 0360 ff 
-fe | 0361 fe 
-39 | 0362 39 pushx_v ushort 91             | push father:ushort
-5b | 0363 5b 
-11 | 0364 11 neq                           | neq
-7f | 0365 7f ifelse 55 56                  | ifelse True_55 False_56
-01 | 0366 .00 addr:370
-72 | 0367 .37 
-01 | 0368 .00 addr:408
-98 | 0369 .38 
-f4 | 0370 f4 set_v ushort 150 91           | msgData.target = father
-96 | 0371 96 
-5b | 0372 5b 
-28 | 0373 28 push_c 95                     | push &seqData
-5f | 0374 5f 
-58 | 0375 58 inc ubyte                     | inc ubyte
-38 | 0376 38 pushx_v ubyte 95              | push seqData:ubyte
-5f | 0377 5f 
-1b | 0378 1b outevt_e 5                    | emit LEDS
-05 | 0379 05 
-f0 | 0380 f0 set_v ubyte 154 95            | msgData.d8_3 = seqData
-9a | 0381 9a 
-5f | 0382 5f 
-f4 | 0383 f4 set_v ushort 162 91           | msgData.d16_4 = father
-a2 | 0384 a2 
-5b | 0385 5b 
-f0 | 0386 f0 set_v ubyte 153 96            | msgData.d8_2 = reqTopoBlind
-99 | 0387 99 
-60 | 0388 60 
-28 | 0389 28 push_c 100                    | push 100
-64 | 0390 64 
-39 | 0391 39 pushx_v ushort 85             | push nodeId:ushort
-55 | 0392 55 
-09 | 0393 09 mult                          | mult
-c4 | 0394 c4 clken_e 3 0 52                | clock enable Awake_exp_52 (stack)ms
-03 | 0395 03 
-01 | 0396 .00 addr:399
-8f | 0397 .34 
-01 | 0398 01 end                           | end
-28 | 0399 28 push_c 147                    | push_c &msgData:usrMsg2_t
-93 | 0400 93 
-19 | 0401 19 func 10                       | func qPut
-0a | 0402 0a 
-20 | 0403 20 popx ubyte 89                 | pop stat
-59 | 0404 59 
-75 | 0405 75 exec 57                       | goto  57
-01 | 0406 .00 addr:414
-9e | 0407 .39 
-68 | 0408 68 outevt_c 20 1                 | emit REQ_CUSTOM_A len=1 const=1
-14 | 0409 14 
-01 | 0410 01 
-75 | 0411 75 exec 57                       | goto  57
-01 | 0412 .00 addr:414
-9e | 0413 .39 
-01 | 0414 01 end                           | end
-d1 | 0415 d1 tkins_max 0 37                | insert track ParOr_out_37
-01 | 0416 .00 addr:419
-a3 | 0417 .25 
-01 | 0418 01 end                           | end
-78 | 0419 78 memclr 8 24                   | clear WClocks gates from 1 to 4
-08 | 0420 08 
-18 | 0421 18 
-78 | 0422 78 memclr 50 2                   | clear EXT gates for TEMP
-32 | 0423 32 
-02 | 0424 02 
-75 | 0425 75 exec 32                       | goto  32
-01 | 0426 .00 addr:323
-43 | 0427 .20 
-78 | 0428 78 memclr 8 24                   | clear WClocks gates from 1 to 4
-08 | 0429 08 
-18 | 0430 18 
-78 | 0431 78 memclr 50 2                   | clear EXT gates for TEMP
-32 | 0432 32 
-02 | 0433 02 
-01 | 0434 01 end                           | end
-28 | 0435 28 push_c 2                      | push 2
-02 | 0436 02 
-20 | 0437 20 popx ubyte 68                 | evt RECEIVE() auxId = pop
-44 | 0438 44 
-e5 | 0439 e5 set16_c ushort 69 61          | await RECEIVE()[0]
-45 | 0440 45 
-01 | 0441 .00 addr:444
-bc | 0442 .3d 
-01 | 0443 01 end                           | end
-50 | 0444 50 getextdt_v 97 25              | getExtData msgTopo 25
-61 | 0445 61 
-19 | 0446 19 
-29 | 0447 29 push_c 0xfffe                 | push 0xfffe
-ff | 0448 ff 
-fe | 0449 fe 
-39 | 0450 39 pushx_v ushort 91             | push father:ushort
-5b | 0451 5b 
-11 | 0452 11 neq                           | neq
-7f | 0453 7f ifelse 64 65                  | ifelse True_64 EndIf_65
-01 | 0454 .00 addr:458
-ca | 0455 .40 
-01 | 0456 .00 addr:470
-d6 | 0457 .41 
-f4 | 0458 f4 set_v ushort 100 91           | msgTopo.target = father
-64 | 0459 64 
-5b | 0460 5b 
-28 | 0461 28 push_c 97                     | push_c &msgTopo:usrMsg2_t
-61 | 0462 61 
-19 | 0463 19 func 10                       | func qPut
-0a | 0464 0a 
-20 | 0465 20 popx ubyte 89                 | pop stat
-59 | 0466 59 
-75 | 0467 75 exec 65                       | goto  65
-01 | 0468 .00 addr:470
-d6 | 0469 .41 
-75 | 0470 75 exec 58                       | goto  58
-01 | 0471 .00 addr:435
-b3 | 0472 .3a 
-78 | 0473 78 memclr 68 2                   | clear EXT gates for RECEIVE()
-44 | 0474 44 
-02 | 0475 02 
-01 | 0476 01 end                           | end
-39 | 0477 39 pushx_v ushort 87             | push baseNode:ushort
-57 | 0478 57 
-39 | 0479 39 pushx_v ushort 85             | push nodeId:ushort
-55 | 0480 55 
-11 | 0481 11 neq                           | neq
-7f | 0482 7f ifelse 101 102                | ifelse True_101 False_102
-01 | 0483 .00 addr:487
-e7 | 0484 .65 
-02 | 0485 .00 addr:602
-5a | 0486 .66 
-d1 | 0487 d1 tkins_max 0 68                | insert track ParEver_sub_1_68
-01 | 0488 .00 addr:494
-ee | 0489 .44 
-d1 | 0490 d1 tkins_max 0 69                | insert track ParEver_sub_2_69
-02 | 0491 .00 addr:551
-27 | 0492 .45 
-01 | 0493 01 end                           | end
-28 | 0494 28 push_c 1                      | push 1
-01 | 0495 01 
-20 | 0496 20 popx ubyte 71                 | evt RECEIVE() auxId = pop
-47 | 0497 47 
-e5 | 0498 e5 set16_c ushort 72 76          | await RECEIVE()[1]
-48 | 0499 48 
-01 | 0500 .00 addr:503
-f7 | 0501 .4c 
-01 | 0502 01 end                           | end
-50 | 0503 50 getextdt_v 97 25              | getExtData msgTopo 25
-61 | 0504 61 
-19 | 0505 19 
-39 | 0506 39 pushx_v ushort 93             | push seqReq:ushort
-5d | 0507 5d 
-28 | 0508 28 push_c 108                    | push msgTopo.d16_2
-6c | 0509 6c 
-95 | 0510 95 deref ushort                  | deref ushort
-14 | 0511 14 gt                            | gt
-7f | 0512 7f ifelse 83 84                  | ifelse True_83 EndIf_84
-02 | 0513 .00 addr:517
-05 | 0514 .53 
-02 | 0515 .00 addr:544
-20 | 0516 .54 
-e0 | 0517 e0 set16_c ubyte 96 0            | reqTopoBlind = 0
-60 | 0518 60 
-00 | 0519 00 
-f4 | 0520 f4 set_v ushort 93 108           | seqReq = msgTopo.d16_2
-5d | 0521 5d 
-6c | 0522 6c 
-f4 | 0523 f4 set_v ushort 91 98            | father = msgTopo.source
-5b | 0524 5b 
-62 | 0525 62 
-28 | 0526 28 push_c 103                    | push msgTopo.d8_2
-67 | 0527 67 
-58 | 0528 58 inc ubyte                     | inc ubyte
-f0 | 0529 f0 set_v ubyte 90 103            | hop = msgTopo.d8_2
-5a | 0530 5a 
-67 | 0531 67 
-f4 | 0532 f4 set_v ushort 98 85            | msgTopo.source = nodeId
-62 | 0533 62 
-55 | 0534 55 
-28 | 0535 28 push_c 97                     | push_c &msgTopo:usrMsg2_t
-61 | 0536 61 
-19 | 0537 19 func 10                       | func qPut
-0a | 0538 0a 
-20 | 0539 20 popx ubyte 89                 | pop stat
-59 | 0540 59 
-75 | 0541 75 exec 84                       | goto  84
-02 | 0542 .00 addr:544
-20 | 0543 .54 
-75 | 0544 75 exec 73                       | goto  73
-01 | 0545 .00 addr:494
-ee | 0546 .49 
-78 | 0547 78 memclr 68 2                   | clear EXT gates for RECEIVE()
-44 | 0548 44 
-02 | 0549 02 
-01 | 0550 01 end                           | end
-28 | 0551 28 push_c 3                      | push 3
-03 | 0552 03 
-20 | 0553 20 popx ubyte 74                 | evt RECEIVE() auxId = pop
-4a | 0554 4a 
-e5 | 0555 e5 set16_c ushort 75 88          | await RECEIVE()[2]
-4b | 0556 4b 
-02 | 0557 .00 addr:560
-30 | 0558 .58 
-01 | 0559 01 end                           | end
-50 | 0560 50 getextdt_v 97 25              | getExtData msgTopo 25
-61 | 0561 61 
-19 | 0562 19 
-28 | 0563 28 push_c 0                      | push 0
-00 | 0564 00 
-38 | 0565 38 pushx_v ubyte 96              | push reqTopoBlind:ubyte
-60 | 0566 60 
-10 | 0567 10 eq                            | eq
-29 | 0568 29 push_c 0xfffe                 | push 0xfffe
-ff | 0569 ff 
-fe | 0570 fe 
-39 | 0571 39 pushx_v ushort 91             | push father:ushort
-5b | 0572 5b 
-11 | 0573 11 neq                           | neq
-17 | 0574 17 land                          | land
-7f | 0575 7f ifelse 92 93                  | ifelse True_92 EndIf_93
-02 | 0576 .00 addr:580
-44 | 0577 .5c 
-02 | 0578 .00 addr:592
-50 | 0579 .5d 
-f4 | 0580 f4 set_v ushort 100 91           | msgTopo.target = father
-64 | 0581 64 
-5b | 0582 5b 
-28 | 0583 28 push_c 97                     | push_c &msgTopo:usrMsg2_t
-61 | 0584 61 
-19 | 0585 19 func 10                       | func qPut
-0a | 0586 0a 
-20 | 0587 20 popx ubyte 89                 | pop stat
-59 | 0588 59 
-75 | 0589 75 exec 93                       | goto  93
-02 | 0590 .00 addr:592
-50 | 0591 .5d 
-75 | 0592 75 exec 85                       | goto  85
-02 | 0593 .00 addr:551
-27 | 0594 .55 
-78 | 0595 78 memclr 68 2                   | clear EXT gates for RECEIVE()
-44 | 0596 44 
-02 | 0597 02 
-01 | 0598 01 end                           | end
-75 | 0599 75 exec 103                      | goto  103
-02 | 0600 .00 addr:658
-92 | 0601 .67 
-28 | 0602 28 push_c 3                      | push 3
-03 | 0603 03 
-20 | 0604 20 popx ubyte 77                 | evt RECEIVE() auxId = pop
-4d | 0605 4d 
-e5 | 0606 e5 set16_c ushort 78 97          | await RECEIVE()[3]
-4e | 0607 4e 
-02 | 0608 .00 addr:611
-63 | 0609 .61 
-01 | 0610 01 end                           | end
-50 | 0611 50 getextdt_v 97 25              | getExtData msgTopo 25
-61 | 0612 61 
-19 | 0613 19 
-e0 | 0614 e0 set16_c ubyte 97 1            | msgTopo.type = 1
-61 | 0615 61 
-01 | 0616 01 
-f4 | 0617 f4 set_v ushort 98 85            | msgTopo.source = nodeId
-62 | 0618 62 
-55 | 0619 55 
-e5 | 0620 e5 set16_c ushort 100 0xffff     | msgTopo.target = 0xffff
-64 | 0621 64 
-ff | 0622 ff 
-ff | 0623 ff 
-e0 | 0624 e0 set16_c ubyte 103 0           | msgTopo.d8_2 = 0
-67 | 0625 67 
-00 | 0626 00 
-28 | 0627 28 push_c 93                     | push &seqReq
-5d | 0628 5d 
-59 | 0629 59 inc ushort                    | inc ushort
-f4 | 0630 f4 set_v ushort 108 93           | msgTopo.d16_2 = seqReq
-6c | 0631 6c 
-5d | 0632 5d 
-28 | 0633 28 push_c 97                     | push_c &msgTopo:usrMsg2_t
-61 | 0634 61 
-19 | 0635 19 func 10                       | func qPut
-0a | 0636 0a 
-20 | 0637 20 popx ubyte 89                 | pop stat
-59 | 0638 59 
-a5 | 0639 a5 clken_c 4 2000 100            | clock enable Awake_2000_100 2000msec
-04 | 0640 04 
-07 | 0641 07 
-d0 | 0642 d0 
-02 | 0643 .00 addr:646
-86 | 0644 .64 
-01 | 0645 01 end                           | end
-75 | 0646 75 exec 94                       | goto  94
-02 | 0647 .00 addr:602
-5a | 0648 .5e 
-78 | 0649 78 memclr 32 8                   | clear WClocks gates from 4 to 5
-20 | 0650 20 
-08 | 0651 08 
-78 | 0652 78 memclr 68 2                   | clear EXT gates for RECEIVE()
-44 | 0653 44 
-02 | 0654 02 
-75 | 0655 75 exec 103                      | goto  103
-02 | 0656 .00 addr:658
-92 | 0657 .67 
-01 | 0658 01 end                           | end
-39 | 0659 39 pushx_v ushort 87             | push baseNode:ushort
-57 | 0660 57 
-39 | 0661 39 pushx_v ushort 85             | push nodeId:ushort
-55 | 0662 55 
-11 | 0663 11 neq                           | neq
-7f | 0664 7f ifelse 115 116                | ifelse True_115 EndIf_116
-02 | 0665 .00 addr:669
-9d | 0666 .73 
-02 | 0667 .00 addr:719
-cf | 0668 .74 
-e5 | 0669 e5 set16_c ushort 54 109         | await CUSTOM_A[0]
-36 | 0670 36 
-02 | 0671 .00 addr:674
-a2 | 0672 .6d 
-01 | 0673 01 end                           | end
-29 | 0674 29 push_c 0xfffe                 | push 0xfffe
-ff | 0675 ff 
-fe | 0676 fe 
-39 | 0677 39 pushx_v ushort 91             | push father:ushort
-5b | 0678 5b 
-10 | 0679 10 eq                            | eq
-7f | 0680 7f ifelse 113 114                | ifelse True_113 EndIf_114
-02 | 0681 .00 addr:685
-ad | 0682 .71 
-02 | 0683 .00 addr:710
-c6 | 0684 .72 
-e0 | 0685 e0 set16_c ubyte 97 3            | msgTopo.type = 3
-61 | 0686 61 
-03 | 0687 03 
-f4 | 0688 f4 set_v ushort 98 85            | msgTopo.source = nodeId
-62 | 0689 62 
-55 | 0690 55 
-e5 | 0691 e5 set16_c ushort 100 0xffff     | msgTopo.target = 0xffff
-64 | 0692 64 
-ff | 0693 ff 
-ff | 0694 ff 
-28 | 0695 28 push_c 93                     | push &seqReq
-5d | 0696 5d 
-59 | 0697 59 inc ushort                    | inc ushort
-f4 | 0698 f4 set_v ushort 108 93           | msgTopo.d16_2 = seqReq
-6c | 0699 6c 
-5d | 0700 5d 
-28 | 0701 28 push_c 97                     | push_c &msgTopo:usrMsg2_t
-61 | 0702 61 
-19 | 0703 19 func 10                       | func qPut
-0a | 0704 0a 
-20 | 0705 20 popx ubyte 89                 | pop stat
-59 | 0706 59 
-75 | 0707 75 exec 114                      | goto  114
-02 | 0708 .00 addr:710
-c6 | 0709 .72 
-75 | 0710 75 exec 106                      | goto  106
-02 | 0711 .00 addr:669
-9d | 0712 .6a 
-78 | 0713 78 memclr 54 2                   | clear EXT gates for CUSTOM_A
-36 | 0714 36 
-02 | 0715 02 
-75 | 0716 75 exec 116                      | goto  116
-02 | 0717 .00 addr:719
-cf | 0718 .74 
-01 | 0719 01 end                           | end
-e0 | 0720 e0 set16_c ubyte 172 1           | ack = 1
-ac | 0721 ac 
-01 | 0722 01 
-e0 | 0723 e0 set16_c ubyte 173 0           | reply = 0
-ad | 0724 ad 
-00 | 0725 00 
-e5 | 0726 e5 set16_c ushort 82 122         | await Q_READY[0]
-52 | 0727 52 
-02 | 0728 .00 addr:731
-db | 0729 .7a 
-01 | 0730 01 end                           | end
-28 | 0731 28 push_c 0                      | push 0
-00 | 0732 00 
-19 | 0733 19 func 12                       | func qSize
-0c | 0734 0c 
-14 | 0735 14 gt                            | gt
-7f | 0736 7f ifelse 154 155                | ifelse True_154 False_155
-02 | 0737 .00 addr:741
-e5 | 0738 .9a 
-03 | 0739 .00 addr:869
-65 | 0740 .9b 
-e0 | 0741 e0 set16_c ubyte 173 0           | reply = 0
-ad | 0742 ad 
-00 | 0743 00 
-28 | 0744 28 push_c 122                    | push_c &msgRadio:usrMsg2_t
-7a | 0745 7a 
-19 | 0746 19 func 11                       | func qGet
-0b | 0747 0b 
-20 | 0748 20 popx ubyte 89                 | pop stat
-59 | 0749 59 
-29 | 0750 29 push_c 0xffff                 | push 0xffff
-ff | 0751 ff 
-ff | 0752 ff 
-28 | 0753 28 push_c 125                    | push msgRadio.target
-7d | 0754 7d 
-95 | 0755 95 deref ushort                  | deref ushort
-10 | 0756 10 eq                            | eq
-7f | 0757 7f ifelse 151 152                | ifelse True_151 False_152
-02 | 0758 .00 addr:762
-fa | 0759 .97 
-03 | 0760 .00 addr:778
-0a | 0761 .98 
-71 | 0762 71 outevtx_v 40 122              | emit SEND len=25 var=msgRadio
-28 | 0763 28 
-7a | 0764 7a 
-28 | 0765 28 push_c 122                    | push msgRadio.type
-7a | 0766 7a 
-94 | 0767 94 deref ubyte                   | deref ubyte
-20 | 0768 20 popx ubyte 58                 | evt SEND_DONE() auxId = pop
-3a | 0769 3a 
-e5 | 0770 e5 set16_c ushort 59 131         | await SEND_DONE()[0]
-3b | 0771 3b 
-03 | 0772 .00 addr:775
-07 | 0773 .83 
-01 | 0774 01 end                           | end
-75 | 0775 75 exec 153                      | goto  153
-03 | 0776 .00 addr:866
-62 | 0777 .99 
-38 | 0778 38 pushx_v ubyte 173             | push reply:ubyte
-ad | 0779 ad 
-28 | 0780 28 push_c 127                    | push msgRadio.d8_1
-7f | 0781 7f 
-94 | 0782 94 deref ubyte                   | deref ubyte
-07 | 0783 07 add                           | add
-20 | 0784 20 popx ubyte 127                | pop msgRadio.d8_1
-7f | 0785 7f 
-71 | 0786 71 outevtx_v 41 122              | emit SEND_ACK len=25 var=msgRadio
-29 | 0787 29 
-7a | 0788 7a 
-28 | 0789 28 push_c 122                    | push msgRadio.type
-7a | 0790 7a 
-94 | 0791 94 deref ubyte                   | deref ubyte
-20 | 0792 20 popx ubyte 63                 | evt SEND_DONE_ACK() auxId = pop
-3f | 0793 3f 
-e5 | 0794 e5 set16_c ushort 64 141         | await SEND_DONE_ACK()[0]
-40 | 0795 40 
-03 | 0796 .00 addr:799
-1f | 0797 .8d 
-01 | 0798 01 end                           | end
-50 | 0799 50 getextdt_v 172 1              | getExtData ack 1
-ac | 0800 ac 
-01 | 0801 01 
-28 | 0802 28 push_c 173                    | push &reply
-ad | 0803 ad 
-58 | 0804 58 inc ubyte                     | inc ubyte
-28 | 0805 28 push_c 20                     | push 20
-14 | 0806 14 
-38 | 0807 38 pushx_v ubyte 173             | push reply:ubyte
-ad | 0808 ad 
-14 | 0809 14 gt                            | gt
-7f | 0810 7f ifelse 145 146                | ifelse True_145 EndIf_146
-03 | 0811 .00 addr:815
-2f | 0812 .91 
-03 | 0813 .00 addr:830
-3e | 0814 .92 
-e5 | 0815 e5 set16_c ushort 91 0xfffe      | father = 0xfffe
-5b | 0816 5b 
-ff | 0817 ff 
-fe | 0818 fe 
-68 | 0819 68 outevt_c 20 1                 | emit REQ_CUSTOM_A len=1 const=1
-14 | 0820 14 
-01 | 0821 01 
-87 | 0822 87 tkins_z 1 17 134              | insert track Loop_out_134 tree 17
-11 | 0823 11 
-03 | 0824 .00 addr:857
-59 | 0825 .86 
-01 | 0826 01 end                           | end
-75 | 0827 75 exec 146                      | goto  146
-03 | 0828 .00 addr:830
-3e | 0829 .92 
-28 | 0830 28 push_c 1                      | push 1
-01 | 0831 01 
-38 | 0832 38 pushx_v ubyte 172             | push ack:ubyte
-ac | 0833 ac 
-10 | 0834 10 eq                            | eq
-7f | 0835 7f ifelse 148 149                | ifelse True_148 EndIf_149
-03 | 0836 .00 addr:840
-48 | 0837 .94 
-03 | 0838 .00 addr:848
-50 | 0839 .95 
-87 | 0840 87 tkins_z 1 17 134              | insert track Loop_out_134 tree 17
-11 | 0841 11 
-03 | 0842 .00 addr:857
-59 | 0843 .86 
-01 | 0844 01 end                           | end
-75 | 0845 75 exec 149                      | goto  149
-03 | 0846 .00 addr:848
-50 | 0847 .95 
-a4 | 0848 a4 clken_c 5 50 150              | clock enable Awake_50_150 50msec
-05 | 0849 05 
-32 | 0850 32 
-03 | 0851 .00 addr:854
-56 | 0852 .96 
-01 | 0853 01 end                           | end
-75 | 0854 75 exec 132                      | goto  132
-03 | 0855 .00 addr:778
-0a | 0856 .84 
-78 | 0857 78 memclr 40 8                   | clear WClocks gates from 5 to 6
-28 | 0858 28 
-08 | 0859 08 
-78 | 0860 78 memclr 63 2                   | clear EXT gates for SEND_DONE_ACK()
-3f | 0861 3f 
-02 | 0862 02 
-75 | 0863 75 exec 153                      | goto  153
-03 | 0864 .00 addr:866
-62 | 0865 .99 
-75 | 0866 75 exec 156                      | goto  156
-03 | 0867 .00 addr:877
-6d | 0868 .9c 
-87 | 0869 87 tkins_z 1 10 125              | insert track Loop_out_125 tree 10
-0a | 0870 0a 
-03 | 0871 .00 addr:880
-70 | 0872 .7d 
-01 | 0873 01 end                           | end
-75 | 0874 75 exec 156                      | goto  156
-03 | 0875 .00 addr:877
-6d | 0876 .9c 
-75 | 0877 75 exec 123                      | goto  123
-02 | 0878 .00 addr:731
-db | 0879 .7b 
-78 | 0880 78 memclr 40 8                   | clear WClocks gates from 5 to 6
-28 | 0881 28 
-08 | 0882 08 
-78 | 0883 78 memclr 58 2                   | clear EXT gates for SEND_DONE()
-3a | 0884 3a 
-02 | 0885 02 
-78 | 0886 78 memclr 63 2                   | clear EXT gates for SEND_DONE_ACK()
-3f | 0887 3f 
-02 | 0888 02 
-75 | 0889 75 exec 119                      | goto  119
-02 | 0890 .00 addr:726
-d6 | 0891 .77 
-78 | 0892 78 memclr 40 8                   | clear WClocks gates from 5 to 6
-28 | 0893 28 
-08 | 0894 08 
-78 | 0895 78 memclr 58 2                   | clear EXT gates for SEND_DONE()
-3a | 0896 3a 
-02 | 0897 02 
-78 | 0898 78 memclr 63 2                   | clear EXT gates for SEND_DONE_ACK()
-3f | 0899 3f 
-02 | 0900 02 
-78 | 0901 78 memclr 82 2                   | clear EXT gates for Q_READY
-52 | 0902 52 
-02 | 0903 02 
-01 | 0904 01 end                           | end
-01 | 0905 01 end                           | end
-78 | 0906 78 memclr 0 48                   | clear WClocks gates from 0 to 6
-00 | 0907 00 
-30 | 0908 30 
-01 | 0909 01 end                           | end program
-01 | 0910 01 end                           | end
+206 863 7 6 0 0 48 6 48
+00 | 00000 0 track 0
+00 | 00001 0
+00 | 00002 0
+00 | 00003 0
+00 | 00004 0 track 1
+00 | 00005 0
+00 | 00006 0
+00 | 00007 0
+00 | 00008 0 track 2
+00 | 00009 0
+00 | 00010 0
+00 | 00011 0
+00 | 00012 0 track 3
+00 | 00013 0
+00 | 00014 0
+00 | 00015 0
+00 | 00016 0 track 4
+00 | 00017 0
+00 | 00018 0
+00 | 00019 0
+00 | 00020 0 track 5
+00 | 00021 0
+00 | 00022 0
+00 | 00023 0
+00 | 00024 0 track 6
+00 | 00025 0
+00 | 00026 0
+00 | 00027 0
+00 | 00028 0 track 7
+00 | 00029 0
+00 | 00030 0
+00 | 00031 0
+00 | 00032 0000 wClock 0
+00 | 00033 0001
+00 | 00034 0002
+00 | 00035 0003
+00 | 00036 0004
+00 | 00037 0005
+00 | 00038 0006
+00 | 00039 0007
+00 | 00040 0008 wClock 1
+00 | 00041 0009
+00 | 00042 0010
+00 | 00043 0011
+00 | 00044 0012
+00 | 00045 0013
+00 | 00046 0014
+00 | 00047 0015
+00 | 00048 0016 wClock 2
+00 | 00049 0017
+00 | 00050 0018
+00 | 00051 0019
+00 | 00052 0020
+00 | 00053 0021
+00 | 00054 0022
+00 | 00055 0023
+00 | 00056 0024 wClock 3
+00 | 00057 0025
+00 | 00058 0026
+00 | 00059 0027
+00 | 00060 0028
+00 | 00061 0029
+00 | 00062 0030
+00 | 00063 0031
+00 | 00064 0032 wClock 4
+00 | 00065 0033
+00 | 00066 0034
+00 | 00067 0035
+00 | 00068 0036
+00 | 00069 0037
+00 | 00070 0038
+00 | 00071 0039
+00 | 00072 0040 wClock 5
+00 | 00073 0041
+00 | 00074 0042
+00 | 00075 0043
+00 | 00076 0044
+00 | 00077 0045
+00 | 00078 0046
+00 | 00079 0047
+00 | 00080 0048 inEvt 005 : TEMP
+00 | 00081 0049           : 01 gates
+00 | 00082 0050
+00 | 00083 0051
+00 | 00084 0052 inEvt 013 : CUSTOM_A
+00 | 00085 0053           : 01 gates
+00 | 00086 0054
+00 | 00087 0055
+00 | 00088 0056 inEvt 040 : SEND_DONE()
+00 | 00089 0057           : 01 gates
+00 | 00090 0058
+00 | 00091 0059
+00 | 00092 0060
+00 | 00093 0061 inEvt 042 : SEND_DONE_ACK()
+00 | 00094 0062           : 01 gates
+00 | 00095 0063
+00 | 00096 0064
+00 | 00097 0065
+00 | 00098 0066 inEvt 044 : RECEIVE()
+00 | 00099 0067           : 04 gates
+00 | 00100 0068
+00 | 00101 0069
+00 | 00102 0070
+00 | 00103 0071
+00 | 00104 0072
+00 | 00105 0073
+00 | 00106 0074
+00 | 00107 0075
+00 | 00108 0076
+00 | 00109 0077
+00 | 00110 0078
+00 | 00111 0079
+00 | 00112 0080 inEvt 046 : Q_READY
+00 | 00113 0081           : 01 gates
+00 | 00114 0082
+00 | 00115 0083
+00 | 00116 0084 $ret:1, 
+00 | 00117 0085 nodeId:2, 
+00 | 00118 0086 
+00 | 00119 0087 baseNode:2, 
+00 | 00120 0088 
+00 | 00121 0089 stat:1, 
+00 | 00122 0090 hop:1, 
+00 | 00123 0091 father:2, 
+00 | 00124 0092 
+00 | 00125 0093 seqReq:2, 
+00 | 00126 0094 
+00 | 00127 0095 seqData:1, 
+00 | 00128 0096 reqTopoBlind:1, 
+00 | 00129 0097 msgTopo:25, 
+00 | 00130 0098 
+00 | 00131 0099 
+00 | 00132 0100 
+00 | 00133 0101 
+00 | 00134 0102 
+00 | 00135 0103 
+00 | 00136 0104 
+00 | 00137 0105 
+00 | 00138 0106 
+00 | 00139 0107 
+00 | 00140 0108 
+00 | 00141 0109 
+00 | 00142 0110 
+00 | 00143 0111 
+00 | 00144 0112 
+00 | 00145 0113 
+00 | 00146 0114 
+00 | 00147 0115 
+00 | 00148 0116 
+00 | 00149 0117 
+00 | 00150 0118 
+00 | 00151 0119 
+00 | 00152 0120 
+00 | 00153 0121 
+00 | 00154 0122 msgRadio:25, 
+00 | 00155 0123 
+00 | 00156 0124 
+00 | 00157 0125 
+00 | 00158 0126 
+00 | 00159 0127 
+00 | 00160 0128 
+00 | 00161 0129 
+00 | 00162 0130 
+00 | 00163 0131 
+00 | 00164 0132 
+00 | 00165 0133 
+00 | 00166 0134 
+00 | 00167 0135 
+00 | 00168 0136 
+00 | 00169 0137 
+00 | 00170 0138 
+00 | 00171 0139 
+00 | 00172 0140 
+00 | 00173 0141 
+00 | 00174 0142 
+00 | 00175 0143 
+00 | 00176 0144 
+00 | 00177 0145 
+00 | 00178 0146 
+00 | 00179 0147 msgData:25, 
+00 | 00180 0148 
+00 | 00181 0149 
+00 | 00182 0150 
+00 | 00183 0151 
+00 | 00184 0152 
+00 | 00185 0153 
+00 | 00186 0154 
+00 | 00187 0155 
+00 | 00188 0156 
+00 | 00189 0157 
+00 | 00190 0158 
+00 | 00191 0159 
+00 | 00192 0160 
+00 | 00193 0161 
+00 | 00194 0162 
+00 | 00195 0163 
+00 | 00196 0164 
+00 | 00197 0165 
+00 | 00198 0166 
+00 | 00199 0167 
+00 | 00200 0168 
+00 | 00201 0169 
+00 | 00202 0170 
+00 | 00203 0171 
+00 | 00204 0172 ack:1, 
+00 | 00205 0173 reply:1, 
+c5 | 00206 c5 set16_c ushort 48 1281        | config gate TEMP with 1 await(s) - 0x0501 = 1281
+30 | 00207 30 
+05 | 00208 05 
+01 | 00209 01 
+c5 | 00210 c5 set16_c ushort 52 3329        | config gate CUSTOM_A with 1 await(s) - 0x0d01 = 3329
+34 | 00211 34 
+0d | 00212 0d 
+01 | 00213 01 
+c5 | 00214 c5 set16_c ushort 56 10369       | config gate SEND_DONE() with 1 await(s) - 0x2881 = 10369
+38 | 00215 38 
+28 | 00216 28 
+81 | 00217 81 
+c5 | 00218 c5 set16_c ushort 61 10881       | config gate SEND_DONE_ACK() with 1 await(s) - 0x2a81 = 10881
+3d | 00219 3d 
+2a | 00220 2a 
+81 | 00221 81 
+c5 | 00222 c5 set16_c ushort 66 11396       | config gate RECEIVE() with 4 await(s) - 0x2c84 = 11396
+42 | 00223 42 
+2c | 00224 2c 
+84 | 00225 84 
+c5 | 00226 c5 set16_c ushort 80 11777       | config gate Q_READY with 1 await(s) - 0x2e01 = 11777
+50 | 00227 50 
+2e | 00228 2e 
+01 | 00229 01 
+19 | 00230 19 func 0                        | func getNodeId
+00 | 00231 00 
+21 | 00232 21 popx ushort 85                | pop nodeId
+55 | 00233 55 
+c4 | 00234 c4 set16_c ushort 87 2           | baseNode = 2
+57 | 00235 57 
+02 | 00236 02 
+28 | 00237 28 push_c 10                     | push 10
+0a | 00238 0a 
+31 | 00239 31 pushx_v ushort 85             | push nodeId:ushort
+55 | 00240 55 
+14 | 00241 14 gt                            | gt
+7f | 00242 7f ifelse 8 9                    | ifelse True_8 EndIf_9
+00 | 00243 .00 addr:247
+f7 | 00244 .08 
+00 | 00245 .00 addr:253
+fd | 00246 .09 
+c4 | 00247 c4 set16_c ushort 87 11          | baseNode = 11
+57 | 00248 57 
+0b | 00249 0b 
+75 | 00250 75 exec 9                        | goto  9
+00 | 00251 .00 addr:253
+fd | 00252 .09 
+c5 | 00253 c5 set16_c ushort 91 0xfffe      | father = 0xfffe
+5b | 00254 5b 
+ff | 00255 ff 
+fe | 00256 fe 
+c4 | 00257 c4 set16_c ushort 93 0           | seqReq = 0
+5d | 00258 5d 
+00 | 00259 00 
+c0 | 00260 c0 set16_c ubyte 95 0            | seqData = 0
+5f | 00261 5f 
+00 | 00262 00 
+c0 | 00263 c0 set16_c ubyte 96 0            | reqTopoBlind = 0
+60 | 00264 60 
+00 | 00265 00 
+c0 | 00266 c0 set16_c ubyte 147 2           | msgData.type = 2
+93 | 00267 93 
+02 | 00268 02 
+e4 | 00269 e4 set16_v ushort 148 85         | msgData.source = nodeId
+94 | 00270 94 
+55 | 00271 55 
+e4 | 00272 e4 set16_v ushort 160 85         | msgData.d16_3 = nodeId
+a0 | 00273 a0 
+55 | 00274 55 
+e4 | 00275 e4 set16_v ushort 98 85          | msgTopo.source = nodeId
+62 | 00276 62 
+55 | 00277 55 
+31 | 00278 31 pushx_v ushort 87             | push baseNode:ushort
+57 | 00279 57 
+31 | 00280 31 pushx_v ushort 85             | push nodeId:ushort
+55 | 00281 55 
+10 | 00282 10 eq                            | eq
+7f | 00283 7f ifelse 19 20                  | ifelse True_19 EndIf_20
+01 | 00284 .00 addr:288
+20 | 00285 .13 
+01 | 00286 .00 addr:297
+29 | 00287 .14 
+c4 | 00288 c4 set16_c ushort 91 1           | father = 1
+5b | 00289 5b 
+01 | 00290 01 
+c4 | 00291 c4 set16_c ushort 93 1           | seqReq = 1
+5d | 00292 5d 
+01 | 00293 01 
+75 | 00294 75 exec 20                       | goto  20
+01 | 00295 .00 addr:297
+29 | 00296 .14 
+94 | 00297 94 tkins_max 0 21                | insert track ParEver_sub_1_21
+01 | 00298 .00 addr:313
+39 | 00299 .15 
+94 | 00300 94 tkins_max 0 22                | insert track ParEver_sub_2_22
+01 | 00301 .00 addr:430
+ae | 00302 .16 
+94 | 00303 94 tkins_max 0 23                | insert track ParEver_sub_3_23
+01 | 00304 .00 addr:469
+d5 | 00305 .17 
+94 | 00306 94 tkins_max 0 24                | insert track ParEver_sub_4_24
+02 | 00307 .00 addr:635
+7b | 00308 .18 
+94 | 00309 94 tkins_max 0 25                | insert track ParEver_sub_5_25
+02 | 00310 .00 addr:690
+b2 | 00311 .19 
+01 | 00312 01 end                           | end
+a5 | 00313 a5 clken_c 0 2000 29             | clock enable Awake_2000_29 2000msec
+00 | 00314 00 
+07 | 00315 07 
+d0 | 00316 d0 
+01 | 00317 .00 addr:320
+40 | 00318 .1d 
+01 | 00319 01 end                           | end
+68 | 00320 68 outevt_c 20 1                 | emit REQ_CUSTOM_A len=1 const=1
+14 | 00321 14 
+01 | 00322 01 
+94 | 00323 94 tkins_max 0 35                | insert track ParOr_sub_1_35
+01 | 00324 .00 addr:330
+4a | 00325 .23 
+94 | 00326 94 tkins_max 0 36                | insert track ParOr_sub_2_36
+01 | 00327 .00 addr:341
+55 | 00328 .24 
+01 | 00329 01 end                           | end
+a5 | 00330 a5 clken_c 1 30000 38            | clock enable Awake_30000_38 30000msec
+01 | 00331 01 
+75 | 00332 75 
+30 | 00333 30 
+01 | 00334 .00 addr:337
+51 | 00335 .26 
+01 | 00336 01 end                           | end
+94 | 00337 94 tkins_max 0 37                | insert track ParOr_out_37
+01 | 00338 .00 addr:414
+9e | 00339 .25 
+01 | 00340 01 end                           | end
+a5 | 00341 a5 clken_c 2 10000 39            | clock enable Awake_10000_39 10000msec
+02 | 00342 02 
+27 | 00343 27 
+10 | 00344 10 
+01 | 00345 .00 addr:348
+5c | 00346 .27 
+01 | 00347 01 end                           | end
+1a | 00348 1a outevt_z 9                    | emit REQ_TEMP
+09 | 00349 09 
+c5 | 00350 c5 set16_c ushort 50 42          | await TEMP[0]
+32 | 00351 32 
+01 | 00352 .00 addr:355
+63 | 00353 .2a 
+01 | 00354 01 end                           | end
+28 | 00355 28 push_c 156                    | push msgData.d16_1
+9c | 00356 9c 
+4c | 00357 4c getextdt_e 2                  | getExtData stack len=2
+02 | 00358 02 
+29 | 00359 29 push_c 0xfffe                 | push 0xfffe
+ff | 00360 ff 
+fe | 00361 fe 
+31 | 00362 31 pushx_v ushort 91             | push father:ushort
+5b | 00363 5b 
+11 | 00364 11 neq                           | neq
+7f | 00365 7f ifelse 55 56                  | ifelse True_55 False_56
+01 | 00366 .00 addr:370
+72 | 00367 .37 
+01 | 00368 .00 addr:406
+96 | 00369 .38 
+e4 | 00370 e4 set16_v ushort 150 91         | msgData.target = father
+96 | 00371 96 
+5b | 00372 5b 
+28 | 00373 28 push_c 95                     | push &seqData
+5f | 00374 5f 
+58 | 00375 58 inc ubyte                     | inc ubyte
+30 | 00376 30 pushx_v ubyte 95              | push seqData:ubyte
+5f | 00377 5f 
+1b | 00378 1b outevt_e 5                    | emit LEDS
+05 | 00379 05 
+d0 | 00380 d0 set8_v ubyte 154 95           | msgData.d8_3 = seqData
+9a | 00381 9a 
+5f | 00382 5f 
+e4 | 00383 e4 set16_v ushort 162 91         | msgData.d16_4 = father
+a2 | 00384 a2 
+5b | 00385 5b 
+d0 | 00386 d0 set8_v ubyte 153 96           | msgData.d8_2 = reqTopoBlind
+99 | 00387 99 
+60 | 00388 60 
+28 | 00389 28 push_c 100                    | push 100
+64 | 00390 64 
+31 | 00391 31 pushx_v ushort 85             | push nodeId:ushort
+55 | 00392 55 
+09 | 00393 09 mult                          | mult
+b4 | 00394 b4 clken_ve 3 0 52               | clock enable Awake_exp_52 (stack)ms
+03 | 00395 03 
+01 | 00396 .00 addr:399
+8f | 00397 .34 
+01 | 00398 01 end                           | end
+28 | 00399 28 push_c 147                    | push_c &msgData:usrMsg2_t
+93 | 00400 93 
+19 | 00401 19 func 10                       | func qPut
+0a | 00402 0a 
+20 | 00403 20 popx ubyte 89                 | pop stat
+59 | 00404 59 
+01 | 00405 01 end                           | end
+68 | 00406 68 outevt_c 20 1                 | emit REQ_CUSTOM_A len=1 const=1
+14 | 00407 14 
+01 | 00408 01 
+01 | 00409 01 end                           | end
+94 | 00410 94 tkins_max 0 37                | insert track ParOr_out_37
+01 | 00411 .00 addr:414
+9e | 00412 .25 
+01 | 00413 01 end                           | end
+78 | 00414 78 memclr 8 24                   | clear WClocks gates from 1 to 4
+08 | 00415 08 
+18 | 00416 18 
+78 | 00417 78 memclr 50 2                   | clear EXT gates for TEMP
+32 | 00418 32 
+02 | 00419 02 
+75 | 00420 75 exec 32                       | goto  32
+01 | 00421 .00 addr:323
+43 | 00422 .20 
+78 | 00423 78 memclr 8 24                   | clear WClocks gates from 1 to 4
+08 | 00424 08 
+18 | 00425 18 
+78 | 00426 78 memclr 50 2                   | clear EXT gates for TEMP
+32 | 00427 32 
+02 | 00428 02 
+01 | 00429 01 end                           | end
+28 | 00430 28 push_c 2                      | push 2
+02 | 00431 02 
+20 | 00432 20 popx ubyte 68                 | evt RECEIVE() auxId = pop
+44 | 00433 44 
+c5 | 00434 c5 set16_c ushort 69 61          | await RECEIVE()[0]
+45 | 00435 45 
+01 | 00436 .00 addr:439
+b7 | 00437 .3d 
+01 | 00438 01 end                           | end
+50 | 00439 50 getextdt_v 97 25              | getExtData msgTopo 25
+61 | 00440 61 
+19 | 00441 19 
+29 | 00442 29 push_c 0xfffe                 | push 0xfffe
+ff | 00443 ff 
+fe | 00444 fe 
+31 | 00445 31 pushx_v ushort 91             | push father:ushort
+5b | 00446 5b 
+11 | 00447 11 neq                           | neq
+7f | 00448 7f ifelse 64 65                  | ifelse True_64 EndIf_65
+01 | 00449 .00 addr:453
+c5 | 00450 .40 
+01 | 00451 .00 addr:430
+ae | 00452 .3a 
+e4 | 00453 e4 set16_v ushort 100 91         | msgTopo.target = father
+64 | 00454 64 
+5b | 00455 5b 
+28 | 00456 28 push_c 97                     | push_c &msgTopo:usrMsg2_t
+61 | 00457 61 
+19 | 00458 19 func 10                       | func qPut
+0a | 00459 0a 
+20 | 00460 20 popx ubyte 89                 | pop stat
+59 | 00461 59 
+75 | 00462 75 exec 65                       | goto  65
+01 | 00463 .00 addr:430
+ae | 00464 .3a 
+78 | 00465 78 memclr 68 2                   | clear EXT gates for RECEIVE()
+44 | 00466 44 
+02 | 00467 02 
+01 | 00468 01 end                           | end
+31 | 00469 31 pushx_v ushort 87             | push baseNode:ushort
+57 | 00470 57 
+31 | 00471 31 pushx_v ushort 85             | push nodeId:ushort
+55 | 00472 55 
+11 | 00473 11 neq                           | neq
+7f | 00474 7f ifelse 101 102                | ifelse True_101 False_102
+01 | 00475 .00 addr:479
+df | 00476 .65 
+02 | 00477 .00 addr:584
+48 | 00478 .66 
+94 | 00479 94 tkins_max 0 68                | insert track ParEver_sub_1_68
+01 | 00480 .00 addr:486
+e6 | 00481 .44 
+94 | 00482 94 tkins_max 0 69                | insert track ParEver_sub_2_69
+02 | 00483 .00 addr:539
+1b | 00484 .45 
+01 | 00485 01 end                           | end
+28 | 00486 28 push_c 1                      | push 1
+01 | 00487 01 
+20 | 00488 20 popx ubyte 71                 | evt RECEIVE() auxId = pop
+47 | 00489 47 
+c5 | 00490 c5 set16_c ushort 72 76          | await RECEIVE()[1]
+48 | 00491 48 
+01 | 00492 .00 addr:495
+ef | 00493 .4c 
+01 | 00494 01 end                           | end
+50 | 00495 50 getextdt_v 97 25              | getExtData msgTopo 25
+61 | 00496 61 
+19 | 00497 19 
+31 | 00498 31 pushx_v ushort 93             | push seqReq:ushort
+5d | 00499 5d 
+31 | 00500 31 pushx_v u/short 108           | push msgTopo.d16_2
+6c | 00501 6c 
+14 | 00502 14 gt                            | gt
+7f | 00503 7f ifelse 83 84                  | ifelse True_83 EndIf_84
+01 | 00504 .00 addr:508
+fc | 00505 .53 
+01 | 00506 .00 addr:486
+e6 | 00507 .49 
+c0 | 00508 c0 set16_c ubyte 96 0            | reqTopoBlind = 0
+60 | 00509 60 
+00 | 00510 00 
+e4 | 00511 e4 set16_v ushort 93 108         | seqReq = msgTopo.d16_2
+5d | 00512 5d 
+6c | 00513 6c 
+e4 | 00514 e4 set16_v ushort 91 98          | father = msgTopo.source
+5b | 00515 5b 
+62 | 00516 62 
+28 | 00517 28 push_c 103                    | push msgTopo.d8_2
+67 | 00518 67 
+58 | 00519 58 inc ubyte                     | inc ubyte
+d0 | 00520 d0 set8_v ubyte 90 103           | hop = msgTopo.d8_2
+5a | 00521 5a 
+67 | 00522 67 
+e4 | 00523 e4 set16_v ushort 98 85          | msgTopo.source = nodeId
+62 | 00524 62 
+55 | 00525 55 
+28 | 00526 28 push_c 97                     | push_c &msgTopo:usrMsg2_t
+61 | 00527 61 
+19 | 00528 19 func 10                       | func qPut
+0a | 00529 0a 
+20 | 00530 20 popx ubyte 89                 | pop stat
+59 | 00531 59 
+75 | 00532 75 exec 84                       | goto  84
+01 | 00533 .00 addr:486
+e6 | 00534 .49 
+78 | 00535 78 memclr 68 2                   | clear EXT gates for RECEIVE()
+44 | 00536 44 
+02 | 00537 02 
+01 | 00538 01 end                           | end
+28 | 00539 28 push_c 3                      | push 3
+03 | 00540 03 
+20 | 00541 20 popx ubyte 74                 | evt RECEIVE() auxId = pop
+4a | 00542 4a 
+c5 | 00543 c5 set16_c ushort 75 88          | await RECEIVE()[2]
+4b | 00544 4b 
+02 | 00545 .00 addr:548
+24 | 00546 .58 
+01 | 00547 01 end                           | end
+50 | 00548 50 getextdt_v 97 25              | getExtData msgTopo 25
+61 | 00549 61 
+19 | 00550 19 
+28 | 00551 28 push_c 0                      | push 0
+00 | 00552 00 
+30 | 00553 30 pushx_v ubyte 96              | push reqTopoBlind:ubyte
+60 | 00554 60 
+10 | 00555 10 eq                            | eq
+29 | 00556 29 push_c 0xfffe                 | push 0xfffe
+ff | 00557 ff 
+fe | 00558 fe 
+31 | 00559 31 pushx_v ushort 91             | push father:ushort
+5b | 00560 5b 
+11 | 00561 11 neq                           | neq
+17 | 00562 17 land                          | land
+7f | 00563 7f ifelse 92 93                  | ifelse True_92 EndIf_93
+02 | 00564 .00 addr:568
+38 | 00565 .5c 
+02 | 00566 .00 addr:539
+1b | 00567 .55 
+e4 | 00568 e4 set16_v ushort 100 91         | msgTopo.target = father
+64 | 00569 64 
+5b | 00570 5b 
+28 | 00571 28 push_c 97                     | push_c &msgTopo:usrMsg2_t
+61 | 00572 61 
+19 | 00573 19 func 10                       | func qPut
+0a | 00574 0a 
+20 | 00575 20 popx ubyte 89                 | pop stat
+59 | 00576 59 
+75 | 00577 75 exec 93                       | goto  93
+02 | 00578 .00 addr:539
+1b | 00579 .55 
+78 | 00580 78 memclr 68 2                   | clear EXT gates for RECEIVE()
+44 | 00581 44 
+02 | 00582 02 
+01 | 00583 01 end                           | end
+28 | 00584 28 push_c 3                      | push 3
+03 | 00585 03 
+20 | 00586 20 popx ubyte 77                 | evt RECEIVE() auxId = pop
+4d | 00587 4d 
+c5 | 00588 c5 set16_c ushort 78 97          | await RECEIVE()[3]
+4e | 00589 4e 
+02 | 00590 .00 addr:593
+51 | 00591 .61 
+01 | 00592 01 end                           | end
+50 | 00593 50 getextdt_v 97 25              | getExtData msgTopo 25
+61 | 00594 61 
+19 | 00595 19 
+c0 | 00596 c0 set16_c ubyte 97 1            | msgTopo.type = 1
+61 | 00597 61 
+01 | 00598 01 
+e4 | 00599 e4 set16_v ushort 98 85          | msgTopo.source = nodeId
+62 | 00600 62 
+55 | 00601 55 
+c5 | 00602 c5 set16_c ushort 100 0xffff     | msgTopo.target = 0xffff
+64 | 00603 64 
+ff | 00604 ff 
+ff | 00605 ff 
+c0 | 00606 c0 set16_c ubyte 103 0           | msgTopo.d8_2 = 0
+67 | 00607 67 
+00 | 00608 00 
+28 | 00609 28 push_c 93                     | push &seqReq
+5d | 00610 5d 
+59 | 00611 59 inc ushort                    | inc ushort
+e4 | 00612 e4 set16_v ushort 108 93         | msgTopo.d16_2 = seqReq
+6c | 00613 6c 
+5d | 00614 5d 
+28 | 00615 28 push_c 97                     | push_c &msgTopo:usrMsg2_t
+61 | 00616 61 
+19 | 00617 19 func 10                       | func qPut
+0a | 00618 0a 
+20 | 00619 20 popx ubyte 89                 | pop stat
+59 | 00620 59 
+a5 | 00621 a5 clken_c 4 2000 100            | clock enable Awake_2000_100 2000msec
+04 | 00622 04 
+07 | 00623 07 
+d0 | 00624 d0 
+02 | 00625 .00 addr:584
+48 | 00626 .5e 
+01 | 00627 01 end                           | end
+78 | 00628 78 memclr 32 8                   | clear WClocks gates from 4 to 5
+20 | 00629 20 
+08 | 00630 08 
+78 | 00631 78 memclr 68 2                   | clear EXT gates for RECEIVE()
+44 | 00632 44 
+02 | 00633 02 
+01 | 00634 01 end                           | end
+31 | 00635 31 pushx_v ushort 87             | push baseNode:ushort
+57 | 00636 57 
+31 | 00637 31 pushx_v ushort 85             | push nodeId:ushort
+55 | 00638 55 
+11 | 00639 11 neq                           | neq
+7f | 00640 7f ifelse 115 116                | ifelse True_115 EndIf_116
+02 | 00641 .00 addr:645
+85 | 00642 .73 
+02 | 00643 .00 addr:689
+b1 | 00644 .74 
+c5 | 00645 c5 set16_c ushort 54 109         | await CUSTOM_A[0]
+36 | 00646 36 
+02 | 00647 .00 addr:650
+8a | 00648 .6d 
+01 | 00649 01 end                           | end
+29 | 00650 29 push_c 0xfffe                 | push 0xfffe
+ff | 00651 ff 
+fe | 00652 fe 
+31 | 00653 31 pushx_v ushort 91             | push father:ushort
+5b | 00654 5b 
+10 | 00655 10 eq                            | eq
+7f | 00656 7f ifelse 113 114                | ifelse True_113 EndIf_114
+02 | 00657 .00 addr:661
+95 | 00658 .71 
+02 | 00659 .00 addr:645
+85 | 00660 .6a 
+c0 | 00661 c0 set16_c ubyte 97 3            | msgTopo.type = 3
+61 | 00662 61 
+03 | 00663 03 
+e4 | 00664 e4 set16_v ushort 98 85          | msgTopo.source = nodeId
+62 | 00665 62 
+55 | 00666 55 
+c5 | 00667 c5 set16_c ushort 100 0xffff     | msgTopo.target = 0xffff
+64 | 00668 64 
+ff | 00669 ff 
+ff | 00670 ff 
+28 | 00671 28 push_c 93                     | push &seqReq
+5d | 00672 5d 
+59 | 00673 59 inc ushort                    | inc ushort
+e4 | 00674 e4 set16_v ushort 108 93         | msgTopo.d16_2 = seqReq
+6c | 00675 6c 
+5d | 00676 5d 
+28 | 00677 28 push_c 97                     | push_c &msgTopo:usrMsg2_t
+61 | 00678 61 
+19 | 00679 19 func 10                       | func qPut
+0a | 00680 0a 
+20 | 00681 20 popx ubyte 89                 | pop stat
+59 | 00682 59 
+75 | 00683 75 exec 114                      | goto  114
+02 | 00684 .00 addr:645
+85 | 00685 .6a 
+78 | 00686 78 memclr 54 2                   | clear EXT gates for CUSTOM_A
+36 | 00687 36 
+02 | 00688 02 
+01 | 00689 01 end                           | end
+c0 | 00690 c0 set16_c ubyte 172 1           | ack = 1
+ac | 00691 ac 
+01 | 00692 01 
+c0 | 00693 c0 set16_c ubyte 173 0           | reply = 0
+ad | 00694 ad 
+00 | 00695 00 
+c5 | 00696 c5 set16_c ushort 82 122         | await Q_READY[0]
+52 | 00697 52 
+02 | 00698 .00 addr:701
+bd | 00699 .7a 
+01 | 00700 01 end                           | end
+28 | 00701 28 push_c 0                      | push 0
+00 | 00702 00 
+19 | 00703 19 func 12                       | func qSize
+0c | 00704 0c 
+14 | 00705 14 gt                            | gt
+7f | 00706 7f ifelse 154 155                | ifelse True_154 False_155
+02 | 00707 .00 addr:711
+c7 | 00708 .9a 
+03 | 00709 .00 addr:826
+3a | 00710 .9b 
+c0 | 00711 c0 set16_c ubyte 173 0           | reply = 0
+ad | 00712 ad 
+00 | 00713 00 
+28 | 00714 28 push_c 122                    | push_c &msgRadio:usrMsg2_t
+7a | 00715 7a 
+19 | 00716 19 func 11                       | func qGet
+0b | 00717 0b 
+20 | 00718 20 popx ubyte 89                 | pop stat
+59 | 00719 59 
+29 | 00720 29 push_c 0xffff                 | push 0xffff
+ff | 00721 ff 
+ff | 00722 ff 
+31 | 00723 31 pushx_v u/short 125           | push msgRadio.target
+7d | 00724 7d 
+10 | 00725 10 eq                            | eq
+7f | 00726 7f ifelse 151 152                | ifelse True_151 False_152
+02 | 00727 .00 addr:731
+db | 00728 .97 
+02 | 00729 .00 addr:743
+e7 | 00730 .98 
+71 | 00731 71 outevtx_v 40 122              | emit SEND len=25 var=msgRadio
+28 | 00732 28 
+7a | 00733 7a 
+30 | 00734 30 pushx_v u/byte 122            | push msgRadio.type
+7a | 00735 7a 
+20 | 00736 20 popx ubyte 58                 | evt SEND_DONE() auxId = pop
+3a | 00737 3a 
+c5 | 00738 c5 set16_c ushort 59 131         | await SEND_DONE()[0]
+3b | 00739 3b 
+02 | 00740 .00 addr:701
+bd | 00741 .7b 
+01 | 00742 01 end                           | end
+30 | 00743 30 pushx_v ubyte 173             | push reply:ubyte
+ad | 00744 ad 
+30 | 00745 30 pushx_v u/byte 127            | push msgRadio.d8_1
+7f | 00746 7f 
+07 | 00747 07 add                           | add
+20 | 00748 20 popx ubyte 127                | pop msgRadio.d8_1
+7f | 00749 7f 
+71 | 00750 71 outevtx_v 41 122              | emit SEND_ACK len=25 var=msgRadio
+29 | 00751 29 
+7a | 00752 7a 
+30 | 00753 30 pushx_v u/byte 122            | push msgRadio.type
+7a | 00754 7a 
+20 | 00755 20 popx ubyte 63                 | evt SEND_DONE_ACK() auxId = pop
+3f | 00756 3f 
+c5 | 00757 c5 set16_c ushort 64 141         | await SEND_DONE_ACK()[0]
+40 | 00758 40 
+02 | 00759 .00 addr:762
+fa | 00760 .8d 
+01 | 00761 01 end                           | end
+50 | 00762 50 getextdt_v 172 1              | getExtData ack 1
+ac | 00763 ac 
+01 | 00764 01 
+28 | 00765 28 push_c 173                    | push &reply
+ad | 00766 ad 
+58 | 00767 58 inc ubyte                     | inc ubyte
+28 | 00768 28 push_c 20                     | push 20
+14 | 00769 14 
+30 | 00770 30 pushx_v ubyte 173             | push reply:ubyte
+ad | 00771 ad 
+14 | 00772 14 gt                            | gt
+7f | 00773 7f ifelse 145 146                | ifelse True_145 EndIf_146
+03 | 00774 .00 addr:778
+0a | 00775 .91 
+03 | 00776 .00 addr:793
+19 | 00777 .92 
+c5 | 00778 c5 set16_c ushort 91 0xfffe      | father = 0xfffe
+5b | 00779 5b 
+ff | 00780 ff 
+fe | 00781 fe 
+68 | 00782 68 outevt_c 20 1                 | emit REQ_CUSTOM_A len=1 const=1
+14 | 00783 14 
+01 | 00784 01 
+87 | 00785 87 tkins_z 1 17 134              | insert track Loop_out_134 tree 17
+11 | 00786 11 
+03 | 00787 .00 addr:817
+31 | 00788 .86 
+01 | 00789 01 end                           | end
+75 | 00790 75 exec 146                      | goto  146
+03 | 00791 .00 addr:793
+19 | 00792 .92 
+28 | 00793 28 push_c 1                      | push 1
+01 | 00794 01 
+30 | 00795 30 pushx_v ubyte 172             | push ack:ubyte
+ac | 00796 ac 
+10 | 00797 10 eq                            | eq
+7f | 00798 7f ifelse 148 149                | ifelse True_148 EndIf_149
+03 | 00799 .00 addr:803
+23 | 00800 .94 
+03 | 00801 .00 addr:811
+2b | 00802 .95 
+87 | 00803 87 tkins_z 1 17 134              | insert track Loop_out_134 tree 17
+11 | 00804 11 
+03 | 00805 .00 addr:817
+31 | 00806 .86 
+01 | 00807 01 end                           | end
+75 | 00808 75 exec 149                      | goto  149
+03 | 00809 .00 addr:811
+2b | 00810 .95 
+a4 | 00811 a4 clken_c 5 50 150              | clock enable Awake_50_150 50msec
+05 | 00812 05 
+32 | 00813 32 
+02 | 00814 .00 addr:743
+e7 | 00815 .84 
+01 | 00816 01 end                           | end
+78 | 00817 78 memclr 40 8                   | clear WClocks gates from 5 to 6
+28 | 00818 28 
+08 | 00819 08 
+78 | 00820 78 memclr 63 2                   | clear EXT gates for SEND_DONE_ACK()
+3f | 00821 3f 
+02 | 00822 02 
+75 | 00823 75 exec 153                      | goto  153
+02 | 00824 .00 addr:701
+bd | 00825 .7b 
+87 | 00826 87 tkins_z 1 10 125              | insert track Loop_out_125 tree 10
+0a | 00827 0a 
+03 | 00828 .00 addr:834
+42 | 00829 .7d 
+01 | 00830 01 end                           | end
+75 | 00831 75 exec 156                      | goto  156
+02 | 00832 .00 addr:701
+bd | 00833 .7b 
+78 | 00834 78 memclr 40 8                   | clear WClocks gates from 5 to 6
+28 | 00835 28 
+08 | 00836 08 
+78 | 00837 78 memclr 58 2                   | clear EXT gates for SEND_DONE()
+3a | 00838 3a 
+02 | 00839 02 
+78 | 00840 78 memclr 63 2                   | clear EXT gates for SEND_DONE_ACK()
+3f | 00841 3f 
+02 | 00842 02 
+75 | 00843 75 exec 119                      | goto  119
+02 | 00844 .00 addr:696
+b8 | 00845 .77 
+78 | 00846 78 memclr 40 8                   | clear WClocks gates from 5 to 6
+28 | 00847 28 
+08 | 00848 08 
+78 | 00849 78 memclr 58 2                   | clear EXT gates for SEND_DONE()
+3a | 00850 3a 
+02 | 00851 02 
+78 | 00852 78 memclr 63 2                   | clear EXT gates for SEND_DONE_ACK()
+3f | 00853 3f 
+02 | 00854 02 
+78 | 00855 78 memclr 82 2                   | clear EXT gates for Q_READY
+52 | 00856 52 
+02 | 00857 02 
+01 | 00858 01 end                           | end
+78 | 00859 78 memclr 0 48                   | clear WClocks gates from 0 to 6
+00 | 00860 00 
+30 | 00861 30 
+01 | 00862 01 end                           | end

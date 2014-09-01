@@ -73,8 +73,8 @@ F = {
         local body = unpack(me)
         SAME(me, body)
 --print("tight::Loop:",_AST.iter'Async'(),me.isBounded,body.blocks)
---afb        ASR(_AST.iter'Async'() or me.isBounded or body.blocks,
-        ASR(_AST.iter'Async'() or body.blocks,
+        ASR(_AST.iter'Async'() or me.isBounded or body.blocks,
+        --afb ASR(_AST.iter'Async'() or body.blocks,
                 me,'tight loop')
         me.blocks = body.awaits or body.returns
     end,

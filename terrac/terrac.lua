@@ -448,7 +448,7 @@ print(string.format('--    %4d    %4d     %4d     %4d            |      %4d     
 print('---------------------------------------------------------------------')
 
 if (lastBytes+_AST.root.max_stack*4 > (60*24)) then
-  WRN(false,_AST.root,'Program may be too long for VM memory. Please check target VM memory capacity!')
+  WRN(false,_AST.root,'Program may be too long for VM memory. Please check the VM memory capacity!')
 end
 
 if _WRN.n_wrns > 0 then

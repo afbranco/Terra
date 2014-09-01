@@ -1,6 +1,37 @@
 #include "TerraNet.defs"
 
 
+pktype usrMsg1_t from radioMsg with
+	var ubyte[4]  d8;
+	var ushort[4] d16;
+	var ulong[2]  d32;
+end
 
+var usrMsg1_t sndData;
+var usrMsg1_t recData;
+
+
+sndData.target = BROADCAST;
+sndData.source = getNodeId();
+sndData.d8[0] = 1;
+par do
+	loop do
+		emit REQ_TEMP();
+		sndData.d16[0] = await TEMP;
+		emit REQ_PHOTO();
+		sndData.d16[1] = await PHOTO;
+		emit REQ_VOLTS();
+		sndData.d16[2] = await VOLTS;
+		emit SEND(sndData);
+		await SEND_DONE;
+		inc sndData.d8[0];
+		await 5s;
+	end
+with
+	loop do
+		recData = await RECEIVE;
+		emit LEDS(recData.d8[0]);
+	end
+end
 
 

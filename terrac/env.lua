@@ -741,7 +741,7 @@ F = {
     end,
     ['Op2_or']  = 'Op2_any',
     ['Op2_and'] = 'Op2_any',
-    ['Op1_not'] = 'Op2_any',
+    ['Op1_not'] = 'Op1_int',
 
 --    ['Op1_*'] = function (me)
 --        local op, e1 = unpack(me)

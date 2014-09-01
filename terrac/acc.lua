@@ -554,8 +554,8 @@ G = {
           local first_md = {}
           local trail_trigger = string.sub(tostring(me[1].ana.accs),8)
           for k,acc in ipairs(me[z].ana.accs) do
-          local tag = acc.tag or acc.id.tag or acc.id.pre 
---print("acc::ParOr: wr+rd",z, acc.tag, tag,acc.id.id, acc.md,trail_trigger)
+          local tag = acc.tag or acc.id.tag or (acc.id.pre and 'var') 
+--print("acc::ParOr: wr+rd",z,'[', acc.tag,acc.id.tag, acc.id.pre,']', tag,acc.id.id, acc.md,trail_trigger)
             if tag=='var' or tag=='event' then -- is a Var/VarEvent
 --print(print_r(acc,"acc::ParOr: var/evet acc"))
               if acc.setEvt then
@@ -567,7 +567,7 @@ G = {
               if acc.md == 'rd' and first_md[acc.id.id]=='wr' then acc.md='no' end
               acc.trg = trail_trigger
             else -- is not a var, then it is a new trail
---print("acc::ParOr: tag",tag,string.sub(tag or ' ',1,5) == 'Await')
+--print("acc::ParOr: tag",tag)--,string.sub(tag or ' ',1,5) == 'Await')
               if string.sub(tag or ' ',1,5) == 'Await' then
                 first_md = {}
                 trail_trigger = ((acc.id.tag=='AwaitExt' or acc.id.tag=='AwaitInt') and ((acc.id[1] and acc.id[1][1]) or acc.id.id)) or string.sub(tostring(acc),8)

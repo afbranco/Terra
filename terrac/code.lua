@@ -408,7 +408,7 @@ end
 function Op1_any(me,mnemonic)
     local op, e1 = unpack(me)
 		CONC(me,e1)
-print("code::Op1_any",e1.tag)
+--print("code::Op1_any",e1.tag)
     codeB = LINE(me,mnemonic,nil,'// stack0 = '..mnemonic..'(stack0)')
     BYTECODE(me,codeB,'op1_any',mnemonic)
 end
@@ -1320,7 +1320,7 @@ F = {
   ['Var'] = function (me)
     --		ASR(typelen[me.var.tp] or _TP.deref(me.var.tp),me,'must use custom type only as pointer.')
     local tp = (_TP.deref(me.var.tp) and 'ushort') or me.var.tp
-print("Code::Var:",me.var.id,me.var.tp,tp,me.var.arr,_TP.isBasicType( _TP.deref(me.var.tp) or me.var.tp))
+--print("Code::Var:",me.var.id,me.var.tp,tp,me.var.arr,_TP.isBasicType( _TP.deref(me.var.tp) or me.var.tp))
     if _TP.isBasicType( (_TP.deref(me.var.tp) and _TP.deref(_TP.deref(me.var.tp))) or _TP.deref(me.var.tp) or me.var.tp) then
       if me.var.arr then -- needs addr
         codeB = LINE(me,'push_c &'..me.var.id..':'..me.var.tp,nil,'// push &Var ')

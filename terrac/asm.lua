@@ -511,10 +511,10 @@ end
   -- arg={gate,unit,label}
   op_clken_e= function (me,codeB,arg) -- bit2=1
 --lbl    local bytecode = string.format('%02x',(opcode['op_clken_e']) +  _TP.getConstLen(arg[1])*2^3 + _TP.getConstLen(arg[3])*2^2 + arg[2])
-    local bytecode = string.format('%02x',(opcode['op_clken_e']) +  _TP.getConstLen(arg[1])*2^3 + 1*2^2 + arg[2])
+    local bytecode = string.format('%02x',(opcode['op_clken_ve']) +  _TP.getConstLen(arg[1])*2^3 + 1*2^2 + arg[2])
 --lbl    bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytes(arg[3]))
     bytecode = string.format('%s %s %s',bytecode,_TP.getConstBytes(arg[1]),_TP.getConstBytesLbl(arg[3]))
-    local codeA = 'clken_e '..arg[1]..' '..arg[2]..' '..arg[3]
+    local codeA = 'clken_ve '..arg[1]..' '..arg[2]..' '..arg[3]
     OPCODE(me,bytecode,codeA,codeB)     
   end,
  
@@ -549,7 +549,7 @@ end
 
   -- arg={type}
   op_deref= function (me,codeB,arg)      
-    local bytecode = string.format('%02x',(opcode['op_deref']))+typelen[arg[1]]
+    local bytecode = string.format('%02x',(opcode['op_deref'])+typelen[arg[1]])
     local codeA = 'deref '..arg[1]
     OPCODE(me,bytecode,codeA,codeB)
   end, 
