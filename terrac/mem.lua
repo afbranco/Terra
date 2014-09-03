@@ -423,7 +423,7 @@ F = {
         local exp, unit = unpack(me)
         me.ms   = nil
 --afb        me.val  = exp.val .. '*' .. t2n[unit] .. 'L'
-        me.val  = t2idx[unit]..' '..exp.tp..' '..exp.val
+        me.val  = t2idx[unit]..' '..exp.tp..' '.. (exp.val or '--')
         me.accs = exp.accs
     end,
 
