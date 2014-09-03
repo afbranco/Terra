@@ -46,8 +46,10 @@ implementation{
 	BS.snd_NEWPROGVERSION -> RadioAM.AMSend[AM_NEWPROGVERSION];
 	BS.snd_NEWPROGBLOCK -> RadioAM.AMSend[AM_NEWPROGBLOCK];
 	BS.snd_REQPROGBLOCK -> RadioAM.AMSend[AM_REQPROGBLOCK];
+#ifdef MODE_SETDATA
 	BS.snd_SETDATAND -> RadioAM.AMSend[AM_SETDATAND];
 	BS.snd_REQDATA -> RadioAM.AMSend[AM_REQDATA];
+#endif
 	BS.snd_PINGMSG -> RadioAM.AMSend[AM_PINGMSG];
 	BS.snd_CUSTOM_0 -> RadioAM.AMSend[AM_CUSTOM_0];
 	BS.snd_CUSTOM_1 -> RadioAM.AMSend[AM_CUSTOM_1];
@@ -67,8 +69,10 @@ implementation{
 	BS.rec_NEWPROGVERSION -> RadioAM.Receive[AM_NEWPROGVERSION];
 	BS.rec_NEWPROGBLOCK -> RadioAM.Receive[AM_NEWPROGBLOCK];
 	BS.rec_REQPROGBLOCK -> RadioAM.Receive[AM_REQPROGBLOCK];
+#ifdef MODE_SETDATA
 	BS.rec_SETDATAND -> RadioAM.Receive[AM_SETDATAND];
 	BS.rec_REQDATA -> RadioAM.Receive[AM_REQDATA];
+#endif
 	BS.rec_PINGMSG -> RadioAM.Receive[AM_PINGMSG];
 	BS.rec_CUSTOM_0 -> RadioAM.Receive[AM_CUSTOM_0];
 	BS.rec_CUSTOM_1 -> RadioAM.Receive[AM_CUSTOM_1];
@@ -93,9 +97,10 @@ implementation{
 #endif
 	
 	// setData queue - only NEW_DATA_LIST_SIZE last updates
+#ifdef MODE_SETDATA
 	components new dataQueueC(setDataBuff_t,SET_DATA_LIST_SIZE*2,(char)unique("dataQueueC")) as setDataQueue;
 	BS.setDataQ -> setDataQueue;
-
+#endif
 	// Bit vector to control memory blocks
 	components new vmBitVectorC(CURRENT_MAX_BLOCKS) as Bitmap;
 	BS.BM -> Bitmap;	
@@ -118,8 +123,9 @@ implementation{
 	components new TimerMilliC() as SendDataFullTimer;	
 	BS.SendDataFullTimer -> SendDataFullTimer;
 	components new TimerMilliC() as DataReqTimer;	
+#ifdef MODE_SETDATA
 	BS.DataReqTimer -> DataReqTimer;
-
+#endif
 	components LedsC;
 	BS.Leds -> LedsC;
 	components RandomC;

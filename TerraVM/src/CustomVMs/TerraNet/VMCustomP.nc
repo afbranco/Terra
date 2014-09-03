@@ -14,9 +14,19 @@ module VMCustomP{
 	uses interface BSRadio;
 	uses interface SensAct as SA;
 	uses interface Random;
-
+#ifdef M_FFT
+	uses interface kissFFT as KF;
+#endif
+#ifdef M_VOLCANO
+    uses interface ReadStream<int32_t>;
+    uses interface Set<uint32_t> as SetSensorRtime;
+    uses interface Get<uint32_t> as GetSensorRtime;
+    uses interface BlockRead as GModelBlockRead;
+#endif
+#ifdef M_MSG_QUEUE
 	// usrMsg queue
 	uses interface dataQueue as usrDataQ;
+#endif
 }
 implementation{
 
@@ -28,7 +38,9 @@ nx_uint8_t ExtDataSendDoneError;
 nx_uint8_t ExtDataWasAcked;
 nx_uint8_t ExtDataQReady;			// last queue ready - queue size 
 nx_uint32_t ExtDataTimeStamp;		// last SLPL_FIRED - timestamp 
-
+nx_uint8_t ExtDataGModelRdDone;		// last GModelReadDone Status 
+nx_uint16_t ExtDataBufferRdDone;	// last StreamReadDone [error=0 | Count>0]
+nx_uint32_t* UsrStreamBuffer;		// Pointer to user data stream buffer
 /*
  * Output Events implementation
  */
@@ -136,6 +148,15 @@ void  proc_req_custom_a(uint16_t id, uint32_t value){
 	signal VM.queueEvt(I_CUSTOM_A_ID,auxId, &ExtDataCustomA);
 	signal VM.queueEvt(I_CUSTOM_A   ,    0, &ExtDataCustomA);
 	}
+
+#ifdef M_VOLCANO
+void  proc_rd_stream(uint16_t id, uint32_t value){
+	dbg(APPNAME,"Custom::proc_rd_stream(): id=%d value=%d\n",id,value);
+	UsrStreamBuffer = (nx_uint32_t*)signal VM.getRealAddr(value,2);
+	call ReadStream.postBuffer(NULL, 0);
+}
+#endif
+
 	
 /*
  * Function implementation
@@ -154,6 +175,7 @@ void  func_random(uint16_t id){
 	dbg(APPNAME,"Custom::func_random(): func id=%d, Random=%d\n",id,stat);
 	signal VM.push(stat);
 	}
+#ifdef M_MSG_QUEUE
 void  func_qPut(uint16_t id){
 	error_t stat;
 	qData_t* qData_p;
@@ -188,7 +210,109 @@ void  func_qClear(uint16_t id){
 	stat = call usrDataQ.clearAll();
 	signal VM.push(stat);
 	}
-	
+#endif //M_MSG_QUEUE
+
+#ifdef M_FFT
+void  func_fftAlloc(uint16_t id){
+	error_t stat;
+	nx_uint16_t nfft;
+	nx_uint8_t inverse_fft;
+	uint16_t varCfg;
+	uint16_t varLen;
+	void* mem;
+	nx_uint16_t* lenmem;
+	dbg(APPNAME,"Custom::func_fftAlloc(): id=%d\n",id);
+	varLen = (uint16_t)signal VM.pop();	
+	varCfg = (uint16_t)signal VM.pop();	
+	inverse_fft = (uint8_t)signal VM.pop();	
+	nfft = (nx_uint16_t)signal VM.pop();	
+
+	mem = (void*)signal VM.getRealAddr(varCfg,2);
+	lenmem = (void*)signal VM.getRealAddr(varLen,2);
+	stat = call KF.kiss_fftr_alloc(nfft, inverse_fft, mem, lenmem);
+	if (stat!=SUCCESS) signal VM.evtError(E_IDXOVF);
+	signal VM.push(stat);
+	}
+void  func_fft(uint16_t id){
+	error_t stat;
+	uint16_t varCfg,varInData,varOutData;
+	kiss_fftr_cfg cfg;
+	const int32_t* timedata;
+	kiss_fft_cpx* freqdata;
+	dbg(APPNAME,"Custom::func_fft(): id=%d\n",id);
+	varOutData = (uint16_t)signal VM.pop();	
+	varInData = (uint16_t)signal VM.pop();	
+	varCfg = (uint16_t)signal VM.pop();	
+
+	cfg = (void*)signal VM.getRealAddr(varCfg,2);
+	timedata = (void*)signal VM.getRealAddr(varInData,2);
+	freqdata = (void*)signal VM.getRealAddr(varOutData,2);
+
+	call KF.kiss_fftr(cfg, timedata, freqdata);
+	stat = SUCCESS;
+	signal VM.push(stat);
+	}
+#endif	
+
+#ifdef M_VOLCANO
+void  func_GModelRead(uint16_t id){
+	error_t stat;
+	uint8_t* gmodel;
+	uint16_t varGModel;
+	dbg(APPNAME,"Custom::func_GModelRead(): id=%d\n",id);
+	varGModel = (uint16_t)signal VM.pop();
+	gmodel = (void*)signal VM.getRealAddr(varGModel,2);
+	stat = call GModelBlockRead.read(0, gmodel, GMODEL_SIZE);
+	signal VM.push(stat);
+}
+void  func_getRTime(uint16_t id){
+	uint32_t rtime;
+	dbg(APPNAME,"Custom::func_getRTime(): id=%d\n",id);
+	rtime = call GetSensorRtime.get();
+	signal VM.push(rtime);
+}
+void  func_setRTime(uint16_t id){
+	uint32_t rtime;
+	dbg(APPNAME,"Custom::func_setRTime(): id=%d\n",id);
+	rtime = (uint32_t)signal VM.pop();
+	call SetSensorRtime.set(rtime);
+	signal VM.push(SUCCESS);
+}
+#include "bayes_model.h"
+void  func_getNSamples(uint16_t id){
+	uint8_t scale;
+	uint16_t varGModel;
+	ms_gauss_model* gModel;
+	dbg(APPNAME,"Custom::func_setRTime(): id=%d\n",id);
+	scale = (uint16_t)signal VM.pop();
+	varGModel = (uint16_t)signal VM.pop();
+	gModel = (ms_gauss_model*)signal VM.getRealAddr(varGModel,2);
+	// return nSample value
+	if (scale < MS_GAUSS_SCALES)
+		signal VM.push(gModel->nsample[scale]);
+	else
+		signal VM.push(0);
+}
+#include "detect.c"
+void  func_detect(uint16_t id){
+
+	uint8_t scale,decision;
+	uint16_t varGModel,varOutData;
+	ms_gauss_model* gModel;
+	kiss_fft_cpx* outData;
+	dbg(APPNAME,"Custom::func_setRTime(): id=%d\n",id);
+	varOutData = (uint16_t)signal VM.pop();
+	scale = (uint16_t)signal VM.pop();
+	varGModel = (uint16_t)signal VM.pop();
+	outData = (kiss_fft_cpx*)signal VM.getRealAddr(varOutData,2);
+	gModel = (ms_gauss_model*)signal VM.getRealAddr(varGModel,2);
+	// calculate detect()
+	decision = detect(gModel,scale,outData);
+	// return 'detect' value
+	signal VM.push(gModel->nsample[scale]);
+}
+#endif
+
 /**
  *	procOutEvt(uint8_t id)
  *  	procOutEvt - process the out events (emit)
@@ -217,6 +341,9 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		case O_CFG_INT_A 	: proc_cfg_int_a(id,value); break;
 		case O_CFG_INT_B 	: proc_cfg_int_b(id,value); break;
 		case O_CUSTOM_A : proc_req_custom_a(id,value); break;
+#ifdef M_VOLCANO
+		case O_RD_STREAM : proc_rd_stream(id,value); break;
+#endif
 	}
 }
 
@@ -226,10 +353,23 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		switch (id){
 			case F_GETNODEID: func_getNodeId(id); break;
 			case F_RANDOM 	: func_random(id); break;
+#ifdef M_MSG_QUEUE
 			case F_QPUT 	: func_qPut(id); break;
 			case F_QGET 	: func_qGet(id); break;
 			case F_QSIZE 	: func_qSize(id); break;
 			case F_QCLEAR 	: func_qClear(id); break;		
+#endif
+#ifdef M_FFT
+			case F_FFT_ALLOC: func_fftAlloc(id); break;
+			case F_FFT 		: func_fft(id); break;
+#endif
+#ifdef M_VOLCANO
+			case F_GMODEL_READ   : func_GModelRead(id); break;
+			case F_GET_RTIME     : func_getRTime(id); break;
+			case F_SET_RTIME     : func_setRTime(id); break;
+			case F_GET_NSAMPLES  : func_getNSamples(id); break;
+			case F_DETECT        : func_detect(id); break;
+#endif
 		}
 	}
 
@@ -302,11 +442,34 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 /**
  * Custom usrDataueue
  */
+#ifdef M_MSG_QUEUE
 	event void usrDataQ.dataReady(){
 		dbg(APPNAME,"Custom::usrDataQ.dataReady()\n");
 		// Queue the custom event
 		ExtDataQReady = call usrDataQ.size();
 		signal VM.queueEvt(I_Q_READY, 0, &ExtDataQReady);
 	}
+#endif
+
+/**
+ * Volcano module
+ */
+#ifdef M_VOLCANO
+	event void ReadStream.bufferDone(error_t result, int32_t* buf, uint16_t count){
+		uint16_t i;
+		ExtDataBufferRdDone = (result==SUCCESS)?count:0;
+		for (i=0; i < count;i++) UsrStreamBuffer[i] = buf[i];
+		signal VM.queueEvt(I_STREAM_RD_DONE, 0, &ExtDataBufferRdDone);		
+	}
+	
+	event void ReadStream.readDone(error_t result, uint32_t usActualPerid){}
+
+	event void GModelBlockRead.computeCrcDone(storage_addr_t addr, storage_len_t len, uint16_t crc, error_t error) {}
+
+	event void GModelBlockRead.readDone(storage_addr_t addr, void *buf_, storage_len_t len, error_t error) {
+		ExtDataGModelRdDone = error;
+		signal VM.queueEvt(I_GMODEL_RD_DONE, 0, &ExtDataGModelRdDone);  	
+  }
+#endif
 
 }

@@ -146,14 +146,13 @@ void TViewer(char* cmd,uint16_t p1, uint16_t p2){
 	TViewer("error",ecode,0);
 
 }
-
 	/*
 	 * Get constant values from program memory. Convert big-endian to the local type endian.
 	 */
 	uint8_t getPar8(uint8_t p_len){
 		uint8_t temp=(uint8_t)CEU_data[PC];
 		PC++;
-		dbg(APPNAME,"VM::getPar8: PC=%d, p_len=%d, value=%d\n",PC,p_len,temp);
+		dbg(APPNAME,"VM::getPar8: PC=%d, p_len=%d, value=%d\n",PC-1,p_len,temp);
 		return temp;
 	}
 	uint16_t getPar16(uint8_t p_len){
@@ -187,11 +186,10 @@ void TViewer(char* cmd,uint16_t p1, uint16_t p2){
 
 uint32_t unit2val(uint32_t val, uint8_t unit){
 	switch (unit){  // result in 'ms'
-		case 0: return (uint32_t)(val/1000L);		// us
-		case 1: return (uint32_t)(val);				// ms
-		case 2: return (uint32_t)(val*1000L);		// seg
-		case 3: return (uint32_t)(val*60L*1000L);		// min
-		case 4: return (uint32_t)(val*60L*60L*1000L);	// h
+		case 0: return (uint32_t)(val);				// ms
+		case 1: return (uint32_t)(val*1000L);		// seg
+		case 2: return (uint32_t)(val*60L*1000L);		// min
+		case 3: return (uint32_t)(val*60L*60L*1000L);	// h
 	}
 	return val;
 }
@@ -697,6 +695,7 @@ void execTrail(uint16_t lbl){
 	while (Opcode != op_end){
 	    if (haltedFlag) return;
 		Decoder(Opcode,Param1);
+//dbg(APPNAME,"CEU::execTrail(): m[97/98]=%d,%d\n",*(uint8_t*)(MEM+97),*(uint8_t*)(MEM+98));
 		getOpCode(&Opcode,&Param1);
 	}
 	dbg(APPNAME,"CEU::execTrail(%d):: found an 'end' opcode\n",lbl);
@@ -1166,8 +1165,9 @@ void f_memclr(uint8_t Modifier){
 	len = getPar16(p2_1len);
 	dbg(APPNAME,"VM::f_memclr(%02x): Maddr=%d, len=%d\n",Modifier,Maddr,len);
 	dbg("VMDBG","VM:: clear clock/gate entry.\n");
-	memset((MEM+Maddr),0,len);
-	//{int x; for (x=0; x< len;x++) *(uint8_t*)(MEM+Maddr+x)=0;} 
+	//memset((MEM+Maddr),0,len); //does not work in TOSSIM
+	{int x; for (x=0; x< len;x++) *(uint8_t*)(MEM+Maddr+x)=0;} 
+	dbg(APPNAME,"VM::f_memclr(): m[97/98]=%d,%d\n",*(uint8_t*)(MEM+97),*(uint8_t*)(MEM+98));
 	}
 	
 void f_getextdt_v(uint8_t Modifier){
@@ -1401,9 +1401,9 @@ void f_clken_ve(uint8_t Modifier){
 		unit = getPar8(1);
 		VtimeAddr = getPar16(2);
 		lbl = getPar16(2);
-		Time = getMVal(((uint16_t)MEM+VtimeAddr),v3_len); 
-		dbg(APPNAME,"VM::f_clken_v(%02x): p1_1len=%d, v3_len=%d, gate=%d, unit=%d, Vtime=%d, lbl=%d\n",
-			Modifier,p1_1len,v3_len,gate,unit,VtimeAddr,lbl);
+		Time = getMVal(VtimeAddr,v3_len); 
+		dbg(APPNAME,"VM::f_clken_v(%02x): p1_1len=%d, v3_len=%d, gate=%d, unit=%d, VtimeAddr=%d, Time=%d, lbl=%d, Time(ms)=%d\n",
+			Modifier,p1_1len,v3_len,gate,unit,VtimeAddr, Time,lbl,(s32)unit2val(Time,unit));
 		dbg("VMDBG","VM:: await timer %ld for label %d\n",(s32)unit2val(Time,unit), lbl);
 		ceu_wclock_enable(gate, (s32)unit2val(Time,unit), lbl);
 	} else {
@@ -1411,7 +1411,7 @@ void f_clken_ve(uint8_t Modifier){
 		uint16_t gate,lbl;
 		uint32_t Time=0;
 		p1_1len = (uint8_t)(1<<((Modifier & 0x08)>>3));
-		unit = (uint8_t)(1<<(Modifier & 0x03));
+		unit = (uint8_t)((Modifier & 0x03));
 		gate = getPar16(p1_1len);
 		lbl = getPar16(2);
 		Time = pop();
@@ -1726,6 +1726,11 @@ void f_tkins_z(uint8_t Modifier){
 		dbg(APPNAME,"VM::BSUpload.loadSection(): blk=%d, Addr=%d, Size=%d 1stByte=%d\n",(uint8_t)(Addr/BLOCK_SIZE),Addr,Size,CEU_data[Addr]);
 	}
 	
+	event void VMCustom.evtError(uint8_t ecode){ 
+#ifndef ONLY_BSTATION
+	evtError(ecode);
+#endif
+	}
 	
 	
 }

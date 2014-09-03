@@ -6,9 +6,9 @@ enum{
 	// Sensor control BIT (Identify request sources) max=4 - 0..3)
 	SENSOR_CTL_BIT = 6,
 	REQ_SOURCE1 = 0,	// Used for VM requests
-	REQ_SOURCE2 = 1,	// TDB
-	REQ_SOURCE3 = 2,	// TDB
-	REQ_SOURCE4 = 3,	// TDB
+	REQ_SOURCE2 = 1,	// Used for GRP-AggregReq
+	REQ_SOURCE3 = 2,	// Used for GRP-AggregLocal
+	REQ_SOURCE4 = 3,	// Used for GRP-Election
 	
 	// Actuator IDs (max 31)
 	AID_LEDS = 1,

@@ -7,8 +7,10 @@
 #ifndef VMCUSTOM_H
 #define VMCUSTOM_H
 
-#include "../../VMData.h"
-#include "../../VMError.h"
+#include "VMData.h" //"../../VMData.h"
+#include "VMError.h" //"../../VMError.h"
+
+#include "kissFFTConfig.h"
 
 
 enum{
@@ -21,7 +23,7 @@ enum{
 	O_LED2			=8,
 	O_TEMP			=9,
 	O_PHOTO			=10,
-	O_VOLTS			=22,
+	O_VOLTS			=11,
 	O_PORT_A		=12,
 	O_PORT_B		=13,
 	O_CFG_PORT_A	=14,
@@ -34,7 +36,8 @@ enum{
 	// TerraNet Custom Output events
 	O_SEND			=40,
 	O_SEND_ACK		=41,
-
+	// Volcano Output event
+	O_RD_STREAM		=50,
 
 	// TerraNet Local Input events
 //	I_ERROR_id		=0,  // Defined in VMError.h
@@ -56,7 +59,9 @@ enum{
 	I_RECEIVE_ID		=44,
 	I_RECEIVE			=45,
 	I_Q_READY 			=46,
-
+	// Volcano Input events
+	I_GMODEL_RD_DONE 	=50,
+	I_STREAM_RD_DONE	=51,
 	
 	// TerraNet basic functions
 	F_GETNODEID 	= 0,
@@ -66,7 +71,17 @@ enum{
 	F_QGET 			= 11,
 	F_QSIZE 		= 12,
 	F_QCLEAR 		= 13,
-	
+	F_FFT_ALLOC 	= 14,
+	F_FFT 			= 15,
+	// Volcano custom functions
+	F_GMODEL_READ	= 20,
+	F_GET_RTIME		= 21,
+	F_SET_RTIME		= 22,
+	F_GET_NSAMPLES	= 23,
+	F_DETECT		= 24,
+
+	// GModel internal constants
+	GMODEL_SIZE = (8*FEATURE_DIM) + 4  + ((8*MS_GAUSS_SCALES)*(1 + FEATURE_DIM)),
 	
 	// Event Type ID - 3 msb bits of EvtId
 	TID_SENSOR_DONE = 0 << 5,

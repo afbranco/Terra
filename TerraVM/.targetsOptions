@@ -13,7 +13,7 @@
 </excludes>
 <typedefs/>
 <macros>
-<macro content="0" name="MODULE_CTP" ncc="true" yeti="true"/>
+<macro content="1" name="MODULE_CTP" ncc="true" yeti="true"/>
 </macros>
 <boards>
 <board>mts300</board>

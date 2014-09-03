@@ -21,6 +21,23 @@ implementation{
 	custom.Random -> RandomC;
 	
 	// Custom Queues
+#ifdef M_MSG_QUEUE
 	components new dataQueueC(qData_t,USRMSG_QSIZE,(char)unique("dataQueueC")) as usrDataQ;
 	custom.usrDataQ -> usrDataQ;
+#endif
+
+	// FFT Module
+#ifdef M_FFT
+	components kissFFTC as KF;
+	custom.KF -> KF;
+#endif
+	// Volcano Data Module (GModel & Sensor Stream)
+#ifdef M_VOLCANO
+	components VolcanoDataC as VCN;
+	custom.ReadStream -> VCN.ReadStream;
+	custom.SetSensorRtime -> VCN;
+	custom.GetSensorRtime -> VCN;
+	custom.GModelBlockRead -> VCN.BlockRead;
+#endif
+
 }

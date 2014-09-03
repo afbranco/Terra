@@ -29,8 +29,10 @@ module BasicServicesP{
     uses interface AMSend as snd_NEWPROGVERSION;
     uses interface AMSend as snd_NEWPROGBLOCK;
     uses interface AMSend as snd_REQPROGBLOCK;
+#ifdef MODE_SETDATA
     uses interface AMSend as snd_SETDATAND;
     uses interface AMSend as snd_REQDATA;
+#endif
     uses interface AMSend as snd_PINGMSG;
     uses interface AMSend as snd_CUSTOM_0;
     uses interface AMSend as snd_CUSTOM_1;
@@ -49,8 +51,10 @@ module BasicServicesP{
     uses interface Receive as rec_NEWPROGVERSION;
     uses interface Receive as rec_NEWPROGBLOCK;
     uses interface Receive as rec_REQPROGBLOCK;
+#ifdef MODE_SETDATA
     uses interface Receive as rec_SETDATAND;
     uses interface Receive as rec_REQDATA;
+#endif
     uses interface Receive as rec_PINGMSG;
     uses interface Receive as rec_CUSTOM_0;
     uses interface Receive as rec_CUSTOM_1;
@@ -78,7 +82,9 @@ module BasicServicesP{
 	uses {
 		
 		// setData queue
+#ifdef MODE_SETDATA
 		interface dataQueue as setDataQ;
+#endif
 		// Bitmap
 		interface vmBitVector as BM;
 		/* Messages Queue */
@@ -91,8 +97,9 @@ module BasicServicesP{
 		interface Timer<TMilli> as sendTimer;
 		interface Timer<TMilli> as ProgReqTimer;
 		interface Timer<TMilli> as SendDataFullTimer;
+#ifdef MODE_SETDATA
 		interface Timer<TMilli> as DataReqTimer;
-
+#endif
 		interface Leds;
 		interface Random;
 
@@ -160,8 +167,9 @@ implementation{
 	void sendNewProgVersion(newProgVersion_t *Data);
 	void sendNewProgBlock(newProgBlock_t *Data);
 	void sendReqData(reqData_t *Data);
+#ifdef MODE_SETDATA
 	void sendSetDataND(setDataND_t *Data);	
-	
+#endif	
 	void TViewer(char* cmd,uint16_t p1, uint16_t p2){
 		dbg("TVIEW","<<: %s %d %d %d :>>\n",cmd,TOS_NODE_ID,p1,p2);
 		}	
@@ -316,6 +324,7 @@ implementation{
 	 * 
 	 * @param seq Sequence number to be checked
 	 */
+#ifdef MODE_SETDATA
 	uint8_t hasDataSeq(uint16_t seq){
 		uint16_t i=0;
 		setDataBuff_t Buff;
@@ -326,9 +335,9 @@ implementation{
 		}
 		return (SET_DATA_LIST_SIZE*2);
 	}
+#endif
 
 	void maxDataSeq(nx_uint16_t seq){	maxSeenDataSeq=(maxSeenDataSeq<seq)?seq:maxSeenDataSeq;}
-
 
 /* **************************************************************\
 *             Messages receive
@@ -524,8 +533,10 @@ implementation{
     event message_t * rec_NEWPROGVERSION.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_NEWPROGVERSION,msg,payload,len);}
     event message_t * rec_NEWPROGBLOCK.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_NEWPROGBLOCK,msg,payload,len);}
     event message_t * rec_REQPROGBLOCK.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_REQPROGBLOCK,msg,payload,len);}
+#ifdef MODE_SETDATA
     event message_t * rec_SETDATAND.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_SETDATAND,msg,payload,len);}
     event message_t * rec_REQDATA.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_REQDATA,msg,payload,len);}
+#endif
     event message_t * rec_PINGMSG.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_PINGMSG,msg,payload,len);}
     event message_t * rec_CUSTOM_0.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_CUSTOM_0,msg,payload,len);}
     event message_t * rec_CUSTOM_1.receive(message_t *msg, void *payload, uint8_t len){return RadioReceiver_receive(AM_CUSTOM_1,msg,payload,len);}
@@ -547,7 +558,6 @@ implementation{
  	 * @param Data Message data
  	 */ 
  	void procNewProgVersion(newProgVersion_t* Data){
- 		reqProgBlock_t xData;
 		dbg(APPNAME, "BS::procNewProgVersion().\n");
 		call Leds.set(7);
 		// Stop the VM
@@ -568,19 +578,22 @@ implementation{
  		// reset all memory (leave set unused blocks)
  		atomic call BM.resetRange(ProgBlockStart,(ProgBlockStart+ProgBlockLen)-1);
  		//printBM();
- 		// send a recProgBlock full
- 		ProgTimeOutCounter=0;
-	 	xData.reqOper=RO_DATA_FULL;
-	 	ReqState = RO_DATA_FULL;
-	 	xData.versionId = ProgVersion;
-	 	xData.blockId = ProgBlockStart;
-	 	loadingProgramFlag = TRUE;
-	 	sendReqProgBlock(&xData);
-	 	// Wait next block up to time-out
-		if (MoteID != BStation)
-	 		call ProgReqTimer.startOneShot(REQUEST_TIMEOUT);
-	 	else
-	 		call ProgReqTimer.startOneShot(REQUEST_TIMEOUT_BS);	 	
+		{
+	 		reqProgBlock_t xData;
+	 		// send a recProgBlock full
+	 		ProgTimeOutCounter=0;
+		 	xData.reqOper=RO_DATA_FULL;
+		 	ReqState = RO_DATA_FULL;
+		 	xData.versionId = ProgVersion;
+		 	xData.blockId = ProgBlockStart;
+		 	loadingProgramFlag = TRUE;
+		 	sendReqProgBlock(&xData);
+		 	// Wait next block up to time-out
+			if (MoteID != BStation)
+		 		call ProgReqTimer.startOneShot(REQUEST_TIMEOUT);
+		 	else
+		 		call ProgReqTimer.startOneShot(REQUEST_TIMEOUT_BS);	
+		}
  	}
  	/**
  	 * Process a received newProgBlock message
@@ -590,7 +603,6 @@ implementation{
 		 uint8_t lData[BLOCK_SIZE];
 		 uint16_t i;
 		 uint16_t Addr=0;
-		 newProgVersion_t xVersion;
 		 dbg(APPNAME, "BS::procNewProgBlock(). version=%hhu, blockId=%hhu, ReqState=%d\n",Data->versionId,Data->blockId,ReqState);
 		 call Leds.led0Toggle();		 
 //		printf("prc_nb%d.",Data->blockId);printfflush();
@@ -615,12 +627,15 @@ implementation{
 				TViewer("vmstart",0,0);
 				signal BSUpload.start(TRUE);
 			} else {
+#ifndef NO_BSTATION
+		 		newProgVersion_t xVersion;
 				// BStation - Do not start VM and broadcast newProgVersion.
 				xVersion.versionId = ProgVersion;
 			 	xVersion.blockLen = ProgBlockLen;
 			 	xVersion.blockStart = ProgBlockStart;
 			 	signal BSUpload.getEnv(&xVersion);
 			 	sendNewProgVersion(&xVersion);				
+#endif
 			}
 		 } else {
 		 	// Wait next block
@@ -628,6 +643,7 @@ implementation{
 			if (MoteID != BStation){
 		 		call ProgReqTimer.startOneShot(REQUEST_TIMEOUT);
 		 	} else {
+#ifndef NO_BSTATION
 		 		// if BS, request next block 
 			 	serialReqProgBlock.reqOper=RO_DATA_FULL;
 				ReqState = RO_DATA_FULL;
@@ -635,6 +651,7 @@ implementation{
 				serialReqProgBlock.blockId = Data->blockId+1;
 				sendReqProgBlock(&serialReqProgBlock);
 		 		call ProgReqTimer.startOneShot(REQUEST_TIMEOUT_BS);
+#endif
 		 		}
 		 }
 	 }
@@ -787,6 +804,7 @@ implementation{
  	 * Process a received setDataND message
  	 * @param Data Message data
  	 */ 	
+#ifdef MODE_SETDATA
 	void procSetDataND(setDataND_t* Data){
  		setDataBuff_t buff;
 		uint8_t lData[SET_DATA_SIZE],secp=0,secLen;
@@ -819,6 +837,8 @@ implementation{
 					}
 					//signal BSUpload.start(TRUE);
 				} else {
+#ifndef NO_BSTATION
+
 					for (x=0;x<Data->nSections;x++){
 						secAddr=Data->Data[secp++];
 						secAddr = secAddr + (Data->Data[secp++] << 8); 
@@ -826,6 +846,7 @@ implementation{
 						for (i=0; i < secLen; i++) lData[i] = Data->Data[secp++];
 						signal BSUpload.loadSection(secAddr , secLen, &lData[0]);
 					}
+#endif
 				}
 			} else {
 				dbg(APPNAME, "BS::procSetDataND(): Is not to me! Target=%hhu.\n",Data->targetMote);				
@@ -854,10 +875,12 @@ implementation{
 			}
 		}	
  	}
+#endif
  	/**
  	 * Process a received reqData message
  	 * @param Data Message data
  	 */
+#ifdef MODE_SETDATA
 	void procReqData(reqData_t* Data){
 		uint8_t idx=0;
 		setDataBuff_t Buff;
@@ -892,7 +915,7 @@ implementation{
 			dbg(APPNAME, "BS::DataReqTimer.fired(): Requested all expected setData\n");
 		}
 	}
-
+#endif
 	/**
 	* Process each event from input Queue
 	*/
@@ -907,8 +930,10 @@ implementation{
 					case AM_NEWPROGVERSION: procNewProgVersion((newProgVersion_t*)&tempOutputInQ.Data); break;
 					case AM_NEWPROGBLOCK: procNewProgBlock((newProgBlock_t*) &tempOutputInQ.Data); break;
 					case AM_REQPROGBLOCK: procRecReqProgBlock((reqProgBlock_t*) &tempOutputInQ.Data); break;
+#ifdef MODE_SETDATA
 					case AM_SETDATAND: procSetDataND((setDataND_t*) &tempOutputInQ.Data); break;
 					case AM_REQDATA: procReqData((reqData_t*) &tempOutputInQ.Data); break;
+#endif
 					default: dbg(APPNAME, "BS::procInputEvent(): Unknow AM_ID=%hhu\n",tempOutputInQ.AM_ID); break;
 				}
 #ifndef ONLY_BSTATION
@@ -968,8 +993,10 @@ implementation{
 				case AM_NEWPROGVERSION	: return call snd_NEWPROGVERSION.send(target, msg, len); break;
 				case AM_NEWPROGBLOCK 	: return call snd_NEWPROGBLOCK.send(target, msg, len); break;
 				case AM_REQPROGBLOCK 	: return call snd_REQPROGBLOCK.send(target, msg, len); break;
+#ifdef MODE_SETDATA
 				case AM_SETDATAND 		: return call snd_SETDATAND.send(target, msg, len); break;
 				case AM_REQDATA 		: return call snd_REQDATA.send(target, msg, len); break;
+#endif
 				case AM_PINGMSG 		: return call snd_PINGMSG.send(target, msg, len); break;
 				case AM_CUSTOM_0 		: return call snd_CUSTOM_0.send(target, msg, len); break;
 				case AM_CUSTOM_1 		: return call snd_CUSTOM_1.send(target, msg, len); break;
@@ -1046,6 +1073,7 @@ implementation{
 					sendSerialN();
 				}			
 				break;
+#ifdef MODE_SETDATA
 			case AM_SETDATAND: sendRadioN(); break;
 			case AM_REQDATA: 
 				// Send to Radio or UART
@@ -1055,6 +1083,7 @@ implementation{
 					sendSerialN();
 				}
 				break;
+#endif
 			default: 
 				if (tempOutputOutQ.AM_ID >= AM_CUSTOM_START && tempOutputOutQ.AM_ID <= AM_CUSTOM_END) { // AM_CUSTOM Range
 					// Send to Radio or UART
@@ -1162,8 +1191,10 @@ implementation{
     event void snd_NEWPROGVERSION.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_NEWPROGVERSION,msg,error);}
     event void snd_NEWPROGBLOCK.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_NEWPROGBLOCK,msg,error);}
     event void snd_REQPROGBLOCK.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_REQPROGBLOCK,msg,error);}
+#ifdef MODE_SETDATA
     event void snd_SETDATAND.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_SETDATAND,msg,error);}
     event void snd_REQDATA.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_REQDATA,msg,error);}
+#endif
     event void snd_PINGMSG.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_PINGMSG,msg,error);}
     event void snd_CUSTOM_0.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_CUSTOM_0,msg,error);}
     event void snd_CUSTOM_1.sendDone(message_t *msg, error_t error){RadioSender_sendDone(AM_CUSTOM_1,msg,error);}
@@ -1279,6 +1310,7 @@ implementation{
 	* Insert a SetDataND message in output queue
 	* @param Data Message data
 	*/
+#ifdef MODE_SETDATA
 	void sendSetDataND(setDataND_t *Data){
 		dbg(APPNAME, "BS::sendSetDataND(): insert in outQueue\n");		
 		memcpy(&tempInputOutQ.Data,Data,sizeof(setDataND_t));
@@ -1290,7 +1322,7 @@ implementation{
 			dbg(APPNAME, "BS::sendSetDataND(): outQueue is full! Losting a message.\n");
 		}
 	}	
-
+#endif
 	/**
 	 * Custom Send Message - queue the message to send via radio
 	 */
@@ -1423,7 +1455,7 @@ implementation{
 		memcpy(&Data,payload,sizeof(newProgBlock_t));
 		procNewProgBlock(&Data);
 	}
-
+#ifdef MODE_SETDATA
 	void recSerialSetDataND_receive(message_t *msg, void *payload, uint8_t len){
 		setDataND_t *xmsg;
 		dbg(APPNAME, "BS::recSerialSetDataND_receive():\n");
@@ -1444,7 +1476,7 @@ implementation{
 			if (call outQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recSerialSetDataND_receive(): outQueue is full! Losting a message.\n");		
 			}
 	}
-
+#endif
 
 	event message_t * SerialReceiver.receive[am_id_t id](message_t *msg, void *payload, uint8_t len){
 		dbg(APPNAME, "BS::SerialReceiver.receive(): AM=%hhu\n",id);
@@ -1456,9 +1488,11 @@ implementation{
 			case AM_NEWPROGBLOCK:
 				recSerialNewProgBlock_receive(msg,payload,len);
 				break;			
+#ifdef MODE_SETDATA
 			case AM_SETDATAND:
 				recSerialSetDataND_receive(msg,payload,len);
 				break;						
+#endif
 			default:
 				break;
 		}
@@ -1470,7 +1504,8 @@ implementation{
 
 
 	// Not using Queue dataReady event
+#ifdef MODE_SETDATA
 	event void setDataQ.dataReady(){}
-
+#endif
 
 }

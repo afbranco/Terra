@@ -17,12 +17,19 @@ configuration SensActC{
 implementation{
 	components SensActP;
 #ifdef TOSSIM
+	components dataSensorC as dtSensor;
+	SensActP.S_TEMP -> dtSensor.Temp;
+	SensActP.S_PHOTO -> dtSensor.Photo;
+	SensActP.S_VOLT -> dtSensor.Volt;
+
+/*
 	components new DemoSensorC() as S_TEMP;
 	components new DemoSensorC() as S_PHOTO;
 	components new DemoSensorC() as S_VOLT;
 	SensActP.S_TEMP -> S_TEMP;
 	SensActP.S_PHOTO -> S_PHOTO;
 	SensActP.S_VOLT -> S_VOLT;
+* */
 #elif defined(PLATFORM_MICAZ) || defined(PLATFORM_MICA2) || defined(PLATFORM_MICA2DOT)
 	components new TempC() as S_TEMP;
 	components new PhotoC() as S_PHOTO;
@@ -43,7 +50,6 @@ implementation{
 	SAinterface = SensActP.SA;
 	SensActP.A_LEDS -> A_LEDS;
 
-
 #ifndef TOSSIM
 #if defined(PLATFORM_MICAZ) || defined(PLATFORM_MICA2)
 	components MicaBusC as Bus;
@@ -52,12 +58,12 @@ implementation{
 #if TOSVERSION >= 212
 	SensActP.A_INT1 -> Bus.Int0_Interrupt;
 	SensActP.A_INT2 -> Bus.Int1_Interrupt;
-#endif
+#endif // TOSVERSION >= 212
 #if TOSVERSION <= 211
 	components HplAtm128InterruptC as GenIOCInt;
 	SensActP.A_INT1 -> GenIOCInt.Int0;
 	SensActP.A_INT2 -> GenIOCInt.Int1;
-#endif
+#endif //TOSVERSION <= 211
 //--	components HplAtm128GeneralIOC as GenIOC; // MicaZ
 //	components HplAtm128InterruptC as GenIOCInt; // MicaZ
 //--	SensActP.A_PIN1 -> GenIOC.PortC4;
@@ -67,8 +73,8 @@ implementation{
 #elif defined(PLATFORM_TELOSB)
 
 
-#endif
+#endif // #if defined(...)
 
-#endif	
+#endif	// TOSSIM
 	
 }

@@ -5,6 +5,8 @@ import pygame
 from pygame.locals import *
 from collections import deque
 import re
+import select
+from struct import *
 
 BLACK = (  0,   0,   0)
 WHITE = (255, 255, 255)
@@ -52,6 +54,9 @@ class gNode:
         screen.blit(self.text, [self.xx+2*zoom,self.yy+2*zoom])
         self.LedsValue=0
         self.setLeds(self.LedsValue)
+        self.sensorValue(1)
+        self.sensorValue(2)
+        self.sensorValue(3)
         pygame.display.update(rect)
     def update(self):
         self.xx = nodeDist*self.column + offset
@@ -65,6 +70,9 @@ class gNode:
         self.sensor(1)
         self.sensor(2)
         self.sensor(3)
+        self.sensorValue(1)
+        self.sensorValue(3)
+        self.sensorValue(2)
         if self.isStarted:
             self.vmstart()
         else:
@@ -188,6 +196,34 @@ class gNode:
             pygame.display.update(pygame.draw.lines(screen,BLUE,False,points,1))
             eraseQueue.append((pygame.time.get_ticks()+eraseTime,points))
 
+    def sensorValue(self,stype):
+        global sData
+        self.sfont = pygame.font.SysFont("dejavusans", 3*zoom)
+        if self.id > 1 :
+            if stype == 1:
+                self.s1text = self.sfont.render(format(sData[(self.id*3)+stype-1],'04d'), 1, GRAY,BACKGROUND)
+                screen.blit(self.s1text, [self.xx+nodeSize-8*zoom,self.yy+nodeSize-11*zoom])
+                pygame.display.update()
+            elif stype == 2:
+                self.s2text = self.sfont.render(format(sData[(self.id*3)+stype-1],'04d'), 1, GRAY,BACKGROUND)
+                screen.blit(self.s2text, [self.xx+nodeSize-8*zoom,self.yy+nodeSize-15*zoom])
+                pygame.display.update()
+            else :
+                self.s3text = self.sfont.render(format(sData[(self.id*3)+stype-1],'04d'), 1, GRAY,BACKGROUND)
+                screen.blit(self.s3text, [self.xx+nodeSize-8*zoom,self.yy+nodeSize-19*zoom])
+                pygame.display.update()
+        else:
+            if stype == 1:
+                self.s1text = self.sfont.render('temp', 1, GRAY,BACKGROUND)
+                screen.blit(self.s1text, [self.xx+nodeSize-10*zoom,self.yy+nodeSize-11*zoom])
+            elif stype == 2:
+                self.s2text = self.sfont.render('photo', 1, GRAY,BACKGROUND)
+                screen.blit(self.s2text, [self.xx+nodeSize-10*zoom,self.yy+nodeSize-15*zoom])
+            else :
+                self.s3text = self.sfont.render('volts', 1, GRAY,BACKGROUND)
+                screen.blit(self.s3text, [self.xx+nodeSize-10*zoom,self.yy+nodeSize-19*zoom])
+        
+
     def sensor(self,stype):
         if stype == 1:
             color = RED
@@ -214,16 +250,16 @@ class gNode:
     def serial(self,stype):
         if stype == 0:  # out
             color = RED
-            p1 = [self.xx+nodeSize-4*zoom,self.yy+2*zoom]
-            p2 = [self.xx+nodeSize-2*zoom,self.yy+2*zoom]
-            p3 = [self.xx+nodeSize-2*zoom,self.yy+3*zoom]
-            p4 = [self.xx+nodeSize-4*zoom,self.yy+3*zoom]
+            p1 = [self.xx+2*zoom,self.yy+1*zoom]
+            p2 = [self.xx+4*zoom,self.yy+1*zoom]
+            p3 = [self.xx+4*zoom,self.yy+2*zoom]
+            p4 = [self.xx+2*zoom,self.yy+2*zoom]
         else:           # in
             color = BLUE
-            p1 = [self.xx+nodeSize-4*zoom,self.yy+4*zoom]
-            p2 = [self.xx+nodeSize-2*zoom,self.yy+4*zoom]
-            p3 = [self.xx+nodeSize-2*zoom,self.yy+5*zoom]
-            p4 = [self.xx+nodeSize-4*zoom,self.yy+5*zoom]
+            p1 = [self.xx+5*zoom,self.yy+1*zoom]
+            p2 = [self.xx+7*zoom,self.yy+1*zoom]
+            p3 = [self.xx+7*zoom,self.yy+2*zoom]
+            p4 = [self.xx+5*zoom,self.yy+2*zoom]
         points = [p1,p2,p3,p4,p1]
         pygame.display.update(pygame.draw.lines(screen,color,False,points,1))
         eraseQueue.append((pygame.time.get_ticks()+eraseTime,points))
@@ -236,6 +272,8 @@ class gNode:
             pygame.draw.rect(screen,RED,self.node,1)
             pygame.display.update(self.node)
 
+    def getXY(self):
+        return (self.xx, self.yy)
   
 ##################
 #
@@ -273,17 +311,6 @@ def procCMD(cmd,node,p1,p2):
 
 def clock(node,param,p2):
     global globalClock
-    global zoom
-    # exit?
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            exit(0)
-        elif event.type == VIDEORESIZE:
-            xw,xh = event.size
-            zoom = calcZoom(xw,xh)
-            #print "new zoom=",zoom, xw,xh
-            update((xw,xh))
-        
     globalClock = param
     if globalClock%1000 == 0:
         text = globalFont.render(" {}s of {}s [zoom: x{}] ".format(globalClock/1000,runTime,zoom), 1, BLACK,BACKGROUND)
@@ -324,6 +351,7 @@ def init(_nCols,_nLines,p2):
     global nLines
     global nCols
     global offset
+    global hasDisplay
 
     nLines = _nLines
     nCols = _nCols
@@ -356,6 +384,8 @@ def init(_nCols,_nLines,p2):
     screen.blit(background, (0, 0))
     pygame.display.flip()
     clock(0,0,0)
+    hasDisplay = True
+    readSData()
 
 
 def end(node,p1,p2):
@@ -432,14 +462,63 @@ def update(ScreenSize):
         if gNodes[index]!=0 :
             gNodes[index].update()
 
+
+def writeSData():
+    buff = pack('300H',*sData)
+    fData = open('sensors.bin', "wb")
+    fData.write(buff)
+    fData.close()
+
+def readSData():
+    global sData
+    fData = open('sensors.bin', "rb")
+    buff = fData.read(600)
+    sData = unpack('300H',buff)
+    fData.close()
+
+def mouseClick(button,pos):
+    global sData
+    nodeId = ((pos[0]/nodeDist)*10 + (pos[1]/nodeDist)+1)
+    if nodeId<100 and gNodes[nodeId]!=0 :
+        nodeXY = gNodes[nodeId].getXY()
+        dx = (pos[0] - nodeXY[0])/zoom
+        dy = (pos[1] - nodeXY[1])/zoom
+        sId=0
+        if (dx>=10 and dx <=_nodeSize) and (dy>=1 and dy <= 11):
+            if (dy>=1 and dy <= 3):
+                sId = 3
+            elif (dy>=5 and dy <= 7):
+                sId = 2
+            elif (dy>=9 and dy <= 11):
+                sId = 1
+        if (sId>0):
+            step = 0
+            if (button==(1,0,0)):
+                step = 10
+            if (button==(0,0,1)):
+                step = -10
+            lData = list(sData)
+            lData[(nodeId*3)+sId-1]=lData[(nodeId*3)+sId-1]+step
+            if lData[(nodeId*3)+sId-1] < 0:
+                lData[(nodeId*3)+sId-1] = 0
+            if lData[(nodeId*3)+sId-1] > 0x03ff:
+                lData[(nodeId*3)+sId-1] = 0x03ff
+            sData = tuple(lData)
+            gNodes[nodeId].sensorValue(sId)
+            writeSData()
+    
+
 #print "BEGIN --------------------------------------------"
 
 #inCMD = open("./TViewer.txt",'r')
 inCMD = sys.stdin
+hasDisplay=False
 
 while 1:
-    line = inCMD.readline()
-    if len(line)>0:
+    status = select.select([inCMD], [], [], 0.01)[0]
+    if (status):
+      line = inCMD.readline()
+      if len(line)>0:
         if screen:
             pygame.event.pump()
         a1 = re.split('<<:',line)
@@ -448,6 +527,18 @@ while 1:
             cmd = re.split('\s+',a2[0].strip())
             #print cmd
             procCMD(cmd[0],cmd[1],cmd[2],cmd[3])
+    else:
+      if (hasDisplay):
+        event = pygame.event.poll()
+        if (event.type == pygame.MOUSEBUTTONDOWN):
+            mouseClick(pygame.mouse.get_pressed(),pygame.mouse.get_pos())
+        elif event.type == pygame.QUIT:
+            exit(0)
+        elif event.type == VIDEORESIZE:
+            xw,xh = event.size
+            zoom = calcZoom(xw,xh)
+            #print "new zoom=",zoom, xw,xh
+            update((xw,xh))
 
 
 #print "END --------------------------------------------"

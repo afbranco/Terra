@@ -4,6 +4,9 @@
 # Define target VM to build: NET or GRP | default NET
 #    VM=GRP
 #
+# Define additional modules: FFT,VOLCANO,MSGQ | default ''
+#    MOD=FFT,VOLCANO | MOD=FFT
+#
 # Configure sensorboard: MTS300CA or MTS300CB(wired) or MDA100 | default MDA100
 #    SENSOR=MTS300CA
 #
@@ -15,6 +18,9 @@
 #
 # Hybrid mode: YES => TelosB Mem.Blocks = micaz Mem.Blocks or NO=> TelosB Large Mem.Blocks | Default YES
 #    HYB=NO
+#
+# SetData functionality: YES or NO | default NO
+#    SETDATA=NO
 #
 # MicaZ/TelosB RF Power: 03 07 11 15 19 23 27 31 | default 03
 #    RFPOWER=03
@@ -44,6 +50,13 @@ HYB ?= YES
 ifneq ($(HYB),YES)
   ifneq ($(HYB),NO)
     $(error HYB must be "YES" or "NO")
+  endif
+endif
+
+SETDATA ?= NO
+ifneq ($(SETDATA),YES)
+  ifneq ($(SETDATA),NO)
+    $(error SETDATA must be "YES" or "NO")
   endif
 endif
 
@@ -78,6 +91,7 @@ endif
 ifeq ($(VM),GRP)
 	VMDIR = $(APPDIR)/CustomVMs/TerraGrp
 	PFLAGS += -DMODULE_CTP
+	CFLAGS += -I$(TOSDIR)/lib/net/ -I$(TOSDIR)/lib/net/4bitle -I$(TOSDIR)/lib/net/ctp 
 endif
 
 #
@@ -152,17 +166,17 @@ endif
 # define VM memory use
 #
 ifeq ($(VM),NET)
-  MB_SHORT_ALL = 64
-  MB_SHORT_NOBS = 72
-  MB_LONG_ALL = 46
-  MB_LONG_NOBS = 54
-  MB_TELOSB    =300
+  MB_SHORT_ALL = 88
+  MB_SHORT_NOBS = 94
+  MB_LONG_ALL = 68
+  MB_LONG_NOBS = 75
+  MB_TELOSB    = 250
 else ifeq ($(VM),GRP)
-  MB_SHORT_ALL = 300 #16
+  MB_SHORT_ALL = 16
   MB_SHORT_NOBS = 22
   MB_LONG_ALL = 12
   MB_LONG_NOBS = 12
-  MB_TELOSB    = 250
+  MB_TELOSB    = 200
 endif
 
 ifeq ($(HYB),YES) # Same value for all types
@@ -202,6 +216,12 @@ else # HYB=NO
   endif
 endif
 
+# Define MemBlocks Size for each additional module/operations
+M_SETDATA = 14
+M_MSGQ = 8
+M_FFT = 0     # ???
+M_VOLCANO = 0 # ???
+
 
 #
 # Configure BS and QUEUE defines
@@ -216,20 +236,59 @@ ifeq ($(QUEUE) , SHORT)
 endif
 
 
+# Reset MODULES if VM!=NET
+ifeq ($(VM) , GRP)
+	MODULES = 'Not applicable'
+else
+	MODULES = $(MOD)
+endif
+# Additional modules -I flag
+ifneq ($(findstring FFT,$(MODULES)),)
+    CFLAGS += -DM_FFT
+    DM_FFT = $(M_FFT)
+else
+    DM_FFT = 0
+endif
+ifneq ($(findstring VOLCANO,$(MODULES)),)
+    CFLAGS += -DM_VOLCANO
+    DM_VOLCANO = $(M_VOLCANO)
+else
+    DM_VOLCANO = 0
+endif
+ifneq ($(findstring MSGQ,$(MODULES)),)
+    CFLAGS += -DM_MSG_QUEUE
+    DM_MSGQ = $(M_MSGQ)
+else
+    DM_MSGQ = 0
+endif
+ifeq ($(SETDATA) , YES)
+    CFLAGS += -DMODE_SETDATA
+    DM_SETDATA = $(M_SETDATA)
+else
+    DM_SETDATA = 0
+endif
+
+# Calculate final MemBlocks
+MBLOCKS_F = $(shell echo ${MBLOCKS}-${DM_MSGQ}-${DM_SETDATA}-${DM_FFT}-${DM_VOLCANO} | bc)
 # force short memory - test with printf
 # MBLOCKS=40
+CFLAGS += -DVM_MEM_BLKS=$(MBLOCKS_F) -DTOSVER=$(TOSVERSION)
+# $(info shell echo ${MBLOCKS}-${DM_MSGQ}-${DM_SETDATA}-${DM_FFT}-${DM_VOLCANO})
 
-CFLAGS += -DVM_MEM_BLKS=$(MBLOCKS) -DTOSVER=$(TOSVERSION)
 
 $(info ***********************)
 $(info **** Configuration ****)
 $(info VM          = $(VM))
+$(info MODULES     = $(MODULES) [FFT,VOLCANO,MSGQ])
 $(info MOTE        = $(MOTE))
+$(info RFPOWER     = $(RFPOWER))
 $(info SENSORBOARD = $(SENSORBOARD))
 $(info TYPE        = $(TYPE))
 $(info HYB         = $(HYB))
+$(info SETDATA     = $(SETDATA))
 $(info QUEUE       = $(QUEUE))
-$(info VM_MEM_BLKS = $(MBLOCKS))
+$(info VM_MEM_BLKS = $(MBLOCKS_F))
+$(info VM_MEM      = $(shell echo ${MBLOCKS_F}*24 | bc))
 $(info TOSVERSION  = $(TOSVERSION))
 $(info ***********************)
 
@@ -239,7 +298,6 @@ MSG_SIZE = 29
 
 CFLAGS += -DNO_DEBUG 
 CFLAGS += -I. -I$(VMDIR) -I$(XCOMPSDIR)
-CFLAGS += -I$(TOSDIR)/lib/net/ -I$(TOSDIR)/lib/net/4bitle -I$(TOSDIR)/lib/net/ctp 
 #CFLAGS += -DPRINTF
 #CFLAGS += -I$(TOSDIR)/lib/printf
 
