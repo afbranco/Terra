@@ -180,11 +180,11 @@ public class ControlCore implements MessageListener
 				for (int i=0; i<4; i++) {
 					Data = Data + String.format("%d,",omsg.get_data()[i]); 				
 				}
-				for (int i=4; i<11; i=i+2) {
+				for (int i=4; i<12; i=i+2) {
 					Data = Data + String.format("%d,",(omsg.get_data()[i] << 8) + omsg.get_data()[i+1]); 				
 				}
 				for (int i=12; i<20; i=i+4) {
-					Data = Data + String.format("%d,",(omsg.get_data()[i] << 24) + (omsg.get_data()[i+1] << 16) + (omsg.get_data()[i] * 8) + omsg.get_data()[i+1]); 				
+					Data = Data + String.format("%d,",(omsg.get_data()[i] << 24) + (omsg.get_data()[i+1] << 16) + (omsg.get_data()[i+2] * 8) + omsg.get_data()[i+3]); 				
 				}
 			}
 			controlform.sendBSMsg(omsg.get_source(),omsg.get_type(),0,Data);
