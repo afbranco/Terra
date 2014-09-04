@@ -1,0 +1,66 @@
+#include "TerraNet.defs"
+
+#define OUT_SIZE 102 // (2*ulong)*((FREQ/2)+1)
+
+var ubyte stat;
+
+var ushort fft_mem_len = 1276; // 1138 is for 100-point FFT on TelosB; 1276 on TOSSIM
+var ubyte[1276] fft_cfg; //1138
+var ubyte fft_points=100;
+
+//In&Out Data
+var long[128] inData;
+var long[OUT_SIZE] outData;
+
+do
+  stat = fftAlloc(fft_points,0,fft_cfg,&fft_mem_len);
+finally
+  stat=0;
+end
+
+// Create new data
+var byte dir=1;
+var ulong yVal;
+loop x, 100 do
+  inData[x] = yVal + (1000*dir);
+  if (x%10) == 0 then dir = dir * -1; end
+  await 1ms;
+end
+
+
+do
+	   //kiss_fftr_cfg st,const kiss_fft_scalar *timedata,kiss_fft_cpx *freqdata
+  stat = fft(         fft_cfg,      		       inData, 		      outData);
+finally
+  stat=0;
+end
+
+pktype radioData from radioMsg with
+  var ubyte idx;
+  var long val1;
+  var long val2;
+end
+
+var radioData dataMsg;
+dataMsg.type=1;
+dataMsg.source = getNodeId();
+dataMsg.target = 1;
+
+loop x, OUT_SIZE/2 do
+  if outData[2*x] != 0 then
+    dataMsg.idx = x;
+    dataMsg.val1 = outData[2*x];
+    dataMsg.val2 = outData[(2*x)+1];
+    emit SEND(dataMsg);
+    await SEND_DONE();
+  else
+    await 1ms;
+  end
+end
+
+dataMsg.type=7;
+emit SEND(dataMsg);
+await SEND_DONE();
+
+
+

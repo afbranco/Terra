@@ -1,0 +1,214 @@
+#include "TerraNet.defs"
+pktype radioData from radioMsg with
+  var ubyte[4] xx;
+  var ushort[4] yy;
+  var long[2] zz;
+end
+
+#define OUT_SIZE 102 // (2*ulong)*((FREQ/2)+1)=102
+#define INVALID_MEASUREMENT -2147483648
+
+//
+// Globals
+//
+var ubyte stat;
+// Gauss Model
+// ms_gauss_model size = GMODEL_SIZE = 964 bytes
+//var ubyte[GMODEL_SIZE] gModel;
+var ubyte[POOL_LEN] buffer_pool_scale;
+var ushort[POOL_LEN] buffer_pool_count;
+var ulong[POOL_LEN] buffer_pool_rtime_map;
+var ubyte[POOL_LEN] buffer_pool_avail_map;
+var ubyte[1138] fft_cfg; //1138
+var ulong requested_rtime; // the rtime that BS requires the sensor to do detection
+var ubyte[GMODEL_SIZE] gModel;
+//var long[BUFFER_POOL_LEN] buffer_pool;
+
+
+
+// Init
+do
+  // fft alloc -> Format fft_cfg
+  var ushort fft_mem_len = 1138; // 1138 is for 100-point FFT on TelosB; 1276 on TOSSIM
+  var ubyte fft_points=100; //100
+    stat = fftAlloc(fft_points,0,fft_cfg,&fft_mem_len);
+    stat = gModelRead(gModel);
+    stat = await GMODEL_RD_DONE;
+
+  // Initialize buffer_pool_avail_map
+  loop i, POOL_LEN do
+    buffer_pool_avail_map[i] = TRUE;
+  end
+
+finally
+  stat=0;
+end
+
+// MSG_START runs
+do
+  loop z1, 200 do
+requested_rtime = z1;
+    par/and do
+      do
+    
+      // Local MSG_START run
+      // Sensor Data
+      var ulong m_addr = 0;
+      var streamData sData;
+      // RSensorTime
+      var ulong rtime = 0;
+      // Read Sensor Data
+      var ushort count;
+      emit RD_STREAM(sData);
+      count = await STREAM_RD_DONE();
+
+      rtime = getRTime() - 1;
+
+
+      //
+      // Calculate and remove mean from raw data vector
+      //
+      var ushort valid_count=0;
+      var long intensity_mean=0;
+      intensity_mean = 0;
+      // Calculate mean
+      loop i, count do
+        if(sData.val[i] != INVALID_MEASUREMENT) then
+          intensity_mean = intensity_mean + sData.val[i];
+          inc valid_count;
+        end
+      end
+      intensity_mean = intensity_mean / valid_count;
+
+      // integer_seismic_energy
+      var ulong seismic_energy;
+      var ulong sum_sq=0;
+      if valid_count > 0 then
+        loop i, count do
+          if(sData.val[i] != INVALID_MEASUREMENT) then
+            sum_sq = sum_sq + ((sData.val[i] - intensity_mean) * (sData.val[i] - intensity_mean));
+          end
+        end
+        seismic_energy = sum_sq / valid_count;
+      else
+        seismic_energy = 0;
+      end //if valid_count
+
+
+      // Energy scale
+      var ulong base=10;
+      var ubyte scale=8;
+      loop i, 7 do
+        if (seismic_energy/base) == 0 then scale=i; break;end
+        base = base * 10;
+      end 
+
+
+      // copy the data to buffer pool
+      var byte oldest_index = -1;
+      loop i, POOL_LEN do
+        if (buffer_pool_avail_map[i]) then
+          loop j, count do
+            if(sData.val[i] != INVALID_MEASUREMENT) then 
+              //buffer_pool[i*j] = sData.val[j] - intensity_mean;
+            else
+              //buffer_pool[i*j] = 0;
+            end
+          end // loop j, count
+          buffer_pool_scale[i] = scale;
+          buffer_pool_count[i] = count;
+          buffer_pool_rtime_map[i] = rtime;
+          buffer_pool_avail_map[i] = FALSE;
+          break;    
+        else
+          if(oldest_index == -1) then 
+            oldest_index = i;
+          else 
+            if (buffer_pool_rtime_map[i] < buffer_pool_rtime_map[oldest_index]) then
+	      oldest_index = i;
+            else
+	      oldest_index = oldest_index;
+            end
+          end
+        end
+      end // loop i, POOL_LEN
+      
+      
+      //
+      // Send Msg 1
+      //
+
+      var radioData dataMsg;
+      dataMsg.type=1;
+      dataMsg.source = getNodeId();
+      dataMsg.target = 1;
+
+      dataMsg.xx[0] = z1;
+      dataMsg.xx[1] = scale;
+      dataMsg.yy[0] = count;
+      dataMsg.yy[1] = valid_count;
+      dataMsg.zz[0] = rtime;
+      dataMsg.zz[1] = seismic_energy;
+      emit SEND(dataMsg);
+      await SEND_DONE();
+     
+      end
+//
+// detect() from MSG_SEL message
+//
+/*
+      do
+        var ubyte decision=0;
+        loop i, POOL_LEN do
+
+          if ((buffer_pool_avail_map[i]==FALSE) and (buffer_pool_rtime_map[i] == requested_rtime) ) then
+            if getNSamples(gModel,buffer_pool_scale[i]) >= STAT_SIGNIFICANCE then
+              var ulong[OUT_SIZE] outdata;
+              //stat = fft(fft_cfg,&buffer_pool[0],outdata);
+              //decision = detect(gModel,buffer_pool_scale[i],outdata);
+
+            end
+            break;
+          end
+          
+	      //
+	      // Send Msg 2
+	      //
+
+	      var radioData dataMsg;
+	      dataMsg.type=2;
+	      dataMsg.source = getNodeId();
+	      dataMsg.target = 1;
+
+	      dataMsg.xx[0] = i;
+	      dataMsg.xx[1] = decision;
+	      dataMsg.xx[2] = buffer_pool_avail_map[i];
+	      dataMsg.xx[3] = buffer_pool_scale[i];
+	      dataMsg.yy[0] = getNSamples(gModel,buffer_pool_scale[i]);
+	      dataMsg.yy[1] = 0;
+	      dataMsg.yy[2] = 0;
+	      dataMsg.yy[3] = 0;
+	      dataMsg.zz[0] = requested_rtime;
+	      dataMsg.zz[1] = buffer_pool_rtime_map[i];
+	      //if decision != 0 then
+	        emit SEND(dataMsg);
+	        await SEND_DONE();
+              //end
+        end      
+
+      end
+         
+*/
+    with
+      await 1s;
+      emit LED0(TOGGLE);
+    end // par/and
+  end //loop
+end
+
+
+
+/*
+
+*/
+

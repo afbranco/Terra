@@ -1,0 +1,64 @@
+#include "TerraGrp.defs"
+
+//emit INIT(1);
+
+pktype msgBS from msgBS_t with
+	var ubyte seq;
+	var ubyte count;
+	var ushort value;
+end
+
+pktype msgGR from msgGR_t with
+	var ubyte seq;
+	var ubyte err;
+	var ushort val;
+end
+
+var ubyte[6000] xx;
+
+var ubyte stat;
+var msgBS dataBS;
+
+var ubyte grId1 = 1;
+var ubyte grParam1 = 1;//(getNodeId()/10);
+var group_t grp1;
+var aggreg_t ag1;
+var aggDone_t agDone1;
+//var ubyte grId2 = 2;
+//var ubyte grParam2 = getNodeId()%10;
+//var group_t grp2;
+
+//     groupInit(RegName,     Id,    param, nhops, status, elFlag, leader)
+stat = groupInit(grp1   ,   grId1,grParam1,    6,   TRUE,   eACTIVE,      0);
+//stat = groupInit(grp2   ,   grId2,grParam2,    15,   TRUE,   eACTIVE,      0);
+
+//     aggregInit( RegName, grName, sensorId, agOper, agComp, refVal)
+stat = aggregInit(     ag1,   grp1, SID_TEMP,   fMIN,   opGT,  0);
+
+await (grParam1)s;
+loop do
+ par/and do
+  if getNodeId() == grp1.leader then
+    emit LED0(ON);
+    emit LED1(OFF);
+    emit AGGREG(ag1);
+    agDone1 = await AGGREG_DONE();
+
+    dataBS.msgId = 5;
+    dataBS.seq = 1;
+    dataBS.count = agDone1.count;
+    dataBS.value = agDone1.value;
+    emit SEND_BS(dataBS);
+  else
+    emit LED0(OFF);
+    emit LED1(ON);
+  end
+ with
+  await 10s;
+ end
+end
+
+/*
+
+*/
+
