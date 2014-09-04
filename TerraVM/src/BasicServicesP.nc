@@ -1090,7 +1090,12 @@ implementation{
 					if (MoteID != BStation){
 						sendRadioN();
 					} else {
-						sendSerialN();
+						if ( tempOutputOutQ.sendToMote == 0) {
+							tempOutputOutQ.sendToMote = AM_BROADCAST_ADDR;
+							sendRadioN();
+							}
+						else
+							sendSerialN();
 					}
 				}				
 				break;
@@ -1478,6 +1483,16 @@ implementation{
 	}
 #endif
 
+	void recSerialCustomMsg_receive(message_t *msg, void *payload, uint8_t len){
+		dbg(APPNAME, "BS::recSerialCustomMsg_receive():\n");
+		memcpy(&tempInputOutQ.Data,payload,len);
+		tempInputOutQ.AM_ID = call RadioAMPacket.type(msg);
+		tempInputOutQ.DataSize = len;
+		tempInputOutQ.sendToMote = 0;
+		tempInputOutQ.reqAck = 0;
+		if (call outQ.put(&tempInputOutQ)!=SUCCESS) dbg(APPNAME, "BS::recSerialCustomMsg_receive(): outQueue is full! Losting a message.\n");		
+	}
+
 	event message_t * SerialReceiver.receive[am_id_t id](message_t *msg, void *payload, uint8_t len){
 		dbg(APPNAME, "BS::SerialReceiver.receive(): AM=%hhu\n",id);
 		TViewer("serial",1,0);
@@ -1494,7 +1509,12 @@ implementation{
 				break;						
 #endif
 			default:
-				break;
+				if (id >= AM_CUSTOM_START && id <= AM_CUSTOM_END) { // AM_CUSTOM Range
+					if (loadingProgramFlag == FALSE) recSerialCustomMsg_receive(msg,payload,len);
+		 		} else {
+					dbg(APPNAME, "BS::SerialReceiver.receive(). Received a undefined AM=%hhu from %hhu\n",id,call RadioAMPacket.source(msg));	 		
+		 		}
+		 		break;
 		}
 		return msg;
 	}
