@@ -25,7 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
+//import java.util.List;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -40,6 +40,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JTextArea;
 import javax.swing.JRadioButton;
 
+/* dataPanel
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
@@ -49,7 +50,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 
 import messages.*;
-
+*/
 import javax.swing.JCheckBox;
 
 public class ControlForm {
@@ -58,7 +59,8 @@ public class ControlForm {
 	ProgBin progBin;
 	
 	static int DataMsgsCount=1;
-	
+
+/* dataPanel	
 	private Integer[] Lengths = new Integer[]{0,0,0,0,0};
 	private boolean[] LengthStatus = new boolean[]{false,false,false,false,false};
 	private Integer[] ValuesCount = new Integer[]{0,0,0,0,0};
@@ -70,7 +72,7 @@ public class ControlForm {
 	private boolean GrNdIdStatus = false;
 	private Integer[] GrNdIdValues = new Integer[32];
 	private Integer GrNdIdLen = 0;
-	
+*/	
 	private String lastDir=".";
 	private String userHome="";
 	Properties prop;
@@ -122,6 +124,7 @@ public class ControlForm {
 	int reqConfigDigits=1;
 	ArrayList<Integer> activeNodes = new ArrayList<Integer>();
 	private JTextField textTime;
+/* dataPanel
 	private JTextField Addr1;
 	private JTextField nBytes1;
 	private JTextField grndid;
@@ -155,7 +158,7 @@ public class ControlForm {
 	private JTextField GrPar;
 	private JTextField TargetMote;
 	private JTextField EvtID;
-	
+*/	
 	/**
 	 * Launch the application.
 	 */
@@ -341,16 +344,18 @@ public class ControlForm {
 		comboPrefix.setBounds(530, 41, 218, 24);
 		controlPanel.add(comboPrefix);
 		fillComboPrefix();
+		btnDir.setBounds(483, 42, 20, 24);
 
 		
 //------------------------------------------------------			
 	
-		
 		/**
 		 * Data Tab
 		 */
+		/*		
 		tabbedPane.addTab("Data", null, dataPanel, "Support to send data messages.");
 		dataPanel.setLayout(null);
+		
 			
 		TargetSel = new JCheckBox("select target");
 		TargetSel.setSelected(true);
@@ -370,7 +375,6 @@ public class ControlForm {
 		lblSetMemoryData.setFont(new Font("Dialog", Font.BOLD, 14));
 		lblSetMemoryData.setBounds(12, 90, 271, 15);
 		dataPanel.add(lblSetMemoryData);
-		btnDir.setBounds(483, 42, 20, 24);
 
 
 		JLabel lblNodesStatus = new JLabel("Send Group Message (via BS)");
@@ -384,8 +388,7 @@ public class ControlForm {
 		lblTCPStatus3.setForeground(Color.RED);
 		lblTCPStatus3.setBounds(298, 533, 98, 15);
 		dataPanel.add(lblTCPStatus3);
-		
-	
+*/
 		//------------------------------------------------------		
 		
 		/**
@@ -449,7 +452,7 @@ public class ControlForm {
 		separator_7.setBounds(872, 517, 1, 70);
 		controlPanel.add(separator_7);
 		
-	
+/* // dataPanel	
 		Addr1 = new JTextField();
 		Addr1.addKeyListener(new KeyAdapter() {
 			@Override
@@ -799,63 +802,84 @@ public class ControlForm {
 			});		
 		SendGRValuesStr.setLineWrap(true);
 		scrollPane.setViewportView(SendGRValuesStr);
+
+*/		
 		
 		JLabel lblDataMessages = new JLabel("Data Messages");
 		lblDataMessages.setHorizontalAlignment(SwingConstants.CENTER);
-		lblDataMessages.setFont(new Font("Dialog", Font.BOLD, 14));
-		lblDataMessages.setBounds(352, 10, 154, 15);
+		lblDataMessages.setFont(new Font("Dialog", Font.BOLD, 16));
+		lblDataMessages.setBounds(350, 20, 300, 30);
 		monitorPanel.add(lblDataMessages);
 
-		rdbtnmsgtype = new JRadioButton("MsgType: Decimal");
+		rdbtnmsgtype = new JRadioButton("Decimal");
+		rdbtnmsgtype.setToolTipText("Print msg -- Decinal= 4 byte,4 short, 2 long. Hexa=All bytes as hexa");
 		rdbtnmsgtype.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				rdbtnmsgtype.setText( (rdbtnmsgtype.isSelected()==false)?"MsgType: Decimal":"MsgType: Hexa");
+				rdbtnmsgtype.setText( (rdbtnmsgtype.isSelected()==false)?"Decimal":"Hexa");
 				}
 		});
-		rdbtnmsgtype.setBounds(250, 35, 200, 23);
+		rdbtnmsgtype.setBounds(200, 40, 100, 23);
 		monitorPanel.add(rdbtnmsgtype);
 
+		JLabel lblMsgType = new JLabel("Message print [D/H]:");
+		lblMsgType.setBounds(200, 20, 400, 15);
+		monitorPanel.add(lblMsgType);
+
+		JSeparator separator_d1 = new JSeparator();
+		separator_d1.setOrientation(SwingConstants.VERTICAL);
+		separator_d1.setBounds(190, 20, 1, 40);
+		monitorPanel.add(separator_d1);
 		
+		JSeparator separator_d2 = new JSeparator();
+		separator_d2.setOrientation(SwingConstants.VERTICAL);
+		separator_d2.setBounds(350, 20, 1, 40);
+		monitorPanel.add(separator_d2);
+
+		JSeparator separator_d3 = new JSeparator();
+		separator_d3.setOrientation(SwingConstants.VERTICAL);
+		separator_d3.setBounds(630, 20, 1, 40);
+		monitorPanel.add(separator_d3);
+
 		textClock = new JTextField();
 		textClock.setEditable(false);
 		textClock.setColumns(10);
-		textClock.setBounds(733, 6, 140, 19);
+		textClock.setBounds(733, 18, 140, 19);
 		monitorPanel.add(textClock);
 		
 		JLabel lblClock = new JLabel("Local clock:");
-		lblClock.setBounds(645, 8, 81, 15);
+		lblClock.setBounds(645, 20, 81, 15);
 		monitorPanel.add(lblClock);
 		
 		textTime = new JTextField();
 		textTime.setEditable(false);
 		textTime.setColumns(10);
-		textTime.setBounds(733, 33, 140, 19);
+		textTime.setBounds(733, 42, 140, 19);
 		monitorPanel.add(textTime);
 		
 		JLabel lblTime = new JLabel("Local time:");
-		lblTime.setBounds(645, 37, 81, 15);
+		lblTime.setBounds(645, 44, 81, 15);
 		monitorPanel.add(lblTime);
 		
-		lblTCPStatus2 = new JLabel("TCP OFF");
+		lblTCPStatus2 = new JLabel("TCP");
 		lblTCPStatus2.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTCPStatus2.setForeground(Color.RED);
-		lblTCPStatus2.setBounds(535, 37, 98, 15);
+		lblTCPStatus2.setBounds(4, 4,40, 15);
 		monitorPanel.add(lblTCPStatus2);
 		
 		barFSM2 = new JProgressBar();
 		barFSM2.setToolTipText("Progress of sending VM data to BaseStation.");
 		barFSM2.setStringPainted(true);
-		barFSM2.setBounds(22, 38, 161, 14);
+		barFSM2.setBounds(22, 42, 161, 14);
 		monitorPanel.add(barFSM2);
 		
-		JLabel label = new JLabel("Send Prog to BStation");
+		JLabel label = new JLabel("Send progress");
 		label.setHorizontalAlignment(SwingConstants.CENTER);
-		label.setBounds(22, 8, 161, 15);
+		label.setBounds(22, 20, 161, 15);
 		monitorPanel.add(label);
-		
+/*	dataPanel	
 		jtfLenList= new JTextField[]{nBytes1,nBytes2,nBytes3,nBytes4,nBytes5};
 		jtfValuesList= new JTextField[]{Values1,Values2,Values3,Values4,Values5};
-	
+*/	
 	}
 	
 	private void Apply(){
@@ -922,12 +946,12 @@ public class ControlForm {
 		lblTCPStatus.setText("TCP OFF");
 		lblTCPStatus.setForeground(Color.RED);
 		lblTCPStatus.repaint();
-		lblTCPStatus2.setText("TCP OFF");
+		lblTCPStatus2.setText("TCP");
 		lblTCPStatus2.setForeground(Color.RED);
 		lblTCPStatus2.repaint();
-		lblTCPStatus3.setText("TCP OFF");
-		lblTCPStatus3.setForeground(Color.RED);
-		lblTCPStatus3.repaint();
+		//lblTCPStatus3.setText("TCP OFF"); // dataForm
+		//lblTCPStatus3.setForeground(Color.RED);
+		//lblTCPStatus3.repaint();
 		terracore.retryConnect();
 	}
 	
@@ -936,26 +960,26 @@ public class ControlForm {
 		if (status) {
 			lblTCPStatus.setText("TCP ON");
 			lblTCPStatus.setForeground(Color.BLUE);
-			lblTCPStatus2.setText("TCP ON");
+			lblTCPStatus2.setText("TCP");
 			lblTCPStatus2.setForeground(Color.BLUE);
-			lblTCPStatus3.setText("TCP ON");
-			lblTCPStatus3.setForeground(Color.BLUE);
+			//lblTCPStatus3.setText("TCP ON");		// dataForm
+			//lblTCPStatus3.setForeground(Color.BLUE);
 			lblTCPRetries.setForeground(Color.GRAY);
 			btnApply.setEnabled(true);
 		} else {
 			lblTCPStatus.setText("TCP OFF");
 			lblTCPStatus.setForeground(Color.RED);
-			lblTCPStatus2.setText("TCP OFF");
+			lblTCPStatus2.setText("TCP");
 			lblTCPStatus2.setForeground(Color.RED);
-			lblTCPStatus3.setText("TCP OFF");
-			lblTCPStatus3.setForeground(Color.RED);
+			//lblTCPStatus3.setText("TCP OFF");	// dataForm
+			//lblTCPStatus3.setForeground(Color.RED);
 			lblTCPRetries.setForeground(Color.BLACK);
 			btnApply.setEnabled(false);
 		}
 		lblTCPRetries.setText("Retries: "+retries);
 		lblTCPStatus.repaint();
 		lblTCPStatus2.repaint();
-		lblTCPStatus3.repaint();
+		//lblTCPStatus3.repaint(); // dataForm
 		lblTCPRetries.repaint();
 		
 	}
@@ -1041,7 +1065,8 @@ public class ControlForm {
 		ControlMsgs.append(String.format("%s %04d %s\n", DateFormat.format(System.currentTimeMillis()), ControlMsgsLine,text));
 		ControlMsgs.setCaretPosition(ControlMsgs.getDocument().getLength());
 	}
-	
+
+/* dataPanel
 	private void chkAddr(JTextField Addr, Integer index){
 		String Addr1Str = Addr.getText();
 		AddrStatus[index-1]=false;
@@ -1210,6 +1235,7 @@ public class ControlForm {
 			btnSendGR.setEnabled(false);			
 		}
 	}
+*/
 	public JComboBox<String> getComboPrefix() {
 		return comboPrefix;
 	}
