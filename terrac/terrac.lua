@@ -132,7 +132,7 @@ for line in io.lines(cpp_file) do
     _STR = _STR..line..'\n'
   end
 end
---os.remove(cpp_file)
+os.remove(cpp_file)
 
 -- PARSE
 do
