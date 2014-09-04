@@ -1,18 +1,57 @@
 #include "TerraNet.defs"
 
-/*
-loop counter do
-	emit LEDS(counter);
-	await 500ms;
-end
-*/
+#define ROOT 11
 
+event ushort target;
+var ushort nodeId = getNodeId();
+var ubyte isRoot = (ROOT == <ubyte>nodeId);
 
-var byte counter=0;
-loop do
-	emit LEDS(counter);
-	inc counter;
-	await 500ms;
+pktype userMsg from radioMsg with
+	var ubyte[4]  d8;
+	var ushort[4] d16;
+	var ulong[2]  d32;
 end
-/*
-*/
+
+var userMsg sndData;
+var userMsg recData;
+var ulong delay = nodeId * 100;
+
+if isRoot then		
+	target = 1;
+else
+	target = nodeId - 1;
+end
+sndData.type = 1;
+recData.type = 2;
+sndData.target = target;
+sndData.source = nodeId;
+
+await 1s;
+par do
+	loop do
+		par/and do
+			await (delay)ms;
+			sndData.d16[0] = nodeId;
+			sndData.d16[1] = target;
+			sndData.d16[2] = 0;
+			sndData.d8[0] = 1;
+			sndData.d32[0] = delay;
+			emit SEND(sndData);
+			await SEND_DONE(1);
+		with
+			await 5s;
+		end
+	end
+with
+	loop do
+		recData = await RECEIVE;
+		if recData.target == nodeId then
+			recData.type = 2;
+			recData.target = target;
+			recData.d16[2] = nodeId;
+			inc recData.d8[0];
+			emit SEND(recData);
+			await SEND_DONE(2);
+		end
+	end
+end
