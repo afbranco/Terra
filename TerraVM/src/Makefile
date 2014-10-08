@@ -19,6 +19,9 @@
 # Hybrid mode: YES => TelosB Mem.Blocks = micaz Mem.Blocks or NO=> TelosB Large Mem.Blocks | Default YES
 #    HYB=NO
 #
+# Verbose Compilation mode: YES or NO | Default NO
+#    VERB=YES
+#
 # SetData functionality: YES or NO | default NO
 #    SETDATA=NO
 #
@@ -34,9 +37,11 @@
 #
 VM ?= NET
 ifneq ($(VM),NET)
-  ifneq ($(VM),GRP)
-    $(error VM must be "NET" or "GRP")
+ ifneq ($(VM),GRP)
+  ifneq ($(VM),INO)
+    $(error VM must be "NET" or "GRP" or "INO")
   endif
+ endif
 endif
 
 QUEUE ?= SHORT
@@ -50,6 +55,12 @@ HYB ?= YES
 ifneq ($(HYB),YES)
   ifneq ($(HYB),NO)
     $(error HYB must be "YES" or "NO")
+  endif
+endif
+VERB ?= NO
+ifneq ($(VERB),YES)
+  ifneq ($(VERB),NO)
+    $(error VERB must be "YES" or "NO")
   endif
 endif
 
@@ -77,10 +88,17 @@ ifeq ($(findstring $(RFPOWER), 03 07 11 15 19 23 27 31),)
     $(error 'RFPOWER must have one of these numbers: 03 07 11 15 19 23 27 31')
 endif
 
+# Verbose mode
+ifeq ($(VERB),YES)
+	CFLAGS += -v
+endif
+
+
 #
 # define root APP dir
 #
 APPDIR = $(shell pwd)
+INODIR = /home/branco/gitspace/Terra/nescino/src/ino
 
 #
 # Define VM path
@@ -93,6 +111,10 @@ ifeq ($(VM),GRP)
 	PFLAGS += -DMODULE_CTP
 	CFLAGS += -I$(TOSDIR)/lib/net/ -I$(TOSDIR)/lib/net/4bitle -I$(TOSDIR)/lib/net/ctp 
 endif
+ifeq ($(VM),INO)
+	VMDIR = $(APPDIR)/CustomVMs/TerraIno
+	CFLAGS += -I$(INODIR) -DINO
+endif
 
 #
 # Define XComps path
@@ -100,7 +122,7 @@ endif
 XCOMPSDIR = $(APPDIR)/XComps
 
 
-# build TinyOS Version ID (211 ... 212)
+# build TinyOS Version ID number (211 ... 212)
 TOSVERSION = $(subst .,,$(subst /opt/tinyos-,,$(TOSROOT)))
 
 #
@@ -124,6 +146,13 @@ endif
 ifeq (telosb,$(word 1,$(MAKECMDGOALS)))
   PFLAGS += -DCC2420_DEF_RFPOWER=$(RFPOWER)
   MOTE=telosb
+endif
+ifeq (iris,$(word 1,$(MAKECMDGOALS)))
+  ifeq ($(VM),INO)
+    MOTE=ino
+  else
+    MOTE=iris
+  endif
 endif
 
 #
@@ -167,15 +196,15 @@ endif
 #
 ifeq ($(VM),NET)
   MB_SHORT_ALL = 88
-  MB_SHORT_NOBS = 94
+  MB_SHORT_NOBS = 96
   MB_LONG_ALL = 68
   MB_LONG_NOBS = 75
   MB_TELOSB    = 250
 else ifeq ($(VM),GRP)
-  MB_SHORT_ALL = 16
-  MB_SHORT_NOBS = 22
-  MB_LONG_ALL = 12
-  MB_LONG_NOBS = 12
+  MB_SHORT_ALL =28
+  MB_SHORT_NOBS = 36
+  MB_LONG_ALL = 14
+  MB_LONG_NOBS = 14
   MB_TELOSB    = 200
 endif
 
@@ -279,7 +308,7 @@ CFLAGS += -DVM_MEM_BLKS=$(MBLOCKS_F) -DTOSVER=$(TOSVERSION)
 $(info ***********************)
 $(info **** Configuration ****)
 $(info VM          = $(VM))
-$(info MODULES     = $(MODULES) [FFT,VOLCANO,MSGQ])
+$(info MODULES     = $(MODULES) -- [FFT,VOLCANO,MSGQ])
 $(info MOTE        = $(MOTE))
 $(info RFPOWER     = $(RFPOWER))
 $(info SENSORBOARD = $(SENSORBOARD))
@@ -291,6 +320,7 @@ $(info VM_MEM_BLKS = $(MBLOCKS_F))
 $(info VM_MEM      = $(shell echo ${MBLOCKS_F}*24 | bc))
 $(info TOSVERSION  = $(TOSVERSION))
 $(info ***********************)
+$(info Make Cmds- $(MAKECMDGOALS))
 
 PFLAGS += -fno-strict-aliasing # required for accessing VARS
 MSG_SIZE = 29
@@ -323,6 +353,12 @@ reqDataMsg.java: BasicServices.h
 usrMsg.java: CustomVMs/TerraNet/usrMsg.h
 	mig java -target=$(PLATFORM) $(CFLAGS) -java-classname=usrMsg CustomVMs/TerraNet/usrMsg.h usrMsg -o $@
 
-include $(MAKERULES)
+ifeq (ino,$(word 2,$(MAKECMDGOALS)))
+  include Makefile_ino
+else
+  include $(MAKERULES)
+endif
+
+
 
 

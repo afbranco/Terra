@@ -35,6 +35,18 @@ implementation{
 	BSRadio = BS.BSRadio;
 
 	// Communication wire
+#ifdef INO
+// Ino Radio configurations
+	components XBeeMsgC as RadioAM;
+	BS.RadioControl -> RadioAM;
+	BS.RadioAck -> RadioAM;
+	BS.RadioSender -> RadioAM.AMSend;
+	BS.RadioReceiver -> RadioAM.Receive;
+	BS.RadioAMPacket -> RadioAM;
+	BS.RadioPacket -> RadioAM;
+
+#else
+// TinyOS Radio configurations
 	components ActiveMessageC as RadioAM;
 	BS.RadioControl -> RadioAM.SplitControl;
 	BS.RadioAMPacket -> RadioAM;
@@ -85,7 +97,7 @@ implementation{
 	BS.rec_CUSTOM_8 -> RadioAM.Receive[AM_CUSTOM_8];
 	BS.rec_CUSTOM_9 -> RadioAM.Receive[AM_CUSTOM_9];
 #endif
-
+#endif // INO x TinyOS
 
 	// Base Station
 #ifndef NO_BSTATION
@@ -112,17 +124,17 @@ implementation{
 	BS.outQ -> outQueue;	
 
 	// Timers
-	components new TimerMilliC() as TimerAsync;	
-	BS.TimerVM -> TimerVM;	
 	components new TimerMilliC() as TimerVM;	
-	BS.TimerAsync -> TimerAsync;	
+	components new TimerMilliC() as TimerAsync;	
 	components new TimerMilliC() as sendTimer;	
-	BS.sendTimer -> sendTimer;	
 	components new TimerMilliC() as ProgReqTimer;	
-	BS.ProgReqTimer -> ProgReqTimer;
 	components new TimerMilliC() as SendDataFullTimer;	
-	BS.SendDataFullTimer -> SendDataFullTimer;
 	components new TimerMilliC() as DataReqTimer;	
+	BS.TimerVM -> TimerVM;	
+	BS.TimerAsync -> TimerAsync;	
+	BS.sendTimer -> sendTimer;	
+	BS.ProgReqTimer -> ProgReqTimer;
+	BS.SendDataFullTimer -> SendDataFullTimer;
 #ifdef MODE_SETDATA
 	BS.DataReqTimer -> DataReqTimer;
 #endif
@@ -144,6 +156,13 @@ implementation{
 	BS.sendBSNet -> sendBS;
 #endif
 
-
+// afb
+  components Atm128Uart0C as UART0;
+  BS.Uart0 -> UART0;
+  BS.Uart0Ctl -> UART0;
+  components new QueueC(uint8_t, 100) as LogQ;
+  BS.LogQ -> LogQ;
+  components InoIOC;
+  BS.InoIO -> InoIOC;
 	
 }

@@ -18,9 +18,20 @@ module BasicServicesP{
 	provides interface BSUpload;
 	provides interface BSRadio;
 
+	uses interface Boot as TOSBoot;
+
+#ifdef INO
+// Ino Radio Configuration
+    uses interface AMSend as RadioSender[am_id_t id];
+    uses interface Receive as RadioReceiver[am_id_t id];
+	uses interface SplitControl as RadioControl;
+    uses interface PacketAcknowledgements as RadioAck;
+	uses interface AMPacket as RadioAMPacket;
+	uses interface Packet as RadioPacket;
+#else
+// TinyOS Radio configurations
 	uses interface AMPacket as RadioAMPacket;
 	uses interface SplitControl as RadioControl;
-	uses interface Boot as TOSBoot;
 	uses interface Packet as RadioPacket;
     uses interface PacketAcknowledgements as RadioAck;
 #ifndef MODULE_CTP
@@ -67,6 +78,7 @@ module BasicServicesP{
     uses interface Receive as rec_CUSTOM_8;
     uses interface Receive as rec_CUSTOM_9;
 #endif
+#endif // INO x TinyOS
 
 
 	// Base Station
@@ -111,6 +123,15 @@ module BasicServicesP{
 	uses interface StdControl as RoutingControl;
 	uses interface RootControl;
 #endif
+
+
+// afb log
+  uses {
+  	interface UartStream as Uart0;
+  	interface StdControl as Uart0Ctl;
+  	interface Queue<uint8_t> as LogQ;
+  	interface InoIO;
+  }
 
 }
 implementation{
@@ -173,6 +194,36 @@ implementation{
 	void TViewer(char* cmd,uint16_t p1, uint16_t p2){
 		dbg("TVIEW","<<: %s %d %d %d :>>\n",cmd,TOS_NODE_ID,p1,p2);
 		}	
+// afb
+  #define LOG_BUFFER_LEN 100
+  uint8_t logBuffer[LOG_BUFFER_LEN];
+  uint8_t logIdx;
+  uint8_t logLen;
+  uint8_t logIdle=TRUE;
+  char logData[10];
+  
+  task void logProc(){
+  	uint8_t logByte;
+	if (call LogQ.size() > 0) {
+		logIdle=FALSE;
+		logByte = call LogQ.dequeue();
+		call Uart0.send(&logByte, 1);
+		//call Uart0.send("X", 1);
+  	} else
+  		logIdle = TRUE;
+  }
+
+	async event void Uart0.sendDone(uint8_t *buf, uint16_t len, error_t error){
+		post logProc();
+	}
+  void logS(uint8_t* logMsg, uint8_t len){
+  	uint8_t idx;
+  	for (idx=0; idx<len;idx++) call LogQ.enqueue(logMsg[idx]);
+  	if (logIdle) post logProc();
+  }
+
+// afb
+
 /* **********************************************************************************
  *        Initialize parameters, switch-on the radio, and startup protocols.
 \* **********************************************************************************/
@@ -205,6 +256,18 @@ implementation{
 	event void TOSBoot.booted(){
 		uint32_t rnd=0;
 		dbg(APPNAME, "BS::TOSBoot.booted().\n");
+// afb
+call InoIO.pinMode(D22,OUTPUT);
+call InoIO.pinMode(D23,OUTPUT);
+call InoIO.pinMode(D24,OUTPUT);
+call InoIO.digitalWrite(D22,HIGH);
+call InoIO.digitalWrite(D23,HIGH);
+call InoIO.digitalWrite(D24,HIGH);
+
+call InoIO.digitalWrite(D22,LOW);
+
+call Uart0Ctl.start();
+logS("A",1);
 		MoteID = TOS_NODE_ID;
 		rnd = call Random.rand32() & 0x0f;
 		reSendDelay = RESEND_DELAY + (rnd * 5);
@@ -218,22 +281,25 @@ implementation{
 		} else {
 			signal BSBoot.booted();
 		}
+
 	}
 
 	/**
 	 * Radio started event.
 	 */
 	event void RadioControl.startDone(error_t error) {
+logS("B",1);
 		dbg(APPNAME, "BS::RadioControl.startDone().\n");
 #ifdef MODULE_CTP
 		call RoutingControl.start(); 		// CTP
 #endif
+		MoteID = TOS_NODE_ID;
 		// Only for first initialization (boot)
 		if (firstInic && MoteID!=BStation){
 			reqProgBlock_t Data;
 			firstInic = FALSE;
-			call Leds.set(0);
-			call Leds.led1On();
+//			call Leds.set(0);
+//			call Leds.led1On();
 			// Request initial program version
 			ReqState=RO_NEW_VERSION;
 			Data.reqOper=RO_NEW_VERSION;
@@ -500,6 +566,7 @@ implementation{
 #else
 	message_t * RadioReceiver_receive(am_id_t id,message_t *msg, void *payload, uint8_t len){
 #endif
+logS("r",1);
 		dbg(APPNAME, "BS::RadioReceiver.receive(). AM=%hhu from %hhu\n",id,call RadioAMPacket.source(msg));
 		// Switch AM_ID
 		switch (id){
@@ -559,7 +626,7 @@ implementation{
  	 */ 
  	void procNewProgVersion(newProgVersion_t* Data){
 		dbg(APPNAME, "BS::procNewProgVersion().\n");
-		call Leds.set(7);
+//		call Leds.set(7);
 		// Stop the VM
  		signal BSUpload.stop();
  		signal BSUpload.resetMemory();
@@ -604,7 +671,7 @@ implementation{
 		 uint16_t i;
 		 uint16_t Addr=0;
 		 dbg(APPNAME, "BS::procNewProgBlock(). version=%hhu, blockId=%hhu, ReqState=%d\n",Data->versionId,Data->blockId,ReqState);
-		 call Leds.led0Toggle();		 
+//		 call Leds.led0Toggle();		 
 //		printf("prc_nb%d.",Data->blockId);printfflush();
 		 call ProgReqTimer.stop();
 		 // Convert nx_uint8_t to uint8_t
@@ -619,7 +686,7 @@ implementation{
 //		printf("pend%d.",call BM.countPend());printfflush();
 		 // Check if it was the last block
 		 if ( call BM.isAllBitSet()) {
-		 	call Leds.set(0);
+//		 	call Leds.set(0);
 		 	loadingProgramFlag = FALSE;
 		 	if (MoteID != BStation){
 			 	// Start the VM
@@ -987,6 +1054,7 @@ implementation{
 
 		error_t RadioSender_send(uint8_t am_id, uint16_t target, message_t* msg, uint8_t len){
 #ifndef MODULE_CTP
+logS("s",1);
 			return call RadioSender.send[tempOutputOutQ.AM_ID](tempOutputOutQ.sendToMote, &sendBuff, tempOutputOutQ.DataSize);
 #else
 			switch (am_id){
@@ -1528,4 +1596,17 @@ implementation{
 	event void setDataQ.dataReady(){}
 #endif
 
+
+// afb
+	async event void Uart0.receivedByte(uint8_t byte){
+		// TODO Auto-generated method stub
+	}
+
+	async event void Uart0.receiveDone(uint8_t *buf, uint16_t len, error_t error){
+		// TODO Auto-generated method stub
+	}
+
+	event void InoIO.interruptFired(interrupt_enum intPin){}
+	event void InoIO.pulseLen(interrupt_enum intPin, pinvalue_enum value, uint32_t data){}
+	event void InoIO.analogReadDone(analog_enum pin, uint16_t data){}
 }
