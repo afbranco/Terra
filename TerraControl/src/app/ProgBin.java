@@ -9,6 +9,7 @@ public class ProgBin {
 	static short BLOCK_SIZE = 24;
 	static int MAX_BLOCKS = 500; //16;
 	static int MAX_TABLE_LEN = BLOCK_SIZE * MAX_BLOCKS;
+	private boolean validProg=false;
 
 	private String lastError;
 	
@@ -31,14 +32,17 @@ public class ProgBin {
 		System.out.printf("ProgBin:file=%s\n",FileName);
 		resetProgData();
 		lastError = ReadFile(FileName);
+		if (lastError=="") validProg=true;
 	}
 
 	private void resetProgData(){
+		validProg=false;
 		for (int blk=0; blk<MAX_BLOCKS; blk++)
 			for (int x=0; x<BLOCK_SIZE; x++)
 				ProgData[blk][x]=0;
 	}
 	
+	public boolean isValid(){return validProg;}
 	public int getNumBlocks(){return numBlocks;}
 	public short[] getProgBlock(int Block){return ProgData[Block];}
 	public int getBlockStart() {return blockStart;}

@@ -55,7 +55,8 @@ import javax.swing.JCheckBox;
 
 public class ControlForm {
 
-	ControlCore terracore;
+//	ControlCore terracore;
+	ControlCoreXBee terracore;
 	ProgBin progBin;
 	
 	static int DataMsgsCount=1;
@@ -196,7 +197,8 @@ public class ControlForm {
 		}
 		this.textFolder.setText(lastDir);
 		fillComboPrefix();
-		terracore = new ControlCore(this,"localhost",9002);
+//		terracore = new ControlCore(this,"localhost",9002);
+		terracore = new ControlCoreXBee(this,"/dev/ttyUSB0",57600);
 	}
 	
 	class updClock extends TimerTask {
@@ -952,7 +954,12 @@ public class ControlForm {
 		//lblTCPStatus3.setText("TCP OFF"); // dataForm
 		//lblTCPStatus3.setForeground(Color.RED);
 		//lblTCPStatus3.repaint();
-		terracore.retryConnect();
+		try {
+			terracore.retryConnect();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void setTCP(boolean status, int retries){
