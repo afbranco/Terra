@@ -472,4 +472,11 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
   }
 #endif
 
+#ifdef MODULE_CTP
+	event void BSRadio.sendBSDone(message_t* msg,error_t error){
+		// Do nothing by now!
+		// In future may return an event to VM.
+	}
+#endif // MODULE_CTP
+
 }
