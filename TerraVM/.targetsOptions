@@ -7,6 +7,7 @@
 <make-extras/>
 <includes>
 <include global="false" include="source" ncc="true" recursive="true">/opt/tinyos-2.1.2/tos/lib/net/ctp</include>
+<include global="false" include="source" ncc="true" recursive="false">/home/branco/gitspace/Terra/nescino/src/ino</include>
 </includes>
 <excludes>
 <exclude>.*\.svn.*</exclude>
