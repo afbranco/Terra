@@ -53,6 +53,14 @@ public class ControlCoreXBee
 	int CurrentBlockId=-1;
 	Timer TCPtimer;
 	Timer Sendtimer;
+	
+// Control block send
+	int startBlockId;
+	int nextBlockId;
+	int lastBlockId;
+	Timer SendBlocktimer;
+	int sendBusyID=0;
+	boolean sendBlockMultiple=false;
 
 	public ControlCoreXBee(ControlForm Form,String Port,int Baudrate) throws InterruptedException, IOException  {
 		super();
@@ -61,6 +69,7 @@ public class ControlCoreXBee
 		port=Port; // 9002;
 		TCPretries = 0;
 //		serviceOFF = true;
+		SendBlocktimer = new Timer();
 		TCPtimer = new Timer();
 		TCPtimer.schedule(new tryConnect(), 0);
 	}
@@ -183,7 +192,18 @@ public class ControlCoreXBee
 			break;
 		case TX_STATUS_RESPONSE:
 			TxStatusResponse sendDone = (TxStatusResponse)msg;
-			System.out.println("SendDone="+sendDone.getStatus());
+			System.out.println("SendDone="+sendDone.getStatus()+" sendBusyID="+sendBusyID+" nextBlockId="+nextBlockId+" lastBlockId="+lastBlockId+" BlkMultiple="+sendBlockMultiple);
+			if (sendBusyID==newProgBlockMsg.AM_TYPE){
+				nextBlockId++;
+				if (sendBlockMultiple && nextBlockId <= lastBlockId){
+					SendBlocktimer.schedule(new sendNewProgBlockTask(nextBlockId), 100);
+					System.out.println("------> Agendei o timer outra vez!");
+				} else {
+					sendBlockMultiple = false;
+					nextBlockId = startBlockId;
+				}
+			}
+			sendBusyID = 0;
 			break;
 		case UNKNOWN:
 			break;
@@ -265,6 +285,18 @@ public class ControlCoreXBee
 		}
 	}
 	
+	class sendNewProgBlockTask extends TimerTask {
+		int blkId;
+		sendNewProgBlockTask(int BlkId){
+			this.blkId = BlkId;
+		}
+        public void run() {
+        	System.out.println("sendNewProgBlockTask():: blkId="+blkId);
+			sendNewProgBlock(blkId);				
+        }
+    }
+
+	
 	private void procMsg(int amId, int[] msg, int len) {
 		System.out.println("messageReceived:: Type="+ amId + " size="+len);
 
@@ -272,13 +304,27 @@ public class ControlCoreXBee
 		if (amId == reqProgBlockMsg.AM_TYPE) {
 			message_t recMsg = new message_t(msg);
 			reqProgBlockMsg omsg = new reqProgBlockMsg(recMsg.data,0,recMsg.len);
+			System.out.println("ReqOper="+omsg.get_reqOper()+" VersionId="+omsg.get_versionId()+" BlockId="+omsg.get_blockId());
 			
-			VersionId = omsg.get_versionId();
-			if (progBin.isValid()){
-				controlform.recReqProgBlockMsg(progBin.getBlockStart(),omsg.get_blockId(),progBin.getNumBlocks());
+			if (omsg.get_versionId() == 0){
+				System.out.println("Ignoring a Startup BlockRequest from mote "+recMsg.source);
+				return;
 			}
+			if (omsg.get_blockId() < startBlockId || omsg.get_blockId() > lastBlockId){
+				System.out.println("Ignoring a invalid BlockRequest from mote "+recMsg.source);
+				return;
+			}
+			VersionId = omsg.get_versionId();
 			System.out.println(omsg.toString());
-			sendNewProgBlock(omsg.get_blockId());
+
+			if (omsg.get_reqOper() == 2) sendBlockMultiple = true; // 2= RO_DATA_FULL
+			if (progBin!=null){
+				controlform.recReqProgBlockMsg(progBin.getBlockStart(),omsg.get_blockId(),progBin.getNumBlocks());
+				nextBlockId = omsg.get_blockId();
+				SendBlocktimer.schedule(new sendNewProgBlockTask(nextBlockId), 10);
+				System.out.println("------> Agendei o timer na primeira vez!");
+			}
+
 		}
 
 		// Received a reqDataMsg
@@ -339,6 +385,7 @@ public class ControlCoreXBee
 		public sendMsg(String Name, Message Msg){
 			this.name=Name;
 			msg = new message_t(Msg);
+			sendBusyID = Msg.amType();
 		}
 		@Override
 		public void run() {
@@ -389,8 +436,10 @@ public class ControlCoreXBee
 		
 		short[] ProgBlock = progBin.getProgBlock(BlockId);
 		msg.set_data(ProgBlock);
+		System.out.println(">>>> sendNewProgBlock >>>>");
 		System.out.println(msg.toString());
 		TCPtimer.schedule(new sendMsg("NewProgBlock",msg), 10);
+		controlform.updateLoadBar(startBlockId, BlockId);
 	}
 
 
@@ -412,6 +461,10 @@ public class ControlCoreXBee
 		msg.set_inEvts(progBin.getInEvts());
 		msg.set_async0(progBin.getAsync0());
 		
+		startBlockId = progBin.getBlockStart();
+		nextBlockId = startBlockId;
+		lastBlockId = startBlockId + progBin.getNumBlocks() - 1;
+
 		System.out.println(msg.toString());		
 		TCPtimer.schedule(new sendMsg("NewProgVersion",msg), 10);
 	}
