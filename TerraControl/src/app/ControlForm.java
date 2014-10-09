@@ -324,7 +324,7 @@ public class ControlForm {
 		
 		barFSM = new JProgressBar();
 		barFSM.setStringPainted(true);
-		barFSM.setToolTipText("Progress of sending FSM data to BaseStation.");
+		barFSM.setToolTipText("Progress of sending binary data to 1st node.");
 		barFSM.setBounds(414, 563, 161, 14);
 		controlPanel.add(barFSM);
 		
@@ -869,7 +869,7 @@ public class ControlForm {
 		monitorPanel.add(lblTCPStatus2);
 		
 		barFSM2 = new JProgressBar();
-		barFSM2.setToolTipText("Progress of sending VM data to BaseStation.");
+		barFSM2.setToolTipText("Progress of sending VM data to 1st node.");
 		barFSM2.setStringPainted(true);
 		barFSM2.setBounds(22, 42, 161, 14);
 		monitorPanel.add(barFSM2);
@@ -1043,7 +1043,15 @@ public class ControlForm {
 		barFSM2.setMaximum(numBlocks-1);
 		barFSM2.setMinimum(0);
 		barFSM2.setValue(blockId-blockInit);
-		String line = String.format("recReqFSMDataMsg: Block: %d - %d/%d", blockId,blockId-blockInit+1,numBlocks);
+		String line = String.format("recReqProgBlockMsg: Block: %d - %d/%d", blockId,blockId-blockInit+1,numBlocks);
+		appendControlMsg(line);
+	}	
+	
+	public void updateLoadBar(int blockInit,int blockId){
+		System.out.println("updateLoadBar: block="+blockId);
+		barFSM.setValue(blockId-blockInit);
+		barFSM2.setValue(blockId-blockInit);
+		String line = String.format("Load Status: Block: %d - %d/%d", blockId,blockId-blockInit+1,barFSM.getMaximum()+1);
 		appendControlMsg(line);
 	}
 	
