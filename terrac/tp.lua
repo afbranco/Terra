@@ -156,8 +156,8 @@ function _TP.max (tp1, tp2, c)
 end
 
 function _TP.getConstType(val,me,no_wrn)
-	local nval = tonumber(val)
---print("tp::getConstType:",val,nval)
+	local nval = tonumber(val) or string.byte(val,2)
+print("tp::getConstType:",val,nval)
 	if (nval <= 0xff) then return 'ubyte' end
   if (nval <= 0xffff) then return 'ushort' end
   if (nval <= 0xffffffff) then return 'ulong' end
@@ -167,7 +167,7 @@ end
 
 function _TP.getConstLen(val)
 --print("tp::getConstLen:",val)
-	local nval = tonumber(val)
+	local nval = tonumber(val) or string.byte(val,2)
 	if (nval <= 0xff) then return 0 end
 	if (nval <= 0xffff) then return 1 end
 	if (nval <= 0xffffff) then return 2 end
@@ -177,7 +177,7 @@ end
 function _TP.getConstBytes(val,len)
   len = len or 0;
   nx=1
-  local nval = tonumber(val)
+  local nval = tonumber(val) or string.byte(val,2)
   local bytes = string.format('%02x ',nval % 256)
   while (math.floor(nval/256) > 0 or len>1)  and nx < 4 do
     nx = nx+1;
@@ -192,7 +192,7 @@ end
 function _TP.getConstBytesLbl(val,len)
   len = 2;
   nx=1
-  local nval = tonumber(val)
+  local nval = tonumber(val) or string.byte(val,2)
   local bytes = string.format('.%02x ',nval % 256)
   while (math.floor(nval/256) > 0 or len>1)  and nx < 4 do
     nx = nx+1;

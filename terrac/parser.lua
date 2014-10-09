@@ -296,7 +296,8 @@ _GG = {
 
     , SIZEOF = KEY'sizeof' * EK'<' * EV'ID_typenp' * EK'>'
     , CONST = CK( #m.R'09' * (m.R'09'+m.S'xX'+m.R'AF'+m.R'af')^1 )
-            + CK( "'" * (P(1)-"'")^0 * "'" )
+--            + CK( "'" * (P(1)-"'")^0 * "'" )
+            + CK( "'" * (P(1)-"'") * "'" )
 
     , NULL = CK'null'
 
