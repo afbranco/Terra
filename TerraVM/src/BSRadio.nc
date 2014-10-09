@@ -15,4 +15,8 @@ interface BSRadio{
 	command error_t sendBS(void* dataMsg, uint8_t dataSize);
 	event void sendBSDone(message_t* msg,error_t error);
 #endif
+#ifdef INO
+	// Log data to USB0
+	command void logS(uint8_t* data, uint8_t len);
+#endif	
 }
