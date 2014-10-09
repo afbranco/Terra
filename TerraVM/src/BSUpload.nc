@@ -34,4 +34,8 @@ interface BSUpload{
 	// get program section
 	event uint8_t* getSection(uint16_t Addr);
 	
+#ifdef INO
+	// Log data to USB0
+	command void logS(uint8_t* data, uint8_t len);
+#endif	
 }
