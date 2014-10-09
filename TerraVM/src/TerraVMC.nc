@@ -67,6 +67,13 @@ implementation
 	uint32_t pop();
 #endif
 
+
+	void logS(uint8_t* data, uint8_t len){
+#ifdef INO
+		call BSUpload.logS(data,len);
+#endif
+	}
+
 // Ceu intrinsic functions
 //	void ceu_out_wclock(uint32_t ms){ if (ms != CEU_WCLOCK_NONE ) call BSTimerVM.startOneShot(((ms)<1)?1:(ms)); }
 	void ceu_out_wclock(uint32_t ms){ if (ms != CEU_WCLOCK_NONE ) call BSTimerVM.startOneShot(ms); }
@@ -661,8 +668,11 @@ int ceu_go_wclock (int* ret, s32 dt, s32* nxt)
             ceu_spawn(&tmr->lbl);           // spawns sharing phys/ext
         } else {
             tmr->togo -= dt;
-            if ( tmr->togo < 0 ) tmr->togo = 0L;
-            ceu_wclock_lt(tmr);             // next? (sets CEU->wclk_cur)
+            if ( tmr->togo < 0 ) { 
+            	tmr->togo = 0L; 
+            	ceu_spawn(&tmr->lbl);
+            } else
+            	ceu_wclock_lt(tmr);             // next? (sets CEU->wclk_cur)
         }
 //        if (BStation!=TOS_NODE_ID)
 //         	dbg(APPNAME,"CEU::ceu_go_wclock(): Loop2 nos wClocks: tmr->togo=%d, tmr->lbl=%d\n",tmr->togo, tmr->lbl);
@@ -1687,13 +1697,17 @@ void f_tkins_z(uint8_t Modifier){
 
 	event void BSUpload.start(bool resetFlag){
 		uint8_t i, size;
+		MoteID = TOS_NODE_ID;
 		dbg(APPNAME,"VM::BSUpload.start(%s)\n",(resetFlag)?"TRUE":"FALSE");
 		if (resetFlag==TRUE){ // Reset all stuff
 			//Clean up Event Queue
 			size = call evtQ.size();
 			for (i=0; i < size; i++) call evtQ.dequeue();
 		}
-		haltedFlag = FALSE;	
+		if (MoteID==BStation)
+			haltedFlag = TRUE;
+		else
+			haltedFlag = FALSE;	
 
 #ifndef ONLY_BSTATION
 		// Reset VMCustom
