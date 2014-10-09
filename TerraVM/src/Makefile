@@ -147,12 +147,13 @@ ifeq (telosb,$(word 1,$(MAKECMDGOALS)))
   PFLAGS += -DCC2420_DEF_RFPOWER=$(RFPOWER)
   MOTE=telosb
 endif
-ifeq (iris,$(word 1,$(MAKECMDGOALS)))
-  ifeq ($(VM),INO)
+ifeq (ino,$(word 2,$(MAKECMDGOALS)))
     MOTE=ino
-  else
-    MOTE=iris
-  endif
+    ifeq (mega,$(word 1,$(MAKECMDGOALS)))
+        MODEL=mega
+    else
+        $(error Invalid Arduino Board)
+    endif
 endif
 
 #
@@ -206,6 +207,12 @@ else ifeq ($(VM),GRP)
   MB_LONG_ALL = 14
   MB_LONG_NOBS = 14
   MB_TELOSB    = 200
+else ifeq ($(VM),INO)
+  MB_SHORT_ALL =28
+  MB_SHORT_NOBS = 36
+  MB_LONG_ALL = 14
+  MB_LONG_NOBS = 14
+  MB_TELOSB    = 200
 endif
 
 ifeq ($(HYB),YES) # Same value for all types
@@ -241,6 +248,10 @@ else # HYB=NO
   endif
 # TelosB
   ifeq ($(MOTE),telosb)
+    MBLOCKS = $(MB_TELOSB)               # Telos; NO HYB
+  endif
+# Ino Mega
+  ifeq ($(MOTE),ino)
     MBLOCKS = $(MB_TELOSB)               # Telos; NO HYB
   endif
 endif
@@ -302,7 +313,7 @@ MBLOCKS_F = $(shell echo ${MBLOCKS}-${DM_MSGQ}-${DM_SETDATA}-${DM_FFT}-${DM_VOLC
 # force short memory - test with printf
 # MBLOCKS=40
 CFLAGS += -DVM_MEM_BLKS=$(MBLOCKS_F) -DTOSVER=$(TOSVERSION)
-# $(info shell echo ${MBLOCKS}-${DM_MSGQ}-${DM_SETDATA}-${DM_FFT}-${DM_VOLCANO})
+$(info shell echo ${MBLOCKS}-${DM_MSGQ}-${DM_SETDATA}-${DM_FFT}-${DM_VOLCANO})
 
 
 $(info ***********************)
