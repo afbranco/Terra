@@ -1,6 +1,6 @@
 /***********************************************
  * TerraVM - Terra virtual machine project
- * March, 2014
+ * September, 2014
  * Author: A.Branco
  * abranco at inf.puc-rio.br
  * *********************************************/
@@ -12,42 +12,28 @@
 
 enum{
 	
-	// TerraNet local Output events
+	// TerraIno local Output events
 //	O_INIT			=0,
-	O_LEDS			=5,
-	O_LED0			=6,
-	O_LED1			=7,
-	O_LED2			=8,
-	O_TEMP			=9,
-	O_PHOTO			=10,
-	O_VOLTS			=11,
-	O_PORT_A		=12,
-	O_PORT_B		=13,
-	O_CFG_PORT_A	=14,
-	O_CFG_PORT_B	=15,
-	O_REQ_PORT_A	=16,
-	O_REQ_PORT_B	=17,
-	O_CFG_INT_A		=18,
-	O_CFG_INT_B		=19,
-	O_CUSTOM_A		=20,	
+	
+	O_CUSTOM_A		=39,
 	// TerraNet Custom Output events
 	O_SEND			=40,
 	O_SEND_ACK		=41,
-	// Volcano Output event
-	O_RD_STREAM		=50,
 
 	// TerraNet Local Input events
 //	I_ERROR_id		=0,  // Defined in VMError.h
 //	I_ERROR			=1,  // Defined in VMError.h
-	I_TEMP			=5, 
-	I_PHOTO			=6,
-	I_VOLTS			=7,
-	I_PORT_A		=8,
-	I_PORT_B		=9,
-	I_INT_A			=10,
-	I_INT_B			=11,
-	I_CUSTOM_A_ID	=12,
-	I_CUSTOM_A		=13,
+	I_CUSTOM_A_ID 		= 10,
+	I_CUSTOM_A 			= 11,
+	
+	// Ino EVents
+	I_ANA_READ_DONE_ID 	= 20,
+	I_ANA_READ_DONE 	= 21,
+	I_INT_FIRED_ID		= 22,
+	I_INT_FIRED			= 23,
+	I_PULSE_LEN_ID 		= 24,
+	I_PULSE_LEN 		= 25,
+	
 	// TerraNet Custom Input events
 	I_SEND_DONE_ID		=40,
 	I_SEND_DONE			=41,
@@ -57,16 +43,27 @@ enum{
 	I_RECEIVE			=45,
 	I_Q_READY 			=46,
 	
-	// TerraNet basic functions
+	// Terra basic functions
 	F_GETNODEID 	= 0,
 	F_RANDOM		= 1,
-	// TerraNet custom functions
+	// Terra Queue custom functions
 	F_QPUT 			= 10,
 	F_QGET 			= 11,
 	F_QSIZE 		= 12,
 	F_QCLEAR 		= 13,
-	F_FFT_ALLOC 	= 14,
-	F_FFT 			= 15,
+	// TerraIno Specific custom functions
+	F_PIN_MODE 			= 20,
+	F_DIGITAL_WRITE 	= 21,
+	F_DIGITAL_READ 		= 22,
+	F_DIGITAL_TOGGLE 	= 23,
+	F_ANALOG_REFERENCE 	= 24,
+	F_ANALOG_READ 		= 25,
+	F_INT_RISING_EDGE 	= 26,
+	F_INT_FALLING_EDGE	= 27,
+	F_INT_DISABLE 		= 28,
+	F_PULSE_IN 			= 29,
+	F_LOGS 				= 30,
+	
 
 	// Event Type ID - 3 msb bits of EvtId
 	TID_SENSOR_DONE = 0 << 5,
@@ -74,16 +71,6 @@ enum{
 	TID_MSG_DONE = 2 << 5,
 	TID_MSG_REC = 3 << 5,
 	
-	// Sensor IDs (max 31)
-	SENSOR_COUNT = 8,
-	SID_TEMP = 1,
-	SID_PHOTO = 2,
-	SID_LEDS = 3,
-	SID_VOLT = 4,
-	SID_IN1 = 5,
-	SID_IN2 = 6,
-	SID_INT1 = 7,
-	SID_INT2 = 8,
 	
 };
 

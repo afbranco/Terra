@@ -10,12 +10,12 @@ configuration VMCustomC{
 }
 implementation{
 	components VMCustomP as custom;
-	components BasicServicesC as BS;
-//	components SensActC as SA;
-	
+	components BasicServicesC as BS;	
 	custom.VM = VMCustom;
 	custom.BSRadio -> BS;
-//	custom.SA -> SA;
+
+	components InoIOC;
+	custom.InoIO -> InoIOC;
 	
 	components RandomC;
 	custom.Random -> RandomC;

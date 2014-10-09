@@ -7,12 +7,11 @@
 #include "VMCustomIno.h"
 #include "usrMsg.h"
 #include "BasicServices.h"
-//#include "SensAct.h"
 
 module VMCustomP{
 	provides interface VMCustom as VM;
 	uses interface BSRadio;
-//	uses interface SensAct as SA;
+	uses interface InoIO; 
 	uses interface Random;
 #ifdef M_MSG_QUEUE
 	// usrMsg queue
@@ -28,6 +27,9 @@ usrMsg_t ExtDataRadioReceived;	// last radio received msg
 nx_uint8_t ExtDataSendDoneError;
 nx_uint8_t ExtDataWasAcked;
 nx_uint8_t ExtDataQReady;			// last queue ready - queue size 
+nx_uint16_t ExtAnaData;				// last Analog read data
+nx_uint8_t  ExtIntData;				// dummy var for last pin interrupt
+nx_uint32_t ExtPulseData; 			// last Pulse len
 
 /*
  * Output Events implementation
@@ -40,46 +42,7 @@ void  proc_init(uint16_t id, uint32_t value){
 }
 */
 
-// Comment all sensor functions
-/*
-void  proc_leds(uint16_t id, uint32_t value){
-	dbg(APPNAME,"Custom::proc_leds(): id=%d, val=%d\n",id,(uint8_t)value);
-	call SA.setActuator(AID_LEDS, (uint8_t)(value & 0x07));
-}
-void  proc_led0(uint16_t id, uint32_t value){
-	dbg(APPNAME,"Custom::proc_led0(): id=%d, value=%d\n",id,(uint8_t)value);
-	if (value > 1) 
-		call SA.setActuator(AID_LED0_TOGGLE, (uint8_t)(value & 0x07));
-	else
-		call SA.setActuator(AID_LED0, (uint8_t)(value & 0x01));
-}
-void  proc_led1(uint16_t id, uint32_t value){
-	dbg(APPNAME,"Custom::proc_led1(): id=%d, value=%d\n",id,(uint8_t)value);
-	if (value > 1) 
-		call SA.setActuator(AID_LED1_TOGGLE, (uint8_t)(value & 0x07));
-	else
-		call SA.setActuator(AID_LED1, (uint8_t)(value & 0x01));
-}
-void  proc_led2(uint16_t id, uint32_t value){
-	dbg(APPNAME,"Custom::proc_led2(): id=%d, value=%d\n",id,(uint8_t)value);
-	if (value > 1) 
-		call SA.setActuator(AID_LED2_TOGGLE, (uint8_t)(value & 0x07));
-	else
-		call SA.setActuator(AID_LED2, (uint8_t)(value & 0x01));
-}
-void  proc_req_temp(uint16_t id, uint32_t value){
-	dbg(APPNAME,"Custom::proc_req_temp(): id=%d\n",id);
-	call SA.reqSensor(REQ_SOURCE1,SID_TEMP);
-	}
-void  proc_req_photo(uint16_t id, uint32_t value){
-	dbg(APPNAME,"Custom::proc_req_photo(): id=%d\n",id);
-	call SA.reqSensor(REQ_SOURCE1,SID_PHOTO);
-	}
-void  proc_req_volts(uint16_t id, uint32_t value){
-	dbg(APPNAME,"Custom::proc_req_volts(): id=%d\n",id);
-	call SA.reqSensor(REQ_SOURCE1,SID_VOLT);
-	}
-*/
+
 void  proc_send_x(uint16_t id,uint16_t addr,uint8_t ack){
 	usrMsg_t* usrMsg;
 	uint8_t reqRetryAck;
@@ -97,41 +60,7 @@ void  proc_send_ack(uint16_t id, uint32_t addr){
 	proc_send_x(id,(uint16_t)addr,TRUE);
 	}
 
-// commnet all I/O functions
-/*
-void  proc_set_port_a(uint16_t id, uint32_t value){
-	dbg(APPNAME,"Custom::proc_set_port_a(): id=%d, value=%d\n",id,value);
-	call SA.setActuator(AID_OUT1, (uint8_t)(value & 0x01));
-}
-void  proc_set_port_b(uint16_t id, uint32_t value){
-	dbg(APPNAME,"Custom::proc_set_port_b(): id=%d, value=%d\n",id,value);
-	call SA.setActuator(AID_OUT2, (uint8_t)(value & 0x01));
-}
-void  proc_cfg_port_a(uint16_t id, uint32_t value){
-	dbg(APPNAME,"Custom::proc_cfg_port_a(): id=%d, value=%d\n",id,value);
-	call SA.setActuator(AID_PIN1, (uint8_t)(value & 0x01));
-}
-void  proc_cfg_port_b(uint16_t id, uint32_t value){
-	dbg(APPNAME,"Custom::proc_cfg_port_b(): id=%d, value=%d\n",id,value);
-	call SA.setActuator(AID_PIN2, (uint8_t)(value & 0x01));
-}
-void  proc_req_port_a(uint16_t id, uint32_t value){
-	dbg(APPNAME,"Custom::proc_req_port_a(): id=%d\n",id);
-	call SA.reqSensor(REQ_SOURCE1,SID_IN1);
-	}
-void  proc_req_port_b(uint16_t id, uint32_t value){
-	dbg(APPNAME,"Custom::proc_req_port_b(): id=%d\n",id);
-	call SA.reqSensor(REQ_SOURCE1,SID_IN2);
-	}
-void  proc_cfg_int_a(uint16_t id, uint32_t value){
-	dbg(APPNAME,"Custom::proc_cfg_int_a(): id=%d, value=%d\n",id,value);
-	call SA.setActuator(AID_INT1, (uint8_t)value);
-	}
-void  proc_cfg_int_b(uint16_t id, uint32_t value){
-	dbg(APPNAME,"Custom::proc_cfg_int_b(): id=%d value=%d\n",id,value);
-	call SA.setActuator(AID_INT2, (uint8_t)value);
-	}
-*/
+
 void  proc_req_custom_a(uint16_t id, uint32_t value){
 	uint8_t auxId ;
 	ExtDataCustomA = (uint8_t)value;
@@ -190,12 +119,134 @@ void  func_qSize(uint16_t id){
 void  func_qClear(uint16_t id){
 	error_t stat;
 	dbg(APPNAME,"Custom::func_qClear(): id=%d\n",id);
-	// return queue size
+	// Clear the queue
 	stat = call usrDataQ.clearAll();
 	signal VM.push(stat);
 	}
 #endif //M_MSG_QUEUE
 
+/**
+ * Ino functions
+ */
+
+void  func_pinMode(uint16_t id){
+	error_t stat;
+	digital_enum pin;
+	pinmode_enum mode;
+	dbg(APPNAME,"Custom::func_pinMode(): id=%d\n",id);
+	mode = (uint8_t)signal VM.pop();
+	pin = (uint8_t)signal VM.pop();
+	stat = SUCCESS;
+	call InoIO.pinMode(pin,mode);
+	signal VM.push(stat);
+	}
+
+
+void  func_digitalWrite(uint16_t id){
+	error_t stat;
+	digital_enum pin;
+	pinvalue_enum value;
+	dbg(APPNAME,"Custom::func_digitalWrite(): id=%d\n",id);
+	value = (uint8_t)signal VM.pop();
+	pin = (uint8_t)signal VM.pop();
+	stat = SUCCESS;
+	call InoIO.digitalWrite(pin,value);
+	signal VM.push(stat);
+	}
+
+void  func_digitalRead(uint16_t id){
+	error_t stat;
+	digital_enum pin;
+	dbg(APPNAME,"Custom::func_digitalRead(): id=%d\n",id);
+	pin = (uint8_t)signal VM.pop();
+	stat = call InoIO.digitalRead(pin);
+	signal VM.push(stat);
+	}
+
+void  func_digitalToggle(uint16_t id){
+	error_t stat;
+	digital_enum pin;
+	dbg(APPNAME,"Custom::func_digitalToggle(): id=%d\n",id);
+	pin = (uint8_t)signal VM.pop();
+	stat = SUCCESS;
+	call InoIO.digitalToggle(pin);
+	signal VM.push(stat);
+	}
+
+void  func_analogReference(uint16_t id){
+	error_t stat;
+	analogref_enum type;
+	dbg(APPNAME,"Custom::func_analogReference(): id=%d\n",id);
+	type = (uint8_t)signal VM.pop();
+	stat = SUCCESS;
+	call InoIO.analogReference(type);
+	signal VM.push(stat);
+	}
+
+void  func_analogRead(uint16_t id){
+	error_t stat;
+	analog_enum pin;
+	dbg(APPNAME,"Custom::func_analogRead(): id=%d\n",id);
+	pin = (uint8_t)signal VM.pop();
+	stat = call InoIO.analogRead(pin);
+	signal VM.push(stat);
+	}
+
+void  func_interruptRisingEdge(uint16_t id){
+	error_t stat;
+	interrupt_enum intPin;
+	dbg(APPNAME,"Custom::func_interruptRisingEdge(): id=%d\n",id);
+	intPin = (uint8_t)signal VM.pop();
+	stat = SUCCESS;
+	call InoIO.interruptRisingEdge(intPin);
+	signal VM.push(stat);
+	}
+
+void  func_interruptFallingEdge(uint16_t id){
+	error_t stat;
+	interrupt_enum intPin;
+	dbg(APPNAME,"Custom::func_interruptFallingEdge(): id=%d\n",id);
+	intPin = (uint8_t)signal VM.pop();
+	stat = SUCCESS;
+	call InoIO.interruptFallingEdge(intPin);
+	signal VM.push(stat);
+	}
+
+void  func_interruptDisable(uint16_t id){
+	error_t stat;
+	interrupt_enum intPin;
+	dbg(APPNAME,"Custom::func_interruptDisable(): id=%d\n",id);
+	intPin = (uint8_t)signal VM.pop();
+	stat = SUCCESS;
+	call InoIO.interruptDisable(intPin);
+	signal VM.push(stat);
+	}	
+
+void  func_pulseIn(uint16_t id){
+	error_t stat;
+	interrupt_enum intPin;
+	pinvalue_enum value;
+	uint32_t timeout;
+	dbg(APPNAME,"Custom::func_pulseIn(): id=%d\n",id);
+	timeout= (uint32_t)signal VM.pop();
+	value  = (uint8_t) signal VM.pop();
+	intPin = (uint8_t) signal VM.pop();
+	stat = SUCCESS;
+	call InoIO.pulseIn(intPin,value,timeout);
+	signal VM.push(stat);
+	}
+
+void  func_logS(uint16_t id){
+	error_t stat;
+	uint8_t* data;
+	uint8_t len;
+	dbg(APPNAME,"Custom::func_logS(): id=%d\n",id);
+	len = (uint8_t) signal VM.pop();
+	data = signal VM.getRealAddr((uint16_t)signal VM.pop(),2);
+	stat = SUCCESS;
+	call BSRadio.logS(data,len);
+	signal VM.push(stat);
+	}
 
 /**
  *	procOutEvt(uint8_t id)
@@ -207,23 +258,8 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 	dbg(APPNAME,"Custom::procOutEvt(): id=%d\n",id);
 	switch (id){
 //		case O_INIT 		: proc_init(id,value); break;
-/*		case O_LEDS 		: proc_leds(id,value); break;
-		case O_LED0 		: proc_led0(id,value); break;
-		case O_LED1 		: proc_led1(id,value); break;
-		case O_LED2 		: proc_led2(id,value); break;
-		case O_TEMP 	: proc_req_temp(id,value); break;
-		case O_PHOTO 	: proc_req_photo(id,value); break;
-		case O_VOLTS 	: proc_req_volts(id,value); break;  */
 		case O_SEND 		: proc_send(id,value); break;
 		case O_SEND_ACK 	: proc_send_ack(id,value); break;
-/*		case O_PORT_A : proc_set_port_a(id,value); break;
-		case O_PORT_B : proc_set_port_b(id,value); break;
-		case O_CFG_PORT_A : proc_cfg_port_a(id,value); break;
-		case O_CFG_PORT_B : proc_cfg_port_b(id,value); break;
-		case O_REQ_PORT_A : proc_req_port_a(id,value); break;
-		case O_REQ_PORT_B : proc_req_port_b(id,value); break;
-		case O_CFG_INT_A 	: proc_cfg_int_a(id,value); break;
-		case O_CFG_INT_B 	: proc_cfg_int_b(id,value); break; */
 		case O_CUSTOM_A : proc_req_custom_a(id,value); break;
 	}
 }
@@ -240,6 +276,17 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 			case F_QSIZE 	: func_qSize(id); break;
 			case F_QCLEAR 	: func_qClear(id); break;		
 #endif
+			case F_PIN_MODE			: func_pinMode(id); break;
+			case F_DIGITAL_WRITE	: func_digitalWrite(id); break;
+			case F_DIGITAL_READ 	: func_digitalRead(id); break;
+			case F_DIGITAL_TOGGLE 	: func_digitalToggle(id); break;
+			case F_ANALOG_REFERENCE	: func_analogReference(id); break;
+			case F_ANALOG_READ		: func_analogRead(id); break;
+			case F_INT_RISING_EDGE	: func_interruptRisingEdge(id); break;
+			case F_INT_FALLING_EDGE	: func_interruptFallingEdge(id); break;
+			case F_INT_DISABLE 		: func_interruptDisable(id); break;
+			case F_PULSE_IN 		: func_pulseIn(id); break;
+			case F_LOGS 			: func_logS(id); break;
 		}
 	}
 
@@ -283,34 +330,10 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 			dbg(APPNAME,"Custom::BSRadio.sendDoneAck(): Discarting sendDoneAck AM_ID = %d\n",am_id);
 		}
 	}
-// Comment all Sensor & I/O functions
-/*
-	uint8_t wd2ceuSensorId(uint8_t wdId){
-		switch (wdId & 0x01f){
-			case SID_TEMP: return I_TEMP;
-			case SID_PHOTO: return I_PHOTO;
-			case SID_VOLT: return I_VOLTS;
-			case SID_IN1: return I_PORT_A;
-			case SID_IN2: return I_PORT_B;
-			case SID_INT1: return I_INT_A;
-			case SID_INT2: return I_INT_B;
-		}
-		return 0;
-	}
-	event void SA.Ready(uint8_t reqSource, uint8_t codeEvt_id){
-		dbg(APPNAME,"Custom::SA.Ready()\n");
-		switch (reqSource) {
-			case REQ_SOURCE1 : signal VM.queueEvt(wd2ceuSensorId(codeEvt_id), 0, call SA.getDatap((uint8_t)(codeEvt_id & 0x1f))); break;			
-//			case REQ_SOURCE2 : break;  // TBD
-//			case REQ_SOURCE3 : break;  // TBD
-//			case REQ_SOURCE4 : break;  // TBD
-			default:dbg(APPNAME,"Custom::SA.Ready(): reqSource not defined - %d\n",reqSource);
-		}		
-	}
-*/
+
 
 /**
- * Custom usrDataueue
+ * Custom usrDataQueue
  */
 #ifdef M_MSG_QUEUE
 	event void usrDataQ.dataReady(){
@@ -327,4 +350,26 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		// In future may return an event to VM.
 	}
 #endif // MODULE_CTP
+
+/**
+ * Ino Events
+ */
+
+	event void InoIO.analogReadDone(analog_enum pin, uint16_t value){
+		ExtAnaData = value;
+		signal VM.queueEvt(I_ANA_READ_DONE_ID, (uint8_t)pin, &ExtAnaData);
+		signal VM.queueEvt(I_ANA_READ_DONE,               0, &ExtAnaData);
+	}
+
+	event void InoIO.interruptFired(interrupt_enum intPin){
+		ExtIntData = 0;
+		signal VM.queueEvt(I_INT_FIRED_ID, (uint8_t)intPin, &ExtIntData);
+		signal VM.queueEvt(I_INT_FIRED,                  0, &ExtIntData);
+	}
+
+	event void InoIO.pulseLen(interrupt_enum intPin, pinvalue_enum value, uint32_t len){
+		ExtPulseData = len;
+		signal VM.queueEvt(I_PULSE_LEN_ID, (uint8_t)intPin, &ExtPulseData);
+		signal VM.queueEvt(I_PULSE_LEN,                  0, &ExtPulseData);
+	}
 }
