@@ -125,6 +125,7 @@ module BasicServicesP{
 #endif
 
 
+#ifdef INO
 // afb log
   uses {
   	interface UartStream as Uart0;
@@ -132,6 +133,7 @@ module BasicServicesP{
   	interface Queue<uint8_t> as LogQ;
   	interface InoIO;
   }
+#endif
 
 }
 implementation{
@@ -200,8 +202,9 @@ implementation{
   uint8_t logIdx;
   uint8_t logLen;
   uint8_t logIdle=TRUE;
-  char logData[10];
-  
+
+  uint8_t logData[10];  
+#ifdef INO
   task void logProc(){
   	uint8_t logByte;
 	if (call LogQ.size() > 0) {
@@ -221,11 +224,14 @@ implementation{
   	for (idx=0; idx<len;idx++) call LogQ.enqueue(logMsg[idx]);
   	if (logIdle) post logProc();
   }
+#else
+  void logS(uint8_t* logMsg, uint8_t len){}
+#endif
 
 // afb
 
 /* **********************************************************************************
- *        Initialize parameters, switch-on the radio, and startup protocols.
+ *        Initialize parameters, switch-on the radio, and start protocols.
 \* **********************************************************************************/
 
 	/**
@@ -256,17 +262,11 @@ implementation{
 	event void TOSBoot.booted(){
 		uint32_t rnd=0;
 		dbg(APPNAME, "BS::TOSBoot.booted().\n");
-// afb
-call InoIO.pinMode(D22,OUTPUT);
-call InoIO.pinMode(D23,OUTPUT);
-call InoIO.pinMode(D24,OUTPUT);
-call InoIO.digitalWrite(D22,HIGH);
-call InoIO.digitalWrite(D23,HIGH);
-call InoIO.digitalWrite(D24,HIGH);
 
-call InoIO.digitalWrite(D22,LOW);
-
+// log afb
+#ifdef INO
 call Uart0Ctl.start();
+#endif
 logS("A",1);
 		MoteID = TOS_NODE_ID;
 		rnd = call Random.rand32() & 0x0f;
@@ -631,6 +631,7 @@ logS("r",1);
  		signal BSUpload.stop();
  		signal BSUpload.resetMemory();
  		TViewer("vmstop",0,0);
+logS("I",1);
  		// Get new version ID - If it is the BStation, use last loaded version + 1.
  		if (MoteID != BStation){
  			ProgVersion = Data->versionId;
@@ -647,7 +648,7 @@ logS("r",1);
  		//printBM();
 		{
 	 		reqProgBlock_t xData;
-	 		// send a recProgBlock full
+	 		// send a reqProgBlock full
 	 		ProgTimeOutCounter=0;
 		 	xData.reqOper=RO_DATA_FULL;
 		 	ReqState = RO_DATA_FULL;
@@ -681,11 +682,17 @@ logS("r",1);
 		 // Update memory and BitMap
 		 signal BSUpload.loadSection(Addr , (uint8_t)BLOCK_SIZE, &lData[0]);
 		 call BM.set((uint16_t)Data->blockId);
+logData[0]='M';
+logData[1]='0'+(Data->blockId%100)/10;
+logData[2]='0'+(Data->blockId%10)/1;
+logS(logData,3);
 		 // Reset timeOut counter
 		 ProgTimeOutCounter = 0;
 //		printf("pend%d.",call BM.countPend());printfflush();
 		 // Check if it was the last block
 		 if ( call BM.isAllBitSet()) {
+logData[0]='F';
+logS(logData,1);
 //		 	call Leds.set(0);
 		 	loadingProgramFlag = FALSE;
 		 	if (MoteID != BStation){
@@ -774,6 +781,9 @@ logS("r",1);
 		 uint16_t nextBlock=CURRENT_MAX_BLOCKS;
 		 reqProgBlock_t Data;
 		 uint32_t timeout=REQUEST_TIMEOUT;
+logData[0]='T';
+logData[1]='0'+ReqState;
+logS(logData,2);
 		 nextBlock = getNextEmptyBlock();
 		 dbg(APPNAME, "BS::ProgReqTimer.fired(). nextBlock=%d\n",nextBlock);
 		 lastRecNewProgVersion = 0;
@@ -1598,6 +1608,12 @@ logS("s",1);
 
 
 // afb
+
+	// Log data to USB0
+#ifdef INO
+	command void BSUpload.logS(uint8_t* data, uint8_t len){logS(data,len);}
+	command void BSRadio.logS(uint8_t* data, uint8_t len){logS(data,len);}
+
 	async event void Uart0.receivedByte(uint8_t byte){
 		// TODO Auto-generated method stub
 	}
@@ -1609,4 +1625,5 @@ logS("s",1);
 	event void InoIO.interruptFired(interrupt_enum intPin){}
 	event void InoIO.pulseLen(interrupt_enum intPin, pinvalue_enum value, uint32_t data){}
 	event void InoIO.analogReadDone(analog_enum pin, uint16_t data){}
+#endif
 }

@@ -156,6 +156,7 @@ implementation{
 	BS.sendBSNet -> sendBS;
 #endif
 
+#ifdef INO
 // afb
   components Atm128Uart0C as UART0;
   BS.Uart0 -> UART0;
@@ -164,5 +165,5 @@ implementation{
   BS.LogQ -> LogQ;
   components InoIOC;
   BS.InoIO -> InoIOC;
-	
+#endif	
 }
