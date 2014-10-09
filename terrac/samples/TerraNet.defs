@@ -2,7 +2,12 @@
 #ifndef _TERRANET_
 #define _TERRANET_
 config 00.01.00 do
-
+/*
+ * ATENTION: DO NOT use comments with '/**', always use only one star!
+ * Actual compiler has a bug to identifier this type of comments. 
+ */
+ 
+ 
 /*
  * Define constants
  */

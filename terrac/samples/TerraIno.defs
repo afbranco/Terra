@@ -1,0 +1,226 @@
+/*{-{*/
+#ifndef _TERRAINO_
+#define _TERRAINO_
+config 00.01.00 do
+/*
+ * ATENTION: DO NOT use comments with '/**', always use only one star!
+ * Actual compiler has a bug to identifier this type of comments. 
+ */
+
+/*
+ * Define constants
+ */
+
+
+// error_t
+#define SUCCESS 0 
+     // FAIL > 0
+// Boolean
+#define TRUE 1
+#define FALSE 0
+// Leds Constants
+#define ON 1
+#define OFF 0
+
+
+
+// Start Ino Constants
+	/*
+	 * Digital Pins
+	 */
+
+#define D22  0	// PA0
+#define D23  1	// PA1
+#define D24  2	// PA2
+#define D25  3	// PA3
+#define D26  4	// PA4
+#define D27  5	// PA5
+#define D28  6	// PA6
+#define D29  7	// PA7
+
+#define D53  8	// PB0 (SS)
+#define D52  9	// PB1 (SCK)
+#define D51 10	// PB2 (MOSI)
+#define D50 11	// PB3 (MISO)
+#define D10 12	// PB4 (PWM/OC2A)
+#define D11 13	// PB5 (PWM/OC1A)
+#define D12 14	// PB6 (PWM/OC1B)
+#define D13 15	// PB7 (PWM/OC0A/OC1C)
+	 
+#define D37 16 	// PC0
+#define D36 17 	// PC1
+#define D35 18 	// PC2
+#define D34 19 	// PC3
+#define D33 20 	// PC4
+#define D32 21 	// PC5
+#define D31 22 	// PC6
+#define D30 23 	// PC7
+
+#define D21 24 	// PD0 (SCL)
+#define D20 25 	// PD1 (SDA)
+#define D19 26 	// PD2 (RX1)
+#define D18 27 	// PD3 (TX1)
+	 //Dxx = 28, 	// PD4
+	 //Dxx = 29, 	// PD5
+	 //Dxx = 30, 	// PD6
+#define D38 31 	// PD7
+	 
+#define D0 32 	// PE0 (RX0)
+#define D1 33 	// PE1 (TX0)
+	 //Dxx = 34, 	// PE2
+#define D5 35 	// PE3 (PWM/OC3A)
+#define D2 36 	// PE4 (PWM/OC3B) [INT4]
+#define D3 37 	// PE5 (PWM/OC3C) [INT5]
+	 //Dxx = 38, 	// PE6
+	 //Dxx = 39, 	// PE7
+
+	// PG ????
+	
+	// PH ???? 
+
+	// PJ ???? 
+
+#define A0   0 	// PF0 (ADC0)  
+#define A1   1 	// PF1 (ADC1)  
+#define A2   2 	// PF2 (ADC2)  
+#define A3   3 	// PF3 (ADC3)  
+#define A4   4 	// PF4 (ADC4)  
+#define A5   5 	// PF5 (ADC5)  
+#define A6   6 	// PF6 (ADC6)  
+#define A7   7 	// PF7 (ADC7)  
+
+	// PK ????
+#define A8   8 	// PK0 (ADC8)  
+#define A9   9 	// PK1 (ADC9)  
+#define A10 10 	// PK2 (ADC10)  
+#define A11 11 	// PK3 (ADC11)  
+#define A12 12 	// PK4 (ADC12)  
+#define A13 13 	// PK5 (ADC13)  
+#define A14 14 	// PK6 (ADC14)  
+#define A15 15 	// PK7 (ADC15)  
+
+
+	// PL ???? 
+
+	/*
+	 * Interruption pins
+	 */
+
+#define I0 0 
+#define I1 1 
+#define I2 2 
+#define I3 3 
+
+	/*
+	 * Pin mode
+	 */
+
+#define INPUT  0
+#define OUTPUT  1
+#define INPUT_PULLUP 2
+
+	/*
+	 * Pin Value
+	 */
+
+#define LOW  0
+#define HIGH 1
+
+	/*
+	 * Analog Reference voltage
+	 */
+
+#define DEFAULT 	0 
+#define INTERNAL 	1 
+#define INTERNAL1V1 2 
+#define INTERNAL2V56 3 
+#define EXTERNAL 	4
+
+
+// End Ino Constants
+
+
+// Message
+#define BROADCAST 0xffff
+#define SEND_DATA_SIZE 16
+// VM Error codes
+#define E_DIVZERO 10 // Division by zero
+#define E_IDXOVF  11 // Array index overflow
+#define E_STKOVF  20 // Stack overflow -- fatal
+
+
+
+/*
+ * Define custom registers
+ */
+
+	// radioMsg - Radio/Queue Data Message Register
+	packet radioMsg with
+		var ubyte type;
+		var ushort source;
+		var ushort target;
+		var payload[20] data;
+	end
+
+
+	// Terra local Output events
+//	output void		INIT			ubyte 0;
+	output void 	REQ_CUSTOM_A	ubyte 20;
+	// TerraNet Custom Output events
+	output void 	SEND			radioMsg 40;
+	output void 	SEND_ACK		radioMsg 41;
+
+	// TerraNet Local Input events
+	input ubyte 	ERROR 		 	ubyte 	0;
+	input ubyte 	ERROR 			void	1;
+	input ubyte 	CUSTOM_A_ID		ubyte 	10;
+	input ubyte 	CUSTOM_A 		void 	11;
+
+	// Ino EVents
+	input ubyte	ANA_READ_DONE_ID	ubyte	20;
+	input ubyte	ANA_READ_DONE		void	21;
+	input ubyte	INT_FIRED_ID		ubyte	22;
+	input ubyte	INT_FIRED		void	23;
+	input ubyte	INT_PULSE_LEN_ID	ubyte	24;
+	input ubyte	INT_PULSE_LEN		void	25;
+
+
+	// TerraNet Custom Input events
+	input ubyte 	SEND_DONE 		ubyte	40;
+	input ushort 	SEND_DONE 		void 	41;
+	input ubyte 	SEND_DONE_ACK	ubyte	42;
+	input ubyte 	SEND_DONE_ACK	void	43;
+	input radioMsg	RECEIVE 		ubyte 	44;
+	input radioMsg	RECEIVE 		void 	45;
+	input ubyte 	Q_READY 		void 	46;
+
+	// Terra basic functions
+	function pure ushort getNodeId()		0;
+	function pure ushort random()			1;
+	// TerraNet custom functions
+	function nohold ubyte qPut(radioMsg) 	10;
+	function nohold ubyte qGet(radioMsg) 	11;
+	function pure ubyte qSize()				12;
+	function pure ubyte qClear()			13;
+	// TerraIno Specific custom functions
+	function ubyte pinMode(ubyte,ubyte) 		20;
+	function ubyte digitalWrite(ubyte,ubyte) 	21;
+	function ubyte digitalRead(ubyte) 			22;
+	function ubyte digitalToggle(ubyte) 		23;
+	function ubyte analogReference(ubyte) 		24;
+	function ushort analogRead(ubyte) 			25;
+	function ubyte interruptRisingEdge(ubyte) 	26;
+	function ubyte interruptFallingEdge(ubyte) 	27;
+	function ubyte interruptDisable(ubyte) 		28;
+	function ubyte pulseIn(ubyte) 				29;
+	function nohold ubyte logS(ubyte*,ubyte) 			30;
+
+// Deterministic
+// ???
+					
+// await/until macro
+#define await_until(ret,evt,cond) loop do ret = await evt; if cond then break; end end
+
+end
+#endif
+/*}-}*/

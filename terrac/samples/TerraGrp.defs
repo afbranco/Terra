@@ -2,7 +2,11 @@
 #ifndef _TERRAGRP_
 #define _TERRAGRP_
 config 00.02.00 do
-
+/*
+ * ATENTION: DO NOT use comments with '/**', always use only one star!
+ * Actual compiler has a bug to identifier this type of comments. 
+ */
+ 
 /*
  * Define constants
  */
