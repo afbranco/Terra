@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<buildTargets>
+<default version="4">
+<default>true</default>
+<project/>
+<target>iris</target>
+<make-extras/>
+<includes>
+<include global="false" include="system" ncc="true" recursive="true">/home/branco/gitspace/Terra/nescino/src/build/iris</include>
+</includes>
+<excludes>
+<exclude>.*\.svn.*</exclude>
+</excludes>
+<typedefs/>
+<macros/>
+<boards>
+<board>mda100</board>
+</boards>
+<no-std-incl>false</no-std-incl>
+<component/>
+<component-file/>
+<include-last-build>true</include-last-build>
+<include-env-default-paths>true</include-env-default-paths>
+<environment_variables/>
+</default>
+<client-data/>
+</buildTargets>
