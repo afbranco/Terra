@@ -65,6 +65,7 @@ implementation{
 	event void XBeeApi.txReqDone(error_t status){
 		// If it get a send error, return a sendDone with the error
 		if (status != SUCCESS){
+			radioBusy = FALSE;
 			call SendTimeOut.stop();
 			signal AMSend.sendDone[lastSend_p->amid](lastSend_p, status);
 		}
@@ -203,7 +204,7 @@ implementation{
 	}
 
 	async command bool PacketAcknowledgements.wasAcked(message_t *msg){
-		return msg->opt;
+		return msg->opt==0;
 	}
 
 	async command error_t PacketAcknowledgements.noAck(message_t *msg){
