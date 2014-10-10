@@ -157,7 +157,7 @@ end
 
 function _TP.getConstType(val,me,no_wrn)
 	local nval = tonumber(val) or string.byte(val,2)
-print("tp::getConstType:",val,nval)
+--print("tp::getConstType:",val,nval)
 	if (nval <= 0xff) then return 'ubyte' end
   if (nval <= 0xffff) then return 'ushort' end
   if (nval <= 0xffffffff) then return 'ulong' end
