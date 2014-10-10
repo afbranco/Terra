@@ -22,7 +22,7 @@ ino:
 	/home/branco/arduino-1.0.5/hardware/tools/avr/bin/avr-objcopy -O ihex -R .eeprom build/iris/main.exe build/iris/main.hex
 
 install: ino
-	/home/branco/arduino-1.0.5/hardware/tools/avrdude -C/home/branco/arduino-1.0.5/hardware/tools/avrdude.conf  -v -patmega2560 -cwiring -P/dev/ttyACM0 -b115200 -D -Uflash:w:build/iris/main.hex:i
+	/home/branco/arduino-1.0.5/hardware/tools/avrdude -C/home/branco/arduino-1.0.5/hardware/tools/avrdude.conf  -v -patmega2560 -cwiring -P$(INO_INSTALL_PORT) -b115200 -D -Uflash:w:build/iris/main.hex:i
 	
 	
 

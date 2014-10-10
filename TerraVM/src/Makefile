@@ -29,8 +29,13 @@
 #    RFPOWER=03
 #                       Ref.: http://www.ti.com/lit/ds/symlink/cc2420.pdf ; pag-51, table:9
 #
+# XBee USB Connection: 0 or 1 | default 1
+#    INO_XBEE_USB=0
+#
 # Command line examples
 #  make micaz  VM=GRP TYPE=NOBS QUEUE=SHORT install.2 mib520,/dev/ttyUSB0 HYB=NO
+
+
 
 #
 # Check options
@@ -78,6 +83,17 @@ ifneq ($(findstring sim,$(MAKECMDGOALS)),)
   endif
 endif
 
+INO_XBEE_USB ?= 1
+ifneq ($(INO_XBEE_USB),0)
+  ifneq ($(INO_XBEE_USB),1)
+    $(error INO_XBEE_USB must be "0" or "1")
+  endif
+endif
+
+INO_INSTALL_PORT ?= /dev/ttyACM0
+
+
+
 #TinyOS micaz default radio power
 RFPOWER ?= 03
 ifneq ($(findstring $(RFPOWER), 0 1 2 3 4 5 6 7 8 9),)
@@ -113,7 +129,7 @@ ifeq ($(VM),GRP)
 endif
 ifeq ($(VM),INO)
 	VMDIR = $(APPDIR)/CustomVMs/TerraIno
-	CFLAGS += -I$(INODIR) -DINO
+	CFLAGS += -I$(INODIR) -DINO -DINO_XBEE_USB=$(INO_XBEE_USB)
 endif
 
 #
