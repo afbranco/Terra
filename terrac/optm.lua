@@ -154,7 +154,7 @@ end
 local lblL,lblH;
 local lastOp,execOp,lastLabel, execLabel, prevLabel
 for x,op in pairs(_AST.root.opcode) do
-print(x,op)
+--print(x,op)
   if (string.sub(op,1,1) ~= 'L') then
     if (string.sub(op,1,1) == '.') then
       if (lblH==nil) then
@@ -172,13 +172,13 @@ print(x,op)
     else
       local op_num = tonumber('0x'..op)
       if execOp and op_num==opcode.op_end then -- next opcode is an 'end'
-print('*********************:', prevLabel,execLabel,lastLabel) 
+--print('*********************:', prevLabel,execLabel,lastLabel) 
         if (prevLabel~=execLabel and execLabel==lastLabel) then -- remove the 'exec' oper
           local count = 1
           local remove = true
           while remove do
             if (string.sub(_AST.root.opcode[x-count],1,1) == '.') then
-print('removing: ',x-count-2,_AST.root.opcode[x-count-2],_AST.root.opcode[x-count-1],_AST.root.opcode[x-count])
+--print('removing: ',x-count-2,_AST.root.opcode[x-count-2],_AST.root.opcode[x-count-1],_AST.root.opcode[x-count])
               _AST.root.opcode[x-count]   = '_'
               _AST.root.opcode[x-count-1] = '_'
               _AST.root.opcode[x-count-2] = '_'
