@@ -1401,7 +1401,7 @@ F = {
         BYTECODE(me,codeB,'op_push_c',arr.val+(idx.val*_ENV.c[idx_tp].len))  
     elseif (arr.tag == 'Var') and (idx.tag=='Var') then  -- push direct the addr and idx
         codeB = LINE(me,'pusharr_v &'..arr[1]..'['..idx[1]..']',nil,'')
-        BYTECODE(me,codeB,'op_pusharr_v',arr.tp,idx.tp,idx.val,arr.arr*1,arr.val)  
+        BYTECODE(me,codeB,'op_pusharr_v',_TP.deref(arr.tp),idx.tp,idx.val,arr.arr*1,arr.val)  
     elseif (arr.tag == 'Op2_.')  and not(_TP.deref(arr[2].tp)) and (idx.tag=='CONST') then  -- push direct the var.field addr + idx
         ASR((idx.val*1 < arr.arr*1),me,'array index out of range, 0..'.. arr.arr-1 ..'.')
 --print("code::Op2_idx: ",arr[2][1]..'.'..arr[3]..'['..idx.val..']', arr[2].val, arr[2].fst.fields[arr[3]].val, me.tp, (idx.val*_ENV.c[me.tp].len))
