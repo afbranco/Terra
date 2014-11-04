@@ -43,7 +43,12 @@ public class ControlMoteIF extends MoteIF {
 		public void error(IOException e) {
 			System.out.println("WDPhoenixError: "+e.getMessage());
 			source.shutdown();
-			wdForm.restartTCP();
+			try {
+				wdForm.restartTCP();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
 		
 	}

@@ -10,6 +10,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
@@ -55,8 +56,7 @@ import javax.swing.JCheckBox;
 
 public class ControlForm {
 
-//	ControlCore terracore;
-	ControlCoreXBee terracore;
+	ControlCore terracore;
 	ProgBin progBin;
 	
 	static int DataMsgsCount=1;
@@ -178,10 +178,11 @@ public class ControlForm {
 
 	/**
 	 * Create the application.
+	 * @throws FileNotFoundException 
 	 * @throws IOException 
 	 * @throws InterruptedException 
 	 */
-	public ControlForm() throws InterruptedException, IOException {
+	public ControlForm() throws FileNotFoundException, IOException, InterruptedException {
 		initialize();
 		Timer clockTimer = new Timer();
 		clockTimer.scheduleAtFixedRate(new updClock(), 1000-(System.currentTimeMillis()%1000), 1000);
@@ -197,8 +198,7 @@ public class ControlForm {
 		}
 		this.textFolder.setText(lastDir);
 		fillComboPrefix();
-//		terracore = new ControlCore(this,"localhost",9002);
-		terracore = new ControlCoreXBee(this,"/dev/ttyUSB0",57600);
+		terracore = new ControlCore(this,"localhost",9002);
 	}
 	
 	class updClock extends TimerTask {
@@ -944,19 +944,16 @@ public class ControlForm {
 		}
 	}
 	
-	public void restartTCP(){
+	public void restartTCP() throws IOException{
 		lblTCPStatus.setText("TCP OFF");
 		lblTCPStatus.setForeground(Color.RED);
 		lblTCPStatus.repaint();
 		lblTCPStatus2.setText("TCP");
 		lblTCPStatus2.setForeground(Color.RED);
 		lblTCPStatus2.repaint();
-		//lblTCPStatus3.setText("TCP OFF"); // dataForm
-		//lblTCPStatus3.setForeground(Color.RED);
-		//lblTCPStatus3.repaint();
 		try {
 			terracore.retryConnect();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

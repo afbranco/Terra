@@ -1,7 +1,9 @@
 package app;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
@@ -64,28 +66,39 @@ public class ControlCore implements MessageListener
 	public void retryConnect() {
 		// TCP/IP Connection
 		controlform.appendControlMsg("ControlCore: Retry TCP connection.");
+
 		Socket socket = null;
 		try {
 			socket = new Socket(host, port);
+			OutputStream out = socket.getOutputStream();
+			out.write('U');
+			out.write(' ');
 		} catch (IOException e) {
 			TCPretries++;
 			TCPtimer.schedule(new tryConnect(), 5000);			
 			// e.printStackTrace();
 			return;
 		}
-//		serviceOFF = true;
-		
+		//		serviceOFF = true;
+
+
 		if (socket!=null) {
-//			serviceOFF=false;
+			//			serviceOFF=false;
 			try {
 				socket.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		
 
-	    
+
+		// Waits do avoid connect immediately.
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		phoenix = BuildSource.makePhoenix("serial@/dev/ttyUSB0:micaz", PrintStreamMessenger.err);
 		mote = new ControlMoteIF(PrintStreamMessenger.err,controlform);
 		mote.setPacketErrorHandler();
@@ -119,7 +132,7 @@ public class ControlCore implements MessageListener
 		erroCount=0;
 		CurrentBlockId=-1;
 		controlform.appendControlMsg("ControlCore: newData button.");
-		sendNewProgVersion();
+		sendNewProgVersion(true);
 	}
 	
 	public void newSetData(List<SetData> SetDataArray){
@@ -142,10 +155,19 @@ public class ControlCore implements MessageListener
 		// Received a reqProgBlockMsg
 		if (msg instanceof reqProgBlockMsg) {
 			reqProgBlockMsg omsg = (reqProgBlockMsg)msg;
-			VersionId = omsg.get_versionId();
-			controlform.recReqProgBlockMsg(progBin.getBlockStart(),omsg.get_blockId(),progBin.getNumBlocks());
-			System.out.println(omsg.toString());
-			sendNewProgBlock(omsg.get_blockId());
+			System.out.println("reqProgBlockMsg:: omsg.get_versionId()="+omsg.get_versionId()+" VersionId="+VersionId);
+			if (VersionId > 0){
+				if (omsg.get_versionId()==0){
+					sendNewProgVersion(false);				
+				}else if (VersionId == omsg.get_versionId()){
+					controlform.recReqProgBlockMsg(progBin.getBlockStart(),omsg.get_blockId(),progBin.getNumBlocks());
+					System.out.println(omsg.toString());
+					sendNewProgBlock(omsg.get_blockId());
+				} else if (VersionId < omsg.get_versionId()){
+					VersionId = omsg.get_versionId();
+					sendNewProgVersion(false);				
+				}
+			}
 		}
 		// Received a reqDataMsg
 		if (msg instanceof reqDataMsg) {
@@ -202,6 +224,7 @@ public class ControlCore implements MessageListener
 		}
         public void run() {
     		try {
+//    			mote.send(0xffff, msg);
     			mote.send(1, msg);
     		}
     		catch (IOException e) {
@@ -230,11 +253,11 @@ public class ControlCore implements MessageListener
 	}
 
 
-	void sendNewProgVersion(){
+	void sendNewProgVersion(boolean incVersionId){
 		controlform.appendControlMsg("ControlCore: sendNewProgVersion()");
 		newProgVersionMsg msg = new newProgVersionMsg();
 
-		VersionId++;
+		if (incVersionId) VersionId++;
 		msg.set_versionId(VersionId);
 		msg.set_blockLen(progBin.getNumBlocks());
 		msg.set_blockStart(progBin.getBlockStart());
