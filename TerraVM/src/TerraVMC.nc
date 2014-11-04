@@ -1018,7 +1018,7 @@ void f_deref(uint8_t Modifier){
 	MAddr = (uint16_t)pop();
 	dbg(APPNAME,"VM::f_deref(%02x): type=%d, MAddr=%d, ",Modifier,type,MAddr);
 	switch (type){
-		case x8 : dbg_clear(APPNAME,"type='x8' , value=%d\n",( uint8_t)getMVal(MAddr,tlen)); push(( uint8_t)getMVal(MAddr,tlen)); break;
+		case x8 : dbg_clear(APPNAME,"type='x8' , value=%d\n",(uint8_t)getMVal(MAddr,tlen)); push((uint8_t)getMVal(MAddr,tlen)); break;
 		case x16: dbg_clear(APPNAME,"type='x16', value=%d\n",(uint16_t)getMVal(MAddr,tlen)); push((uint16_t)getMVal(MAddr,tlen)); break;
 		case x32: dbg_clear(APPNAME,"type='x32', value=%d\n",(uint32_t)getMVal(MAddr,tlen)); push((uint32_t)getMVal(MAddr,tlen)); break;
 	}
@@ -1064,10 +1064,10 @@ void f_pusharr_v(uint8_t Modifier){
 	Maddr = getPar16(p1_1len);
  	Vidx  = getPar16(p2_1len);
 	Max   = getPar16(p3_1len);
-	dbg(APPNAME,"VM::f_pusharr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, Val=%d, IDX OVERFLOW=%s idx=%d\n",Modifier,Maddr,Vidx,Max,
-			(getMVal(Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len)),_TFstr(getMVal(Vidx,v2_len) > Max),getMVal(Vidx,v2_len));
+	dbg(APPNAME,"VM::f_pusharr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, Val=%d, IDX OVERFLOW=%s idx=%d, v1_len=%d\n",Modifier,Maddr,Vidx,Max,
+			(getMVal(Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len)),_TFstr(getMVal(Vidx,v2_len) > Max),getMVal(Vidx,v2_len),v1_len);
 //	(getMVal(Vidx,v2_len)<Max)?push(getMVal(Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len)):0;
-// Alterado para fazer push de Addr+Id
+// Alterado para fazer push de Addr+(Idx*typelen)
 	if (getMVal(Vidx,v2_len) >= Max) 
 		evtError(E_IDXOVF);
 	else
