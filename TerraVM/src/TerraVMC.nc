@@ -802,7 +802,7 @@ void f_mod(uint8_t Modifier){
 	v1 = pop();
 	v2 = pop();
 	dbg(APPNAME,"VM::f_mod(%02x): v1=%d, v2=%d, mod=%d\n",Modifier,v1,v2,v1%v2);
-	dbg("VMDBG","VM:: mod operation: (%d % %d) = %d \n",v1,v2,v1%v2);
+	dbg("VMDBG","VM:: mod operation: (%d %% %d) = %d \n",v1,v2,v1%v2);
 	push((v2==0)?0:v1%v2);
 	if (v2==0) evtError(E_DIVZERO);
  }
