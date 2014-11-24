@@ -41,6 +41,13 @@ nx_uint32_t ExtDataTimeStamp;		// last SLPL_FIRED - timestamp
 nx_uint8_t ExtDataGModelRdDone;		// last GModelReadDone Status 
 nx_uint16_t ExtDataBufferRdDone;	// last StreamReadDone [error=0 | Count>0]
 nx_uint32_t* UsrStreamBuffer;		// Pointer to user data stream buffer
+
+uint8_t MIC_flag;					// Indicate if Mic Sensor was setup
+nx_uint16_t* MIC_buf;				// Mic Sensor read buffer
+uint16_t MIC_count;				// Mic Sensor read count
+uint32_t MIC_usPeriod;			// Mic Sensor read period
+uint8_t MIC_gain;				// Mic Sensor gain adjust
+
 /*
  * Output Events implementation
  */
@@ -143,7 +150,7 @@ void  proc_req_custom_a(uint16_t id, uint32_t value){
 	uint8_t auxId ;
 	ExtDataCustomA = (uint8_t)value;
 	dbg(APPNAME,"Custom::proc_req_custom_a(): id=%d, ExtDataCustomA=%d\n",id,ExtDataCustomA);
-	auxId = (uint8_t)signal VM.pop();
+	auxId = (uint8_t)value;//(uint8_t)signal VM.pop();
 	// Queue the custom event
 	signal VM.queueEvt(I_CUSTOM_A_ID,auxId, &ExtDataCustomA);
 	signal VM.queueEvt(I_CUSTOM_A   ,    0, &ExtDataCustomA);
@@ -157,6 +164,22 @@ void  proc_rd_stream(uint16_t id, uint32_t value){
 }
 #endif
 
+void  proc_req_mic(uint16_t id, uint32_t value){
+	dbg(APPNAME,"Custom::proc_req_mic(): id=%d, value=%d, MIC Flad=%d\n",id,value, MIC_flag);
+#if defined(PLATFORM_MICAZ) || defined(PLATFORM_MICA2) || defined(PLATFORM_IRIS)
+	#if SBOARD == 300
+	if (MIC_flag)
+		call SA.reqStreamSensor(REQ_SOURCE1, SID_MIC, (uint16_t*)MIC_buf, MIC_count, MIC_usPeriod, MIC_gain);
+	else
+		signal VM.evtError(E_NOSETUP);
+	#endif
+#endif
+}
+
+void  proc_beep(uint16_t id, uint32_t value){
+	dbg(APPNAME,"Custom::proc_beep(): id=%d, val=%d\n",id,(uint16_t)value);
+	call SA.setActuator(AID_SOUNDER, (uint16_t)value);
+}
 	
 /*
  * Function implementation
@@ -254,6 +277,19 @@ void  func_fft(uint16_t id){
 	}
 #endif	
 
+void  func_setupMic(uint16_t id){
+	error_t stat;
+	uint16_t bufAddr;
+	MIC_gain = (uint8_t)signal VM.pop();
+	MIC_usPeriod = (uint32_t)signal VM.pop();
+	MIC_count = (uint16_t)signal VM.pop();
+	bufAddr = (uint16_t)signal VM.pop();
+	MIC_buf = (nx_uint16_t*)signal VM.getRealAddr(bufAddr,2);
+	MIC_flag = TRUE;
+	stat = SUCCESS;
+	signal VM.push(stat);
+
+}
 #ifdef M_VOLCANO
 void  func_GModelRead(uint16_t id){
 	error_t stat;
@@ -341,6 +377,8 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		case O_CFG_INT_A 	: proc_cfg_int_a(id,value); break;
 		case O_CFG_INT_B 	: proc_cfg_int_b(id,value); break;
 		case O_CUSTOM_A : proc_req_custom_a(id,value); break;
+		case O_REQ_MIC: proc_req_mic(id,value); break;
+		case O_BEEP: proc_beep(id,value); break;
 #ifdef M_VOLCANO
 		case O_RD_STREAM : proc_rd_stream(id,value); break;
 #endif
@@ -363,6 +401,9 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 			case F_FFT_ALLOC: func_fftAlloc(id); break;
 			case F_FFT 		: func_fft(id); break;
 #endif
+
+			case F_SETUP_MIC: func_setupMic(id); break;
+
 #ifdef M_VOLCANO
 			case F_GMODEL_READ   : func_GModelRead(id); break;
 			case F_GET_RTIME     : func_getRTime(id); break;
@@ -423,6 +464,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 			case SID_IN2: return I_PORT_B;
 			case SID_INT1: return I_INT_A;
 			case SID_INT2: return I_INT_B;
+			case SID_MIC: return I_MIC;
 		}
 		return 0;
 	}
