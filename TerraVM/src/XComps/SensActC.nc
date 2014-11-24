@@ -21,15 +21,15 @@ implementation{
 	SensActP.S_TEMP -> dtSensor.Temp;
 	SensActP.S_PHOTO -> dtSensor.Photo;
 	SensActP.S_VOLT -> dtSensor.Volt;
-
-/*
+/*  
+	// TOSSIM sensor components
 	components new DemoSensorC() as S_TEMP;
 	components new DemoSensorC() as S_PHOTO;
 	components new DemoSensorC() as S_VOLT;
 	SensActP.S_TEMP -> S_TEMP;
 	SensActP.S_PHOTO -> S_PHOTO;
 	SensActP.S_VOLT -> S_VOLT;
-* */
+*/
 #elif defined(PLATFORM_MICAZ) || defined(PLATFORM_MICA2) || defined(PLATFORM_MICA2DOT) || defined(PLATFORM_IRIS)
 	components new TempC() as S_TEMP;
 	components new PhotoC() as S_PHOTO;
@@ -37,6 +37,14 @@ implementation{
 	SensActP.S_TEMP -> S_TEMP;
 	SensActP.S_PHOTO -> S_PHOTO;
 	SensActP.S_VOLT -> S_VOLT;
+	#if SBOARD == 300
+		// MicStream and Sounder
+		components new MicStreamC() as MicStream, SounderC;
+		SensActP.S_MIC -> MicStream;
+		SensActP.S_MIC_CFG -> MicStream;
+		SensActP.A_SOUNDER -> SounderC;
+	#endif
+
 #elif defined(PLATFORM_TELOSB)
 	components new SensirionSht11C() as S_TEMP;
 	components new HamamatsuS1087ParC() as S_PHOTO;

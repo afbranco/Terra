@@ -24,6 +24,7 @@ enum{
 	AID_PIN2 =11,
 	AID_INT1 =12,
 	AID_INT2 =13,
+	AID_SOUNDER =14,
 
 };
 #endif /* SENS_ACT_H */

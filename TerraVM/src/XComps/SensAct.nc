@@ -26,5 +26,7 @@ interface SensAct{
 
 	command void* getDatap(uint8_t id);
 	
+	// Request a Stream sensor data -- only for stream sensors
+	command void reqStreamSensor(uint8_t reqSource, uint8_t id, uint16_t* buf, uint16_t count, uint32_t usPeriod, uint8_t gain);	
 }
  
