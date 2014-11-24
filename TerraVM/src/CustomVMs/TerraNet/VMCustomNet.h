@@ -33,6 +33,8 @@ enum{
 	O_CFG_INT_A		=18,
 	O_CFG_INT_B		=19,
 	O_CUSTOM_A		=20,	
+	O_REQ_MIC		=21,	
+	O_BEEP			=22,	
 	// TerraNet Custom Output events
 	O_SEND			=40,
 	O_SEND_ACK		=41,
@@ -51,6 +53,7 @@ enum{
 	I_INT_B			=11,
 	I_CUSTOM_A_ID	=12,
 	I_CUSTOM_A		=13,
+	I_MIC			=14,
 	// TerraNet Custom Input events
 	I_SEND_DONE_ID		=40,
 	I_SEND_DONE			=41,
@@ -73,6 +76,7 @@ enum{
 	F_QCLEAR 		= 13,
 	F_FFT_ALLOC 	= 14,
 	F_FFT 			= 15,
+	F_SETUP_MIC		= 16,
 	// Volcano custom functions
 	F_GMODEL_READ	= 20,
 	F_GET_RTIME		= 21,
@@ -90,7 +94,7 @@ enum{
 	TID_MSG_REC = 3 << 5,
 	
 	// Sensor IDs (max 31)
-	SENSOR_COUNT = 8,
+	SENSOR_COUNT = 10,
 	SID_TEMP = 1,
 	SID_PHOTO = 2,
 	SID_LEDS = 3,
@@ -99,6 +103,7 @@ enum{
 	SID_IN2 = 6,
 	SID_INT1 = 7,
 	SID_INT2 = 8,
+	SID_MIC = 9,
 	
 };
 
