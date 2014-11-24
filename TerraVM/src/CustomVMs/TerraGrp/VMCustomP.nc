@@ -183,7 +183,7 @@ void  proc_req_custom_a(uint16_t id, uint32_t value){
 	uint8_t auxId ;
 	ExtDataCustomA = (uint8_t)value;
 	dbg(APPNAME,"Custom::proc_req_custom_a(): id=%d, ExtDataCustomA=%d\n",id,ExtDataCustomA);
-	auxId = (uint8_t)signal VM.pop();
+	auxId = (uint8_t)value;
 	// Queue the custom event
 	signal VM.queueEvt(I_CUSTOM_A_ID,auxId, &ExtDataCustomA);
 	signal VM.queueEvt(I_CUSTOM_A   ,    0, &ExtDataCustomA);
