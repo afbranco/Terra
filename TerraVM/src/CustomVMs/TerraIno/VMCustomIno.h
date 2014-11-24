@@ -15,7 +15,7 @@ enum{
 	// TerraIno local Output events
 //	O_INIT			=0,
 	
-	O_CUSTOM_A		=39,
+	O_CUSTOM_A		=20,
 	// TerraNet Custom Output events
 	O_SEND			=40,
 	O_SEND_ACK		=41,
