@@ -1223,7 +1223,7 @@ F = {
     ['Op2_|']   = function (me) Op2_any(me,'bor') end,
     ['Op2_&']   = function (me) Op2_any(me,'band') end,
     ['Op2_<<']  = function (me) Op2_any(me,'lshft') end,
-    ['Op2_>>']  = function (me) Op2_any(me,'rsfth') end,
+    ['Op2_>>']  = function (me) Op2_any(me,'rshft') end,
     ['Op2_^']   = function (me) Op2_any(me,'bxor') end,
     ['Op2_==']  = function (me) Op2_any(me,'eq') end,
     ['Op2_!=']  = function (me) Op2_any(me,'neq') end,

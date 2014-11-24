@@ -150,6 +150,7 @@ end
 
  	-- arg={}
 	op2_any = function (me,codeB,arg)
+--print(unpack(arg))
 		local bytecode = string.format('%02x',(opcode['op_'..arg[1]]))
 		local codeA = arg[1]
 		OPCODE(me,bytecode,codeA,codeB,-1)
