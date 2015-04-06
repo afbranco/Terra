@@ -29,8 +29,7 @@ import net.tinyos.tools.PrintfMsg;
 import net.tinyos.util.Messenger;
 import net.tinyos.util.PrintStreamMessenger;
 
-public class ControlCoreXBee
-//public class ControlCoreXBee implements MessageListener
+public class ControlCoreXBee1
 {
     XBee xbee;
     XBeeAddress16 target = new XBeeAddress16(0xff,0xff);
@@ -62,7 +61,7 @@ public class ControlCoreXBee
 	int sendBusyID=0;
 	boolean sendBlockMultiple=false;
 
-	public ControlCoreXBee(ControlForm Form,String Port,int Baudrate) throws InterruptedException, IOException  {
+	public ControlCoreXBee1(ControlForm Form,String Port,int Baudrate) throws InterruptedException, IOException  {
 		super();
 		controlform = Form;
 		baudrate=Baudrate; // "localhost";
@@ -107,16 +106,6 @@ public class ControlCoreXBee
 				XBeeReceived(arg0);				
 			}
 		});		controlform.setTCP(true, TCPretries);
-/*		
-		phoenix = BuildSource.makePhoenix("serial@/dev/ttyUSB0:micaz", PrintStreamMessenger.err);
-		mote = new ControlMoteIF(PrintStreamMessenger.err,controlform);
-		mote.setPacketErrorHandler();
-		mote.registerListener(new reqProgBlockMsg(), this);
-		mote.registerListener(new reqDataMsg(), this);
-		mote.registerListener(new sendBSMsg(), this);
-		mote.registerListener(new PrintfMsg(), this);
-		mote.registerListener(new usrMsg(), this);
-*/
 	}
 
 	static class TerraMessenger implements Messenger {
@@ -157,39 +146,28 @@ public class ControlCoreXBee
 		//pauseConfig=true;
 	}
 
-
+	
 	private void XBeeReceived(XBeeResponse msg){
 		System.out.println("##### Received a XBee message API Id="+msg.getApiId());
 		switch (msg.getApiId()) {
-		case AT_COMMAND:
-			break;
-		case AT_COMMAND_QUEUE:
-			break;
-		case AT_RESPONSE:
-			break;
-		case ERROR_RESPONSE:
-			break;
-		case MODEM_STATUS_RESPONSE:
-			break;
-		case REMOTE_AT_REQUEST:
-			break;
-		case REMOTE_AT_RESPONSE:
-			break;
-		case RX_16_IO_RESPONSE:
-			break;
+		case AT_COMMAND: break;
+		case AT_COMMAND_QUEUE: break;
+		case AT_RESPONSE: break;
+		case ERROR_RESPONSE: break;
+		case MODEM_STATUS_RESPONSE: break;
+		case REMOTE_AT_REQUEST: break;
+		case REMOTE_AT_RESPONSE: break;
+		case RX_16_IO_RESPONSE: break;
 		case RX_16_RESPONSE:
 			RxResponse16 recMsg = (RxResponse16)msg;
-			System.out.println("AMID="+recMsg.getData()[0]+" len="+recMsg.getLength().getLength());
-			procMsg(recMsg.getData()[0],recMsg.getData(),recMsg.getLength().getLength());
+			message_t msgt = new message_t(recMsg.getData());
+			System.out.println("AMID="+msgt.amid+" XBee len="+recMsg.getLength().getLength());
+			procMsg(msgt.amid,recMsg.getData(),recMsg.getLength().getLength());
 			break;
-		case RX_64_IO_RESPONSE:
-			break;
-		case RX_64_RESPONSE:
-			break;
-		case TX_REQUEST_16:
-			break;
-		case TX_REQUEST_64:
-			break;
+		case RX_64_IO_RESPONSE: break;
+		case RX_64_RESPONSE: break;
+		case TX_REQUEST_16: break;
+		case TX_REQUEST_64: break;
 		case TX_STATUS_RESPONSE:
 			TxStatusResponse sendDone = (TxStatusResponse)msg;
 			System.out.println("SendDone="+sendDone.getStatus()+" sendBusyID="+sendBusyID+" nextBlockId="+nextBlockId+" lastBlockId="+lastBlockId+" BlkMultiple="+sendBlockMultiple);
@@ -205,24 +183,15 @@ public class ControlCoreXBee
 			}
 			sendBusyID = 0;
 			break;
-		case UNKNOWN:
-			break;
-		case ZNET_EXPLICIT_RX_RESPONSE:
-			break;
-		case ZNET_EXPLICIT_TX_REQUEST:
-			break;
-		case ZNET_IO_NODE_IDENTIFIER_RESPONSE:
-			break;
-		case ZNET_IO_SAMPLE_RESPONSE:
-			break;
-		case ZNET_RX_RESPONSE:
-			break;
-		case ZNET_TX_REQUEST:
-			break;
-		case ZNET_TX_STATUS_RESPONSE:
-			break;
-		default:
-			break;
+		case UNKNOWN: break;
+		case ZNET_EXPLICIT_RX_RESPONSE: break;
+		case ZNET_EXPLICIT_TX_REQUEST: break;
+		case ZNET_IO_NODE_IDENTIFIER_RESPONSE: break;
+		case ZNET_IO_SAMPLE_RESPONSE: break;
+		case ZNET_RX_RESPONSE: break;
+		case ZNET_TX_REQUEST: break;
+		case ZNET_TX_STATUS_RESPONSE: break;
+		default: break;
 			
 		}
 		
@@ -230,51 +199,51 @@ public class ControlCoreXBee
 	
 
 	class message_t{
-		int amid;
-		int group;
-		int source;
 		int target;
+		int source;
+		int len;
+		int group;
+		int amid;
 		int opt;
 		int rssi;
-		int len;
 		int metadata;
 		byte data[]=new byte[28];
 		
 		message_t(int[] data){
-			this.amid = data[0];
-			this.group = data[1];
+			this.target = data[0]*256 + data[1];
 			this.source = data[2]*256 + data[3];
-			this.target = data[4]*256 + data[5];
-			this.opt = data[6];
-			this.rssi = data[7];
-			this.len = data[8];
+			this.len = data[4];
+			this.group = data[5];
+			this.amid = data[6];
+			this.opt = data[7];
+			this.rssi = data[8];
 			this.metadata = data[9];
 			for (int i=0; i< this.len; i++) this.data[i] = (byte)data[10+i];			
 		}
 		
 		message_t(Message Msg){
-			this.amid = Msg.amType();
-			this.group = 0;
-			this.source = 0;
 			this.target = 0xffff;
+			this.source = 0;
+			this.len = Msg.dataLength();
+			this.group = 0;
+			this.amid = Msg.amType();
 			this.opt = 0;
 			this.rssi = 0;
-			this.len = Msg.dataLength();
 			this.metadata = 0;
 			for (int i=0; i< this.len; i++) this.data[i] = Msg.dataGet()[i];
 		}
 		
 		int[] getBuffer(){
 			int buf[] = new int[10+this.len];
-			buf[0] = this.amid;
-			buf[1] = this.group;
+			buf[0] = this.target/256; // target H
+			buf[1] = this.target%256; // target L
 			buf[2] = this.source/256; // source H
 			buf[3] = this.source%256; // source L
-			buf[4] = this.target/256; // target H
-			buf[5] = this.target%256; // target L
-			buf[6] = this.opt;
-			buf[7] = this.rssi;
-			buf[8] = this.len;
+			buf[4] = this.len;
+			buf[5] = this.group;
+			buf[6] = this.amid;
+			buf[7] = this.opt;
+			buf[8] = this.rssi;
 			buf[9] = this.metadata;
 			for (int i=0; i< this.len; i++) buf[10+i] = this.data[i];			
 			return buf;
@@ -319,7 +288,7 @@ public class ControlCoreXBee
 
 			if (omsg.get_reqOper() == 2) sendBlockMultiple = true; // 2= RO_DATA_FULL
 			if (progBin!=null){
-				controlform.recReqProgBlockMsg(progBin.getBlockStart(),omsg.get_blockId(),progBin.getNumBlocks());
+				controlform.recReqProgBlockMsg(progBin.getBlockStart(),omsg.get_blockId(),progBin.getNumBlocks(),recMsg.source);
 				nextBlockId = omsg.get_blockId();
 				SendBlocktimer.schedule(new sendNewProgBlockTask(nextBlockId), 10);
 				System.out.println("------> Agendei o timer na primeira vez!");
@@ -513,7 +482,7 @@ public class ControlCoreXBee
 				// Data
 				for (int j=0; j< Data.get(i).Len; j++) DataBytes[ix++] = Data.get(i).Values[j];
 			}
-			//msg.set_Data(DataBytes);	// comentei porque stava dando erro...
+			//msg.set_Data(DataBytes);	// comentei porque estava dando erro...
 			System.out.println(msg.toString());		
 			TCPtimer.schedule(new sendMsg("SetDataND",msg), 10);
 		}

@@ -35,7 +35,8 @@ public class ControlCore implements MessageListener
 	
 	private int VersionId=0;
 	private int setDataSeq=0;
-
+	private int CurrRequestMote=0;
+	
 	private Integer lastSetDataIdx=0;
 	private Map<Integer,List<SetData>> setData=new HashMap<Integer,List<SetData>>();
 
@@ -151,21 +152,27 @@ public class ControlCore implements MessageListener
 
 	@Override
 	public void messageReceived(int dest_addr, Message msg) {
-		System.out.println("messageReceived:: Type="+ msg.amType() + " size="+msg.dataLength());
+		System.out.println("messageReceived:: Type="+ msg.amType() + " size="+msg.dataLength() + " source="+dest_addr + " CurrRequestMote="+CurrRequestMote);
 		// Received a reqProgBlockMsg
 		if (msg instanceof reqProgBlockMsg) {
-			reqProgBlockMsg omsg = (reqProgBlockMsg)msg;
-			System.out.println("reqProgBlockMsg:: omsg.get_versionId()="+omsg.get_versionId()+" VersionId="+VersionId);
-			if (VersionId > 0){
-				if (omsg.get_versionId()==0){
-					sendNewProgVersion(false);				
-				}else if (VersionId == omsg.get_versionId()){
-					controlform.recReqProgBlockMsg(progBin.getBlockStart(),omsg.get_blockId(),progBin.getNumBlocks());
-					System.out.println(omsg.toString());
-					sendNewProgBlock(omsg.get_blockId());
-				} else if (VersionId < omsg.get_versionId()){
-					VersionId = omsg.get_versionId();
-					sendNewProgVersion(false);				
+			if (CurrRequestMote == 0 || CurrRequestMote==dest_addr) { // Doesn't answer a second requester until the first one are finished.
+				reqProgBlockMsg omsg = (reqProgBlockMsg)msg;
+				System.out.println("reqProgBlockMsg:: omsg.get_versionId()="+omsg.get_versionId()+" VersionId="+VersionId);
+				if (VersionId > 0){
+					if (omsg.get_versionId()==0){
+						CurrRequestMote = 0;
+						sendNewProgVersion(false);				
+					}else if (VersionId == omsg.get_versionId()){
+						if (CurrRequestMote == 0) CurrRequestMote = dest_addr;
+						controlform.recReqProgBlockMsg(progBin.getBlockStart(),omsg.get_blockId(),progBin.getNumBlocks(),dest_addr);
+						System.out.println(omsg.toString());
+						if (omsg.get_blockId() == (progBin.getNumBlocks()+progBin.getBlockStart()-1)) CurrRequestMote=0;
+						sendNewProgBlock(omsg.get_blockId());
+					} else if (VersionId < omsg.get_versionId()){
+						VersionId = omsg.get_versionId();
+						CurrRequestMote = 0;
+						sendNewProgVersion(false);				
+					}
 				}
 			}
 		}
@@ -256,7 +263,7 @@ public class ControlCore implements MessageListener
 	void sendNewProgVersion(boolean incVersionId){
 		controlform.appendControlMsg("ControlCore: sendNewProgVersion()");
 		newProgVersionMsg msg = new newProgVersionMsg();
-
+		CurrRequestMote = 0;
 		if (incVersionId) VersionId++;
 		msg.set_versionId(VersionId);
 		msg.set_blockLen(progBin.getNumBlocks());

@@ -1032,7 +1032,7 @@ public class ControlForm {
 	}
 
 	
-	public void recReqProgBlockMsg(int blockInit, int blockId, int numBlocks){
+	public void recReqProgBlockMsg(int blockInit, int blockId, int numBlocks, int sender){
 		System.out.println("recReqProgBlockMsg: block="+blockId);
 		barFSM.setMaximum(numBlocks-1);
 		barFSM.setMinimum(0);
@@ -1040,7 +1040,7 @@ public class ControlForm {
 		barFSM2.setMaximum(numBlocks-1);
 		barFSM2.setMinimum(0);
 		barFSM2.setValue(blockId-blockInit);
-		String line = String.format("recReqProgBlockMsg: Block: %d - %d/%d", blockId,blockId-blockInit+1,numBlocks);
+		String line = String.format("recReqProgBlockMsg: Block: %d - %d/%d, from %d", blockId,blockId-blockInit+1,numBlocks,sender);
 		appendControlMsg(line);
 	}	
 	
