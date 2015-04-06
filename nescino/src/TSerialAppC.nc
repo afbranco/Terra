@@ -36,5 +36,6 @@ implementation{
   components new QueueC(uint8_t, 100) as LogQ;
   App.LogQ -> LogQ;
   
+  
 }
 

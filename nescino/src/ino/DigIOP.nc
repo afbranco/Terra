@@ -14,8 +14,9 @@ implementation{
 			case 3 : return (uint8_t)&PORTD; break;
 			case 4 : return (uint8_t)&PORTE; break;
 			case 5 : return (uint8_t)&PORTF; break;
+			case 6 : return (uint8_t)&PORTG; break;
 		}
-		return (uint8_t)&PORTF;
+		return (uint8_t)&PORTG;
 	}
 	uint8_t pin2ddr(uint8_t pin){
 		switch (pin/8){
@@ -25,8 +26,9 @@ implementation{
 			case 3 : return (uint8_t)&DDRD; break;
 			case 4 : return (uint8_t)&DDRE; break;
 			case 5 : return (uint8_t)&DDRF; break;
+			case 6 : return (uint8_t)&DDRG; break;
 		}
-		return (uint8_t)&DDRF;
+		return (uint8_t)&DDRG;
 	}
 	uint8_t pin2pin(uint8_t pin){
 		switch (pin/8){
@@ -36,8 +38,9 @@ implementation{
 			case 3 : return (uint8_t)&PIND; break;
 			case 4 : return (uint8_t)&PINE; break;
 			case 5 : return (uint8_t)&PINF; break;
+			case 6 : return (uint8_t)&PING; break;
 		}
-		return (uint8_t)&PINF;
+		return (uint8_t)&PING;
 	}
 
 	command bool DigIO.get(uint8_t pin){return call GeneralIOX.get(pin2pin(pin), pin%8);}

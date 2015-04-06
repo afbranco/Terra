@@ -8,10 +8,13 @@ implementation{
 	XBeeApi = XBeeApiP;
 	
 	components HdlcTranslateC as UART1_BYTE;
-	components Atm128Uart1C as UART1_RAW;
-
+#if INO_XBEE_USB == 0
+	components Atm128Uart0C as UART_RAW;
+#else
+	components Atm128Uart1C as UART_RAW;
+#endif
   	XBeeApiP -> UART1_BYTE.SerialFrameComm;
-  	UART1_BYTE.UartStream -> UART1_RAW;
-  	XBeeApiP.XBeeCtl -> UART1_RAW;
+  	UART1_BYTE.UartStream -> UART_RAW;
+  	XBeeApiP.XBeeCtl -> UART_RAW;
 
 }

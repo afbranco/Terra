@@ -111,7 +111,7 @@ implementation{
 		((message_t*)Data)->source = source;
 		((message_t*)Data)->opt = opt;
 		((message_t*)Data)->rssi = rssi;
-		signal Receive.receive[((message_t*)Data)->amid]((message_t*)Data, ((message_t*)Data)->data, dataLen -(uint8_t)(sizeof(message_t) - 28));
+		signal Receive.receive[((message_t*)Data)->amid]((message_t*)Data, ((message_t*)Data)->data, dataLen -(uint8_t)(sizeof(message_t) - TOSH_DATA_LENGTH));
 	}
 
 

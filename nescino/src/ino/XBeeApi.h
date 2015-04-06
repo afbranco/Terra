@@ -4,7 +4,7 @@
 enum{
 	
 	// Size constants
-	MAX_API_FRAME_LEN = 50,
+	MAX_API_FRAME_LEN = 500,//TOSH_DATA_LENGTH+20,
 	
 	// API Identifier	
 	// Request

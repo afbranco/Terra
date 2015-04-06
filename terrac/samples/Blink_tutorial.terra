@@ -1,6 +1,5 @@
 #include "TerraNet.defs"
 
-
 par do
 	loop do
 		await 500ms;

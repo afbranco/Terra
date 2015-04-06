@@ -90,6 +90,8 @@ config 00.01.00 do
 	output void 	CFG_INT_A		ubyte 18;
 	output void 	CFG_INT_B		ubyte 19;
 	output void 	REQ_CUSTOM_A	ubyte 20;
+	output void		REQ_MIC			void  21;
+	output void		BEEP			ushort  22;
 	// TerraNet Custom Output events
 	output void 	SEND			radioMsg 40;
 	output void 	SEND_ACK		radioMsg 41;
@@ -106,8 +108,9 @@ config 00.01.00 do
 	input ubyte 	PORT_B 			void 	9;
 	input ubyte 	INT_A 			void 	10;
 	input ubyte 	INT_B 			void 	11;
-	input ubyte 	CUSTOM_A_ID		ubyte 	12;
+	input ubyte 	CUSTOM_A		ubyte 	12;
 	input ubyte 	CUSTOM_A 		void 	13;
+	input ubyte 	MIC 			void 	14;
 	// TerraNet Custom Input events
 	input ubyte 	SEND_DONE 		ubyte	40;
 	input ushort 	SEND_DONE 		void 	41;
@@ -130,6 +133,7 @@ config 00.01.00 do
 	function pure ubyte qClear()			13;
 	function nohold ubyte fftAlloc(ushort, ushort, ubyte*, ushort*)		14;
 	function nohold  ubyte fft(ubyte*, ulong*, ulong*)			15;
+	function ubyte setupMic(ushort*,ushort,ulong,ubyte)			16;
 	// Volcano custom functions
 	function ubyte  gModelRead(ubyte*) 		20;
 	function ulong  getRTime() 			21;

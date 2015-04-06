@@ -37,10 +37,10 @@ typedef enum{
 	 D31 = 22, 	// PC6
 	 D30 = 23, 	// PC7
 
-	 D21 = 24, 	// PD0 (SCL)
-	 D20 = 25, 	// PD1 (SDA)
-	 D19 = 26, 	// PD2 (RX1)
-	 D18 = 27, 	// PD3 (TX1)
+	 D21 = 24, 	// PD0 (SCL) (INT0)
+	 D20 = 25, 	// PD1 (SDA) (INT1)
+	 D19 = 26, 	// PD2 (RX1) (INT2)
+	 D18 = 27, 	// PD3 (TX1) (INT3)
 	 //Dxx = 28, 	// PD4
 	 //Dxx = 29, 	// PD5
 	 //Dxx = 30, 	// PD6
@@ -50,16 +50,38 @@ typedef enum{
 	 D1  = 33, 	// PE1 (TX0)
 	 //Dxx = 34, 	// PE2
 	 D5  = 35, 	// PE3 (PWM/OC3A)
-	 D2  = 36, 	// PE4 (PWM/OC3B) [INT4]
-	 D3  = 37, 	// PE5 (PWM/OC3C) [INT5]
+	 D2  = 36, 	// PE4 (PWM/OC3B) (INT4)
+	 D3  = 37, 	// PE5 (PWM/OC3C) (INT5)
 	 //Dxx = 38, 	// PE6
 	 //Dxx = 39, 	// PE7
 
-	// PG ????
-	
-	// PH ???? 
+	// PF => Used for ADC (40..47))
 
+	// PG (48..55)
+	 //xx  = 48, 	// PG0 (WR)
+	 //xx  = 49, 	// PG1 (RD)
+	 //D0  = 50, 	// PG2 (ALE)
+	 //D0  = 51, 	// PG3 (TOSC2)
+	 //D0  = 52, 	// PG4 (TOSC1)
+	 D4  = 53, 	// PG5 (OC0B)
+	 //D0  = 54, 	// PG6
+	 //D0  = 55, 	// PG7
+	
+	// PH (56..63)
+	 //xx  = 56, 	// PH0 (RXD2)
+	 //xx  = 57, 	// PH1 (TXD2)
+	 //xx  = 58, 	// PH2 (XCK2)
+	 D6  = 59, 	// PH3 (OC4A)
+	 D7  = 60, 	// PH4 (OC4B)
+	 D8  = 61, 	// PH5 (OC4C)
+	 D9  = 62, 	// PH6 (OC2B)
+	 //xx  = 63, 	// PH7 (T4)
+	
+	
 	// PJ ???? 
+
+	// PK => Used for ADC
+
 
 } digital_enum;
 
