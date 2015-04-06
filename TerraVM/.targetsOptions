@@ -15,6 +15,7 @@
 <typedefs/>
 <macros>
 <macro content="1" name="MODULE_CTP" ncc="true" yeti="true"/>
+<macro content="" name="M_VOLCANO" ncc="false" yeti="true"/>
 </macros>
 <boards>
 <board>mts300</board>

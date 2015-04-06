@@ -30,6 +30,5 @@ implementation
 
 	components new QueueC(evtData_t,EVT_QUEUE_SIZE) as  evtQ;
 	terra.evtQ -> evtQ;
-	
 
 }

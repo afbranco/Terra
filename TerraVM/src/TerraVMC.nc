@@ -10,6 +10,8 @@
  * 
  */
 #include "TerraVM.h"
+#include "stdio.h"
+//#include "AvroraPrint.h"
 
 
 module TerraVMC @safe()
@@ -76,7 +78,7 @@ implementation
 
 // Ceu intrinsic functions
 //	void ceu_out_wclock(uint32_t ms){ if (ms != CEU_WCLOCK_NONE ) call BSTimerVM.startOneShot(((ms)<1)?1:(ms)); }
-	void ceu_out_wclock(uint32_t ms){ if (ms != CEU_WCLOCK_NONE ) call BSTimerVM.startOneShot(ms); }
+	void ceu_out_wclock(uint32_t ms){ if (ms != CEU_WCLOCK_NONE ) {call BSTimerVM.startOneShot(ms);}}
 
 
 
@@ -547,9 +549,10 @@ void ceu_wclock_enable (int gte, s32 us, tceu_nlbl lbl) {
 //printf("[%d/%d] (%ld - %d) = %ld",gte,lbl,us,CEU->wclk_late,dt);printfflush();
     tmr->togo = dt;
     *(nx_uint16_t*)&(tmr->lbl)  = lbl;
-	
-    if (ceu_wclock_lt(tmr))
+
+    if (ceu_wclock_lt(tmr)){
         ceu_out_wclock(dt);
+    }
 }
 
 
@@ -633,16 +636,14 @@ int ceu_go_wclock (int* ret, s32 dt, s32* nxt)
 //    if (BStation!=TOS_NODE_ID && CEU->wclk_cur)
 //    	dbg(APPNAME,"CEU::ceu_go_wclock(): dt=%d, togo=%d lbl=%d\n",dt, CEU->wclk_cur->togo,CEU->wclk_cur->lbl);
 
-
     CEU->stack = CEU_STACK_MIN;
 
     if (!CEU->wclk_cur) {
-        if (nxt)
-            *nxt = CEU_WCLOCK_NONE;
+        if (nxt) *nxt = CEU_WCLOCK_NONE;
+
         ceu_out_wclock(CEU_WCLOCK_NONE);
         return 0;
     }
-
     if (CEU->wclk_cur->togo <= dt) {
         min_togo = CEU->wclk_cur->togo;
         CEU->wclk_late = dt - CEU->wclk_cur->togo;   // how much late the wclock is
@@ -663,7 +664,7 @@ int ceu_go_wclock (int* ret, s32 dt, s32* nxt)
             continue;
 
         if ( tmr->togo==min_togo ) {
-            tmr->togo = 0;
+            tmr->togo = 0L;
             dbg("VMDBG","VM:: timer fired for label %d\n",*(nx_uint16_t*)&(tmr->lbl));
             ceu_spawn(&tmr->lbl);           // spawns sharing phys/ext
         } else {
@@ -1264,6 +1265,13 @@ void f_outevt_c(uint8_t Modifier){
 	Cevt  = getPar8(1);
 	Const = getPar32(Clen);
 	dbg(APPNAME,"VM::f_outevt_c(%02x): Cevt=%d, Clen=%d, Const=%d\n",Modifier,Cevt,Clen,Const);
+//logS("o",1);
+//{
+//char data[20];
+//sprintf(data,"%02d\n",Cevt);	
+//logS(data,3);
+//}
+
 	call VMCustom.procOutEvt(Cevt,Const);
 }
 
@@ -1463,6 +1471,11 @@ void f_tkins_z(uint8_t Modifier){
 //		dbg(APPNAME,"VM::Decoder()\n");
 		// Execute the respective operation
 		dbg(APPNAME,"VM::Decoder(): PC= %d opcode= %hhu modifier=%d\n",PC-1,Opcode,Modifier);
+{
+//	char data[10];
+//	sprintf(data,"%04d %02x\n",PC-1,Opcode);
+//	logS(data,8);
+}
 		switch (Opcode){
 			case op_nop : f_nop(Modifier); break;
 			case op_end : f_end(Modifier); break;
@@ -1547,6 +1560,12 @@ void f_tkins_z(uint8_t Modifier){
 #ifndef ONLY_BSTATION
 		evtData_t evtData;
 		dbg(APPNAME,"VM::VMCustom.queueEvt(): queueing evtId=%d, auxId=%d. procFlag=%s\n",evtId,auxId,(procFlag)?"TRUE":"FALSE");
+{
+//char data[20];
+//sprintf(data,"q%02d %02d %02d\n",evtId,auxId,call evtQ.size());	
+//logS(data,10);
+}
+
 		// Queue the message event
 		evtData.evtId = evtId;
 		evtData.auxId = auxId;
@@ -1564,7 +1583,18 @@ void f_tkins_z(uint8_t Modifier){
 		evtData_t evtData;
 		uint16_t ceuId;
 		dbg(APPNAME,"VM::procEvent(): haltedFlag = %s, procFlag=%s\n",(haltedFlag)?"TRUE":"FALSE",(procFlag)?"TRUE":"FALSE");
-		if (haltedFlag == TRUE) {call evtQ.dequeue(); return;}
+{
+//char data[20];
+//sprintf(data,">%02d\n",call evtQ.size());	
+//logS(data,4);
+}
+		if (haltedFlag == TRUE) {
+			logS("-",1);
+			call evtQ.dequeue(); 
+			return;
+		} else {
+			logS(">",1);			
+		}
 		// Verify if the queue has some event and if the processing is stopped
 		if ((call evtQ.size() > 0) && (procFlag==FALSE)){
 			// Send next event to CEU
@@ -1572,11 +1602,17 @@ void f_tkins_z(uint8_t Modifier){
 			evtData=call evtQ.dequeue();
 			dbg(APPNAME,"VM::procEvent(): ... calling ceu_go_event() for evtId=%d, auxId=%d\n", evtData.evtId,evtData.auxId );
 			ceuId = getEvtCeuId(evtData.evtId);
+{
+//char data[20];
+//sprintf(data,"e%02d %02d %02d\n",ceuId,evtData.evtId,evtData.auxId);	
+//logS(data,10);
+}
 			if (ceuId==0) {
 				dbg(APPNAME,"VM::procEvent(): Discarding event %d\n",evtData.evtId);
 				post procEvent(); // Try next event
-			} else
+			} else {
 				ceu_go_event(NULL,ceuId,evtData.auxId,evtData.data);
+			}
 		}
 		dbg(APPNAME,"VM::procEvent()...\n");
 	}
@@ -1620,6 +1656,7 @@ void f_tkins_z(uint8_t Modifier){
 		return haltedFlag;
 	}
 
+
     event void BSTimerVM.fired()
     {
 #ifndef ONLY_BSTATION
@@ -1630,6 +1667,7 @@ void f_tkins_z(uint8_t Modifier){
         ceu_go_wclock(NULL, dt, NULL); // TODO: "binary" time
 #endif
     }
+
     
 	bool hasAsync(){
 #ifndef ONLY_BSTATION

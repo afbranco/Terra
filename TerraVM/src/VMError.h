@@ -12,6 +12,7 @@ enum {
 	E_DIVZERO 	= 10, // Division by zero
 	E_IDXOVF 	= 11, // Array index overflow
 	E_STKOVF 	= 20, // Stack overflow
+	E_NOSETUP 	= 21, // Missing operation setup
 
 };
 

@@ -182,7 +182,7 @@ ifeq ($(MAKECMDGOALS), mica2dot)
   endif
   ifeq ($(SENSOR),MTS310CA)
     SENSORBOARD = mts300
-    CFLAGS += -DMTS310CA
+    CFLAGS += -DMTS310CA -DSBOARD=300
   endif
 endif
 ifneq ($(MAKECMDGOALS), mica2dot)
@@ -190,19 +190,19 @@ ifneq ($(findstring mica,$(MAKECMDGOALS)),)
   SENSOR ?= MDA100
   ifeq ($(SENSOR) , MTS300CA)
     SENSORBOARD = mts300
-    CFLAGS += -DMTS300CA
+    CFLAGS += -DMTS300CA -DSBOARD=300
   endif
   ifeq ($(SENSOR) , MTS300CB)
     SENSORBOARD = mts300
-    CFLAGS += -DMTS300CB
+    CFLAGS += -DMTS300CB -DSBOARD=300
   endif
   ifeq ($(SENSOR) , MDA100)
     SENSORBOARD = mda100
     CFLAGS += -DMDA100
-    CFLAGS += -I$(TOSDIR)/sensorboards/mda100/cb
+    CFLAGS += -I$(TOSDIR)/sensorboards/mda100/cb -DSBOARD=100
   endif
   ifndef SENSORBOARD
-    $(error Invalid SENSOR value "$(SENSOR)" for "mica2". Options are: MTS300CA, MTS300CB, MDA100)
+    $(error Invalid SENSOR value "$(SENSOR)" for "mica2/micaz". Options are: MTS300CA, MTS300CB, MDA100)
   endif	
 endif
 endif
@@ -381,6 +381,9 @@ usrMsg.java: CustomVMs/TerraNet/usrMsg.h
 	mig java -target=$(PLATFORM) $(CFLAGS) -java-classname=usrMsg CustomVMs/TerraNet/usrMsg.h usrMsg -o $@
 
 ifeq (ino,$(word 2,$(MAKECMDGOALS)))
+  ifneq ($(VM),INO)
+  $(error VM must be "INO" for 'ino' platforms)
+  endif 
   include Makefile_ino
 else
   include $(MAKERULES)

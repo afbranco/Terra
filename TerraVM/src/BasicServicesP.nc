@@ -10,6 +10,7 @@
  * 
  */
 #include "BasicServices.h"
+//#include "AvroraPrint.h"
 
 module BasicServicesP{
 	provides interface Boot as BSBoot;
@@ -138,6 +139,7 @@ module BasicServicesP{
 }
 implementation{
 
+	uint32_t LocalClock=0;
 	nx_uint16_t MoteID;					// Mote Identifier
 	bool firstInic=TRUE;				// First initialization flag
 	uint32_t reSendDelay;
@@ -190,6 +192,7 @@ implementation{
 	void sendNewProgVersion(newProgVersion_t *Data);
 	void sendNewProgBlock(newProgBlock_t *Data);
 	void sendReqData(reqData_t *Data);
+	task void ProgReqTimerTask();
 #ifdef MODE_SETDATA
 	void sendSetDataND(setDataND_t *Data);	
 #endif	
@@ -197,14 +200,9 @@ implementation{
 		dbg("TVIEW","<<: %s %d %d %d :>>\n",cmd,TOS_NODE_ID,p1,p2);
 		}	
 // afb
-  #define LOG_BUFFER_LEN 100
-  uint8_t logBuffer[LOG_BUFFER_LEN];
-  uint8_t logIdx;
-  uint8_t logLen;
-  uint8_t logIdle=TRUE;
-
   uint8_t logData[10];  
 #ifdef INO
+  uint8_t logIdle=TRUE;
   task void logProc(){
   	uint8_t logByte;
 	if (call LogQ.size() > 0) {
@@ -252,7 +250,6 @@ implementation{
 		}
 	}
 
-
 	/**
 	* Command to start the communication
 	*/ 
@@ -282,6 +279,8 @@ logS("A",1);
 
 	}
 
+	uint32_t getRequestTimeout(){return (ProgMoteSource==1)?REQUEST_TIMEOUT_BS:REQUEST_TIMEOUT;}
+
 	/**
 	 * Radio started event.
 	 */
@@ -307,7 +306,7 @@ logS("B",1);
 			if (MoteID != BStation){
 				sendReqProgBlock(&Data);
 			 	// Wait next block up to time-out
-			 	call ProgReqTimer.startOneShot(REQUEST_TIMEOUT);
+			 	call ProgReqTimer.startOneShot(getRequestTimeout());
 		 	}
 		}
 #ifndef NO_BSTATION
@@ -334,8 +333,11 @@ logS("B",1);
 		if ( call TimerVM.isRunning() ) call TimerVM.stop();
 		call TimerVM.startOneShot(dt);
 		}
-	command bool BSTimerVM.isRunning(){ return call TimerAsync.isRunning();}
-	command void BSTimerVM.stop(){ call TimerAsync.stop();}	event void TimerVM.fired(){signal BSTimerVM.fired();}
+	command bool BSTimerVM.isRunning(){ return call TimerVM.isRunning();}
+	command void BSTimerVM.stop(){ call TimerVM.stop();}	
+	event void TimerVM.fired(){
+		signal BSTimerVM.fired();
+	}
 
 
 /*******************************
@@ -468,7 +470,11 @@ logS("B",1);
 				dbg(APPNAME, "BS::recNewProgBlockNet_receive(): Discarding duplicated message - block is 0!\n");
 			}
 		} else {
-			dbg(APPNAME, "BS::recNewProgBlockNet_receive(): Discarding different version message!\n");
+			if (xmsg->versionId > ProgVersion){
+				// Retry request
+				call ProgReqTimer.startOneShot(getRequestTimeout());
+			} else
+				dbg(APPNAME, "BS::recNewProgBlockNet_receive(): Discarding old version message!\n");
 		}
 	}
 
@@ -571,7 +577,7 @@ logS("r",1);
 			memcpy(tempInputInQ.Data,payload,len);
 			tempInputInQ.AM_ID = id;
 			tempInputInQ.DataSize = len;
-			tempInputInQ.sendToMote = 0; // mote 0 means send to serial
+			tempInputInQ.sendToMote = call RadioAMPacket.source(msg) | 0x8000; // (mote | 0x8000) means send to serial
 			// put message in the inQueue
 			if (call inQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::RadioReceiver.receive(): inQueue is full! Losting a message.\n");
 		} else {
@@ -666,7 +672,7 @@ logS("I",1);
 		 	sendReqProgBlock(&xData);
 		 	// Wait next block up to time-out
 			if (MoteID != BStation)
-		 		call ProgReqTimer.startOneShot(REQUEST_TIMEOUT);
+		 		call ProgReqTimer.startOneShot(getRequestTimeout());
 		 	else
 		 		call ProgReqTimer.startOneShot(REQUEST_TIMEOUT_BS);	
 		}
@@ -723,7 +729,7 @@ logS(logData,1);
 		 	// Wait next block
  			ReqState=ST_WAIT_PROG_BLK;
 			if (MoteID != BStation){
-		 		call ProgReqTimer.startOneShot(REQUEST_TIMEOUT);
+		 		call ProgReqTimer.startOneShot(getRequestTimeout());
 		 	} else {
 #ifndef NO_BSTATION
 		 		// if BS, request next block 
@@ -785,10 +791,10 @@ logS(logData,1);
 	 /**
  	 * Request a missing data block
  	 */  	
-	 event void ProgReqTimer.fired(){
+	 task void ProgReqTimerTask(){
 		 uint16_t nextBlock=CURRENT_MAX_BLOCKS;
 		 reqProgBlock_t Data;
-		 uint32_t timeout=REQUEST_TIMEOUT;
+		 uint32_t timeout=getRequestTimeout();
 logData[0]='T';
 logData[1]='0'+ReqState;
 logS(logData,2);
@@ -823,7 +829,7 @@ logS(logData,2);
 					sendReqProgBlock(&Data);
 					// Wait next block up to time-out
 					if (MoteID != BStation)
-						call ProgReqTimer.startOneShot(REQUEST_TIMEOUT);
+						call ProgReqTimer.startOneShot(getRequestTimeout());
 					else
 						call ProgReqTimer.startOneShot(REQUEST_TIMEOUT_BS);					
 				 } else {
@@ -846,7 +852,7 @@ logS(logData,2);
 				 	Data.blockId = nextBlock;
 				 	sendReqProgBlock(&Data);
 				 	// Wait next block up to time-out
-				 	call ProgReqTimer.startOneShot(REQUEST_TIMEOUT);
+				 	call ProgReqTimer.startOneShot(getRequestTimeout());
 				 } else {
 				 	// fill data has finished
 					 if ( call BM.isAllBitSet()) {
@@ -860,6 +866,9 @@ logS(logData,2);
 		 } // end switch
 	 }
 
+	 event void ProgReqTimer.fired(){
+	 	post ProgReqTimerTask();
+	 }
 
 
 	event void SendDataFullTimer.fired(){
@@ -946,7 +955,7 @@ logS(logData,2);
 				// Reset retry counter
 				DataTimeOutCounter=0;
 				// wait for new data
-				call DataReqTimer.startOneShot((MoteID!=BStation)?REQUEST_TIMEOUT:REQUEST_TIMEOUT_BS);
+				call DataReqTimer.startOneShot(getRequestTimeout());
 			} else { // DataSeq is not too old, Request Current value
 				if ((Data->seq < (NewDataSeq + SET_DATA_LIST_SIZE)) && (Data->seq > NewDataSeq)){
 				xData.versionId = ProgVersion;
@@ -955,7 +964,7 @@ logS(logData,2);
 				// Reset retry counter
 				DataTimeOutCounter=0;
 				// wait for new data
-				call DataReqTimer.startOneShot((MoteID!=BStation)?REQUEST_TIMEOUT:REQUEST_TIMEOUT_BS);
+				call DataReqTimer.startOneShot(getRequestTimeout());
 				}
 			}
 		}	
@@ -995,7 +1004,7 @@ logS(logData,2);
 			// Reset retry counter
 			DataTimeOutCounter=0;
 			// wait for new data
-			call DataReqTimer.startOneShot((MoteID!=BStation)?REQUEST_TIMEOUT:REQUEST_TIMEOUT_BS);		
+			call DataReqTimer.startOneShot(getRequestTimeout());		
 		} else {
 			dbg(APPNAME, "BS::DataReqTimer.fired(): Requested all expected setData\n");
 		}
@@ -1129,7 +1138,8 @@ logS("s",1);
 		error_t err;
 		dbg(APPNAME,"BS::sendSerialN(): AM=%hhu\n",tempOutputOutQ.AM_ID);
 		memcpy(call SerialPacket.getPayload(&sendBuff,call SerialPacket.maxPayloadLength()), &tempOutputOutQ.Data, tempOutputOutQ.DataSize);
-		err = call SerialSender.send[tempOutputOutQ.AM_ID](AM_BROADCAST_ADDR, &sendBuff, tempOutputOutQ.DataSize);
+//		err = call SerialSender.send[tempOutputOutQ.AM_ID](AM_BROADCAST_ADDR, &sendBuff, tempOutputOutQ.DataSize);
+		err = call SerialSender.send[tempOutputOutQ.AM_ID]( (tempOutputOutQ.sendToMote & 0x7fff), &sendBuff, tempOutputOutQ.DataSize);
 		if ( err != SUCCESS) {
 			dbg(APPNAME,"BS::sendSerialN(): Error %hhu in sending Message AM=%hhu via UART\n",err,tempOutputOutQ.AM_ID);
 			call sendTimer.startOneShot(reSendDelay);	
@@ -1151,7 +1161,7 @@ logS("s",1);
 
 		if (MoteID == BStation){
 			// Send to Radio or UART
-			if (tempOutputOutQ.sendToMote == 0){
+			if ( (tempOutputOutQ.sendToMote < AM_BROADCAST_ADDR) && (tempOutputOutQ.sendToMote >= 0x8000)) {
 				sendSerialN();
 			} else {
 				sendRadioN();
@@ -1197,8 +1207,7 @@ logS("s",1);
 						if (MoteID != BStation){
 							sendRadioN();
 						} else {
-							if ( tempOutputOutQ.sendToMote == 0) {
-								tempOutputOutQ.sendToMote = AM_BROADCAST_ADDR;
+							if ( (tempOutputOutQ.sendToMote < AM_BROADCAST_ADDR) && (tempOutputOutQ.sendToMote >= 0x8000)) {
 								sendRadioN();
 								}
 							else
@@ -1611,7 +1620,7 @@ logS("s",1);
 			memcpy(tempInputInQ.Data,payload,len);
 			tempInputInQ.AM_ID = id;
 			tempInputInQ.DataSize = len;	
-			tempInputInQ.sendToMote = 0xffff; (call RadioAMPacket.destination(msg)==0)?AM_BROADCAST_ADDR:call RadioAMPacket.destination(msg);
+			tempInputInQ.sendToMote = AM_BROADCAST_ADDR; //(call RadioAMPacket.destination(msg)==0)?AM_BROADCAST_ADDR:call RadioAMPacket.destination(msg);
 			// put message in the inQueue
 			if (call inQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::SerialReceiver.receive(): inQueue is full! Losting a message.\n");
 		}

@@ -54,9 +54,9 @@ enum {
 	
 // Define event queue size - short or long from makefile definition
 #ifdef SHORT_QUEUES
-	EVT_QUEUE_SIZE = 3,
+	EVT_QUEUE_SIZE = 6,
 #else
-	EVT_QUEUE_SIZE = 5,
+	EVT_QUEUE_SIZE = 10,
 #endif
 
 	// Ctl section pointers
