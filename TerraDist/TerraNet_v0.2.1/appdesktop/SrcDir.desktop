@@ -1,0 +1,17 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Icon[en_US]=/home/terra/appdesktop/folder-src.png
+Name[en_US]=src file
+Exec=nautilus /home/terra/TerraNet/src/
+Name=SrcDir
+Icon=/home/terra/appdesktop/folder-src.png
+
+Actions=NewWindows;
+[Desktop Action NewWindows]
+Name=Open a New 'src file' Window
+Exec=nautilus /home/terra/TerraNet/src/
+

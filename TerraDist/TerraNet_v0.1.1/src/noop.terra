@@ -1,0 +1,4 @@
+@include(/home/terra/TerraNet_v0.1/terra/Terra.m4)
+
+emit LEDS(0);
+

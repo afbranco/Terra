@@ -1,0 +1,19 @@
+make micaz sim-sf VM=NET MODULES=MSGQ RFPOWER=03 SENSORBOARD=mda100 TYPE=ALL HYB=YES QUEUE=SHORT
+
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VOLCANO,MSGQ]
+MOTE        = micaz
+RFPOWER     = 03
+SENSORBOARD = mda100
+TYPE        = ALL
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 80
+VM_MEM      = 1920
+TOSVERSION  = 212
+***********************
+
+

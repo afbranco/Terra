@@ -1,0 +1,54 @@
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VOLCANO,MSGQ]
+MOTE        = micaz
+RFPOWER     = 03
+SENSORBOARD = mda100
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 88
+VM_MEM      = 2112
+TOSVERSION  = 212
+***********************
+
+
+make telosb VM=NET MODULES=MSGQ RFPOWER=03 SENSORBOARD=mda100 TYPE=NOBS HYB=YES QUEUE=SHORT
+
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VOLCANO,MSGQ]
+MOTE        = telosb
+RFPOWER     = 03
+SENSORBOARD = mda100
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 88
+VM_MEM      = 2112
+TOSVERSION  = 212
+***********************
+
+make telosb VM=NET MODULES=MSGQ RFPOWER=03 SENSORBOARD=mda100 TYPE=NOBS HYB=NO QUEUE=SHORT
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VOLCANO,MSGQ]
+MOTE        = telosb
+RFPOWER     = 03
+SENSORBOARD = mda100
+TYPE        = NOBS
+HYB         = NO
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 242
+VM_MEM      = 5808
+TOSVERSION  = 212
+***********************
+
+
+

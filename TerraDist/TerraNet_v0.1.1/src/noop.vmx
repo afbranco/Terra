@@ -1,0 +1,43 @@
+24 38 42 42 42 42 1 0 0 0
+00 | 0000 0 track:0
+00 | 0001 0
+00 | 0002 0
+00 | 0003 0
+00 | 0004 0 track:1
+00 | 0005 0
+00 | 0006 0
+00 | 0007 0
+00 | 0008 0000 TEMP gate(s) = 0
+00 | 0009 0001 PHOTO gate(s) = 0
+00 | 0010 0002 VOLTS gate(s) = 0
+00 | 0011 0003 SEND_DONE gate(s) = 0
+00 | 0012 0004 SEND_DONE_ACK gate(s) = 0
+00 | 0013 0005 RECEIVE gate(s) = 0
+00 | 0014 0006 Q_READY gate(s) = 0
+00 | 0015 0007 PORT_A gate(s) = 0
+00 | 0016 0008 PORT_B gate(s) = 0
+00 | 0017 0009 INT_A gate(s) = 0
+00 | 0018 0010 INT_B gate(s) = 0
+00 | 0019 0011 CUSTOM_A gate(s) = 0
+00 | 0020 0012 $ret
+00 | 0021 0013 
+00 | 0022 0014 nodeId
+00 | 0023 0015 
+68 | 0024 68 memclr 0 12                   | clear all gates
+00 | 0025 00 
+0c | 0026 0c 
+91 | 0027 91 outevtx_v 0 2 u16 14          | emit INIT len=2 var=nodeId
+00 | 0028 00 
+02 | 0029 02 
+0e | 0030 0e 
+8c | 0031 8c outevtx_c 1 1 0               | emit LEDS len=1 const=0
+01 | 0032 01 
+01 | 0033 01 
+00 | 0034 00 
+01 | 0035 01 end                           | end
+02 | 0036 02 return                        | return
+01 | 0037 01 end                           | end
+01 | 0038 01 L1(0x01) => 24 (0x18)
+18 | 0039 18 
+03 | 0040 03 L3(0x03) => 36 (0x24)
+24 | 0041 24 

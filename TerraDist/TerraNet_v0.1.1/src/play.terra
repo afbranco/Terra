@@ -1,0 +1,47 @@
+@include(/home/terra/TerraNet_v0.1/terra/Terra.m4)
+
+usrMsg_t(data,1);
+
+
+par do
+	loop do
+		data = await RECEIVE;
+		await 1000ms;
+		if nodeId < 99 then
+			data_source = nodeId;
+			if nodeId/10 < 9 & nodeId/10 > 1 then
+				data_target = nodeId + (((nodeId%2)*2)-1)*10;
+			else
+				if nodeId/10 == 1 then
+					data_target = nodeId + 11 ;
+				else
+					data_target = nodeId -9 ;
+				end
+			end
+			emit SEND_ACK(data);
+			var u8 ack = await SEND_DONE_ACK;
+			if (ack==FALSE) then
+				emit REQ_CUSTOM_A(1);
+			end
+		end
+	end
+with
+	if (nodeId == 11) then
+		loop do
+			await 5s;
+			data_source = nodeId;
+			data_target = nodeId + 10;
+			emit SEND(data);
+			await SEND_DONE;
+			await 1s;
+		end
+	end
+with
+	loop do
+		await CUSTOM_A;
+		emit LED0(ON);
+		await 300ms;
+		emit LED0(OFF);
+	end
+end
+

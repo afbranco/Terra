@@ -1,0 +1,22 @@
+@include(/home/terra/TerraNet_v0.1/terra/Terra.m4)
+
+
+
+par do
+    loop do
+        await 2s;
+	emit LED0(3);
+    end
+with
+    loop do
+        await 4s;
+	emit LED1(3);
+    end
+with
+    loop do
+        await 8s;
+	emit LED2(3);
+    end
+end
+
+

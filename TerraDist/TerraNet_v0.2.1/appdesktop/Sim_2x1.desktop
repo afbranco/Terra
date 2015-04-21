@@ -1,0 +1,45 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Icon[en_US]=/home/terra/appdesktop/Tossim2x1.png
+Exec=gnome-terminal --zoom=.2 --title="TOSSIM 2x1" -e "/bin/bash -i -c 'cd /home/terra/TerraNet/sim; ./TerraSim.py 2 1 0 0 600 | ./TerraViewer.py'"
+Name[en_US]=Sim_2x1
+Name=Sim 2x1
+Icon=/home/terra/appdesktop/Tossim2x1.png
+GenericName[en_US.UTF-8]=Tossim 2x1 motes
+
+Actions=Sim1x1;Sim2x1;Sim1x1+1;Sim2x2;Sim3x3;Sim4x4;Sim4x1;SimCustom
+
+[Desktop Action Sim1x1]
+Name=Sim_1x1
+Exec=gnome-terminal --zoom=.2 --title="TOSSIM 1x1" -e "/bin/bash -i -c 'cd /home/terra/TerraNet/sim; ./TerraSim.py 1 1 0 0 600 | ./TerraViewer.py'" 
+
+[Desktop Action Sim2x1]
+Name=Sim_2x1
+Exec=gnome-terminal --zoom=.2 --title="TOSSIM 2x1" -e "/bin/bash -i -c 'cd /home/terra/TerraNet/sim; ./TerraSim.py 2 1 0 0 600 | ./TerraViewer.py'"
+
+[Desktop Action Sim1x1+1]
+Name=Sim_1x(1+1)
+Exec=gnome-terminal --zoom=.2 --title="TOSSIM 2x1" -e "/bin/bash -i -c 'cd /home/terra/TerraNet/sim; ./TerraSim.py 1 1 1 30 600 | ./TerraViewer.py'"
+
+[Desktop Action Sim2x2]
+Name=Sim_2x2
+Exec=gnome-terminal --zoom=.2 --title="TOSSIM 2x2" -e "/bin/bash -i -c 'cd /home/terra/TerraNet/sim; ./TerraSim.py 2 2 0 0 600 | ./TerraViewer.py'"
+
+[Desktop Action Sim3x3]
+Name=Sim_3x3
+Exec=gnome-terminal --zoom=.2 --title="TOSSIM 3x3" -e "/bin/bash -i -c 'cd /home/terra/TerraNet/sim; ./TerraSim.py 3 3 0 0 600 | ./TerraViewer.py'"
+
+[Desktop Action Sim4x4]
+Name=Sim_4x4
+Exec=gnome-terminal --zoom=.2 --title="TOSSIM 4x4" -e "/bin/bash -i -c 'cd /home/terra/TerraNet/sim; ./TerraSim.py 4 4 0 0 600 | ./TerraViewer.py'"
+
+[Desktop Action Sim4x1]
+Name=Sim_4x1
+Exec=gnome-terminal --zoom=.2 --title="TOSSIM 4x1" -e "/bin/bash -i -c 'cd /home/terra/TerraNet/sim; ./TerraSim.py 4 1 0 0 600 | ./TerraViewer.py'"
+
+[Desktop Action SimCustom]
+Name=Sim_Custom
+Exec=gnome-terminal --title="TOSSIM Custom" -e "/bin/bash -i -c 'cd /home/terra/TerraNet/sim; ./TerraSim.py | ./TerraViewer.py'"
+

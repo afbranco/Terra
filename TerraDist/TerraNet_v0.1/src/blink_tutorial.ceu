@@ -1,0 +1,20 @@
+@include(/home/branco/git/Terra00/TerraVM/src/CustomVMs/TerraNet/Terra.m4)
+
+par do
+    loop do
+        await 500ms;
+	emit LED0(3);
+    end
+with
+    loop do
+        await 1s;
+	emit LED1(3);
+    end
+with
+    loop do
+        await 2s;
+	emit LED2(3);
+    end
+end
+
+

@@ -1,0 +1,30 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Icon[en_US]=/home/terra/appdesktop/SFmicaz0.png
+Name[en_US]=SForward
+Exec=/bin/bash -i -c 'sfmica 1'
+Comment[en_US]=Serial Forward USB1 mica
+Name=SF_USB0
+Comment=Serial Forward USB1 mica
+Icon=/home/terra/appdesktop/SFmicaz0.png
+GenericName[en_US.UTF-8]=Serial Forward USB1 mica
+Actions=sf_mica_1;sf_telos_0;sf_tb_ufrj;sf_tb_puc
+Comment[en_US.UTF-8]=Serial Forward USB1 mica
+
+[Desktop Action sf_mica_1]
+Name=SF Mica USB1
+Exec=/bin/bash -i -c 'sfmica 1' 
+
+[Desktop Action sf_telos_0]
+Name=SF TelosB USB0
+Exec=/bin/bash -i -c 'sftelos 0' 
+
+[Desktop Action sf_tb_ufrj]
+Name=SF Testbed UFRJ
+Exec=/bin/bash -i -c 'sfTBufrj 10001' 
+
+[Desktop Action sf_tb_puc]
+Name=SF Testbed PUC Rio
+Exec=/bin/bash -i -c 'sfTBpuc 10001' 

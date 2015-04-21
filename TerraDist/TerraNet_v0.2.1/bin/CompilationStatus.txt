@@ -1,0 +1,33 @@
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VOLCANO,MSGQ]
+MOTE        = micaz
+RFPOWER     = 03
+SENSORBOARD = mts300
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 88
+VM_MEM      = 2112
+TOSVERSION  = 212
+***********************
+
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VOLCANO,MSGQ]
+MOTE        = telosb
+RFPOWER     = 03
+SENSORBOARD = 
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 88
+VM_MEM      = 2112
+TOSVERSION  = 212
+***********************
+
+

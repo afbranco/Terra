@@ -1,0 +1,16 @@
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VOLCANO,MSGQ]
+MOTE        = micaz
+RFPOWER     = 11
+SENSORBOARD = mts300
+TYPE        = ALL
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 80
+VM_MEM      = 1920
+TOSVERSION  = 212
+***********************
+

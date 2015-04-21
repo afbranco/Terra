@@ -1,0 +1,22 @@
+#include "/home/terra/TerraNet_v0.1/terra/TerraNet.defs"
+
+
+
+par do
+    loop do
+        await 1s;
+	emit LED0(TOGGLE);
+    end
+with
+    loop do
+        await 2s;
+	emit LED1(TOGGLE);
+    end
+with
+    loop do
+        await 4s;
+	emit LED2(TOGGLE);
+    end
+end
+
+

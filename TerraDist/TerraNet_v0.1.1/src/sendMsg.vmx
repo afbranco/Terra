@@ -1,0 +1,244 @@
+96 215 243 243 243 243 2 1 0 8
+00 | 0000 0 track:0
+00 | 0001 0
+00 | 0002 0
+00 | 0003 0
+00 | 0004 0 track:1
+00 | 0005 0
+00 | 0006 0
+00 | 0007 0
+00 | 0008 0 track:2
+00 | 0009 0
+00 | 0010 0
+00 | 0011 0
+00 | 0012 0000 wClock:0
+00 | 0013 0001
+00 | 0014 0002
+00 | 0015 0003
+00 | 0016 0004
+00 | 0017 0005
+00 | 0018 0006
+00 | 0019 0007
+00 | 0020 0008 TEMP gate(s) = 1
+00 | 0021 0009
+00 | 0022 0010
+00 | 0023 0011 PHOTO gate(s) = 0
+00 | 0024 0012 VOLTS gate(s) = 0
+00 | 0025 0013 SEND_DONE gate(s) = 1
+00 | 0026 0014
+00 | 0027 0015
+00 | 0028 0016 SEND_DONE_ACK gate(s) = 0
+00 | 0029 0017 RECEIVE gate(s) = 1
+00 | 0030 0018
+00 | 0031 0019
+00 | 0032 0020 Q_READY gate(s) = 0
+00 | 0033 0021 PORT_A gate(s) = 0
+00 | 0034 0022 PORT_B gate(s) = 0
+00 | 0035 0023 INT_A gate(s) = 0
+00 | 0036 0024 INT_B gate(s) = 0
+00 | 0037 0025 CUSTOM_A gate(s) = 0
+00 | 0038 0026 $ret
+00 | 0039 0027 
+00 | 0040 0028 nodeId
+00 | 0041 0029 
+00 | 0042 0030 sndData_id
+00 | 0043 0031 sndData_source
+00 | 0044 0032 
+00 | 0045 0033 sndData_target
+00 | 0046 0034 
+00 | 0047 0035 sndData_d8_1
+00 | 0048 0036 sndData_d8_2
+00 | 0049 0037 sndData_d8_3
+00 | 0050 0038 sndData_d8_4
+00 | 0051 0039 sndData_d16_1
+00 | 0052 0040 
+00 | 0053 0041 sndData_d16_2
+00 | 0054 0042 
+00 | 0055 0043 sndData_d16_3
+00 | 0056 0044 
+00 | 0057 0045 sndData_d16_4
+00 | 0058 0046 
+00 | 0059 0047 sndData_d32_1
+00 | 0060 0048 
+00 | 0061 0049 
+00 | 0062 0050 
+00 | 0063 0051 sndData_d32_2
+00 | 0064 0052 
+00 | 0065 0053 
+00 | 0066 0054 
+00 | 0067 0055 sndData
+00 | 0068 0056 
+00 | 0069 0057 recData_id
+00 | 0070 0058 recData_source
+00 | 0071 0059 
+00 | 0072 0060 recData_target
+00 | 0073 0061 
+00 | 0074 0062 recData_d8_1
+00 | 0075 0063 recData_d8_2
+00 | 0076 0064 recData_d8_3
+00 | 0077 0065 recData_d8_4
+00 | 0078 0066 recData_d16_1
+00 | 0079 0067 
+00 | 0080 0068 recData_d16_2
+00 | 0081 0069 
+00 | 0082 0070 recData_d16_3
+00 | 0083 0071 
+00 | 0084 0072 recData_d16_4
+00 | 0085 0073 
+00 | 0086 0074 recData_d32_1
+00 | 0087 0075 
+00 | 0088 0076 
+00 | 0089 0077 
+00 | 0090 0078 recData_d32_2
+00 | 0091 0079 
+00 | 0092 0080 
+00 | 0093 0081 
+00 | 0094 0082 recData
+00 | 0095 0083 
+68 | 0096 68 memclr 0 26                   | clear all gates
+00 | 0097 00 
+1a | 0098 1a 
+a0 | 0099 a0 set_c u8 8 1                  | config gate TEMP with 1 await(s)
+08 | 0100 08 
+01 | 0101 01 
+a0 | 0102 a0 set_c u8 13 1                 | config gate SEND_DONE with 1 await(s)
+0d | 0103 0d 
+01 | 0104 01 
+a0 | 0105 a0 set_c u8 17 1                 | config gate RECEIVE with 1 await(s)
+11 | 0106 11 
+01 | 0107 01 
+91 | 0108 91 outevtx_v 0 2 u16 28          | emit INIT len=2 var=nodeId
+00 | 0109 00 
+02 | 0110 02 
+1c | 0111 1c 
+a0 | 0112 a0 set_c u8 30 1                 | sndData_id = 1
+1e | 0113 1e 
+01 | 0114 01 
+1c | 0115 1c push_c 30                     | push &sndData_id
+1e | 0116 1e 
+55 | 0117 55 popx_u u16 55                 | pop *sndData
+37 | 0118 37 
+a0 | 0119 a0 set_c u8 57 1                 | recData_id = 1
+39 | 0120 39 
+01 | 0121 01 
+1c | 0122 1c push_c 57                     | push &recData_id
+39 | 0123 39 
+55 | 0124 55 popx_u u16 82                 | pop *recData
+52 | 0125 52 
+a5 | 0126 a5 set_c u16 33 1                | sndData_target = 1
+21 | 0127 21 
+01 | 0128 01 
+b4 | 0129 b4 set_v u16 31 28               | sndData_source=nodeId
+1f | 0130 1f 
+1c | 0131 1c 
+a0 | 0132 a0 set_c u8 35 1                 | sndData_d8_1 = 1
+23 | 0133 23 
+01 | 0134 01 
+e0 | 0135 e0 tkins_max 0 18                | insert track ParEver_sub_1_18
+12 | 0136 12 
+e0 | 0137 e0 tkins_max 0 19                | insert track ParEver_sub_2_19
+13 | 0138 13 
+01 | 0139 01 end                           | end
+94 | 0140 94 outevt_z 5                    | emit REQ_TEMP
+05 | 0141 05 
+a5 | 0142 a5 set_c u16 9 29                | await TEMP[0]
+09 | 0143 09 
+1d | 0144 1d 
+01 | 0145 01 end                           | end
+70 | 0146 70 getextdt_v 39 2               | get Ext Data sndData_d16_1 2
+27 | 0147 27 
+02 | 0148 02 
+90 | 0149 90 outevtx_v 8 25 _sndData_t* 55 | emit SEND len=25 var=sndData
+08 | 0150 08 
+19 | 0151 19 
+37 | 0152 37 
+a5 | 0153 a5 set_c u16 14 33               | await SEND_DONE[0]
+0e | 0154 0e 
+21 | 0155 21 
+01 | 0156 01 end                           | end
+1c | 0157 1c push_c 1                      | push 1
+01 | 0158 01 
+2c | 0159 2c pushx_vu u8 35                | push sndData_d8_1:u8
+23 | 0160 23 
+04 | 0161 04 add                           | add
+54 | 0162 54 popx_u u8 35                  | pop sndData_d8_1
+23 | 0163 23 
+c1 | 0164 c1 clken_c 0 15000 36            | clock enable Awake_15000000_36 15000msec
+00 | 0165 00 
+3a | 0166 3a 
+98 | 0167 98 
+24 | 0168 24 
+01 | 0169 01 end                           | end
+7c | 0170 7c exec 23                       | goto u8 23
+17 | 0171 17 
+68 | 0172 68 memclr 0 8                    | clear WClocks gates from 0 to 1
+00 | 0173 00 
+08 | 0174 08 
+68 | 0175 68 memclr 9 2                    | clear EXT gates for TEMP
+09 | 0176 09 
+02 | 0177 02 
+68 | 0178 68 memclr 14 2                   | clear EXT gates for SEND_DONE
+0e | 0179 0e 
+02 | 0180 02 
+01 | 0181 01 end                           | end
+a5 | 0182 a5 set_c u16 18 41               | await RECEIVE[0]
+12 | 0183 12 
+29 | 0184 29 
+01 | 0185 01 end                           | end
+6c | 0186 6c getextdt_p 82 25              | get Ext Data *recData 25
+52 | 0187 52 
+19 | 0188 19 
+1c | 0189 1c push_c 0                      | push 0
+00 | 0190 00 
+2d | 0191 2d pushx_vu u16 58               | push recData_source:u16
+3a | 0192 3a 
+0d | 0193 0d eq                            | eq
+80 | 0194 80 ifelse 46 47                  | ifelse True_46 EndIf_47
+2e | 0195 2e 
+2f | 0196 2f 
+90 | 0197 90 outevtx_v 1 1 u8 62           | emit LEDS len=1 var=recData_d8_1
+01 | 0198 01 
+01 | 0199 01 
+3e | 0200 3e 
+7c | 0201 7c exec 47                       | goto u8 47
+2f | 0202 2f 
+7c | 0203 7c exec 37                       | goto u8 37
+25 | 0204 25 
+68 | 0205 68 memclr 18 2                   | clear EXT gates for RECEIVE
+12 | 0206 12 
+02 | 0207 02 
+01 | 0208 01 end                           | end
+01 | 0209 01 end                           | end
+68 | 0210 68 memclr 0 8                    | clear WClocks gates from 0 to 1
+00 | 0211 00 
+08 | 0212 08 
+02 | 0213 02 return                        | return
+01 | 0214 01 end                           | end
+01 | 0215 01 L1(0x01) => 96 (0x60)
+60 | 0216 60 
+2e | 0217 2e L46(0x2e) => 197 (0xc5)
+c5 | 0218 c5 
+21 | 0219 21 L33(0x21) => 157 (0x9d)
+9d | 0220 9d 
+25 | 0221 25 L37(0x25) => 182 (0xb6)
+b6 | 0222 b6 
+27 | 0223 27 L39(0x27) => 205 (0xcd)
+cd | 0224 cd 
+1d | 0225 1d L29(0x1d) => 146 (0x92)
+92 | 0226 92 
+2f | 0227 2f L47(0x2f) => 203 (0xcb)
+cb | 0228 cb 
+12 | 0229 12 L18(0x12) => 140 (0x8c)
+8c | 0230 8c 
+13 | 0231 13 L19(0x13) => 182 (0xb6)
+b6 | 0232 b6 
+29 | 0233 29 L41(0x29) => 186 (0xba)
+ba | 0234 ba 
+03 | 0235 03 L3(0x03) => 210 (0xd2)
+d2 | 0236 d2 
+24 | 0237 24 L36(0x24) => 170 (0xaa)
+aa | 0238 aa 
+17 | 0239 17 L23(0x17) => 140 (0x8c)
+8c | 0240 8c 
+19 | 0241 19 L25(0x19) => 172 (0xac)
+ac | 0242 ac 

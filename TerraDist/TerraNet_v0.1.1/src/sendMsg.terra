@@ -1,0 +1,24 @@
+@include(/home/terra/TerraNet_v0.1/terra/Terra.m4)
+
+usrMsg_t(sndData,1);
+usrMsg_t(recData,1);
+sndData_target = 1;
+sndData_source = nodeId;
+sndData_d8_1 = 1;
+par do
+	loop do
+		emit REQ_TEMP();
+		sndData_d16_1 = await TEMP;
+		emit SEND(sndData);
+		await SEND_DONE;
+		sndData_d8_1 = sndData_d8_1 + 1;
+		await 15s;
+	end
+with
+	loop do
+		recData = await RECEIVE;
+		if recData_source == 0 then
+			emit LEDS(recData_d8_1);
+		end
+	end
+end
