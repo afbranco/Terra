@@ -16,9 +16,9 @@ interface VMCustom{
 	event  uint32_t pop();
 	event  void push(uint32_t val);
 	event void queueEvt(uint8_t evtId, uint8_t auxId,void* data);
-	event int32_t getMVal(uint16_t Maddr, uint8_t v1_len);
-	event void setMVal(uint32_t value,uint16_t Maddr, uint8_t v1_len);
-	event void* getRealAddr(uint16_t Maddr, uint8_t v1_len);
+	event int32_t getMVal(uint16_t Maddr, uint8_t tp);
+	event void setMVal(uint32_t value,uint16_t Maddr, uint8_t fromTp, uint8_t tpTp);
+	event void* getRealAddr(uint16_t Maddr);
 	event bool getHaltedFlag();
 	event void evtError(uint8_t ecode);
 

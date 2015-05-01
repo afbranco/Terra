@@ -22,7 +22,7 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 -->
-<language id="terranet" _name="TerraNet" version="2.0" _section="Script">
+<language id="terranet" _name="TerraNet" version="3.0" _section="Script">
   <metadata>
     <property name="mimetypes">text/x-c;text/x-csrc;image/x-xpixmap</property>
     <property name="globs">*.terra</property>
@@ -219,19 +219,9 @@
       <keyword>ushort</keyword>
       <keyword>long</keyword>
       <keyword>ulong</keyword>
+      <keyword>float</keyword>
       <keyword>void</keyword>
 
-    </context>
-
-    <context id="storage-class" style-ref="storage-class">
-      <keyword>auto</keyword>
-      <keyword>const</keyword>
-      <keyword>extern</keyword>
-      <keyword>inline</keyword>
-      <keyword>register</keyword>
-      <keyword>restrict</keyword>
-      <keyword>static</keyword>
-      <keyword>volatile</keyword>
     </context>
 
     <!-- C99 booleans -->

@@ -1,4 +1,4 @@
-115 330 3 3 0 0 24 2 24
+115 334 3 3 0 0 24 2 24
 00 | 00000 0 track 0
 00 | 00001 0
 00 | 00002 0
@@ -114,218 +114,222 @@
 00 | 00112 0096 
 00 | 00113 0097 ParAnd_flag[2], 
 00 | 00114 0098 
-c5 | 00115 c5 set16_c ushort 24 10370       | config gate SEND_DONE() with 2 await(s) - 0x2882 = 10370
+d1 | 00115 d1 set_c ushort 24 10370         | config gate SEND_DONE() with 2 await(s) - 0x2882 = 10370
 18 | 00116 18 
 28 | 00117 28 
 82 | 00118 82 
-c5 | 00119 c5 set16_c ushort 32 11521       | config gate RECEIVE with 1 await(s) - 0x2d01 = 11521
+d1 | 00119 d1 set_c ushort 32 11521         | config gate RECEIVE with 1 await(s) - 0x2d01 = 11521
 20 | 00120 20 
 2d | 00121 2d 
 01 | 00122 01 
-c0 | 00123 c0 set16_c ubyte 39 0            | event target = 0 gates
+c0 | 00123 c0 set_c ubyte 39 0              | event target = 0 gates
 27 | 00124 27 
 00 | 00125 00 
-78 | 00126 78 memclr 40 0                   | clear target 0 wait(s) 
-28 | 00127 28 
-00 | 00128 00 
-19 | 00129 19 func 0                        | func getNodeId
-00 | 00130 00 
-21 | 00131 21 popx ushort 40                | pop nodeId
-28 | 00132 28 
-31 | 00133 31 pushx_v ushort 40             | push nodeId:ushort
-28 | 00134 28 
-54 | 00135 54 cast ubyte                    | cast ubyte
-28 | 00136 28 push_c 11                     | push 11
-0b | 00137 0b 
-10 | 00138 10 eq                            | eq
-20 | 00139 20 popx ubyte 42                 | pop isRoot
-2a | 00140 2a 
-28 | 00141 28 push_c 100                    | push 100
-64 | 00142 64 
-31 | 00143 31 pushx_v ushort 40             | push nodeId:ushort
-28 | 00144 28 
-09 | 00145 09 mult                          | mult
-22 | 00146 22 popx ulong 93                 | pop delay
-5d | 00147 5d 
-30 | 00148 30 pushx_v ubyte 42              | push isRoot:ubyte
-2a | 00149 2a 
-7f | 00150 7f ifelse 12 13                  | ifelse True_12 False_13
-00 | 00151 .00 addr:155
-9b | 00152 .0c 
-00 | 00153 .00 addr:161
-a1 | 00154 .0d 
-c4 | 00155 c4 set16_c ushort 37 1           | target = 1
-25 | 00156 25 
-01 | 00157 01 
-75 | 00158 75 exec 14                       | goto  14
-00 | 00159 .00 addr:171
-ab | 00160 .0e 
-28 | 00161 28 push_c 1                      | push 1
-01 | 00162 01 
-31 | 00163 31 pushx_v ushort 40             | push nodeId:ushort
-28 | 00164 28 
-06 | 00165 06 sub                           | sub
-21 | 00166 21 popx ushort 37                | pop target
-25 | 00167 25 
-75 | 00168 75 exec 14                       | goto  14
-00 | 00169 .00 addr:171
-ab | 00170 .0e 
-c0 | 00171 c0 set16_c ubyte 43 1            | sndData.type = 1
-2b | 00172 2b 
-01 | 00173 01 
-c0 | 00174 c0 set16_c ubyte 68 2            | recData.type = 2
-44 | 00175 44 
-02 | 00176 02 
-e4 | 00177 e4 set16_v ushort 46 37          | sndData.target = target
-2e | 00178 2e 
-25 | 00179 25 
-e4 | 00180 e4 set16_v ushort 44 40          | sndData.source = nodeId
-2c | 00181 2c 
-28 | 00182 28 
-a5 | 00183 a5 clken_c 0 1000 17             | clock enable Awake_1000_17 1000msec
-00 | 00184 00 
-03 | 00185 03 
-e8 | 00186 e8 
-00 | 00187 .00 addr:190
-be | 00188 .11 
-01 | 00189 01 end                           | end
-94 | 00190 94 tkins_max 0 18                | insert track ParEver_sub_1_18
-00 | 00191 .00 addr:197
-c5 | 00192 .12 
-94 | 00193 94 tkins_max 0 19                | insert track ParEver_sub_2_19
-01 | 00194 .00 addr:277
-15 | 00195 .13 
-01 | 00196 01 end                           | end
-78 | 00197 78 memclr 97 2                   | clear gates from addr 97 to addr 98
-61 | 00198 61 
-02 | 00199 02 
-94 | 00200 94 tkins_max 0 26                | insert track ParAnd_sub_1_26
-00 | 00201 .00 addr:207
-cf | 00202 .1a 
-94 | 00203 94 tkins_max 0 27                | insert track ParAnd_sub_2_27
-00 | 00204 .00 addr:248
-f8 | 00205 .1b 
-01 | 00206 01 end                           | end
-b2 | 00207 b2 clken_ve 1 0 ulong 93 31      | clock enable Awake_delay_31 (delay:ulong)ms
+24 | 00126 24 func 0                        | func getNodeId
+00 | 00127 00 
+a1 | 00128 a1 pop ushort 40                 | pop nodeId
+28 | 00129 28 
+91 | 00130 91 push_v ushort 40              | push nodeId:ushort
+28 | 00131 28 
+40 | 00132 40 push_c 11                     | push 11
+0b | 00133 0b 
+0f | 00134 0f eq                            | eq
+a0 | 00135 a0 pop ubyte 42                  | pop isRoot
+2a | 00136 2a 
+40 | 00137 40 push_c 100                    | push 100
+64 | 00138 64 
+91 | 00139 91 push_v ushort 40              | push nodeId:ushort
+28 | 00140 28 
+08 | 00141 08 mult                          | mult
+a2 | 00142 a2 pop ulong 93                  | pop delay
+5d | 00143 5d 
+90 | 00144 90 push_v ubyte 42               | push isRoot:ubyte
+2a | 00145 2a 
+4f | 00146 4f ifelse 12 13                  | ifelse True_12 False_13
+00 | 00147 .00 addr:151
+97 | 00148 .0c 
+00 | 00149 .00 addr:157
+9d | 00150 .0d 
+c1 | 00151 c1 set_c ushort 37 1             | target = 1
+25 | 00152 25 
+01 | 00153 01 
+39 | 00154 39 exec 14                       | goto  14
+00 | 00155 .00 addr:167
+a7 | 00156 .0e 
+40 | 00157 40 push_c 1                      | push 1
+01 | 00158 01 
+91 | 00159 91 push_v ushort 40              | push nodeId:ushort
+28 | 00160 28 
+05 | 00161 05 sub                           | sub
+a1 | 00162 a1 pop ushort 37                 | pop target
+25 | 00163 25 
+39 | 00164 39 exec 14                       | goto  14
+00 | 00165 .00 addr:167
+a7 | 00166 .0e 
+c0 | 00167 c0 set_c ubyte 43 1              | sndData.type = 1
+2b | 00168 2b 
+01 | 00169 01 
+c0 | 00170 c0 set_c ubyte 68 2              | recData.type = 2
+44 | 00171 44 
+02 | 00172 02 
+2a | 00173 2a set_v ushort 46 ushort 37     | sndData.target = target
+11 | 00174 11 
+2e | 00175 2e 
+25 | 00176 25 
+2a | 00177 2a set_v ushort 44 ushort 40     | sndData.source = nodeId
+11 | 00178 11 
+2c | 00179 2c 
+28 | 00180 28 
+29 | 00181 29 clken_c 0 1000 17             | clock enable Awake_1000_17 1000msec
+03 | 00182 03 
+00 | 00183 00 
+03 | 00184 03 
+e8 | 00185 e8 
+00 | 00186 .00 addr:189
+bd | 00187 .11 
+01 | 00188 01 end                           | end
+89 | 00189 89 tkins_max 0 18                | insert track ParEver_sub_1_18
+00 | 00190 .00 addr:196
+c4 | 00191 .12 
+89 | 00192 89 tkins_max 0 19                | insert track ParEver_sub_2_19
+01 | 00193 .00 addr:279
+17 | 00194 .13 
+01 | 00195 01 end                           | end
+48 | 00196 48 memclr 97 2                   | clear gates from addr 97 to addr 98
+61 | 00197 61 
+02 | 00198 02 
+89 | 00199 89 tkins_max 0 26                | insert track ParAnd_sub_1_26
+00 | 00200 .00 addr:206
+ce | 00201 .1a 
+89 | 00202 89 tkins_max 0 27                | insert track ParAnd_sub_2_27
+00 | 00203 .00 addr:249
+f9 | 00204 .1b 
+01 | 00205 01 end                           | end
+28 | 00206 28 clken_v 1 0 ulong 93 31       | clock enable Awake_delay_31 (delay:ulong)ms
+11 | 00207 11 
 01 | 00208 01 
-00 | 00209 00 
-00 | 00210 00 
-5d | 00211 5d 
-00 | 00212 .00 addr:215
-d7 | 00213 .1f 
-01 | 00214 01 end                           | end
-e4 | 00215 e4 set16_v ushort 52 40          | sndData.d16[0] = nodeId
-34 | 00216 34 
-28 | 00217 28 
-e4 | 00218 e4 set16_v ushort 54 37          | sndData.d16[1] = target
+5d | 00209 5d 
+00 | 00210 .00 addr:213
+d5 | 00211 .1f 
+01 | 00212 01 end                           | end
+2a | 00213 2a set_v ushort 52 ushort 40     | sndData.d16[0] = nodeId
+11 | 00214 11 
+34 | 00215 34 
+28 | 00216 28 
+2a | 00217 2a set_v ushort 54 ushort 37     | sndData.d16[1] = target
+11 | 00218 11 
 36 | 00219 36 
 25 | 00220 25 
-c4 | 00221 c4 set16_c ushort 56 0           | sndData.d16[2] = 0
+c1 | 00221 c1 set_c ushort 56 0             | sndData.d16[2] = 0
 38 | 00222 38 
 00 | 00223 00 
-c0 | 00224 c0 set16_c ubyte 48 1            | sndData.d8[0] = 1
+c0 | 00224 c0 set_c ubyte 48 1              | sndData.d8[0] = 1
 30 | 00225 30 
 01 | 00226 01 
-f8 | 00227 f8 set32_v ulong 60 93           | sndData.d32[0] = delay
-3c | 00228 3c 
-5d | 00229 5d 
-71 | 00230 71 outevtx_v 40 43               | emit SEND len=25 var=sndData
-28 | 00231 28 
-2b | 00232 2b 
-28 | 00233 28 push_c 1                      | push 1
-01 | 00234 01 
-20 | 00235 20 popx ubyte 26                 | evt SEND_DONE() auxId = pop
-1a | 00236 1a 
-c5 | 00237 c5 set16_c ushort 27 38          | await SEND_DONE()[0]
-1b | 00238 1b 
-00 | 00239 .00 addr:242
-f2 | 00240 .26 
-01 | 00241 01 end                           | end
-c0 | 00242 c0 set16_c ubyte 97 1            | open gate 1
-61 | 00243 61 
-01 | 00244 01 
-75 | 00245 75 exec 28                       | goto  28
-01 | 00246 .00 addr:261
-05 | 00247 .1c 
-a5 | 00248 a5 clken_c 2 5000 39             | clock enable Awake_5000_39 5000msec
-02 | 00249 02 
-13 | 00250 13 
-88 | 00251 88 
-00 | 00252 .00 addr:255
-ff | 00253 .27 
-01 | 00254 01 end                           | end
-c0 | 00255 c0 set16_c ubyte 98 1            | open gate 2
-62 | 00256 62 
-01 | 00257 01 
-75 | 00258 75 exec 28                       | goto  28
-01 | 00259 .00 addr:261
-05 | 00260 .1c 
-8c | 00261 8c chkret 97                     | if (gate 0 == 0) PC=PC+1
-61 | 00262 61 
-01 | 00263 01 end                           | end
-8c | 00264 8c chkret 98                     | if (gate 1 == 0) PC=PC+1
-62 | 00265 62 
-01 | 00266 01 end                           | end
-75 | 00267 75 exec 23                       | goto  23
-00 | 00268 .00 addr:197
-c5 | 00269 .17 
-78 | 00270 78 memclr 8 16                   | clear WClocks gates from 1 to 3
-08 | 00271 08 
-10 | 00272 10 
-78 | 00273 78 memclr 26 2                   | clear EXT gates for SEND_DONE()
-1a | 00274 1a 
-02 | 00275 02 
-01 | 00276 01 end                           | end
-c5 | 00277 c5 set16_c ushort 34 43          | await RECEIVE[0]
-22 | 00278 22 
-01 | 00279 .00 addr:282
-1a | 00280 .2b 
-01 | 00281 01 end                           | end
-50 | 00282 50 getextdt_v 68 25              | getExtData recData 25
-44 | 00283 44 
-19 | 00284 19 
-31 | 00285 31 pushx_v ushort 40             | push nodeId:ushort
-28 | 00286 28 
-31 | 00287 31 pushx_v u/short 71            | push recData.target
-47 | 00288 47 
-10 | 00289 10 eq                            | eq
-7f | 00290 7f ifelse 52 53                  | ifelse True_52 EndIf_53
-01 | 00291 .00 addr:295
-27 | 00292 .34 
-01 | 00293 .00 addr:277
-15 | 00294 .28 
-c0 | 00295 c0 set16_c ubyte 68 2            | recData.type = 2
-44 | 00296 44 
-02 | 00297 02 
-e4 | 00298 e4 set16_v ushort 71 37          | recData.target = target
-47 | 00299 47 
-25 | 00300 25 
-e4 | 00301 e4 set16_v ushort 81 40          | recData.d16[2] = nodeId
-51 | 00302 51 
-28 | 00303 28 
-28 | 00304 28 push_c 73                     | push_c recData.d8[0]
-49 | 00305 49 
-58 | 00306 58 inc ubyte                     | inc ubyte
-71 | 00307 71 outevtx_v 40 68               | emit SEND len=25 var=recData
-28 | 00308 28 
-44 | 00309 44 
-28 | 00310 28 push_c 2                      | push 2
-02 | 00311 02 
-20 | 00312 20 popx ubyte 29                 | evt SEND_DONE() auxId = pop
-1d | 00313 1d 
-c5 | 00314 c5 set16_c ushort 30 51          | await SEND_DONE()[1]
-1e | 00315 1e 
-01 | 00316 .00 addr:277
-15 | 00317 .28 
-01 | 00318 01 end                           | end
-78 | 00319 78 memclr 26 2                   | clear EXT gates for SEND_DONE()
-1a | 00320 1a 
-02 | 00321 02 
-78 | 00322 78 memclr 34 2                   | clear EXT gates for RECEIVE
-22 | 00323 22 
-02 | 00324 02 
-01 | 00325 01 end                           | end
-78 | 00326 78 memclr 0 24                   | clear WClocks gates from 0 to 3
-00 | 00327 00 
-18 | 00328 18 
+2a | 00227 2a set_v ulong 60 ulong 93       | sndData.d32[0] = delay
+22 | 00228 22 
+3c | 00229 3c 
+5d | 00230 5d 
+b1 | 00231 b1 outevt_v 40 43                | emit SEND len=25 var=sndData
+28 | 00232 28 
+2b | 00233 2b 
+40 | 00234 40 push_c 1                      | push 1
+01 | 00235 01 
+a0 | 00236 a0 pop ubyte 26                  | evt SEND_DONE() auxId = pop
+1a | 00237 1a 
+d1 | 00238 d1 set_c ushort 27 38            | await SEND_DONE()[0]
+1b | 00239 1b 
+00 | 00240 .00 addr:243
+f3 | 00241 .26 
+01 | 00242 01 end                           | end
+c0 | 00243 c0 set_c ubyte 97 1              | open gate 1
+61 | 00244 61 
+01 | 00245 01 
+39 | 00246 39 exec 28                       | goto  28
+01 | 00247 .00 addr:263
+07 | 00248 .1c 
+29 | 00249 29 clken_c 2 5000 39             | clock enable Awake_5000_39 5000msec
+03 | 00250 03 
+02 | 00251 02 
+13 | 00252 13 
+88 | 00253 88 
+01 | 00254 .00 addr:257
+01 | 00255 .27 
+01 | 00256 01 end                           | end
+c0 | 00257 c0 set_c ubyte 98 1              | open gate 2
+62 | 00258 62 
+01 | 00259 01 
+39 | 00260 39 exec 28                       | goto  28
+01 | 00261 .00 addr:263
+07 | 00262 .1c 
+3a | 00263 3a chkret 97                     | ParAnd_out_29 -- if (gate 0 == 0) PC=PC+1
+61 | 00264 61 
+01 | 00265 01 end                           | end
+3a | 00266 3a chkret 98                     | ParAnd_out_29 -- if (gate 1 == 0) PC=PC+1
+62 | 00267 62 
+01 | 00268 01 end                           | end
+39 | 00269 39 exec 23                       | goto  23
+00 | 00270 .00 addr:196
+c4 | 00271 .17 
+48 | 00272 48 memclr 8 16                   | clear WClocks gates from 1 to 3
+08 | 00273 08 
+10 | 00274 10 
+48 | 00275 48 memclr 26 2                   | clear EXT gates for SEND_DONE()
+1a | 00276 1a 
+02 | 00277 02 
+01 | 00278 01 end                           | end
+d1 | 00279 d1 set_c ushort 34 43            | await RECEIVE[0]
+22 | 00280 22 
+01 | 00281 .00 addr:284
+1c | 00282 .2b 
+01 | 00283 01 end                           | end
+5c | 00284 5c getextdt_v 68 25              | getExtData recData 25
+44 | 00285 44 
+19 | 00286 19 
+91 | 00287 91 push_v ushort 40              | push nodeId:ushort
+28 | 00288 28 
+91 | 00289 91 push_v ushort 71              | push recData.target [Optm:: push_c addr + deref]
+47 | 00290 47 
+0f | 00291 0f eq                            | eq
+4f | 00292 4f ifelse 52 53                  | ifelse True_52 EndIf_53
+01 | 00293 .00 addr:297
+29 | 00294 .34 
+01 | 00295 .00 addr:279
+17 | 00296 .28 
+c0 | 00297 c0 set_c ubyte 68 2              | recData.type = 2
+44 | 00298 44 
+02 | 00299 02 
+2a | 00300 2a set_v ushort 71 ushort 37     | recData.target = target
+11 | 00301 11 
+47 | 00302 47 
+25 | 00303 25 
+2a | 00304 2a set_v ushort 81 ushort 40     | recData.d16[2] = nodeId
+11 | 00305 11 
+51 | 00306 51 
+28 | 00307 28 
+40 | 00308 40 push_c 73                     | push_c recData.d8[0]
+49 | 00309 49 
+60 | 00310 60 inc ubyte                     | inc ubyte
+b1 | 00311 b1 outevt_v 40 68                | emit SEND len=25 var=recData
+28 | 00312 28 
+44 | 00313 44 
+40 | 00314 40 push_c 2                      | push 2
+02 | 00315 02 
+a0 | 00316 a0 pop ubyte 29                  | evt SEND_DONE() auxId = pop
+1d | 00317 1d 
+d1 | 00318 d1 set_c ushort 30 51            | await SEND_DONE()[1]
+1e | 00319 1e 
+01 | 00320 .00 addr:279
+17 | 00321 .28 
+01 | 00322 01 end                           | end
+48 | 00323 48 memclr 26 2                   | clear EXT gates for SEND_DONE()
+1a | 00324 1a 
+02 | 00325 02 
+48 | 00326 48 memclr 34 2                   | clear EXT gates for RECEIVE
+22 | 00327 22 
+02 | 00328 02 
 01 | 00329 01 end                           | end
+48 | 00330 48 memclr 0 24                   | clear WClocks gates from 0 to 3
+00 | 00331 00 
+18 | 00332 18 
+01 | 00333 01 end                           | end

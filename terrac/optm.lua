@@ -1,9 +1,13 @@
 
 varType = {}
-varType[0]='u/byte'
-varType[1]='u/short'
-varType[2]='u/long'
-varType[3]='u/----'
+varType[0]='ubyte'
+varType[1]='ushort'
+varType[2]='ulong'
+varType[3]='float'
+varType[4]='byte'
+varType[5]='short'
+varType[6]='long'
+varType[7]='----'
 
 
 --------------------------------------------------
@@ -25,9 +29,9 @@ for x,op in pairs(_AST.root.opcode) do
         if  next_op_code == opcode.op_deref then
 --print("optm::deref: ",_AST.root.opcode[x+2+op_mod],next_op_num,next_op_code,next_op_mod,string.sub((_AST.root.code2[x+2+op_mod] or ''),1,6))
           if op_mod == 0 then
-            _AST.root.opcode[x]=string.format("%02x",opcode.op_pushx_v+next_op_mod)
-            local newOpText = 'pushx_v '.. varType[next_op_mod] .. ' ' .. tonumber('0x'.._AST.root.opcode[x+1])
-            newOpText = newOpText .. string.sub(_AST.root.code2[x],string.len(newOpText)+1) 
+            _AST.root.opcode[x]=string.format("%02x",opcode.op_push_v+next_op_mod)
+            local newOpText = 'push_v '.. varType[next_op_mod] .. ' ' .. tonumber('0x'.._AST.root.opcode[x+1])
+            newOpText = newOpText .. string.sub(_AST.root.code2[x],string.len(newOpText)+1) .. ' [Optm:: push_c addr + deref]'
             _AST.root.code2[x]=  newOpText
           else
             _AST.root.opcode[x]=string.format("%02x",opcode.op_push_v+next_op_mod)

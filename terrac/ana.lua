@@ -62,7 +62,7 @@ end
 
 local LST = {
     Do=true, Stmts=true, Block=true, Root=true, Dcl_cls=true,
-    Pause=true, 
+    Pause=true,
 }
 
 F = {

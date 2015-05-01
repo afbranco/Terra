@@ -8,6 +8,7 @@ local types = {
     ulong=true, long=true,
     ushort=true, short=true,
     ubyte=true,  byte=true,
+    float=true,
 }
 
 function _TP.isBasicType(tp)
@@ -109,9 +110,10 @@ function _TP.tpCompat(tp1,tp2,arr1,arr2)
         (z1.auxtag == 'var'      and z2.auxtag == 'var'    )                    
     then
         error = false
-        cast = (z1.len < z2.len)
+        cast = ((tp1~=tp2 and (tp1=='float' or tp2=='float'))) or
+               ((tp1~='float' and tp2~='float') and (z1.len < z2.len))
     elseif
-        (z1.auxtag == 'pointer'     and z2.auxtag == 'pointer'   ) and (z1.len == z2.len)                   
+        (z1.auxtag == 'pointer'     and z2.auxtag == 'pointer'   ) and ((z1.len == z2.len and tp1~='float' and tp2~='float') or (tp1=='float' and tp2=='float'))                   
     then
         error = false
         cast = false
@@ -146,6 +148,7 @@ function _TP.contains (tp1, tp2, c)
 end
 
 function _TP.max (tp1, tp2, c)
+    if (tp1=='float' or tp2=='float') then return 'float'; end
     if _TP.contains(tp1, tp2, c) then
         return tp1
     elseif _TP.contains(tp2, tp1, c) then
@@ -155,23 +158,35 @@ function _TP.max (tp1, tp2, c)
     end
 end
 
+function _TP.getCastType(tp)
+  return ((tp=='ubyte' or tp=='ushort' or tp=='ulong') and 'ulong') or ((tp=='byte' or tp=='short' or tp=='long') and 'long') or 'float'  
+end
+
 function _TP.getConstType(val,me,no_wrn)
-	local nval = tonumber(val) or string.byte(val,2)
---print("tp::getConstType:",val,nval)
-	if (nval <= 0xff) then return 'ubyte' end
-  if (nval <= 0xffff) then return 'ushort' end
-  if (nval <= 0xffffffff) then return 'ulong' end
-  WRN(no_wrn,me,'Constant too large, got: "'.. val ..'", max value must be (2^32)-1')
-	return 'ulong'
+  if ((string.find(val,'e') or string.find(val,'E') or string.find(val,'%.')) and tonumber(val)) and not(string.find(val,'x') or string.find(val,'X'))then
+    local nval = tonumber(val)
+    if (nval < -3.4E+38) or (nval > 3.4E+38)  then
+      WRN(no_wrn,me,'Float constant out of range, got: "'.. val ..'", value must range (+/-) 3.4E+38')
+    end    
+    return 'float'
+  else
+    local nval = tonumber(val) or string.byte(val,2)
+--print("tp::getConstTypeI:",val,nval)
+  	if (nval <= 0xff) then return 'ubyte' end
+    if (nval <= 0xffff) then return 'ushort' end
+    if (nval <= 0xffffffff) then return 'ulong' end
+    WRN(no_wrn,me,'Integer constant too large, got: "'.. val ..'", max value must be (2^32)-1')
+  	return 'ulong'
+  end
 end
 
 function _TP.getConstLen(val)
 --print("tp::getConstLen:",val)
-	local nval = tonumber(val) or string.byte(val,2)
-	if (nval <= 0xff) then return 0 end
-	if (nval <= 0xffff) then return 1 end
-	if (nval <= 0xffffff) then return 2 end
-	return 3
+  local nval = tonumber(val) or string.byte(val,2)
+  if (nval <= 0xff) then return 0 end
+  if (nval <= 0xffff) then return 1 end
+  if (nval <= 0xffffff) then return 2 end
+  return 3
 end
 
 function _TP.getConstBytes(val,len)
@@ -189,6 +204,14 @@ function _TP.getConstBytes(val,len)
   return trim(bytes)
 end
 
+function _TP.getConstLenLbl(val)
+--print("tp::getConstLenLbl:",val)
+  local nval = tonumber(val) or string.byte(val,2)
+  if (nval <= 0xff) then return 1 end
+  if (nval <= 0xffff) then return 1 end
+  if (nval <= 0xffffff) then return 2 end
+  return 3
+end
 function _TP.getConstBytesLbl(val,len)
   len = 2;
   nx=1
@@ -204,7 +227,84 @@ function _TP.getConstBytesLbl(val,len)
   return trim(bytes)
 end
 
+--------------------------------------
+-- Convert float to hex / hex to float
+-- Tanks to François Perrad
+-- lua-MessagePack : <http://fperrad.github.io/lua-MessagePack/>
 
+function _TP.float2hex (n)
+    if n == 0.0 then return 0.0 end
+
+    local sign = 0
+    if n < 0.0 then
+        sign = 0x80
+        n = -n
+    end
+
+    local mant, expo = math.frexp(n)
+    local hext = {}
+
+    if mant ~= mant then
+        hext[#hext+1] = string.char(0xFF, 0x88, 0x00, 0x00)
+
+    elseif mant == math.huge or expo > 0x80 then
+        if sign == 0 then
+            hext[#hext+1] = string.char(0x7F, 0x80, 0x00, 0x00)
+        else
+            hext[#hext+1] = string.char(0xFF, 0x80, 0x00, 0x00)
+        end
+
+    elseif (mant == 0.0 and expo == 0) or expo < -0x7E then
+        hext[#hext+1] = string.char(sign, 0x00, 0x00, 0x00)
+
+    else
+        expo = expo + 0x7E
+        mant = (mant * 2.0 - 1.0) * math.ldexp(0.5, 24)
+        hext[#hext+1] = string.char(sign + math.floor(expo / 0x2),
+                                    (expo % 0x2) * 0x80 + math.floor(mant / 0x10000),
+                                    math.floor(mant / 0x100) % 0x100,
+                                    mant % 0x100)
+    end
+
+    return tonumber(string.gsub(table.concat(hext),"(.)",
+                                function (c) return string.format("%02X%s",string.byte(c),"") end), 16)
+end
+
+
+function _TP.hex2float (c)
+    if c == 0 then return 0.0 end
+    local c = string.gsub(string.format("%X", c),"(..)",function (x) return string.char(tonumber(x, 16)) end)
+    local b1,b2,b3,b4 = string.byte(c, 1, 4)
+    local sign = b1 > 0x7F
+    local expo = (b1 % 0x80) * 0x2 + math.floor(b2 / 0x80)
+    local mant = ((b2 % 0x80) * 0x100 + b3) * 0x100 + b4
+
+    if sign then
+        sign = -1
+    else
+        sign = 1
+    end
+
+    local n
+
+    if mant == 0 and expo == 0 then
+        n = sign * 0.0
+    elseif expo == 0xFF then
+        if mant == 0 then
+            n = sign * math.huge
+        else
+            n = 0.0/0.0
+        end
+    else
+        n = sign * math.ldexp(1.0 + mant / 0x800000, expo - 0x7F)
+    end
+
+    return n
+end
+--- =========================================
+
+
+--------------------------------------
 -- Copyright 2009: hans@hpelbers.org
 -- This is freeware
  
@@ -235,3 +335,4 @@ function print_r (t, name, indent)
   end
   return table_r(t,name or 'Value',indent or '')
 end
+--- =========================================

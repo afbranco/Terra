@@ -12,12 +12,14 @@ end
 
 
 _ENV = {
-    exts = {},
+    exts = {}, -- List of External Events
+    ints = {}, -- List of Internal Events: {id=id,ln=ln}
     c = {
         void = 0,
 
         ubyte=1, ushort=2, ulong=4,
         byte=1, short=2, long=4,
+        float=4,
         payload=1,
 
         pointer   = 2, --_OPTS.tp_pointer,
@@ -50,13 +52,20 @@ for k, v in pairs(_ENV.c) do
 end
 
 function newvar (me, blk, pre, tp, dim, id, read_only)
+
+    -- Cheks if name is used by internal event
+    for k,evt in ipairs(_ENV.ints) do
+--print("env::newvar():",k,evt.id,evt.ln)
+      ASR(not(evt.id==id), me,'event "'..id..'" was previously declared at line '..evt.ln)
+    end
+    -- Cheks for context definitions
     for stmt in _AST.iter() do
         if stmt.tag == 'Async' then
             break
         elseif stmt.tag == 'Block' then
             for _, var in ipairs(stmt.vars) do
-                WRN(var.id~=id, me,
-                    'declaration of "'..id..'" hides the one at line '..var.ln)
+                ASR(not(var.id==id and blk==stmt ), me,'var "'..id..'" was defined for same context at line '..var.ln)
+                WRN(var.id~=id, me,'declaration of "'..id..'" hides the one at line '..var.ln)
             end
         end
     end
@@ -70,6 +79,11 @@ function newvar (me, blk, pre, tp, dim, id, read_only)
     ASR(_TP.deref(tp) or (not c) or (tp=='void' and isEvt) or c.len>0, me,
         'cannot instantiate type "'..tp..'"')
     ASR((not dim) or dim>0, me, 'invalid array dimension')
+
+    if isEvt then
+      _ENV.ints[id] = {id=id,ln=me.ln}
+      _ENV.ints[#_ENV.ints+1] = {id=id,ln=me.ln}
+    end
 
     local nvar = {}
     if not(_TP.deref(tp)) and c.fields then
@@ -166,9 +180,15 @@ F = {
     end,
 
     CfgBlk = function (me)
-        local n1, n2, n3 = unpack(me)
---print("env::CfgBlk:", n1, n2, n3) 
-        _ENV.vm_version = (n1 or 0)..'.' .. (n2 or 0)..'.' .. (n3 or 0)
+        local cfgParams = me[1]
+        local name, n1, n2, n3 = unpack(cfgParams)
+--print("env::CfgBlk:", unpack(cfgParams)) 
+        _ENV.vm_name = name
+        _ENV.vm_version = string.format("%03d.%03d.%03d",(n1 or 0),(n2 or 0),(n3 or 0))
+        _ENV.motes_max_size = {}
+        for i=5,#cfgParams,2 do
+          _ENV.motes_max_size[cfgParams[i]]=cfgParams[i+1]
+        end
     end,
     
     Dcl_ext = function (me)
@@ -464,8 +484,7 @@ F = {
     AwaitInt = function (me)
         local exp,_ = unpack(me)
         local var = exp.var
-        ASR(var and var.isEvt, me,
-                'event "'..(var and var.id or '?')..'" is not declared')
+        ASR(var and var.isEvt, me,'event "'..(var and var.id or '?')..'" is not declared')
         me.gte = var.n_awaits
         var.n_awaits = var.n_awaits + 1
         me.tp = var.tp
@@ -648,6 +667,7 @@ F = {
         me.supertp = me[1].supertp
     end,
 
+--[[ -- C Calls are not used in Terra
     Op2_call = function (me)
         local _, f, exps = unpack(me)
 --print("env::Op2_call:",f.tag)
@@ -678,6 +698,7 @@ F = {
             end
         end
     end,
+--]]
 
     Op2_idx = function (me)
 --print(print_r(me,"env:Op2_idx: me"))
@@ -699,7 +720,6 @@ F = {
 --print("env::Op2_int_int:",e2.tag,e2[1])
         ASR(_TP.isNumeric(e1.tp,true) and _TP.isNumeric(e2.tp,true),me, 'invalid operands to binary "'..op..'"')
 --        ASR((e2.tag=='CONST' and tonumber(e2[1])>0) or (e2.tag~='CONST'),me, 'division by zero')
-            
         me.tp  = _TP.max(e1.tp,e2.tp,true)
     end,
     ['Op2_-']  = 'Op2_int_int',
@@ -717,7 +737,7 @@ F = {
         local op, e1 = unpack(me)
         ASR(_TP.isNumeric(e1.tp,true),
                 me, 'invalid operand to unary "'..op..'"')
-        me.tp  = e1.tp
+        me.tp  = (op=='not' and 'ubyte')  or e1.tp
     end,
     ['Op1_~']  = 'Op1_int',
     ['Op1_-']  = 'Op1_int',
@@ -726,7 +746,7 @@ F = {
         local op, e1, e2 = unpack(me)
         ASR(_TP.max(e1.tp,e2.tp,true),
                 me, 'invalid operands to binary "'..op..'"')
-        me.tp  = _TP.max(e1.tp,e2.tp,true)
+        me.tp  = 'ubyte'
     end,
     ['Op2_=='] = 'Op2_same',
     ['Op2_!='] = 'Op2_same',
@@ -737,7 +757,7 @@ F = {
 
     Op2_any = function (me)
         local op, e1, e2 = unpack(me)
-        me.tp  = _TP.max(e1.tp,e2.tp,true)
+        me.tp  = 'ubyte'
     end,
     ['Op2_or']  = 'Op2_any',
     ['Op2_and'] = 'Op2_any',

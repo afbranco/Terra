@@ -1,10 +1,21 @@
 /*{-{*/
 #ifndef _TERRANET_
 #define _TERRANET_
-config 00.01.00 do
+
+
+config 
+	name : TerraNet_MsgQ ,
+	code:00.02.00 , 
+	{
+		tossim: 1920,
+		telosb: 5808,
+		telosb_hyb: 2112,
+		micaz : 2112,
+	} 
+do
 /*
  * ATENTION: DO NOT use comments with '/**', always use only one star!
- * Actual compiler has a bug to identifier this type of comments. 
+ * Current compiler has a bug to identifier this type of comments. 
  */
  
  

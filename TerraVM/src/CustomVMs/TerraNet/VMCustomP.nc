@@ -51,13 +51,7 @@ uint8_t MIC_gain;				// Mic Sensor gain adjust
 /*
  * Output Events implementation
  */
-/*
-void  proc_init(uint16_t id, uint32_t value){
-	uint32_t val = signal VM.pop();
-	dbg(APPNAME,"Custom::proc_init(): id=%d, val=%d\n",id,(uint16_t)val);
-	signal VM.setMVal(TOS_NODE_ID,(uint16_t)val,2);
-}
-*/
+
 void  proc_leds(uint16_t id, uint32_t value){
 	dbg(APPNAME,"Custom::proc_leds(): id=%d, val=%d\n",id,(uint8_t)value);
 	call SA.setActuator(AID_LEDS, (uint8_t)(value & 0x07));
@@ -99,7 +93,7 @@ void  proc_req_volts(uint16_t id, uint32_t value){
 void  proc_send_x(uint16_t id,uint16_t addr,uint8_t ack){
 	usrMsg_t* usrMsg;
 	uint8_t reqRetryAck;
-	usrMsg = (usrMsg_t*)signal VM.getRealAddr(addr,2);
+	usrMsg = (usrMsg_t*)signal VM.getRealAddr(addr);
 	dbg(APPNAME,"Custom::proc_sendx(): id=%d, target=%d, addr=%d, realAddr=%x, ack=%d\n",
 		id,usrMsg->target,addr,usrMsg, ack);
 	reqRetryAck = (ack)?(1<<REQ_ACK_BIT):0; // Define only ack without retry.
@@ -159,7 +153,7 @@ void  proc_req_custom_a(uint16_t id, uint32_t value){
 #ifdef M_VOLCANO
 void  proc_rd_stream(uint16_t id, uint32_t value){
 	dbg(APPNAME,"Custom::proc_rd_stream(): id=%d value=%d\n",id,value);
-	UsrStreamBuffer = (nx_uint32_t*)signal VM.getRealAddr(value,2);
+	UsrStreamBuffer = (nx_uint32_t*)signal VM.getRealAddr(value);
 	call ReadStream.postBuffer(NULL, 0);
 }
 #endif
@@ -205,7 +199,7 @@ void  func_qPut(uint16_t id){
 	uint16_t value = (uint16_t)signal VM.pop();
 	dbg(APPNAME,"Custom::func_qPut(): id=%d, addr=%d\n",id,value);
 	// queue the usrMsg data
-	qData_p = (qData_t*)signal VM.getRealAddr(value,2);
+	qData_p = (qData_t*)signal VM.getRealAddr(value);
 	stat = call usrDataQ.put(qData_p);
 	signal VM.push(stat);
 	}
@@ -215,7 +209,7 @@ void  func_qGet(uint16_t id){
 	uint16_t value = (uint16_t)signal VM.pop();
 	dbg(APPNAME,"Custom::func_qGet(): id=%d, addr=%d\n",id,value);
 	// get the usrMsg data
-	qData_p = (qData_t*)signal VM.getRealAddr(value,2);
+	qData_p = (qData_t*)signal VM.getRealAddr(value);
 	stat = call usrDataQ.get(qData_p);
 	signal VM.push(stat);
 	}
@@ -250,8 +244,8 @@ void  func_fftAlloc(uint16_t id){
 	inverse_fft = (uint8_t)signal VM.pop();	
 	nfft = (nx_uint16_t)signal VM.pop();	
 
-	mem = (void*)signal VM.getRealAddr(varCfg,2);
-	lenmem = (void*)signal VM.getRealAddr(varLen,2);
+	mem = (void*)signal VM.getRealAddr(varCfg);
+	lenmem = (void*)signal VM.getRealAddr(varLen);
 	stat = call KF.kiss_fftr_alloc(nfft, inverse_fft, mem, lenmem);
 	if (stat!=SUCCESS) signal VM.evtError(E_IDXOVF);
 	signal VM.push(stat);
@@ -267,9 +261,9 @@ void  func_fft(uint16_t id){
 	varInData = (uint16_t)signal VM.pop();	
 	varCfg = (uint16_t)signal VM.pop();	
 
-	cfg = (void*)signal VM.getRealAddr(varCfg,2);
-	timedata = (void*)signal VM.getRealAddr(varInData,2);
-	freqdata = (void*)signal VM.getRealAddr(varOutData,2);
+	cfg = (void*)signal VM.getRealAddr(varCfg);
+	timedata = (void*)signal VM.getRealAddr(varInData);
+	freqdata = (void*)signal VM.getRealAddr(varOutData);
 
 	call KF.kiss_fftr(cfg, timedata, freqdata);
 	stat = SUCCESS;
@@ -284,7 +278,7 @@ void  func_setupMic(uint16_t id){
 	MIC_usPeriod = (uint32_t)signal VM.pop();
 	MIC_count = (uint16_t)signal VM.pop();
 	bufAddr = (uint16_t)signal VM.pop();
-	MIC_buf = (nx_uint16_t*)signal VM.getRealAddr(bufAddr,2);
+	MIC_buf = (nx_uint16_t*)signal VM.getRealAddr(bufAddr);
 	MIC_flag = TRUE;
 	stat = SUCCESS;
 	signal VM.push(stat);
@@ -297,7 +291,7 @@ void  func_GModelRead(uint16_t id){
 	uint16_t varGModel;
 	dbg(APPNAME,"Custom::func_GModelRead(): id=%d\n",id);
 	varGModel = (uint16_t)signal VM.pop();
-	gmodel = (void*)signal VM.getRealAddr(varGModel,2);
+	gmodel = (void*)signal VM.getRealAddr(varGModel);
 	stat = call GModelBlockRead.read(0, gmodel, GMODEL_SIZE);
 	signal VM.push(stat);
 }
@@ -322,7 +316,7 @@ void  func_getNSamples(uint16_t id){
 	dbg(APPNAME,"Custom::func_setRTime(): id=%d\n",id);
 	scale = (uint16_t)signal VM.pop();
 	varGModel = (uint16_t)signal VM.pop();
-	gModel = (ms_gauss_model*)signal VM.getRealAddr(varGModel,2);
+	gModel = (ms_gauss_model*)signal VM.getRealAddr(varGModel);
 	// return nSample value
 	if (scale < MS_GAUSS_SCALES)
 		signal VM.push(gModel->nsample[scale]);
@@ -340,8 +334,8 @@ void  func_detect(uint16_t id){
 	varOutData = (uint16_t)signal VM.pop();
 	scale = (uint16_t)signal VM.pop();
 	varGModel = (uint16_t)signal VM.pop();
-	outData = (kiss_fft_cpx*)signal VM.getRealAddr(varOutData,2);
-	gModel = (ms_gauss_model*)signal VM.getRealAddr(varGModel,2);
+	outData = (kiss_fft_cpx*)signal VM.getRealAddr(varOutData);
+	gModel = (ms_gauss_model*)signal VM.getRealAddr(varGModel);
 	// calculate detect()
 	decision = detect(gModel,scale,outData);
 	// return 'detect' value

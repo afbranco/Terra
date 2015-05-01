@@ -155,6 +155,7 @@ local C; C = {
         return _AST.root
     end,
 
+    CfgParams = node('CfgParams'),
     Prog    = node('Block'),
     CfgBlk  = node('CfgBlk'),
     Block   = node('Block'),
@@ -383,9 +384,9 @@ local C; C = {
     Exp = node('Exp'),
     _Exp = function (ln, ...)
         local v1, v2, v3, v4 = ...
-        if not v2 then          -- single value
+        if not v2 then          -- ******************** single value
             return v1
-        elseif v1==true then    -- unary expression
+        elseif v1==true then    -- ******************** unary expression
 --print("ast::_Exp1:", v2)
             -- v1=true, v2=op, v3=exp
             local op = v2
@@ -394,15 +395,14 @@ local C; C = {
                 op = 'cast'
             end
 --print("ast::Exp: op=",op)
-            return node('Op1_'..op)(ln, v2,
-                                    C._Exp(ln, select(3,...)))
-        else                    -- binary expression
---print("ast::_Exp2:", v1.tag, v2, v3.tag)
---print("ast::_Exp2:", v1[1], v2, v3[1])
+            return node('Op1_'..op)(ln, v2,C._Exp(ln, select(3,...)))
+        else                    -- ******************** binary expression
+--print("ast::_Exp2:  obj-", v1.tag, v2, v3.tag)
+--print("ast::_Exp2: type-", v1[2], v2, v3[2])
+--print("ast::_Exp2:  val-", v1[1], v2, v3[1])
             -- v1=e1, v2=op, v3=e2, v4=?
             if v1.tag=='CONST' and v3.tag=='CONST' then
-              local boolT = {}
-              boolT[true]=1; boolT[false]=0;
+              local boolT = {}; boolT[true]=1; boolT[false]=0;
               if (v2=='+' or v2=='-' or v2=='/' or v2=='*' or v2 == '%') then
                 if (v2=='/' or v2=='%') and (v3[1]*1)==0 then
                   ASR(false,v3,'division by zero.')
@@ -410,43 +410,45 @@ local C; C = {
                   loadstring('newConst = '..v1[1]..' '..v2..' '..v3[1])()
                 end
                 return C._Exp(ln,
-                        node('CONST')(ln, math.floor(newConst)),
-                      select(4,...)
+                        node('CONST')(ln, newConst),select(4,...)
                   )
               elseif (v2=='==' or v2=='!=' or v2=='>' or v2=='<' or v2 == '>=' or v2 == '<=') then
                 local relat_op = string.gsub(v2,'!','~')
                 loadstring('relat_result = '..v1[1]..' '.. relat_op ..' '..v3[1])()
                 return C._Exp(ln,
-                        node('CONST')(ln, boolT[relat_result]),
-                      select(4,...)
+                        node('CONST')(ln, boolT[relat_result]),select(4,...)
                   )
               elseif (v2=='<<') then
+                  if (v1[2]=='float' or v3[2]=='float') then ASR(false,v3,'Invalid float operation.'); end
                   loadstring('newConst = '.. v1[1].. ' * math.pow( 2,'..v3[1] ..')')()
                   local newConst2 = tonumber(string.format("0x%08x",newConst))
 --print("ast::_Exp: `<<´:",string.format("0x%08x",newConst),tonumber(string.format("0x%08x",newConst)))
                   return C._Exp(ln,
-                          node('CONST')(ln, math.floor(newConst2)),
-                        select(4,...)
+                          node('CONST')(ln, newConst2),
+                          select(4,...)
                     )
               elseif (v2=='>>') then
+                  if (v1[2]=='float' or v3[2]=='float') then ASR(false,v3,'Invalid float operation.'); end
                   loadstring('newConst = '.. v1[1].. ' / math.pow( 2,'..v3[1] ..')')()
                   return C._Exp(ln,
-                          node('CONST')(ln, math.floor(newConst)),
-                        select(4,...)
+                          node('CONST')(ln, newConst),
+                          select(4,...)
                     )
               elseif (v2=='and') then
+                  if (v1[2]=='float' or v3[2]=='float') then ASR(false,v3,'Invalid float operation.'); end
                   newConst = boolT[tonumber(v1[1])~=0 and tonumber(v3[1])~=0]  
-print("ast::_Exp: `and´:",tonumber(v1[1]),tonumber(v3[1]),tonumber(v1[1])~=0 and tonumber(v3[1])~=0,newConst)
+--print("ast::_Exp: `and´:",tonumber(v1[1]),tonumber(v3[1]),tonumber(v1[1])~=0 and tonumber(v3[1])~=0,newConst)
                   return C._Exp(ln,
                           node('CONST')(ln, math.floor(newConst)),
-                        select(4,...)
+                          select(4,...)
                     )
               elseif (v2=='or') then
+                  if (v1[2]=='float' or v3[2]=='float') then ASR(false,v3,'Invalid float operation.'); end
                   newConst = boolT[tonumber(v1[1])~=0 or tonumber(v3[1])~=0]  
-print("ast::_Exp: `or´:",tonumber(v1[1]),tonumber(v3[1]),tonumber(v1[1])~=0 or tonumber(v3[1])~=0,newConst)
+--print("ast::_Exp: `or´:",tonumber(v1[1]),tonumber(v3[1]),tonumber(v1[1])~=0 or tonumber(v3[1])~=0,newConst)
                   return C._Exp(ln,
                           node('CONST')(ln, math.floor(newConst)),
-                        select(4,...)
+                          select(4,...)
                     )
               else
                   return C._Exp(ln,
@@ -465,12 +467,28 @@ print("ast::_Exp: `or´:",tonumber(v1[1]),tonumber(v3[1]),tonumber(v1[1])~=0 or 
 
     ExpList  = node('ExpList'),
     Op_var   = node('Op_var'),
-    Func     = node('Func'),
+
+    Func     = node('Func'),   
+
+    Call     = function(ln,func)
+      local fname,args = unpack(func)
+--print("ast::Call:",func[1],func[2])    
+        return node('Call')(ln,EXP(node('Var')(ln,'$ret')),node('Func')(ln,fname,args))
+    end,   
+    
     Var      = node('Var'),
     Ext      = node('Ext'),
-    C        = node('C'),
+--    C        = node('C'),
     SIZEOF   = node('SIZEOF'),
-    CONST    = node('CONST'),
+
+--    CONST    = node('CONST'),
+    CONST    = function(ln,constVal)
+--print("ast::CONST:",constVal)
+      local constTp=_TP.getConstType(constVal,nil,true)
+      return node('CONST')(ln,constVal,constTp)
+    end,
+
+
     WCLOCKK  = node('WCLOCKK'),
     WCLOCKE  = node('WCLOCKE'),
 --    STRING   = node('STRING'),

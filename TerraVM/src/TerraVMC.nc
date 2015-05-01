@@ -44,7 +44,6 @@ implementation
 	// Ceu Environment vars
 	uint16_t ProgStart;
 	uint16_t ProgEnd;
-//	uint16_t LblTab11,LblTab12,LblTab21,LblTab22,LblTabEnd;
 	uint16_t nTracks;
 	uint16_t wClocks;
 	uint16_t asyncs;
@@ -67,6 +66,8 @@ implementation
 	void ceu_boot();
 	void push(uint32_t value);
 	uint32_t pop();
+	void pushf(float value);
+	float popf();
 #endif
 
 
@@ -77,7 +78,6 @@ implementation
 	}
 
 // Ceu intrinsic functions
-//	void ceu_out_wclock(uint32_t ms){ if (ms != CEU_WCLOCK_NONE ) call BSTimerVM.startOneShot(((ms)<1)?1:(ms)); }
 	void ceu_out_wclock(uint32_t ms){ if (ms != CEU_WCLOCK_NONE ) {call BSTimerVM.startOneShot(ms);}}
 
 
@@ -90,33 +90,25 @@ implementation
 		if (MoteID==BStation) {
 			haltedFlag = TRUE;
 		}
-		// Start VM enginne
-#ifndef ONLY_BSTATION
-		//ceu_boot();
-#endif
 	}	
 
 
 	/*
 	 * Auxiliary functions
 	 */
-#ifndef ONLY_BSTATION // Start large code ONLY_BSTATION suppression 
+#ifndef ONLY_BSTATION // Start large code for ONLY_BSTATION suppression 
 
 	uint8_t getOpCode(uint8_t* Opcode, uint8_t* Modifier){
+		uint8_t i;
 		*Opcode = (uint8_t)(CEU_data[PC]);
 		*Modifier = (uint8_t)(CEU_data[PC]);
 		dbg(APPNAME,"VM::getOpCode(): CEU_data[%d]=%d (0x%02x)  %s \n",PC,*Opcode,*Opcode,(*Opcode==op_end)?"--> f_end":"");
-//		dbg(APPNAME,"VM::getOpCode(): MEM[32/33/34]=%d,%d,%d \n",*(uint8_t*)(MEM+32),*(uint8_t*)(MEM+33),*(uint8_t*)(MEM+34));
 		PC++;
-		if (*Opcode <= LIMIT_8BIT_OPER){
-			*Modifier=0;
-		} else {
-			if (*Opcode <= LIMIT_6BIT_OPER){
-				*Opcode = (uint8_t)(*Opcode & 0xFC);
-				*Modifier = (uint8_t)(*Modifier & 0x03);	
-			} else {
-				*Opcode = (uint8_t)(*Opcode & 0xF0);
-				*Modifier = (uint8_t)(*Modifier & 0x0F);					
+		for (i=0; i<IS_RangeMask_size; i++){
+			if (*Opcode >= IS_RangeMask[i][0] && *Opcode <= IS_RangeMask[i][1]) {
+				*Modifier = (uint8_t)(*Opcode & IS_RangeMask[i][2]);
+				*Opcode = (uint8_t)(*Opcode & ~IS_RangeMask[i][2]);
+				break;
 			}
 		}
 		return (*Opcode);
@@ -193,6 +185,15 @@ void TViewer(char* cmd,uint16_t p1, uint16_t p2){
 		return temp;
 	}
 
+uint8_t getBits(uint8_t data, uint8_t stBit, uint8_t endBit){
+	uint8_t ret=0;
+	uint8_t pos;
+	for (pos=stBit; pos<=endBit; pos++) ret += ((data & 1<<pos)==0)?0:(1<<(pos-stBit));
+	return ret;	
+}
+uint8_t getBitsPow(uint8_t data, uint8_t stBit, uint8_t endBit){return (1 << getBits(data,stBit,endBit));}
+
+
 uint32_t unit2val(uint32_t val, uint8_t unit){
 	switch (unit){  // result in 'ms'
 		case 0: return (uint32_t)(val);				// ms
@@ -205,8 +206,8 @@ uint32_t unit2val(uint32_t val, uint8_t unit){
 
 void push(uint32_t value){
 	currStack = currStack - 4 ;
-	dbg(APPNAME,"VM::push(): newStack=%d, value=%d (0x%04x), ProgEnd=%d\n",currStack,*(int32_t*)(CEU_data+currStack),*(int32_t*)(CEU_data+currStack),ProgEnd);
-	if ((currStack+4) > ProgEnd) 
+	dbg(APPNAME,"VM::push(): newStack=%d, value=%d (0x%04x), ProgEnd=%d\n",currStack,value,value,ProgEnd);
+	if ((currStack) > ProgEnd) 
 		*(uint32_t*)(CEU_data+currStack)=value;
 	else {
 		evtError(E_STKOVF);
@@ -216,87 +217,85 @@ void push(uint32_t value){
 		call VMCustom.reset();
 	}
 }
+void pushf(float value){
+	currStack = currStack - 4 ;
+	dbg(APPNAME,"VM::pushf(): newStack=%d, value=%f (0x%08x), ProgEnd=%d\n",currStack,value,*(uint32_t*)&value,ProgEnd);
+	if ((currStack) > ProgEnd) 
+		*(float*)(CEU_data+currStack)=value;
+	else {
+		evtError(E_STKOVF);
+		// stop VM execution to prevent unexpected state
+		dbg(APPNAME,"VM::pushf(): Stack Overflow - VM execution stopped\n");
+		haltedFlag = TRUE;
+		call VMCustom.reset();
+	}
+}
 
 uint32_t pop(){
 	currStack = currStack + 4 ;
 	return *(uint32_t*)(CEU_data+currStack-4);
 }
+float popf(){
+	currStack = currStack + 4 ;
+	return *(float*)(CEU_data+currStack-4);
+}
 
-int32_t getMVal(uint16_t Maddr, uint8_t v1_len){
-	switch (v1_len){
-		case 1 : return (int32_t)*(nx_uint8_t*)(MEM+Maddr);
-		case 2 : return (int32_t)*(nx_uint16_t*)(MEM+Maddr);
-		case 4 : return (int32_t)*(nx_uint32_t*)(MEM+Maddr);
+uint32_t getMVal(uint16_t Maddr, uint8_t type){
+	switch (type){
+		case U8  : return (uint32_t)*(nx_uint8_t*)(MEM+Maddr);
+		case U16 : return (uint32_t)*(nx_uint16_t*)(MEM+Maddr);
+		case U32 : return (uint32_t)*(nx_uint32_t*)(MEM+Maddr);
+		case S8  : return (uint32_t)*(nx_int8_t*)(MEM+Maddr);
+		case S16 : return (uint32_t)*(nx_int16_t*)(MEM+Maddr);
+		case S32 : return (uint32_t)*(nx_int32_t*)(MEM+Maddr);
 	}
-	dbg(APPNAME,"ERROR VM::getMVal(): Invalid v1_len=%d\n",v1_len);
+	dbg(APPNAME,"ERROR VM::getMVal(): Invalid type=%d\n",type);
 	return 0;
 }
-void setMVal(int32_t value, uint16_t Maddr, uint8_t v1_len){
-	switch (v1_len){
-		case 1 : *(nx_uint8_t*)(MEM+Maddr) = (uint8_t)value; return;
-		case 2 : *(nx_uint16_t*)(MEM+Maddr) = (uint16_t)value; return;
-		case 4 : *(nx_int32_t*)(MEM+Maddr) = (int32_t)value; return;
-	}
-	dbg(APPNAME,"ERROR VM::setMVal(): Invalid v1_len=%d\n",v1_len);
+float getMValf(uint16_t Maddr){
+	return (float)*(nx_float*)(MEM+Maddr);
 }
- 
-// Convert Memory Signed v1_len bytes to s32 bits
-int32_t MStoS32(uint16_t Maddr,uint8_t v1_len){
-	switch (v1_len){
-		case 1 : return (int32_t)*(nx_int8_t*)(MEM+Maddr);
-		case 2 : return (int32_t)*(nx_int16_t*)(MEM+Maddr);
-		case 4 : return (int32_t)*(nx_int32_t*)(MEM+Maddr);
+
+void setMVal(uint32_t buffer, uint16_t Maddr, uint8_t fromTp, uint8_t toTp){
+	if (fromTp == F32){
+		float value = *(float*)&buffer;
+		switch (toTp){
+				case U8  : *(nx_uint8_t*)(MEM+Maddr) = (uint8_t)value; return;
+				case U16 : *(nx_uint16_t*)(MEM+Maddr) = (uint16_t)value; return;
+				case U32 : *(nx_uint32_t*)(MEM+Maddr) = (uint32_t)value; return;
+				case F32 : *(nx_float*)(MEM+Maddr) = (float)value;
+				case S8  : *(nx_int8_t*)(MEM+Maddr) = (int8_t)value; return;
+				case S16 : *(nx_int16_t*)(MEM+Maddr) = (int16_t)value; return;
+				case S32 : *(nx_int32_t*)(MEM+Maddr) = (int32_t)value; return;
+			}	
+	} else {
+		if (fromTp <= F32) { // from unsignal integer
+			uint32_t value=*(uint32_t*)&buffer;
+			switch (toTp){
+				case U8  : *(nx_uint8_t*)(MEM+Maddr) = (uint8_t)value; return;
+				case U16 : *(nx_uint16_t*)(MEM+Maddr) = (uint16_t)value; return;
+				case U32 : *(nx_uint32_t*)(MEM+Maddr) = (uint32_t)value; return;
+				case F32 : *(nx_float*)(MEM+Maddr) = (float)value;
+				case S8  : *(nx_int8_t*)(MEM+Maddr) = (int8_t)value; return;
+				case S16 : *(nx_int16_t*)(MEM+Maddr) = (int16_t)value; return;
+				case S32 : *(nx_int32_t*)(MEM+Maddr) = (int32_t)value; return;
+			}
+		} else {  // from signal integer
+			int32_t value=*(int32_t*)&buffer;
+			switch (toTp){
+				case U8  : *(nx_uint8_t*)(MEM+Maddr) = (uint8_t)value; return;
+				case U16 : *(nx_uint16_t*)(MEM+Maddr) = (uint16_t)value; return;
+				case U32 : *(nx_uint32_t*)(MEM+Maddr) = (uint32_t)value; return;
+				case F32 : *(nx_float*)(MEM+Maddr) = (float)value;
+				case S8  : *(nx_int8_t*)(MEM+Maddr) = (int8_t)value; return;
+				case S16 : *(nx_int16_t*)(MEM+Maddr) = (int16_t)value; return;
+				case S32 : *(nx_int32_t*)(MEM+Maddr) = (int32_t)value; return;
+			}
+		}
 	}
-	dbg(APPNAME,"ERROR VM::MStoS32(): Invalid v1_len=%d\n",v1_len);
-	return 0;
+	dbg(APPNAME,"ERROR VM::setMVal(): Invalid fromTp=%d, toTp=%d\n",fromTp,toTp);
 }
-// Convert Memory Unsigned v1_len bytes to s32 bits
-uint32_t MUtoS32(uint16_t Maddr,uint8_t v1_len){
-	switch (v1_len){
-		case 1 : return (int32_t)*(nx_uint8_t*)(MEM+Maddr);
-		case 2 : return (int32_t)*(nx_uint16_t*)(MEM+Maddr);
-		case 4 : return (int32_t)*(nx_uint32_t*)(MEM+Maddr);
-	}
-	dbg(APPNAME,"ERROR VM::MUtoS32(): Invalid v1_len=%d\n",v1_len);
-	return 0;
-}
-// Convert Memory Unsigned v1_len bytes to U16 bits 
-uint16_t MUtoU16(uint16_t Maddr,uint8_t v1_len){
-	switch (v1_len){
-		case 1 : return (uint16_t)*(nx_uint8_t*)(MEM+Maddr);
-		case 2 : return (uint16_t)*(nx_uint16_t*)(MEM+Maddr);
-		case 4 : return (uint16_t)*(nx_uint32_t*)(MEM+Maddr);
-	}
-	dbg(APPNAME,"ERROR VM::MUtoU16(): Invalid v1_len=%d\n",v1_len);
-	return 0;
-}
-// Convert S32 bits to Memory Signed v1_len bytes
-void S32toMS(int32_t value, uint16_t Maddr,uint8_t v1_len){
-	switch (v1_len){
-		case 1 : *(nx_int8_t*)(MEM+Maddr) = (int8_t)value; return;
-		case 2 : *(nx_int16_t*)(MEM+Maddr) = (int16_t)value; return;
-		case 4 : *(nx_int32_t*)(MEM+Maddr) = (int32_t)value; return;
-	}
-	dbg(APPNAME,"ERROR VM::S32toMS(): Invalid v1_len=%d\n",v1_len);
-}
-// Convert S32 bits to Memory Unsigned v1_len bytes
-void S32toMU(int32_t value, uint16_t Maddr,uint8_t v1_len){
-	switch (v1_len){
-		case 1 : *(nx_uint8_t*)(MEM+Maddr) = (uint8_t)value; return;
-		case 2 : *(nx_uint16_t*)(MEM+Maddr) = (uint16_t)value; return;
-		case 4 : *(nx_uint32_t*)(MEM+Maddr) = (uint32_t)value; return;
-	}
-	dbg(APPNAME,"ERROR VM::S32toMU(): Invalid v1_len=%d\n",v1_len);
-}
-// Convert U16 bits to Memory Unsigned v1_len bytes
-void U16toMU(uint16_t value, uint16_t Maddr,uint8_t v1_len){
-	switch (v1_len){
-		case 1 : *(nx_uint8_t*)(MEM+Maddr) = (uint8_t)value; return;
-		case 2 : *(nx_uint16_t*)(MEM+Maddr) = (uint16_t)value; return;
-		case 4 : *(nx_uint32_t*)(MEM+Maddr) = (uint32_t)value; return;
-	}
-	dbg(APPNAME,"ERROR VM::U16toMU(): Invalid v1_len=%d\n",v1_len);
-}
+
 
 // Return CEU internal slot offset for EvtId
 uint16_t getEvtCeuId(uint8_t EvtId){
@@ -706,7 +705,7 @@ void execTrail(uint16_t lbl){
 	while (Opcode != op_end){
 	    if (haltedFlag) return;
 		Decoder(Opcode,Param1);
-//dbg(APPNAME,"CEU::execTrail(): m[97/98]=%d,%d\n",*(uint8_t*)(MEM+97),*(uint8_t*)(MEM+98));
+dbg(APPNAME,"CEU::execTrail(): m[94/95/96/97]=%02x,%02x,%02x,%02x\n",*(uint8_t*)(MEM+94),*(uint8_t*)(MEM+95),*(uint8_t*)(MEM+96),*(uint8_t*)(MEM+97));
 		getOpCode(&Opcode,&Param1);
 	}
 	dbg(APPNAME,"CEU::execTrail(%d):: found an 'end' opcode\n",lbl);
@@ -774,12 +773,34 @@ int ceu_go_all ()
 /**********************************************************************
  * OPCODE functions
  *********************************************************************/
-
 void f_nop(uint8_t Modifier){ dbg(APPNAME,"VM::f_nop(%02x)\n",Modifier); }
+
 void f_end(uint8_t Modifier){ 
 	dbg(APPNAME,"VM::f_end(%02x)\n",Modifier); 
 	dbg("VMDBG","VM:: End of Trail\n"); 
 	}
+
+void f_bnot(uint8_t Modifier){  
+	int32_t v1;
+	v1 = pop();
+	dbg(APPNAME,"VM::f_bnot(%02x): ~(v1=%d) =%d\n",Modifier,v1,~v1);
+	dbg("VMDBG","VM:: binary NOT operation: (~ 0x%x) = 0x%x \n",v1,~v1);
+	push(~v1);
+ }
+void f_lnot(uint8_t Modifier){  
+	int32_t v1;
+	v1 = pop();
+	dbg(APPNAME,"VM::f_lnot(%02x): !(v1=%d) =%d\n",Modifier,v1,!v1);
+	dbg("VMDBG","VM:: logical NOT operation: (! %d) = %s \n",v1,_TFstr(!v1));
+	push(!v1);
+ }
+void f_neg(uint8_t Modifier){  
+	int32_t v1;
+	v1 = pop();
+	dbg(APPNAME,"VM::f_neg(%02x): -(v1=%d) =%d\n",Modifier,v1,-1*v1);
+	dbg("VMDBG","VM:: negative operation: (-%d) = %d \n",v1,-1*v1);
+	push(-1*v1);
+ }
 void f_sub(uint8_t Modifier){ 
 	int32_t v1,v2;
 	v1 = pop();
@@ -867,7 +888,6 @@ void f_bxor(uint8_t Modifier){
 	dbg("VMDBG","VM:: binary XOR operation: (0x%x ^ 0x%x) = 0x%x \n",v1,v2,v1 ^ v2);
 	push(v1 ^ v2);
  }
-
 void f_eq(uint8_t Modifier){
 	int32_t v1,v2;
 	v1 = pop();
@@ -933,438 +953,96 @@ void f_land(uint8_t Modifier){
 	dbg("VMDBG","VM:: logical AND operation: (%d && %d) = %s \n",v1,v2,_TFstr(v1 && v2));
 	push(v1 && v2);
 }
-void f_bnot(uint8_t Modifier){  
-	int32_t v1;
-	v1 = pop();
-	dbg(APPNAME,"VM::f_bnot(%02x): ~(v1=%d) =%d\n",Modifier,v1,~v1);
-	dbg("VMDBG","VM:: binary NOT operation: (~ 0x%x) = 0x%x \n",v1,~v1);
-	push(~v1);
+
+void f_neg_f(uint8_t Modifier){  
+	float v1;
+	v1 = popf();
+	dbg(APPNAME,"VM::f_neg_f(%02x): -(v1=%f) =%f\n",Modifier,v1,-1*v1);
+	dbg("VMDBG","VM:: negative float operation: (-%f) = %f \n",v1,-1*v1);
+	pushf(-1*v1);
  }
-void f_lnot(uint8_t Modifier){  
-	int32_t v1;
-	v1 = pop();
-	dbg(APPNAME,"VM::f_lnot(%02x): !(v1=%d) =%d\n",Modifier,v1,!v1);
-	dbg("VMDBG","VM:: logical NOT operation: (! %d) = %s \n",v1,_TFstr(!v1));
-	push(!v1);
+void f_sub_f(uint8_t Modifier){ 
+	float v1,v2;
+	v1 = popf();
+	v2 = popf();
+	dbg(APPNAME,"VM::f_sub(%02x): v1=%f, v2=%f, sub=%f\n",Modifier,v1,v2,v1-v2);
+	dbg("VMDBG","VM:: sub operation: (%f - %f) = %f \n",v1,v2,v1-v2);
+	pushf(v1-v2);
  }
-void f_neg(uint8_t Modifier){  
-	int32_t v1;
-	v1 = pop();
-	dbg(APPNAME,"VM::f_neg(%02x): -(v1=%d) =%d\n",Modifier,v1,-1*v1);
-	dbg("VMDBG","VM:: negative operation: (-%d) = %d \n",v1,-1*v1);
-	push(-1*v1);
+void f_add_f(uint8_t Modifier){
+	float v1,v2;
+	v1 = popf();
+	v2 = popf();
+	dbg(APPNAME,"VM::f_add(%02x): v1=%f, v2=%f, add=%f\n",Modifier,v1,v2,v1+v2);
+	dbg("VMDBG","VM:: add operation: (%f + %f) = %f \n",v1,v2,v1+v2);
+	pushf(v1+v2);
  }
- 
-void f_cast(uint8_t Modifier){
-	uint32_t stack;
-	uint8_t type;
-	type = (uint8_t)(Modifier & 0x3);
-	stack = pop();
-	dbg(APPNAME,"VM::f_cast(%02x): type=%d, stack=%d, ",Modifier,type,stack);
-	switch (type){
-		case x8 : dbg_clear(APPNAME,"type='x8' , cast=%d\n",( uint8_t)stack); push(( uint8_t)stack); break;
-		case x16: dbg_clear(APPNAME,"type='x16', cast=%d\n",(uint16_t)stack); push((uint16_t)stack); break;
-		case x32: dbg_clear(APPNAME,"type='x32', cast=%d\n",(uint32_t)stack); push((uint32_t)stack); break;
-	}
+void f_mult_f(uint8_t Modifier){
+	float v1,v2;
+	v1 = popf();
+	v2 = popf();
+	dbg(APPNAME,"VM::f_mult_f(%02x): v1=%f, v2=%f, mult=%f\n",Modifier,v1,v2,v1*v2);
+	dbg("VMDBG","VM:: mult operation: (%f * %f) = %f \n",v1,v2,v1*v2);
+	pushf(v1*v2);
+}
+void f_div_f(uint8_t Modifier){
+	float v1,v2;
+	v1 = popf();
+	v2 = popf();
+	dbg(APPNAME,"VM::f_div_f(%02x): v1=%f, v2=%f, div=%f\n",Modifier,v1,v2,v1/v2);
+	dbg("VMDBG","VM:: div operation: (%f / %f) = %f \n",v1,v2,v1/v2);
+	pushf(v1/v2);
 }
 
-void f_inc(uint8_t Modifier){
-	uint8_t v1_len;
-	uint16_t Maddr;
-	v1_len = (uint8_t)(1<<(Modifier & 0x03));
-	Maddr = (uint16_t)pop();
-	dbg(APPNAME,"VM::f_inc(%02x): v1_len=%d, Maddr=%d, value+1=%d, \n",Modifier,v1_len,Maddr,getMVal(Maddr,v1_len)+1);
-	setMVal((getMVal(Maddr,v1_len)+1),Maddr,v1_len);	
+void f_eq_f(uint8_t Modifier){
+	float v1,v2;
+	v1 = popf();
+	v2 = popf();
+	dbg(APPNAME,"VM::f_eq_f(%02x): (v1=%f == v2=%f) = %s\n",Modifier,v1,v2,_TFstr(v1 == v2));
+	dbg("VMDBG","VM:: equality test: (%f == %f) = %s \n",v1,v2,_TFstr(v1 == v2));
+	pushf(v1==v2);
 }
 
-void f_dec(uint8_t Modifier){
-	uint8_t v1_len;
-	uint16_t Maddr;
-	v1_len = (uint8_t)(1<<(Modifier & 0x03));
-	Maddr = (uint16_t)pop();
-	dbg(APPNAME,"VM::f_dec(%02x): v1_len=%d, Maddr=%d, value-1=%d, \n",Modifier,v1_len,Maddr,getMVal(Maddr,v1_len)-1);
-	setMVal((getMVal(Maddr,v1_len)-1),Maddr,v1_len);	
+void f_neq_f(uint8_t Modifier){
+	float v1,v2;
+	v1 = popf();
+	v2 = popf();
+	dbg(APPNAME,"VM::f_neq_f(%02x): (v1=%f != v2=%f) = %s\n",Modifier,v1,v2,_TFstr(v1 != v2));
+	dbg("VMDBG","VM:: inequality test: (%f != %f) = %s \n",v1,v2,_TFstr(v1 != v2));
+	pushf(v1!=v2);
 }
-
-
-void f_memcpy(uint8_t Modifier){
-	uint8_t p2_1len,p3_1len;
-	uint16_t size,MaddrFrom,MaddrTo;
-	p2_1len = (uint8_t)(1<<((Modifier & 0x02)>>1));
-	p3_1len = (uint8_t)(1<<((Modifier & 0x01)));
-	size 	  = getPar16(2);
-	MaddrFrom = getPar16(p2_1len);
-	MaddrTo   = getPar16(p2_1len);
-	dbg(APPNAME,"VM::f_memcpy(%02x): size=%d, p2_1len=%d, p3_1len=%d, AddrTo=%d, AddrFrom=%d \n",Modifier,size,p2_1len,p3_1len,MaddrTo,MaddrFrom);
-	memcpy((void*)(MEM+MaddrTo),(void*)(MEM+MaddrFrom),size);
+void f_gte_f(uint8_t Modifier){
+	float v1,v2;
+	v1 = popf();
+	v2 = popf();
+	dbg(APPNAME,"VM::f_gte_f(%02x): (v1=%f >= v2=%f) = %s\n",Modifier,v1,v2,_TFstr(v1>=v2));
+	dbg("VMDBG","VM::  greater-than-equal test: (%f >= %f) = %s \n",v1,v2,_TFstr(v1 >= v2));
+	pushf(v1>=v2);
 }
-
-void f_memcpyx(uint8_t Modifier){
-	uint8_t p2_1len,p3_1len;
-	uint16_t size,MaddrFrom,MaddrTo;
-	p2_1len = (uint8_t)(1<<((Modifier & 0x02)>>1));
-	p3_1len = (uint8_t)(1<<((Modifier & 0x01)));
-	size 	  = getPar16(1);
-	MaddrFrom = getPar16(p2_1len);
-	MaddrTo   = getPar16(p2_1len);
-	dbg(APPNAME,"VM::f_memcpyx(%02x): size=%d, p2_1len=%d, p3_1len=%d, AddrTo=%d, AddrFrom=%d \n",Modifier,size,p2_1len,p3_1len,MaddrTo,MaddrFrom);
-	memcpy((void*)(MEM+MaddrTo),(void*)(MEM+MaddrFrom),size);
+void f_lte_f(uint8_t Modifier){
+	float v1,v2;
+	v1 = popf();
+	v2 = popf();
+	dbg(APPNAME,"VM::f_lte_f(%02x): (v1=%f <= v2=%f) = %s\n",Modifier,v1,v2,_TFstr(v1<=v2));
+	dbg("VMDBG","VM:: less-than-equal test: (%f <= %f) = %s \n",v1,v2,_TFstr(v1 <= v2));
+	pushf(v1<=v2);
 }
-
-void f_deref(uint8_t Modifier){
-	uint16_t MAddr;
-	uint8_t type, tlen;
-	type = (uint8_t)(Modifier & 0x3);
-	tlen = 1 << type;
-	MAddr = (uint16_t)pop();
-	dbg(APPNAME,"VM::f_deref(%02x): type=%d, MAddr=%d, ",Modifier,type,MAddr);
-	switch (type){
-		case x8 : dbg_clear(APPNAME,"type='x8' , value=%d\n",(uint8_t)getMVal(MAddr,tlen)); push((uint8_t)getMVal(MAddr,tlen)); break;
-		case x16: dbg_clear(APPNAME,"type='x16', value=%d\n",(uint16_t)getMVal(MAddr,tlen)); push((uint16_t)getMVal(MAddr,tlen)); break;
-		case x32: dbg_clear(APPNAME,"type='x32', value=%d\n",(uint32_t)getMVal(MAddr,tlen)); push((uint32_t)getMVal(MAddr,tlen)); break;
-	}
+void f_gt_f(uint8_t Modifier){
+	float v1,v2;
+	v1 = popf();
+	v2 = popf();
+	dbg(APPNAME,"VM::f_gt_f(%02x): (v1=%f > v2=%f) = %s\n",Modifier,v1,v2,_TFstr(v1 > v2));
+	dbg("VMDBG","VM::  greater-than test: (%f > %f) = %s \n",v1,v2,_TFstr(v1 > v2));
+	pushf(v1>v2);
 }
-
-void f_push_c(uint8_t Modifier){
-	uint8_t p1_len;
-	uint32_t Const;
-	p1_len = (uint8_t)((Modifier & 0x03)+1);
-	Const = getPar32(p1_len);
-	dbg(APPNAME,"VM::f_push_c(%02x): p1_len=%d, Const=%d, \n",Modifier,p1_len,Const);
-	push(Const);
-	}
-	
-void f_push_v(uint8_t Modifier){
-	uint8_t v1_len;
-	uint16_t Maddr;
-	v1_len = (uint8_t)(1<<(Modifier & 0x03));
-	Maddr = getPar16(2);
-	dbg(APPNAME,"VM::f_push_v(%02x): v1_len=%d, Maddr=%d, value=%d, \n",Modifier,v1_len,Maddr,getMVal(Maddr,v1_len));
-	push(getMVal(Maddr,v1_len));
+void f_lt_f(uint8_t Modifier){
+	float v1,v2;
+	v1 = popf();
+	v2 = popf();
+	dbg(APPNAME,"VM::f_lt_f(%02x): (v1=%f < v2=%f) = %s\n",Modifier,v1,v2,_TFstr(v1 < v2));
+	dbg("VMDBG","VM:: less-than test: (%f < %f) = %s \n",v1,v2,_TFstr(v1 < v2));
+	pushf(v1<v2);
 }
-
-void f_pushx_v(uint8_t Modifier){
-	uint8_t v1_len;
-	uint16_t Maddr;
-	v1_len = (uint8_t)(1<<(Modifier & 0x03));
-	Maddr = getPar16(1);
-	dbg(APPNAME,"VM::f_pushx_v(%02x): v1_len=%d, Maddr=%d, value=%d, \n",Modifier,v1_len,Maddr,getMVal(Maddr,v1_len));
-	push(getMVal(Maddr,v1_len));
-}
-
-
-void f_pusharr_v(uint8_t Modifier){
-	uint8_t v1_len,p1_1len,v2_len,p2_1len,p3_1len,Aux;
-	uint16_t Maddr,Vidx,Max;
-	v1_len = (uint8_t)(1<<((Modifier & 0x03)));
-	Aux = getPar8(1);
-	p1_1len = (uint8_t)(1<<((Aux & 0x40)>>6));
-	v2_len  = (uint8_t)(1<<((Aux & 0x30)>>4));
-	p2_1len = (uint8_t)(1<<((Aux & 0x04)>>2));
-	p3_1len = (uint8_t)(1<<((Aux & 0x01)));
-	Maddr = getPar16(p1_1len);
- 	Vidx  = getPar16(p2_1len);
-	Max   = getPar16(p3_1len);
-	dbg(APPNAME,"VM::f_pusharr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, Val=%d, IDX OVERFLOW=%s idx=%d, v1_len=%d\n",Modifier,Maddr,Vidx,Max,
-			(getMVal(Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len)),_TFstr(getMVal(Vidx,v2_len) > Max),getMVal(Vidx,v2_len),v1_len);
-//	(getMVal(Vidx,v2_len)<Max)?push(getMVal(Maddr+(getMVal(Vidx,v2_len)*v1_len),v1_len)):0;
-// Alterado para fazer push de Addr+(Idx*typelen)
-	if (getMVal(Vidx,v2_len) >= Max) 
-		evtError(E_IDXOVF);
-	else
-		push(Maddr+((getMVal(Vidx,v2_len)%Max)*v1_len));
-}
-
-void f_pop(uint8_t Modifier){ 
-	uint8_t v1_len;
-	uint16_t Maddr;
-	uint32_t Value;
-	v1_len = (uint8_t)(1<<(Modifier & 0x03));
-	Maddr = getPar16(2);
-	Value=pop();
-	dbg(APPNAME,"VM::f_pop(%02x): v1_len=%d, Maddr=%d, value=%d, \n",Modifier,v1_len,Maddr,Value);
-	setMVal(Value,Maddr,v1_len);
-}
-
-void f_popx(uint8_t Modifier){ 
-	uint8_t v1_len;
-	uint16_t Maddr;
-	uint32_t Value;
-	v1_len = (uint8_t)(1<<(Modifier & 0x03));
-	Maddr = getPar16(1);
-	Value=pop();
-	dbg(APPNAME,"VM::f_popx(%02x): v1_len=%d, Maddr=%d, value=%d, \n",Modifier,v1_len,Maddr,Value);
-	setMVal(Value,Maddr,v1_len);
-}
-
-void f_poparr_v(uint8_t Modifier){
-	uint8_t v1_len,p1_1len,v2_len,p2_1len,p3_1len,Aux;
-	uint16_t Maddr,Vidx,Max;
-	uint32_t Value;
-	v1_len = (uint8_t)(1<<((Modifier & 0x03)));
-	Aux = getPar8(1);
-	p1_1len = (uint8_t)(1<<((Aux & 0x40)>>6));
-	v2_len  = (uint8_t)(1<<((Aux & 0x30)>>4));
-	p2_1len = (uint8_t)(1<<((Aux & 0x04)>>2));
-	p3_1len = (uint8_t)(1<<((Aux & 0x01)));
-	Maddr = getPar16(p1_1len);
- 	Vidx  = getPar16(p2_1len);
-	Max   = getPar16(p3_1len);
-	Value=pop();
-	dbg(APPNAME,"VM::f_poparr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, Value=%d, IDX OVERFLOW=%s idx=%d\n",
-			Modifier,Maddr,Vidx,Max,Value,_TFstr(getMVal(Vidx,v2_len) > Max),getMVal(Vidx,v2_len));
-	if (getMVal(Vidx,v2_len) >= Max) 
-		evtError(E_IDXOVF);
-	else
-		setMVal(Value,Maddr+((getMVal(Vidx,v2_len)%Max)*v1_len),v1_len);
-}
-
-
-void f_setarr_vc(uint8_t Modifier){
-	uint8_t v1_len,p1_1len,p2_1len,v2_len,p3_1len,p4_len,Aux;
-	uint16_t Maddr,Vidx,Max;
-	uint32_t Const;
-	v1_len = (uint8_t)(1<<((Modifier & 0x03)));
-	Aux = getPar8(1);
-	p1_1len = (uint8_t)(1<<((Aux & 0x80)>>7));
-	p2_1len = (uint8_t)(1<<((Aux & 0x40)>>6));
-	v2_len  = (uint8_t)(1<<((Aux & 0x30)>>4));
-	p3_1len = (uint8_t)(1<<((Aux & 0x08)>>3));
-	p4_len = (uint8_t)((Aux & 0x03)+1);
-	Maddr = getPar16(p1_1len);
- 	Vidx  = getPar16(p2_1len);
-	Max   = getPar16(p3_1len);
-	Const = getPar32(p4_len);
-	dbg(APPNAME,"VM::f_setarr_vc(%02x):Maddr=%d, Vidx=%d, Max=%d, Const=%d, IDX OVERFLOW=%s idx=%d\n",
-			Modifier,Maddr,Vidx,Max,Const,_TFstr(getMVal(Vidx,v2_len) > Max),getMVal(Vidx,v2_len));
-	if (getMVal(Vidx,v2_len) >= Max) 
-		evtError(E_IDXOVF);
-	else
-//		memcpy((MEM+Maddr+((getMVal(Vidx,v2_len)%Max)*v1_len)),&Const,v1_len);
-		setMVal(Const,Maddr+((getMVal(Vidx,v2_len)%Max)*v1_len),v1_len);
-}
-void f_setarr_vv(uint8_t Modifier){
-	uint8_t v1_len,p1_1len,p2_1len,v2_len,p3_1len,p4_1len,v4_len,Aux;
-	uint16_t Maddr1,Vidx,Max,Maddr2;
-	v1_len = (uint8_t)(1<<((Modifier & 0x03)));
-	Aux = getPar8(1);
-	p1_1len = (uint8_t)(1<<((Aux & 0x80)>>7));
-	p2_1len = (uint8_t)(1<<((Aux & 0x40)>>6));
-	v2_len  = (uint8_t)(1<<((Aux & 0x30)>>4));
-	p3_1len = (uint8_t)(1<<((Aux & 0x08)>>3));
-	p4_1len = (uint8_t)(1<<((Aux & 0x04)>>2));
-	v4_len  = (uint8_t)((Aux & 0x03)+1);
-	Maddr1 = getPar16(p1_1len);
- 	Vidx   = getPar16(p2_1len);
-	Max    = getPar16(p3_1len);
-	Maddr2 = getPar16(p4_1len);
-	dbg(APPNAME,"VM::f_setarr_vv(%02x):Maddr1=%d, Vidx=%d, Max=%d, Madr2=%d, IDX OVERFLOW=%s idx=%d\n",
-				Modifier,Maddr1,Vidx,Max,Maddr2,_TFstr(getMVal(Vidx,v2_len) > Max),getMVal(Vidx,v2_len));
-	if (getMVal(Vidx,v2_len) >= Max) 
-		evtError(E_IDXOVF);
-	else
-//		memcpy((MEM+Maddr1+((getMVal(Vidx,v2_len)%Max)*v1_len)),(MEM+Maddr2),v1_len);
-		setMVal(getMVal(Maddr2,v4_len),Maddr1+((getMVal(Vidx,v2_len)%Max)*v1_len),v1_len);
-}
-
-void f_memclr(uint8_t Modifier){
-	uint8_t p1_1len,p2_1len;
-	uint16_t Maddr,len;
-	p1_1len = (uint8_t)(1<<((Modifier & 0x02)>>1));
-	p2_1len = (uint8_t)(1<<((Modifier & 0x01)));
-	Maddr = getPar16(p1_1len);
-	len = getPar16(p2_1len);
-	dbg(APPNAME,"VM::f_memclr(%02x): Maddr=%d, len=%d\n",Modifier,Maddr,len);
-	dbg("VMDBG","VM:: clear clock/gate entry.\n");
-	//memset((MEM+Maddr),0,len); //does not work in TOSSIM
-	{int x; for (x=0; x< len;x++) *(uint8_t*)(MEM+Maddr+x)=0;} 
-	dbg(APPNAME,"VM::f_memclr(): m[97/98]=%d,%d\n",*(uint8_t*)(MEM+97),*(uint8_t*)(MEM+98));
-	}
-	
-void f_getextdt_v(uint8_t Modifier){
-	uint8_t p1_1len,p2_1len;
-	uint16_t Maddr,len;
-	p1_1len = (uint8_t)(1<<((Modifier & 0x02)>>1));
-	p2_1len = (uint8_t)(1<<((Modifier & 0x01)));
-	Maddr = getPar16(p1_1len);
-	len = getPar16(p2_1len);
-	dbg(APPNAME,"VM::f_getextdt_v(%02x): Maddr=%d, len=%d\n",Modifier,Maddr,len);
-	dbg("VMDBG","VM:: reading input event data.\n");
-	memcpy((MEM+Maddr),CEU->ext_data,len);
-	}
-void f_getextdt_e(uint8_t Modifier){
-	uint8_t p1_1len;
-	uint16_t Maddr,len;
-	p1_1len = (uint8_t)(1<<((Modifier & 0x01)));
-	Maddr = (uint16_t)pop();
-	len = getPar16(p1_1len);
-	dbg(APPNAME,"VM::f_getextdt_e(%02x): Maddr=%d, len=%d\n",Modifier,Maddr,len);
-	dbg("VMDBG","VM:: reading input event data.\n");
-	memcpy((MEM+Maddr),CEU->ext_data,len);
-	}
-
-void f_chkret(uint8_t Modifier){
-	uint8_t p1_1len;
-	uint16_t Maddr;
-	p1_1len = (uint8_t)(1<<(Modifier & 0x01));
-	Maddr = getPar16(p1_1len);
-	dbg(APPNAME,"VM::f_chkret(%02x): p1_1len=%d, MAddr=%d value=%d, \n",Modifier,p1_1len,Maddr,*(uint8_t*)(MEM+Maddr));
-	dbg("VMDBG","VM:: test end of PAR.\n");
-	if (*(uint8_t*)(MEM+Maddr)>0) PC=PC+1;
-}
-
-void f_asen(uint8_t Modifier){
-	uint8_t p1_1len,p2_1len;
-	uint16_t gate,lbl;
-	p1_1len = (uint8_t)(1<<((Modifier & 0x02)>>1));
-	p2_1len = (uint8_t)(1<<((Modifier & 0x01)));
-	gate = getPar16(p1_1len);
-	lbl = getPar16(p2_1len);
-	dbg(APPNAME,"VM::f_asen(%02x): gate=%d, lbl=%d\n",Modifier,gate,lbl);
-	dbg("VMDBG","VM:: async enable: gate=%d; label=%d.\n",gate,lbl);
-	ceu_async_enable(gate,lbl);
-}
-
-void f_exec(uint8_t Modifier){ 
-	uint8_t p1_1len;
-	uint16_t Const;
-	p1_1len = (uint8_t)(1<<(Modifier & 0x01));
-	Const = getPar16(p1_1len);
-	dbg(APPNAME,"VM::f_exec(%02x): p1_1len=%d, Const=%d\n",Modifier,p1_1len,Const);
-	dbg("VMDBG","VM:: executing trail: label=%d.\n",Const);
-	PC = getLblAddr(Const);
-}
-
-void f_ifelse(uint8_t Modifier){
-	uint8_t p1_1len,p2_1len;
-	uint16_t lbl1,lbl2;
-	p1_1len = (uint8_t)(1<<((Modifier & 0x02)>>1));
-	p2_1len = (uint8_t)(1<<((Modifier & 0x01)));
-	lbl1 = getPar16(p1_1len);
-	lbl2 = getPar16(p2_1len);
-	dbg(APPNAME,"VM::f_ifelse(%02x): lbl1=%d, lbl2=%d\n",Modifier,lbl1,lbl2);
-	dbg("VMDBG","VM:: if/else: TRUE label=%d; FALSE label=%d.\n",lbl1,lbl2);
-	if (pop()) PC=getLblAddr(lbl1); else PC=getLblAddr(lbl2);
-}
-
-void f_outevt_e(uint8_t Modifier){
-	uint8_t Cevt;
-	uint32_t value;
-	value = pop();
-	Cevt  = getPar8(1);
-	dbg(APPNAME,"VM::f_outevt_c(%02x): Cevt=%d\n",Modifier,Cevt);
-	dbg("VMDBG","VM:: emitting output event %d\n",Cevt);
-	call VMCustom.procOutEvt(Cevt,value);
-}
-
-void f_outevt_c(uint8_t Modifier){
-	uint8_t Clen;
-	uint8_t Cevt;
-	uint32_t Const;
-	Clen = (uint8_t)((Modifier & 0x03)+1);
-	Cevt  = getPar8(1);
-	Const = getPar32(Clen);
-	dbg(APPNAME,"VM::f_outevt_c(%02x): Cevt=%d, Clen=%d, Const=%d\n",Modifier,Cevt,Clen,Const);
-//logS("o",1);
-//{
-//char data[20];
-//sprintf(data,"%02d\n",Cevt);	
-//logS(data,3);
-//}
-
-	call VMCustom.procOutEvt(Cevt,Const);
-}
-
-void f_outevt_v(uint8_t Modifier){
-	uint8_t Cevt,tp_len;
-	uint16_t Maddr;
-	tp_len = (uint8_t)(1<<(Modifier & 0x02));
-	Cevt  = getPar8(1);
-	Maddr = getPar16(2);
-	dbg(APPNAME,"VM::f_outevt_v(%02x): Cevt=%d, Maddr=%d\n",Modifier,Cevt,Maddr);
-//	call VMCustom.procOutEvt(Cevt,getMVal(Maddr,tp_len));
-	call VMCustom.procOutEvt(Cevt,Maddr);
-}
-void f_outevtx_v(uint8_t Modifier){
-	uint8_t Cevt,tp_len;
-	uint16_t Maddr;
-	tp_len = (uint8_t)(1<<(Modifier & 0x02));
-	Cevt  = getPar8(1);
-	Maddr = getPar16(1);
-	dbg(APPNAME,"VM::f_outevtx_v(%02x): Cevt=%d, Maddr=%d\n",Modifier,Cevt,Maddr);
-//	call VMCustom.procOutEvt(Cevt,getMVal(Maddr,tp_len));
-	call VMCustom.procOutEvt(Cevt,Maddr);
-}
-
-void f_outevt_z(uint8_t Modifier){
-	uint8_t Cevt;
-	Cevt = getPar8(1);
-	dbg(APPNAME,"VM::f_outevt_z(%02x): Evt=%d, \n",Modifier,Cevt);
-	call VMCustom.procOutEvt(Cevt,0);
-	}
-	
-void f_tkclr(uint8_t Modifier){
-	uint8_t p1_1len,p2_1len;
-	uint16_t lbl1,lbl2;
-	p1_1len = (uint8_t)(1<<((Modifier & 0x02)>>1));
-	p2_1len = (uint8_t)(1<<((Modifier & 0x01)));
-	lbl1 = getPar16(p1_1len);
-	lbl2 = getPar16(p2_1len);
-	dbg(APPNAME,"VM::f_tkclr(%02x): lbl1=%d, lbl2=%d\n",Modifier,lbl1,lbl2);
-	dbg("VMDBG","VM:: clear tracks for label %d to label %d\n",lbl1,lbl2);
-	ceu_track_clr(lbl1,lbl2);	
-	}
-
-void f_trg(uint8_t Modifier){
-	uint8_t p1_1len;
-	uint16_t gtAddr;
-	p1_1len = (uint8_t)(1<<(Modifier & 0x01));
-	gtAddr = getPar16(p1_1len);
-	dbg(APPNAME,"VM::f_trg(%02x): p1_1len=%d, gtAddr=%d, \n",Modifier,p1_1len,gtAddr);
-	dbg("VMDBG","VM:: trigger event gate=%d, auxId=0\n",gtAddr);
-	ceu_trigger(gtAddr,0);
-}
-
-void f_set16_c(uint8_t Modifier){
-	uint8_t v1_len,p1_1len,p2_1len;
-	uint16_t Maddr;
-	uint32_t Const;
-	v1_len = (uint8_t)(1<<((Modifier & 0x0C)>>2));
-	p1_1len = (uint8_t)(1<<((Modifier & 0x02)>>1));
-	p2_1len = (uint8_t)(1<<(Modifier & 0x01));
-	Maddr = getPar16(p1_1len);
-	Const = getPar32(p2_1len);
-	dbg(APPNAME,"VM::f_set16_c(%02x): v1_len=%d, p1_1len=%d, p2_len=%d, Maddr=%d, Const=%d\n",Modifier,v1_len,p1_1len,p2_1len,Maddr,Const);
-	//if (getLblAddr((uint16_t)Const) > 0) dbg("VMDBG","VM:: possible await EVENT for label %d\n",Const);
-	setMVal(Const,Maddr,v1_len);
-}
-
-void f_set_c(uint8_t Modifier){
-	uint8_t v1_len,p1_1len,p2_len, param;
-	uint16_t Maddr;
-	uint32_t Const;
-	param = getPar8(1);
-	v1_len = (uint8_t)(1<<((param & 0x30)>>4));
-	p1_1len = (uint8_t)(1<<((param & 0x04)>>2));
-	p2_len = (uint8_t)(1<<(param & 0x03));
-	Maddr = getPar16(p1_1len);
-	Const = getPar32(p2_len);
-	dbg(APPNAME,"VM::f_set_c(%02x): v1_len=%d, p1_1len=%d, p2_len=%d, Maddr=%d, Const=%d\n",Modifier,v1_len,p1_1len,p2_len,Maddr,Const);
-	//if (getLblAddr((uint16_t)Const) > 0) dbg("VMDBG","VM:: possible await EVENT for label %d\n",Const);
-	setMVal(Const,Maddr,v1_len);
-}
-
-void f_set_e(uint8_t Modifier){
-	uint8_t v1_len;
-	uint16_t Maddr1;
-	uint32_t Value;
-	v1_len = (uint8_t)(1<<(Modifier & 0x03));
-	Maddr1 = (uint16_t)pop();
-	Value = pop();
-	setMVal(Value,Maddr1,v1_len);
-	dbg(APPNAME,"VM::f_set_e(%02x): v1_len=%d, Maddr1=%d, Value=%d, ValuePos=%d\n",Modifier,v1_len,Maddr1,Value,getMVal(Maddr1,v1_len));
-}
-
 
 void f_func(uint8_t Modifier){ 
 	uint8_t fID;
@@ -1374,31 +1052,67 @@ void f_func(uint8_t Modifier){
 	call VMCustom.callFunction(fID);
 }
 
-
-void f_set_v(uint8_t Modifier,uint8_t v2_len){
-	uint8_t v1_len,p1_1len,p2_1len;
-	uint16_t Maddr1,Maddr2;
-	v1_len = (uint8_t)(1<<((Modifier & 0x0C)>>2));
-	p1_1len = (uint8_t)(1<<((Modifier & 0x02)>>1));
-	p2_1len = (uint8_t)(1<<(Modifier & 0x01));
-	Maddr1 = getPar16(p1_1len);
-	Maddr2 = getPar16(p2_1len);
-	dbg(APPNAME,"VM::f_set_v(%02x): v1_len=%d, v2_len=%d, p1_1len=%d, p2_1len=%d, Maddr1=%d, Maddr2=%d, v2_val=%d\n",Modifier,v1_len,v2_len,p1_1len,p2_1len,Maddr1,Maddr2,getMVal(Maddr2,v1_len));
-	setMVal(getMVal(Maddr2,v2_len),Maddr1,v1_len);
+void f_outevt_e(uint8_t Modifier){
+	uint8_t Cevt;
+	uint32_t value;
+	value = pop();
+	Cevt  = getPar8(1);
+	dbg(APPNAME,"VM::f_outevt_e(%02x): Cevt=%d\n",Modifier,Cevt);
+	dbg("VMDBG","VM:: emitting output event %d\n",Cevt);
+	call VMCustom.procOutEvt(Cevt,value);
 }
 
-void f_set8_v(uint8_t Modifier){f_set_v(Modifier,1);}
-void f_set16_v(uint8_t Modifier){f_set_v(Modifier,2);}
-void f_set32_v(uint8_t Modifier){f_set_v(Modifier,4);}
-
+void f_outevt_z(uint8_t Modifier){
+	uint8_t Cevt;
+	Cevt = getPar8(1);
+	dbg(APPNAME,"VM::f_outevt_z(%02x): Evt=%d, \n",Modifier,Cevt);
+	call VMCustom.procOutEvt(Cevt,0);
+}
+	
+void f_clken_e(uint8_t Modifier){
+	uint8_t p1_1len,p2_1len,unit;
+	uint16_t gate,lbl;
+	uint32_t Time=0;
+	Modifier = getPar8(1);
+	p1_1len = getBitsPow(Modifier,1,1);
+	p2_1len = getBitsPow(Modifier,0,0);
+	unit = getBits(Modifier,4,6);
+	gate = getPar16(p1_1len);
+	lbl = getPar16(p2_1len);
+	Time = pop();
+	dbg(APPNAME,"VM::f_clken_e(%02x): p1_1len=%d, p2_1len=%d, gate=%d, unit=%d, Time=%d, lbl=%d\n",
+		Modifier,p1_1len,p2_1len,gate,unit,Time,lbl);
+	dbg("VMDBG","VM:: await timer %ld for label %d\n",(s32)unit2val(Time,unit), lbl);
+	ceu_wclock_enable(gate, (s32)unit2val(Time,unit), lbl);		
+}
+void f_clken_v(uint8_t Modifier){
+	uint8_t p1_1len,p2_1len,p3_1len,unit,timeTp;
+	uint16_t gate,lbl,VtimeAddr;
+	uint32_t Time=0;
+	Modifier = getPar8(1);
+	unit = getBits(Modifier,5,7);
+	timeTp  = getBits(Modifier,3,4); // Expect type with 2 bits -- only unsigned integer
+	p1_1len = getBitsPow(Modifier,2,2);
+	p2_1len = getBitsPow(Modifier,1,1);
+	p3_1len = getBitsPow(Modifier,0,0);
+	gate = getPar16(p1_1len);
+	VtimeAddr = getPar16(p2_1len);
+	lbl = getPar16(p3_1len);
+	Time = getMVal(VtimeAddr,timeTp); 
+	dbg(APPNAME,"VM::f_clken_v(%02x): p1_1len=%d, type=%d, gate=%d, unit=%d, VtimeAddr=%d, Time=%d, lbl=%d, Time(ms)=%d\n",
+		Modifier,p1_1len,timeTp,gate,unit,VtimeAddr, Time,lbl,(s32)unit2val(Time,unit));
+	dbg("VMDBG","VM:: await timer %ld for label %d\n",(s32)unit2val(Time,unit), lbl);
+	ceu_wclock_enable(gate, (s32)unit2val(Time,unit), lbl);
+}
 
 void f_clken_c(uint8_t Modifier){
 	uint8_t p1_1len,p2_len,p3_1len;
 	uint16_t gate,lbl;
 	uint32_t Ctime;
-	p1_1len = (uint8_t)(1<<((Modifier & 0x08)>>3));
-	p3_1len = (uint8_t)(1<<((Modifier & 0x04)>>2));
-	p2_len = (uint8_t)((Modifier & 0x03)+1);
+	Modifier = getPar8(1);
+	p1_1len = getBitsPow(Modifier,3,3);
+	p2_len = (uint8_t)(getBits(Modifier,1,2)+1);
+	p3_1len = getBitsPow(Modifier,0,0);
 	gate = getPar16(p1_1len);
 	Ctime = getPar32(p2_len);
 	lbl = getPar16(p3_1len);
@@ -1408,62 +1122,461 @@ void f_clken_c(uint8_t Modifier){
 
 }
 
-void f_clken_ve(uint8_t Modifier){
-	if (((Modifier & 0x04)>>2) == 0)  { // bit2=0 -> clken_v ; bit2=1 -> clken_e
-		uint8_t p1_1len,v3_len,unit;
-		uint16_t gate,lbl,VtimeAddr;
-		uint32_t Time=0;
-		p1_1len = (uint8_t)(1<<((Modifier & 0x08)>>3));
-		v3_len = (uint8_t)(1<<(Modifier & 0x03));
-		gate = getPar16(p1_1len);
-		unit = getPar8(1);
-		VtimeAddr = getPar16(2);
-		lbl = getPar16(2);
-		Time = getMVal(VtimeAddr,v3_len); 
-		dbg(APPNAME,"VM::f_clken_v(%02x): p1_1len=%d, v3_len=%d, gate=%d, unit=%d, VtimeAddr=%d, Time=%d, lbl=%d, Time(ms)=%d\n",
-			Modifier,p1_1len,v3_len,gate,unit,VtimeAddr, Time,lbl,(s32)unit2val(Time,unit));
-		dbg("VMDBG","VM:: await timer %ld for label %d\n",(s32)unit2val(Time,unit), lbl);
-		ceu_wclock_enable(gate, (s32)unit2val(Time,unit), lbl);
-	} else {
-		uint8_t p1_1len,unit;
-		uint16_t gate,lbl;
-		uint32_t Time=0;
-		p1_1len = (uint8_t)(1<<((Modifier & 0x08)>>3));
-		unit = (uint8_t)((Modifier & 0x03));
-		gate = getPar16(p1_1len);
-		lbl = getPar16(2);
-		Time = pop();
-		dbg(APPNAME,"VM::f_clken_e(%02x): p1_1len=%d, gate=%d, unit=%d, Time=%d, lbl=%d\n",
-			Modifier,p1_1len,gate,unit,Time,lbl);
-		dbg("VMDBG","VM:: await timer %ld for label %d\n",(s32)unit2val(Time,unit), lbl);
-		ceu_wclock_enable(gate, (s32)unit2val(Time,unit), lbl);		
-	}
 
+void f_set_v(uint8_t Modifier){
+	uint8_t v1_len,p1_1len,p2_1len,v2_len;
+	uint8_t tp1,tp2;
+	uint16_t Maddr1,Maddr2;
+	Modifier = getPar8(1);
+	p1_1len = getBitsPow(Modifier,7,7);
+	tp1 = getBits(Modifier,4,6);
+	p2_1len = getBitsPow(Modifier,3,3);
+	tp2 = getBits(Modifier,0,2);
+	Maddr1 = getPar16(p1_1len);
+	Maddr2 = getPar16(p2_1len);
+	
+	dbg(APPNAME,"VM::f_set_v(%02x): tp1=%d, tp2=%d, p1_1len=%d, p2_1len=%d, Maddr1=%d, Maddr2=%d\n",Modifier,v1_len,v2_len,p1_1len,p2_1len,Maddr1,Maddr2);
+
+	if (tp2 == F32){ 		// Source is a float
+		float buffer = getMValf(Maddr2);
+		setMVal(*(uint32_t*)&buffer,Maddr1,tp2,tp1);
+	} else { 				// Source is an integer
+		uint32_t buffer = getMVal(Maddr2,tp2);
+		setMVal(buffer,Maddr1,tp2,tp1);
+	}	
+}
+void f_setarr_vc(uint8_t Modifier){
+	uint8_t v1_len,p1_1len,p2_1len,v2_len,p3_1len,p4_len,Aux,tp1,tp2;
+	uint16_t Maddr,Vidx,Max;
+	uint32_t Const;
+	Modifier = getPar8(1);
+	Aux = getPar8(1);
+
+	p1_1len = getBitsPow(Modifier,7,7);
+	tp1 = getBits(Modifier,4,6);
+	p2_1len = getBitsPow(Modifier,3,3);
+	tp2 = getBits(Modifier,0,2);
+	p3_1len = getBitsPow(Modifier,2,2);
+	p4_len = (uint8_t)(getBits(Modifier,0,1)+1);
+	v1_len = (tp1==F32)? 4 : 1<<(tp1&0x3);
+	v2_len = (tp2==F32)? 4 : 1<<(tp2&0x3);
+
+	Maddr = getPar16(p1_1len);
+ 	Vidx  = getPar16(p2_1len);
+	Max   = getPar16(p3_1len);
+	Const = getPar32(p4_len);
+	dbg(APPNAME,"VM::f_setarr_vc(%02x):Maddr=%d, Vidx=%d, Max=%d, Const=%d, IDX OVERFLOW=%s idx=%d\n",
+			Modifier,Maddr,Vidx,Max,Const,_TFstr(getMVal(Vidx,tp2) > Max),getMVal(Vidx,tp2));
+	if (getMVal(Vidx,tp2) >= Max) 
+		evtError(E_IDXOVF);
+	else {
+		if (tp1 == F32){
+			float buffer = (float)Const; 	
+			setMVal(*(uint32_t*)&buffer,Maddr+((getMVal(Vidx,tp2)%Max)*v1_len),tp2,tp1);
+		} else {
+			setMVal(Const,Maddr+((getMVal(Vidx,tp2)%Max)*v1_len),tp2,tp1);
+		}
+	}
 }
 
-void f_tkins_max(uint8_t Modifier){
-	uint8_t stack;
-	uint16_t lbl;
-	stack = (uint8_t)(CEU->stack + (Modifier));
-	lbl = getPar16(2);
-	dbg(APPNAME,"VM::f_tkins_max(%02x): stack=%d, lbl=%d, \n",Modifier,stack,lbl);
-	dbg("VMDBG","VM:: enable track for label %d\n", lbl);
-	ceu_track_ins(stack,255,0,lbl);
+void f_setarr_vv(uint8_t Modifier){
+	uint8_t v1_len,p1_1len,p2_1len,v2_len,p3_1len,p4_1len,v4_len,Aux,tp1,tp2,tp4;
+	uint16_t Maddr1,Vidx,Max,Maddr2;
+	Modifier = getPar8(1);
+	Aux = getPar8(1);
+
+	p1_1len = getBitsPow(Modifier,7,7);
+	tp1 = getBits(Modifier,4,6);
+	p2_1len = getBitsPow(Modifier,3,3);
+	tp2 = getBits(Modifier,0,2);
+
+	p3_1len = getBitsPow(Aux,4,4);
+	p4_1len = getBitsPow(Aux,3,3);
+	tp4 = getBits(Aux,0,2);
+
+	v1_len = (tp1==F32)? 4 : 1<<(tp1&0x3);
+	v2_len = (tp2==F32)? 4 : 1<<(tp2&0x3);
+	v4_len = (tp4==F32)? 4 : 1<<(tp4&0x3);
+
+	Maddr1 = getPar16(p1_1len);
+ 	Vidx   = getPar16(p2_1len);
+	Max    = getPar16(p3_1len);
+	Maddr2 = getPar16(p4_1len);
+
+	dbg(APPNAME,"VM::f_setarr_vv(%02x):Maddr1=%d, Vidx=%d, Max=%d, Madr2=%d, IDX OVERFLOW=%s idx=%d\n",
+			Modifier,Maddr1,Vidx,Max,Maddr2,_TFstr(getMVal(Vidx,tp2) > Max),getMVal(Vidx,tp2));
+	if (getMVal(Vidx,tp2) >= Max) 
+		evtError(E_IDXOVF);
+	else {
+		if (tp4 == F32){ 		// Source is a float
+			float buffer = getMValf(Maddr2);
+			setMVal(*(uint32_t*)&buffer,Maddr1+((getMVal(Vidx,tp2)%Max)*v1_len),tp4,tp1);
+		} else { 				// Source is an integer
+			uint32_t buffer = getMVal(Maddr2,tp4);
+			setMVal(buffer,Maddr1+((getMVal(Vidx,tp2)%Max)*v1_len),tp4,tp1);
+		}
+	}
+}
+
+
+
+void f_poparr_v(uint8_t Modifier){
+	uint8_t v1_len,p1_1len,v2_len,p2_1len,p3_1len,Aux,tp1,tp2;
+	uint16_t Maddr,Vidx,Max;
+
+	p3_1len = getBitsPow(Modifier,0,0);
+	Aux = getPar8(1);
+	p1_1len = getBitsPow(Aux,7,7);
+	tp1 = getBits(Aux,4,6);
+	p2_1len = getBitsPow(Aux,3,3);
+	tp2 = getBits(Aux,0,2);
+
+	v1_len = (tp1==F32)? 4 : 1<<(tp1&0x3);
+	v2_len = (tp2==F32)? 4 : 1<<(tp2&0x3);
+
+	Maddr = getPar16(p1_1len);
+ 	Vidx  = getPar16(p2_1len);
+	Max   = getPar16(p3_1len);
+	if (getMVal(Vidx,tp2) >= Max) 
+		evtError(E_IDXOVF);
+	else {
+		if (tp1 == F32){ // Source/Target are float
+			float v2 = popf();
+			dbg(APPNAME,"VM::f_poparr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, Value=%f, IDX OVERFLOW=%s idx=%d\n",
+				Modifier,Maddr,Vidx,Max,v2,_TFstr(getMVal(Vidx,tp2) > Max),getMVal(Vidx,tp2));
+			setMVal(*(uint32_t*)&v2,Maddr+((getMVal(Vidx,tp2)%Max)*v1_len),F32,tp1);
+		} else { // Source/Target are integer
+			int32_t v2 = pop();
+			dbg(APPNAME,"VM::f_poparr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, Value=%d, IDX OVERFLOW=%s idx=%d\n",
+			Modifier,Maddr,Vidx,Max,v2,_TFstr(getMVal(Vidx,tp2) > Max),getMVal(Vidx,tp2));
+			setMVal(v2,Maddr+((getMVal(Vidx,tp2)%Max)*v1_len),S32,tp1);
+		}	
+	}
+}
+
+void f_pusharr_v(uint8_t Modifier){
+	uint8_t v1_len,p1_1len,v2_len,p2_1len,p3_1len,Aux,tp1,tp2;
+	uint16_t Maddr,Vidx,Max;
+
+	p3_1len = getBitsPow(Modifier,0,0);
+	Aux = getPar8(1);
+	p1_1len = getBitsPow(Aux,7,7);
+	tp1 = getBits(Aux,4,6);
+	p2_1len = getBitsPow(Aux,3,3);
+	tp2 = getBits(Aux,0,2);
+
+	v1_len = (tp1==F32)? 4 : 1<<(tp1&0x3);
+	v2_len = (tp2==F32)? 4 : 1<<(tp2&0x3);
+
+	Maddr = getPar16(p1_1len);
+ 	Vidx  = getPar16(p2_1len);
+	Max   = getPar16(p3_1len);
+
+	if (getMVal(Vidx,tp2) >= Max) 
+		evtError(E_IDXOVF);
+	else {
+		dbg(APPNAME,"VM::f_pusharr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, IDX OVERFLOW=%s idx=%d, v1_len=%d\n",Modifier,Maddr,Vidx,Max,
+			_TFstr(getMVal(Vidx,tp2) > Max),getMVal(Vidx,v2_len),v1_len);
+		push(Maddr+((getMVal(Vidx,tp2)%Max)*v1_len));
+	}
+}
+
+
+void f_getextdt_e(uint8_t Modifier){
+	uint8_t p1_1len;
+	uint16_t Maddr,len;
+	p1_1len = getBitsPow(Modifier,0,0);
+	Maddr = (uint16_t)pop();
+	len = getPar16(p1_1len);
+	dbg(APPNAME,"VM::f_getextdt_e(%02x): Maddr=%d, len=%d\n",Modifier,Maddr,len);
+	dbg("VMDBG","VM:: reading input event data.\n");
+	memcpy((MEM+Maddr),CEU->ext_data,len);
+	}
+
+void f_trg(uint8_t Modifier){
+	uint8_t p1_1len;
+	uint16_t gtAddr;
+	p1_1len = getBitsPow(Modifier,0,0);
+	gtAddr = getPar16(p1_1len);
+	dbg(APPNAME,"VM::f_trg(%02x): p1_1len=%d, gtAddr=%d, \n",Modifier,p1_1len,gtAddr);
+	dbg("VMDBG","VM:: trigger event gate=%d, auxId=0\n",gtAddr);
+	ceu_trigger(gtAddr,0);
+}
+
+void f_exec(uint8_t Modifier){ 
+	uint8_t p1_1len;
+	uint16_t Const;
+	p1_1len = getBitsPow(Modifier,0,0);
+	Const = getPar16(p1_1len);
+	dbg(APPNAME,"VM::f_exec(%02x): p1_1len=%d, Const=%d\n",Modifier,p1_1len,Const);
+	dbg("VMDBG","VM:: executing trail: label=%d.\n",Const);
+	PC = getLblAddr(Const);
+}
+
+void f_chkret(uint8_t Modifier){
+	uint8_t p1_1len;
+	uint16_t Maddr;
+	p1_1len = getBitsPow(Modifier,0,0);
+	Maddr = getPar16(p1_1len);
+	dbg(APPNAME,"VM::f_chkret(%02x): p1_1len=%d, MAddr=%d value=%d, \n",Modifier,p1_1len,Maddr,*(uint8_t*)(MEM+Maddr));
+	dbg("VMDBG","VM:: test end of PAR.\n");
+	if (*(uint8_t*)(MEM+Maddr)>0) PC=PC+1;
+}
+
+void f_push_c(uint8_t Modifier){
+	uint8_t p1_len;
+	uint32_t Const;
+	p1_len = (uint8_t)(getBits(Modifier,0,1)+1);
+	Const = getPar32(p1_len);
+	dbg(APPNAME,"VM::f_push_c(%02x): p1_len=%d, Const=%d, \n",Modifier,p1_len,Const);
+	push(Const);
+	}
+
+void f_cast(uint8_t Modifier){
+	uint32_t stacki;
+	float stackf;
+	uint8_t mode;
+	mode = getBits(Modifier,0,1);
+	dbg(APPNAME,"VM::f_cast(%02x): mode=%d, ",Modifier,mode);
+	switch (mode){
+		case U32_F: stacki = pop();  dbg_clear(APPNAME,"mode='U32_F', stack=%d, cast=%f\n",stacki,(f32)*(u32*)&stacki); pushf((f32)*(u32*)&stacki); break;
+		case S32_F: stacki = pop();  dbg_clear(APPNAME,"mode='S32_F', stack=%d, cast=%f\n",stacki,(f32)*(s32*)&stacki); pushf((f32)*(s32*)&stacki); break;
+		case F_U32: stackf = popf(); dbg_clear(APPNAME,"mode='F_U32', stack=%f, cast=%d\n",stackf,(u32)*(f32*)&stackf); push((u32)*(f32*)&stackf); break;
+		case F_S32: stackf = popf(); dbg_clear(APPNAME,"mode='F_S32', stack=%f, cast=%d\n",stackf,(s32)*(f32*)&stackf); push((u32)*(f32*)&stackf); break;
+	}
+}
+
+void f_memclr(uint8_t Modifier){
+	uint8_t p1_1len,p2_1len;
+	uint16_t Maddr,size;
+	p1_1len = getBitsPow(Modifier,1,1);
+	p2_1len = getBitsPow(Modifier,0,0);
+	Maddr = getPar16(p1_1len);
+	size = getPar16(p2_1len);
+	dbg(APPNAME,"VM::f_memclr(%02x): Maddr=%d, size=%d\n",Modifier,Maddr,size);
+	dbg("VMDBG","VM:: clear clock/gate entry.\n");
+	//memset((MEM+Maddr),0,len); //does not work in TOSSIM
+	{int x; for (x=0; x< size;x++) *(uint8_t*)(MEM+Maddr+x)=0;} 
+	}
+	
+void f_ifelse(uint8_t Modifier){
+	uint8_t p1_1len,p2_1len;
+	uint16_t lbl1,lbl2;
+	p1_1len = getBitsPow(Modifier,1,1);
+	p2_1len = getBitsPow(Modifier,0,0);
+	lbl1 = getPar16(p1_1len);
+	lbl2 = getPar16(p2_1len);
+	dbg(APPNAME,"VM::f_ifelse(%02x): lbl1=%d, lbl2=%d\n",Modifier,lbl1,lbl2);
+	dbg("VMDBG","VM:: if/else: TRUE label=%d; FALSE label=%d.\n",lbl1,lbl2);
+	if (pop()) PC=getLblAddr(lbl1); else PC=getLblAddr(lbl2);
+}
+
+void f_asen(uint8_t Modifier){
+	uint8_t p1_1len,p2_1len;
+	uint16_t gate,lbl;
+	p1_1len = getBitsPow(Modifier,1,1);
+	p2_1len = getBitsPow(Modifier,0,0);
+	gate = getPar16(p1_1len);
+	lbl = getPar16(p2_1len);
+	dbg(APPNAME,"VM::f_asen(%02x): gate=%d, lbl=%d\n",Modifier,gate,lbl);
+	dbg("VMDBG","VM:: async enable: gate=%d; label=%d.\n",gate,lbl);
+	ceu_async_enable(gate,lbl);
+}
+
+void f_tkclr(uint8_t Modifier){
+	uint8_t p1_1len,p2_1len;
+	uint16_t lbl1,lbl2;
+	p1_1len = getBitsPow(Modifier,1,1);
+	p2_1len = getBitsPow(Modifier,0,0);
+	lbl1 = getPar16(p1_1len);
+	lbl2 = getPar16(p2_1len);
+	dbg(APPNAME,"VM::f_tkclr(%02x): lbl1=%d, lbl2=%d\n",Modifier,lbl1,lbl2);
+	dbg("VMDBG","VM:: clear tracks for label %d to label %d\n",lbl1,lbl2);
+	ceu_track_clr(lbl1,lbl2);	
+	}
+
+void f_outevt_c(uint8_t Modifier){
+	uint8_t Clen;
+	uint8_t Cevt;
+	uint32_t Const;
+	Clen = (uint8_t)(getBits(Modifier,0,1)+1);
+	Cevt  = getPar8(1);
+	Const = getPar32(Clen);
+	dbg(APPNAME,"VM::f_outevt_c(%02x): Cevt=%d, Clen=%d, Const=%d\n",Modifier,Cevt,Clen,Const);
+	call VMCustom.procOutEvt(Cevt,Const);
+}
+
+void f_getextdt_v(uint8_t Modifier){
+	uint8_t p1_1len,p2_1len;
+	uint16_t Maddr,size;
+	p1_1len = getBitsPow(Modifier,1,1);
+	p2_1len = getBitsPow(Modifier,0,0);
+	Maddr = getPar16(p1_1len);
+	size = getPar16(p2_1len);
+	dbg(APPNAME,"VM::f_getextdt_v(%02x): Maddr=%d, len=%d\n",Modifier,Maddr,size);
+	dbg("VMDBG","VM:: reading input event data.\n");
+	memcpy((MEM+Maddr),CEU->ext_data,size);
+	}
+	
+void f_inc(uint8_t Modifier){
+	uint8_t v1_len,tp1;
+	uint16_t Maddr;
+	tp1 = getBits(Modifier,0,1);
+	v1_len = 1<<tp1;
+	Maddr = (uint16_t)pop();
+	dbg(APPNAME,"VM::f_inc(%02x): v1_len=%d, Maddr=%d, value+1=%d, \n",Modifier,v1_len,Maddr,getMVal(Maddr,tp1)+1);
+	setMVal((getMVal(Maddr,tp1)+1),Maddr,tp1,tp1);	
+}
+void f_dec(uint8_t Modifier){
+	uint8_t v1_len,tp1;
+	uint16_t Maddr;
+	tp1 = getBits(Modifier,0,1);
+	v1_len = 1<<tp1;
+	Maddr = (uint16_t)pop();
+	dbg(APPNAME,"VM::f_dec(%02x): v1_len=%d, Maddr=%d, value-1=%d, \n",Modifier,v1_len,Maddr,getMVal(Maddr,tp1)-1);
+	setMVal((getMVal(Maddr,tp1)-1),Maddr,tp1,tp1);	
+}
+
+void f_set_e(uint8_t Modifier){
+	uint8_t v1_len,tp1;
+	uint16_t Maddr1;
+	tp1 = getBits(Modifier,0,2);
+	v1_len = (tp1==F32)? 4 : 1<<(tp1&0x3);
+	Maddr1 = (uint16_t)pop();
+	if (tp1 == F32){
+		float Value = popf();
+		setMVal(*(uint32_t*)&Value,Maddr1,F32,tp1);
+		dbg(APPNAME,"VM::f_set_e(%02x): v1_len=%d, Maddr1=%d, Value=%f, ValuePos=%d\n",Modifier,v1_len,Maddr1,Value,getMValf(Maddr1));
+	} else {
+		uint32_t Value = pop();
+		setMVal(Value,Maddr1,S32,tp1);
+		dbg(APPNAME,"VM::f_set_e(%02x): v1_len=%d, Maddr1=%d, Value=%d, ValuePos=%d\n",Modifier,v1_len,Maddr1,Value,getMVal(Maddr1,v1_len));
+	}
+}
+
+void f_deref(uint8_t Modifier){
+	uint16_t MAddr;
+	uint8_t type;
+	type = getBits(Modifier,0,2);
+	MAddr = (uint16_t)pop();
+	dbg(APPNAME,"VM::f_deref(%02x): type=%d, MAddr=%d, ",Modifier,type,MAddr);
+	switch (type){
+		case U8 : dbg_clear(APPNAME,"type= 'u8' , value=%d\n",( uint8_t)getMVal(MAddr,type)); push((uint8_t)getMVal(MAddr,type)); break;
+		case U16: dbg_clear(APPNAME,"type='u16' , value=%d\n",(uint16_t)getMVal(MAddr,type)); push((uint16_t)getMVal(MAddr,type)); break;
+		case U32: dbg_clear(APPNAME,"type='u32' , value=%d\n",(uint32_t)getMVal(MAddr,type)); push((uint32_t)getMVal(MAddr,type)); break;
+		case F32: dbg_clear(APPNAME,"type='f32' , value=%f\n",          getMValf(MAddr));     pushf(         getMValf(MAddr)); break;
+		case S8 : dbg_clear(APPNAME,"type= 's8' , value=%d\n",(  int8_t)getMVal(MAddr,type)); push(( int8_t)getMVal(MAddr,type)); break;
+		case S16: dbg_clear(APPNAME,"type='s16' , value=%d\n",( int16_t)getMVal(MAddr,type)); push(( int16_t)getMVal(MAddr,type)); break;
+		case S32: dbg_clear(APPNAME,"type='s32' , value=%d\n",( int32_t)getMVal(MAddr,type)); push(( int32_t)getMVal(MAddr,type)); break;
+	}
+}
+
+void f_memcpy(uint8_t Modifier){
+	uint8_t p1_1len,p2_1len,p3_1len;
+	uint16_t size,MaddrFrom,MaddrTo;
+	p1_1len = getBitsPow(Modifier,2,2);
+	p2_1len = getBitsPow(Modifier,1,1);
+	p3_1len = getBitsPow(Modifier,0,0);
+	size 	  = getPar16(p1_1len);
+	MaddrFrom = getPar16(p2_1len);
+	MaddrTo   = getPar16(p3_1len);
+	dbg(APPNAME,"VM::f_memcpy(%02x): size=%d, p1_1len=%d, p2_1len=%d, p3_1len=%d, AddrTo=%d, AddrFrom=%d \n",Modifier,size,p1_1len,p2_1len,p3_1len,MaddrTo,MaddrFrom);
+	memcpy((void*)(MEM+MaddrTo),(void*)(MEM+MaddrFrom),size);
 }
 
 void f_tkins_z(uint8_t Modifier){ 
-	uint8_t tree,chk,p2_1len;
+	uint8_t tree,chk,p2_1len,par1;
 	uint16_t lbl;
-	p2_1len = (uint8_t)(1<<((Modifier & 0x02)>>1));
-	chk = (uint8_t)(Modifier & 0x01);
-	tree = getPar8(1);
+	p2_1len = getBitsPow(Modifier,0,0);
+	par1  = getPar8(1);
+	chk = getBits(par1,7,7);
+	tree = getBits(par1,0,6);
 	lbl = getPar16(p2_1len);
 	dbg(APPNAME,"VM::f_tkins_z(%02x): tree=%d, chk=%d, p2_1len=%d, lbl=%d, \n",Modifier,tree,chk,p2_1len,lbl);
 	dbg("VMDBG","VM:: enable track for label %d\n", lbl);
 	ceu_track_ins(0,tree,chk,lbl);
 }
 
+void f_tkins_max(uint8_t Modifier){
+	uint8_t stack,p1_1len;
+	uint16_t lbl;
+	stack = (uint8_t)(CEU->stack + getBits(Modifier,1,2));
+	p1_1len = getBitsPow(Modifier,0,0);
+	lbl = getPar16(p1_1len);
+	dbg(APPNAME,"VM::f_tkins_max(%02x): stack=%d, lbl=%d, \n",Modifier,stack,lbl);
+	dbg("VMDBG","VM:: enable track for label %d\n", lbl);
+	ceu_track_ins(stack,255,0,lbl);
+}
 
+void f_push_v(uint8_t Modifier){
+	uint8_t v1_len,tp1,p1_1len;
+	uint16_t Maddr;
+	p1_1len = getBitsPow(Modifier,3,3);
+	tp1 = getBits(Modifier,0,2);
+	v1_len = (tp1==F32)? 4 : 1<<(tp1&0x3);
+	Maddr = getPar16(p1_1len);
+	if (tp1 == F32){
+		dbg(APPNAME,"VM::f_push_v(%02x): tp1=%d, Maddr=%d, value=%f, \n",Modifier,tp1,Maddr,getMValf(Maddr));
+		pushf(getMValf(Maddr));
+	} else {
+		dbg(APPNAME,"VM::f_push_v(%02x): tp1=%d, Maddr=%d, value=%d, \n",Modifier,tp1,Maddr,getMVal(Maddr,tp1));
+		push(getMVal(Maddr,tp1));
+	}
+}
+
+void f_pop(uint8_t Modifier){ 
+	uint8_t v1_len,tp1,p1_1len;
+	uint16_t Maddr;
+	p1_1len = getBitsPow(Modifier,3,3);
+	tp1 = getBits(Modifier,0,2);
+	v1_len = (tp1==F32)? 4 : 1<<(tp1&0x3);
+	Maddr = getPar16(p1_1len);
+	if (tp1 == F32){
+		float Value=popf();
+		dbg(APPNAME,"VM::f_pop(%02x): tp1=%d, Maddr=%d, value=%f, \n",Modifier,tp1,Maddr,Value);
+		setMVal(*(uint32_t*)&Value,Maddr,F32,tp1);
+	} else {
+		int32_t Value=pop();
+		dbg(APPNAME,"VM::f_pop(%02x): tp1=%d, Maddr=%d, value=%d, \n",Modifier,tp1,Maddr,Value);
+		setMVal(Value,Maddr,S32,tp1);
+	}
+}
+
+void f_popx(uint8_t Modifier){ 
+	int32_t Value=pop();
+	dbg(APPNAME,"VM::f_popx(%02x):\n",Modifier);
+}
+
+void f_outevt_v(uint8_t Modifier){
+	uint8_t v2_len,tp2,p2_1len,Cevt;
+	uint16_t Maddr;
+	p2_1len = getBitsPow(Modifier,3,3);
+	tp2 = getBits(Modifier,0,2);
+	v2_len = (tp2==F32)? 4 : 1<<(tp2&0x3);
+	Cevt  = getPar8(1);
+	Maddr = getPar16(p2_1len);
+	dbg(APPNAME,"VM::f_outevt_v(%02x): Cevt=%d, Maddr=%d\n",Modifier,Cevt,Maddr);
+	call VMCustom.procOutEvt(Cevt,Maddr);
+}
+
+void f_set_c(uint8_t Modifier){
+	uint8_t v1_len,p1_1len,p2_len, param, tp1;
+	uint16_t Maddr;
+	uint32_t Const;
+	tp1 = getBits(Modifier,0,2);
+	v1_len = (tp1==F32)? 4 : 1<<(tp1&0x3);	
+	p1_1len = getBitsPow(Modifier,3,3);
+	p2_len = (uint8_t)(getBits(Modifier,4,5)+1);
+	Maddr = getPar16(p1_1len);
+	Const = getPar32(p2_len);
+	dbg(APPNAME,"VM::f_set_c(%02x): v1_len=%d, p1_1len=%d, p2_len=%d, Maddr=%d, Const=%d\n",Modifier,v1_len,p1_1len,p2_len,Maddr,Const);
+	if (tp1==F32){
+		float buffer =*(float*)&Const;
+		setMVal(*(uint32_t*)&buffer,Maddr,F32,tp1);
+	} else {
+		setMVal(Const,Maddr,S32,tp1);
+	}
+}
 	/*
 	 * Operation decoder
 	 */
@@ -1471,15 +1584,9 @@ void f_tkins_z(uint8_t Modifier){
 //		dbg(APPNAME,"VM::Decoder()\n");
 		// Execute the respective operation
 		dbg(APPNAME,"VM::Decoder(): PC= %d opcode= %hhu modifier=%d\n",PC-1,Opcode,Modifier);
-{
-//	char data[10];
-//	sprintf(data,"%04d %02x\n",PC-1,Opcode);
-//	logS(data,8);
-}
 		switch (Opcode){
 			case op_nop : f_nop(Modifier); break;
 			case op_end : f_end(Modifier); break;
-			
 			case op_bnot : f_bnot(Modifier); break;
 			case op_lnot : f_lnot(Modifier); break;
 			case op_neg : f_neg(Modifier); break;
@@ -1501,49 +1608,61 @@ void f_tkins_z(uint8_t Modifier){
 			case op_lt : f_lt(Modifier); break;
 			case op_lor : f_lor(Modifier); break;
 			case op_land : f_land(Modifier); break;
-			case op_set_c : f_set_c(Modifier); break;
-			case op_func : f_func(Modifier); break;
-			case op_outevt_z : f_outevt_z(Modifier); break;
-			case op_outevt_e : f_outevt_e(Modifier); break;
-			case op_pop : f_pop(Modifier); break;
 			case op_popx : f_popx(Modifier); break;
-			case op_poparr_v : f_poparr_v(Modifier); break;
-			case op_push_c : f_push_c(Modifier); break;
-			case op_push_v : f_push_v(Modifier); break;
-			case op_pushx_v : f_pushx_v(Modifier); break;
-			case op_pusharr_v : f_pusharr_v(Modifier); break;
-			case op_deref : f_deref(Modifier); break;
 			
-			case op_set_e : f_set_e(Modifier); break;
+			
+			case op_neg_f : f_neg_f(Modifier); break;
+			case op_sub_f : f_sub_f(Modifier); break;
+			case op_add_f : f_add_f(Modifier); break;
+			case op_mult_f : f_mult_f(Modifier); break;
+			case op_div_f : f_div_f(Modifier); break;
+			case op_eq_f : f_eq_f(Modifier); break;
+			case op_neq_f : f_neq_f(Modifier); break;
+			case op_gte_f : f_gte_f(Modifier); break;
+			case op_lte_f : f_lte_f(Modifier); break;
+			case op_gt_f : f_gt_f(Modifier); break;
+			case op_lt_f : f_lt_f(Modifier); break;
+			case op_func : f_func(Modifier); break;
+			case op_outEvt_e : f_outevt_e(Modifier); break;
+			case op_outevt_z : f_outevt_z(Modifier); break;
+			case op_clken_e : f_clken_e(Modifier); break;
+			case op_clken_v : f_clken_v(Modifier); break;
+			case op_clken_c : f_clken_c(Modifier); break;
+			case op_set_v : f_set_v(Modifier); break;
 			case op_setarr_vc : f_setarr_vc(Modifier); break;
 			case op_setarr_vv : f_setarr_vv(Modifier); break;
+			
+			
+			
+			case op_poparr_v : f_poparr_v(Modifier); break;
+			case op_pusharr_v : f_pusharr_v(Modifier); break;
 			case op_getextdt_e : f_getextdt_e(Modifier); break;
-			case op_getextdt_v : f_getextdt_v(Modifier); break;
-			case op_cast : f_cast(Modifier); break;
-			case op_inc : f_inc(Modifier); break;
-			case op_dec : f_dec(Modifier); break;
-			case op_memcpy : f_memcpy(Modifier); break;
-			case op_memcpyx : f_memcpyx(Modifier); break;
-			case op_outevt_c : f_outevt_c(Modifier); break;
-			case op_outevt_v : f_outevt_v(Modifier); break;
-			case op_outevtx_v : f_outevtx_v(Modifier); break;
+			case op_trg : f_trg(Modifier); break;
 			case op_exec : f_exec(Modifier); break;
+			case op_chkret : f_chkret(Modifier); break;
+			case op_tkins_z : f_tkins_z(Modifier); break;
+			
+			
+			case op_push_c : f_push_c(Modifier); break;
+			case op_cast : f_cast(Modifier); break;
 			case op_memclr : f_memclr(Modifier); break;
 			case op_ifelse : f_ifelse(Modifier); break;
-			case op_trg : f_trg(Modifier); break;
-			case op_tkins_z : f_tkins_z(Modifier); break;
-			case op_tkclr : f_tkclr(Modifier); break;
-			case op_chkret : f_chkret(Modifier); break;
 			case op_asen : f_asen(Modifier); break;
+			case op_tkclr : f_tkclr(Modifier); break;
+			case op_outEvt_c : f_outevt_c(Modifier); break;
+			case op_getextdt_v : f_getextdt_v(Modifier); break;
+			case op_inc : f_inc(Modifier); break;
+			case op_dec : f_dec(Modifier); break;
+			case op_set_e : f_set_e(Modifier); break;
+			case op_deref : f_deref(Modifier); break;
+			case op_memcpy : f_memcpy(Modifier); break;
+
 			case op_tkins_max : f_tkins_max(Modifier); break;
-			
-			
-			case op_clken_c : f_clken_c(Modifier); break;
-			case op_clken_ve : f_clken_ve(Modifier); break;
-			case op_set16_c : f_set16_c(Modifier); break;
-			case op_set8_v : f_set8_v(Modifier); break;
-			case op_set16_v : f_set16_v(Modifier); break;
-			case op_set32_v : f_set32_v(Modifier); break;
+			case op_push_v : f_push_v(Modifier); break;
+			case op_pop : f_pop(Modifier); break;
+			case op_outEvt_v : f_outevt_v(Modifier); break;
+			case op_set_c : f_set_c(Modifier); break;
+
 		}
 	
 	}
@@ -1618,24 +1737,24 @@ void f_tkins_z(uint8_t Modifier){
 	}
 #endif
 
-	event int32_t VMCustom.getMVal(uint16_t Maddr, uint8_t v1_len){
+	event int32_t VMCustom.getMVal(uint16_t Maddr, uint8_t tp){
 #ifndef ONLY_BSTATION
-		return getMVal(Maddr,v1_len);
+		return getMVal(Maddr,tp);
 #else
 		return 0;
 #endif
 		}
-	event void VMCustom.setMVal(uint32_t value,uint16_t Maddr, uint8_t v1_len){
+	event void VMCustom.setMVal(uint32_t value,uint16_t Maddr, uint8_t fromTp, uint8_t toTp){
 #ifndef ONLY_BSTATION
-		setMVal(value, Maddr,v1_len);
+		setMVal(value, Maddr,fromTp,toTp);
 #endif
 		}
 
-	event void* VMCustom.getRealAddr(uint16_t Maddr, uint8_t v1_len){
+	event void* VMCustom.getRealAddr(uint16_t Maddr){
 #ifndef ONLY_BSTATION
 //		dbg(APPNAME,"VM::VMCustom.getRealAddr(): Maddr=%d, v1_len=%d,MVal = %x, RealMEM=%x\n",Maddr,v1_len,getMVal(Maddr,v1_len),(MEM + getMVal(Maddr,v1_len)));
 //		return (MEM + getMVal(Maddr,v1_len));
-		dbg(APPNAME,"VM::VMCustom.getRealAddr(): Maddr=%d, v1_len=%d,RealMEM=%x\n",Maddr,v1_len,(MEM + Maddr));
+		dbg(APPNAME,"VM::VMCustom.getRealAddr(): Maddr=%d,RealMEM=%x\n",Maddr,(MEM + Maddr));
 		return (MEM + Maddr);
 #else
 		return 0;

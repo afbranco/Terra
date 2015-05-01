@@ -1,4 +1,4 @@
-41 106 3 3 0 0 24 0 24
+41 109 3 3 0 0 24 0 24
 00 | 00000 0 track 0
 00 | 00001 0
 00 | 00002 0
@@ -40,68 +40,71 @@
 00 | 00038 0022
 00 | 00039 0023
 00 | 00040 0024 $ret:1, 
-94 | 00041 94 tkins_max 0 5                 | insert track ParEver_sub_1_5
+89 | 00041 89 tkins_max 0 5                 | insert track ParEver_sub_1_5
 00 | 00042 .00 addr:51
 33 | 00043 .05 
-94 | 00044 94 tkins_max 0 6                 | insert track ParEver_sub_2_6
-00 | 00045 .00 addr:68
-44 | 00046 .06 
-94 | 00047 94 tkins_max 0 7                 | insert track ParEver_sub_3_7
-00 | 00048 .00 addr:85
-55 | 00049 .07 
+89 | 00044 89 tkins_max 0 6                 | insert track ParEver_sub_2_6
+00 | 00045 .00 addr:69
+45 | 00046 .06 
+89 | 00047 89 tkins_max 0 7                 | insert track ParEver_sub_3_7
+00 | 00048 .00 addr:87
+57 | 00049 .07 
 01 | 00050 01 end                           | end
-a5 | 00051 a5 clken_c 0 500 14              | clock enable Awake_500_14 500msec
-00 | 00052 00 
-01 | 00053 01 
-f4 | 00054 f4 
-00 | 00055 .00 addr:58
-3a | 00056 .0e 
-01 | 00057 01 end                           | end
-68 | 00058 68 outevt_c 6 2                  | emit LED0 len=1 const=2
-06 | 00059 06 
-02 | 00060 02 
-75 | 00061 75 exec 11                       | goto  11
-00 | 00062 .00 addr:51
-33 | 00063 .0b 
-78 | 00064 78 memclr 0 8                    | clear WClocks gates from 0 to 1
-00 | 00065 00 
-08 | 00066 08 
-01 | 00067 01 end                           | end
-a5 | 00068 a5 clken_c 1 1000 20             | clock enable Awake_1000_20 1000msec
-01 | 00069 01 
+29 | 00051 29 clken_c 0 1000 14             | clock enable Awake_1000_14 1000msec
+03 | 00052 03 
+00 | 00053 00 
+03 | 00054 03 
+e8 | 00055 e8 
+00 | 00056 .00 addr:59
+3b | 00057 .0e 
+01 | 00058 01 end                           | end
+58 | 00059 58 outevt_c 6 2                  | emit LED0 len=1 const=2
+06 | 00060 06 
+02 | 00061 02 
+39 | 00062 39 exec 11                       | goto  11
+00 | 00063 .00 addr:51
+33 | 00064 .0b 
+48 | 00065 48 memclr 0 8                    | clear WClocks gates from 0 to 1
+00 | 00066 00 
+08 | 00067 08 
+01 | 00068 01 end                           | end
+29 | 00069 29 clken_c 1 2000 20             | clock enable Awake_2000_20 2000msec
 03 | 00070 03 
-e8 | 00071 e8 
-00 | 00072 .00 addr:75
-4b | 00073 .14 
-01 | 00074 01 end                           | end
-68 | 00075 68 outevt_c 7 2                  | emit LED1 len=1 const=2
-07 | 00076 07 
-02 | 00077 02 
-75 | 00078 75 exec 17                       | goto  17
-00 | 00079 .00 addr:68
-44 | 00080 .11 
-78 | 00081 78 memclr 8 8                    | clear WClocks gates from 1 to 2
-08 | 00082 08 
-08 | 00083 08 
-01 | 00084 01 end                           | end
-a5 | 00085 a5 clken_c 2 2000 26             | clock enable Awake_2000_26 2000msec
-02 | 00086 02 
-07 | 00087 07 
-d0 | 00088 d0 
-00 | 00089 .00 addr:92
-5c | 00090 .1a 
-01 | 00091 01 end                           | end
-68 | 00092 68 outevt_c 8 2                  | emit LED2 len=1 const=2
-08 | 00093 08 
-02 | 00094 02 
-75 | 00095 75 exec 23                       | goto  23
-00 | 00096 .00 addr:85
-55 | 00097 .17 
-78 | 00098 78 memclr 16 8                   | clear WClocks gates from 2 to 3
-10 | 00099 10 
-08 | 00100 08 
-01 | 00101 01 end                           | end
-78 | 00102 78 memclr 0 24                   | clear WClocks gates from 0 to 3
-00 | 00103 00 
-18 | 00104 18 
-01 | 00105 01 end                           | end
+01 | 00071 01 
+07 | 00072 07 
+d0 | 00073 d0 
+00 | 00074 .00 addr:77
+4d | 00075 .14 
+01 | 00076 01 end                           | end
+58 | 00077 58 outevt_c 7 2                  | emit LED1 len=1 const=2
+07 | 00078 07 
+02 | 00079 02 
+39 | 00080 39 exec 17                       | goto  17
+00 | 00081 .00 addr:69
+45 | 00082 .11 
+48 | 00083 48 memclr 8 8                    | clear WClocks gates from 1 to 2
+08 | 00084 08 
+08 | 00085 08 
+01 | 00086 01 end                           | end
+29 | 00087 29 clken_c 2 4000 26             | clock enable Awake_4000_26 4000msec
+03 | 00088 03 
+02 | 00089 02 
+0f | 00090 0f 
+a0 | 00091 a0 
+00 | 00092 .00 addr:95
+5f | 00093 .1a 
+01 | 00094 01 end                           | end
+58 | 00095 58 outevt_c 8 2                  | emit LED2 len=1 const=2
+08 | 00096 08 
+02 | 00097 02 
+39 | 00098 39 exec 23                       | goto  23
+00 | 00099 .00 addr:87
+57 | 00100 .17 
+48 | 00101 48 memclr 16 8                   | clear WClocks gates from 2 to 3
+10 | 00102 10 
+08 | 00103 08 
+01 | 00104 01 end                           | end
+48 | 00105 48 memclr 0 24                   | clear WClocks gates from 0 to 3
+00 | 00106 00 
+18 | 00107 18 
+01 | 00108 01 end                           | end

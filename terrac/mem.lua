@@ -84,9 +84,9 @@ F = {
     Block_pre = function (me)
 --print(print_r(me,"mem::Block_pre: me"))
         me.off = _MEM.off
---print("mem::Block_pre: MEM.off",_MEM.off, 'ln='.. me.ln)
 
         for _, var in ipairs(me.vars) do
+--print("mem::Block_pre: var",var.id,me.off,_MEM.off)
             local len
             if var.arr then
 				        if _TP.deref(_TP.deref(var.tp)) then 
@@ -174,6 +174,7 @@ F = {
     ParAnd_bef = 'ParEver_bef',
 
     ParAnd_pre = function (me)
+--print("mem::ParAnd_pre:",'ParAnd_flag['..#me..']',me.off,_MEM.off)
         me.off = alloc(#me)        -- TODO: bitmap?
 		-- afb build a var table in _MEM
         _MEM.vars[me.off]= ( _MEM.vars[me.off] or '')..'ParAnd_flag['..#me..'], '
@@ -199,6 +200,7 @@ F = {
         me.accs = { {me.var, (me.var.arr and 'no') or 'rd', me.var.tp, false,
                     'variable/event `'..me.var.id..'´ (line '..me.ln..')'} }
     end,
+
     AwaitInt = function (me)
         local e = unpack(me)
         e.accs[1][2] = 'aw'
@@ -207,6 +209,7 @@ F = {
         end
         me.val = e.val
     end,
+
     EmitInt = function (me)
         local e1, e2 = unpack(me)
         e1.accs[1][2] = 'tr'

@@ -1,7 +1,5 @@
 #include "TerraGrp.defs"
 
-//emit INIT(1);
-
 pktype msgBS from msgBS_t with
 	var ubyte seq;
 	var ubyte count;
@@ -16,9 +14,10 @@ end
 
 var ubyte stat;
 var msgBS dataBS;
+dataBS.seq = 0;
 
 var ubyte grId1 = 1;
-var ubyte grParam1 = 1;//(getNodeId()/10);
+var ubyte grParam1 = (getNodeId()/10);
 var group_t grp1;
 var aggreg_t ag1;
 var aggDone_t agDone1;
@@ -31,7 +30,7 @@ stat = groupInit(grp1   ,   grId1,grParam1,    6,   TRUE,   eACTIVE,      0);
 //stat = groupInit(grp2   ,   grId2,grParam2,    15,   TRUE,   eACTIVE,      0);
 
 //     aggregInit( RegName, grName, sensorId, agOper, agComp, refVal)
-stat = aggregInit(     ag1,   grp1, SID_TEMP,   fMIN,   opGT,  0);
+stat = aggregInit(     ag1,   grp1, SID_TEMP,   fAVG,   opGT,  0);
 
 await (grParam1)s;
 loop do
@@ -42,7 +41,7 @@ loop do
     agDone1 = await AGGREG_DONE();
 
     dataBS.msgId = 5;
-    dataBS.seq = 1;
+    dataBS.seq = dataBS.seq + 1;
     dataBS.count = agDone1.count;
     dataBS.value = agDone1.value;
     emit SEND_BS(dataBS);

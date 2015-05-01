@@ -66,9 +66,9 @@ local _V2NAME = {
     Ext = 'event',
     Var = 'variable/event',
     ID_c  = 'identifier',
-    ID_var  = 'a not reserved identifier beginning with lowercase',
+    ID_var  = 'a not reserved identifier beginning with lower-case',
     ID_int  = 'identifier',
-    ID_ext  = 'identifier all uppercase',
+    ID_ext  = 'identifier all upper-case',
     ID_type = 'type',
     ID_btype = ' a valid basic type',
     ID_tvoid = ' a valid basic type/pointer or a register type',
@@ -83,7 +83,7 @@ local _V2NAME = {
     ID_field_type = 'a valid non pointer basic type or payload[n]',
     _Dcl_struct = 'declaration',
 --    ID_evt  = 'identifier',
-    Op_var = 'variable'
+    Op_var = 'variable',
 
 }
 local EV = function (rule)
@@ -111,23 +111,14 @@ end
 TYPES = -- P'void' +
        P'ubyte' + 'ushort' + 'ulong'
       + 'byte' + 'short' + 'long'
+      + 'float'
 
 PK_TYPES = -- P'void' +
        P'ubyte' + 'ushort' + 'ulong'
       + 'byte' + 'short' + 'long'
+      + 'float'
       + 'payload'
 
---KEYS = P'and'     
---     + 'async'    
---     + 'await'    + 'break'    + 'C'
---     + 'constant' + 'deterministic'         + 'do'       + 'else'
---     + 'else/if'  + 'emit'     + 'end'      + 'event'    --+ 'external'
---     + 'finally'  + 'FOREVER'  + 'if'       + 'input'    + 'loop'
---     + 'nohold'   + 'not'      + 'null'     + 'or'       + 'output'
---     + 'par'      + 'par/and'  + 'par/or'   + 'pause/if' + 'pure'
---     + 'return'   + 'sizeof'   + 'then'     + 'var'      + 'with'
---     + 'function' + 'config'   + 'regtype'  + 'inc'      + 'dec'
---     + TYPES
 KEYS = P'and'     
      + 'async'    
      + 'await'    + 'break'    
@@ -157,7 +148,8 @@ _GG = {
       , Prog = (CK'' * EV'CfgBlk' * EV'Block' * P(-1)) + EM'config block + program'
 
 ------
-    , CfgBlk = KEY'config' * V'ID_version' * EKEY'do' * V'CfgStmts' * EKEY'end'
+    , CfgBlk = KEY'config' * V'CfgParams' * EKEY'do' * V'CfgStmts' * EKEY'end'
+--    , CfgBlk = KEY'config' * V'ID_version' * EKEY'do' * V'CfgStmts' * EKEY'end'
     , CfgStmts = ((V'_CfgStmt' * (EK';'*K';'^0) + EM'`;´') +
                   (V'_CfgStmtB' * (K';'^-1*K';'^0) + EM'`;´' ) )^0 
 
@@ -188,7 +180,9 @@ _GG = {
             + V'_Dcl_int' + V'_Dcl_var'
 --afb            + V'Dcl_det'  
             + V'_Set'     --+ V'CallStmt' -- must be after Set
-            + V'Op_var' + EM'statement (not last statement as `return´ or `break´) ' 
+            + V'Op_var' 
+            + V'Call'
+            + EM'statement (not last statement as `return´ or `break´) ' 
 
     , _StmtB = V'_Do'   
              + V'Async'  
@@ -284,7 +278,9 @@ _GG = {
                     )^0
     , _13     = V'_Prim'
     , _Prim   = V'_Parens' + V'Func'
-              + V'Var'   + V'C'   + V'SIZEOF'
+              + V'Var'   
+--              + V'C'   
+              + V'SIZEOF'
               + V'NULL'    + V'CONST' --+ V'STRING'
               --+ V'EmitExtE'
 
@@ -295,9 +291,12 @@ _GG = {
     , Op_var = (CKEY'inc' + CKEY'dec') * EV'_Exp' 
 
     , SIZEOF = KEY'sizeof' * EK'<' * EV'ID_typenp' * EK'>'
-    , CONST = CK( #m.R'09' * (m.R'09'+m.S'xX'+m.R'AF'+m.R'af')^1 )
---            + CK( "'" * (P(1)-"'")^0 * "'" )
+
+    , CONST = 
+             CK( P('0') * (P('x')+P('X')) * (m.R'09'+m.R'AF'+m.R'af')^1 )
+            + CK( (#m.R'09' * (m.R'09')^1 *  ( P('.') *  (#m.R'09' * (m.R'09')^1)^-1 )^-1   )   * (  (P('e')+P('E'))* (P('+')+P('-'))^-1 * #m.R'09' * (m.R'09')^1)^-1  )
             + CK( "'" * (P(1)-"'") * "'" )
+
 
     , NULL = CK'null'
 
@@ -329,6 +328,8 @@ _GG = {
     , EmitT    = KEY'emit' * (V'WCLOCKK'+V'WCLOCKE')
 
     , EmitInt  = KEY'emit' * EV'Var' * (K'(' * V'Exp'^-1 * EK')')^-1
+    
+    , Call = V'Func'
 
 --    , _Dcl_ext = (CKEY'input'+CKEY'output') * (EV'ID_type' + EV'ID_tvoid') * EV'ID_ext' * PNUM
     , _Dcl_ext =  (CKEY'output' * (CKEY'pure'+CKEY'nohold'+Cc(false)) * (CKEY'void' + EM'always `void´') * EV'ID_ext' * (EV'ID_type'  + EV'ID_tvoid') * PNUM) +
@@ -362,9 +363,13 @@ _GG = {
     , Func     = V'ID_var' * K'(' * V'ExpList' * EK')'
     , Ext      = V'ID_ext'
     , Var      = V'ID_var'
-    , C        = V'ID_c'
+--    , C        = V'ID_c'
 
-    , ID_version  = PNUM*K'.'*PNUM*K'.'*PNUM + EM'config NUM.NUM.NUM do ... end'
+
+    , CfgParams = V'VM_Name' * K(',')* V'ID_version' * K(',') * V'Params'
+    , VM_Name = (K'name' * K(':') * CK((Alphanum)^1)) + EM'"name: xxxx"'
+    , ID_version  = K'code'*K(':')*PNUM*K'.'*PNUM*K'.'*PNUM + EM'config NUM.NUM.NUM SIZE do ... end'
+    , Params = K'{' * (V'ID_c' * K(':') * PNUM) * ((K',') * V'ID_c' *K(':') * PNUM)^1 * (K',')^-1 * K'}' 
 
     , ID_ext  = -KEYS * CK(m.R'AZ'*ALPHANUM^0)
  

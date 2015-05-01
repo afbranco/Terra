@@ -182,7 +182,7 @@ end
 
 function getAuxValues(e1)
     -- Calculate aux memory access
---print("code::getAuxValues:",e1.tag,e1[1].tag,e1[1][1])
+--print("code::getAuxValues: tags",e1.tag,e1[1].tag,e1[1][1])
     local x1
     x1={}
     x1.tag = e1.tag
@@ -203,6 +203,8 @@ function getAuxValues(e1)
           x1.auxtag1 = 'Const'
           x1.auxtag2 = 'Const'
           x1.val = e1.val
+          x1.auxval = (x1.ntp=='float' and _TP.float2hex(tonumber(e1.val)))
+--print("code::getAuxValues:",x1.val,x1.auxval)
           x1.id = e1.val
       elseif e1[1].tag == 'Var' then -- Var/Var*, Reg/Reg*
         if _TP.isBasicType(_TP.deref(e1.tp) or e1.tp) then
@@ -319,7 +321,7 @@ function getAuxValues(e1)
               x1.val = e1[1][2].val+(e1[1][3].val*_ENV.c[x1.ntp].len)
               x1.id = e1[1][2][1]..'*['..e1[1][3].val..']'
             elseif e1[1][3].tag == 'Var' then
---  print("code::getAuxValues: Var*[Var]",e1[1][2].tag,e1[1][2].tp,e1[1][3].tag,e1[1][3].tp,e1[1][3].val,e1.fst.arr)
+ -- print("code::getAuxValues: Var*[Var]",e1[1][2].tag,e1[1][2].tp,e1[1][3].tag,e1[1][3].tp,e1[1][3].val,e1.fst.arr)
               x1.auxtag1 = 'Var*[Var]'
               x1.auxtag2 = 'Var*[Var]'
               x1.val = e1[1][2].val
@@ -333,13 +335,13 @@ function getAuxValues(e1)
             end
           else
             if e1[1][3].tag == 'CONST' then
---  print("code::getAuxValues: Var[idx]",e1[1][2].tag,e1[1][2].tp,e1[1][3].tag)
+ -- print("code::getAuxValues: Var[idx]",e1[1][2].tag,e1[1][2].tp,e1[1][3].tag)
               x1.auxtag1 = 'Var[idx]'
               x1.auxtag2 = 'Var'
               x1.val = e1[1][2].val+(e1[1][3].val*_ENV.c[x1.ntp].len)
               x1.id = e1[1][2][1]..'['..e1[1][3].val..']'
             elseif e1[1][3].tag == 'Var' then
---  print("code::getAuxValues: Var[Var]",e1[1][2].tag,e1[1][2].tp,e1[1][3].tag,e1[1][3].tp,e1[1][3].val,e1.fst.arr)
+ -- print("code::getAuxValues: Var[Var]",e1[1][2].tag,e1[1][2].tp,e1[1][3].tag,e1[1][3].tp,e1[1][3].val,e1.fst.arr)
               x1.auxtag1 = 'Var[Var]'
               x1.auxtag2 = 'Var[Var]'
               x1.val = e1[1][2].val
@@ -392,13 +394,7 @@ end
 function tryDerefCode(me,tag,tp)
     local ntp = (_TP.deref(tp) and 'ushort') or tp
 --print("code::tryDerefCode:",tag,tp, ntp)
-    if (  tag == 'Op2_idx'
-          or tag == 'Op2_.'
---        tag ~= 'CONST'     -- NOT Constants
---        and tag ~= 'Op1_*'     -- NOT Dereferences
---        and tag ~= 'Var'       -- NOT Var contents
---        and not(_TP.deref(tp) and tag ~= 'Var') --  NOT Var pointers, if necessary "Op1_*" will do!
-      )
+    if (  tag == 'Op2_idx' or tag == 'Op2_.')
      then
       codeB = LINE(me,'deref '..tp,nil,'// deref Var ')
       BYTECODE(me,codeB,'op_deref',ntp)
@@ -409,20 +405,41 @@ function Op1_any(me,mnemonic)
     local op, e1 = unpack(me)
 		CONC(me,e1)
 --print("code::Op1_any",e1.tag)
+    mnemonic = (e1.tp=='float' and opcode['op_'..mnemonic..'_f'] and mnemonic..'_f') or mnemonic 
     codeB = LINE(me,mnemonic,nil,'// stack0 = '..mnemonic..'(stack0)')
     BYTECODE(me,codeB,'op1_any',mnemonic)
 end
 
 function Op2_any(me,mnemonic)
     local op, e1, e2 = unpack(me)
---print("code::Op2_any:",op,e1.tag,e1.tp,e2.tag,e2.tp,e1.arr,e2.arr)
+--print("code::Op2_any:",op,e1.tag,e1.tp,e2.tag,e2.tp,e1.arr,e2.arr,_TP.max(e1.tp,e2.tp))
   local err,cast, _, _, len1, len2 = _TP.tpCompat(e1.tp,e2.tp,e1.arr,e2.arr)
   ASR(not err ,me,'type/size incompatibility: "'..e1.tp..'/'..len1 .. '" <--> "'..e2.tp..'/'..len2)
   --WRN(not cast,me,'automatic cast from ['.. e2.tp ..'] to [' .. e1.tp ..'].')
+  local maxTp =  _TP.max(e1.tp,e2.tp)
+  local toTp = _TP.getCastType(maxTp)  
+  local from2Tp = _TP.getCastType(e2.tp)  
+  local from1Tp = _TP.getCastType(e1.tp) 
+
+--print("code::Op2_any:",toTp,opcode['op_'..mnemonic..'_f'],mnemonic..'_f')  
+  mnemonic = (toTp=='float' and opcode['op_'..mnemonic..'_f'] and mnemonic..'_f') or mnemonic 
+  -- exp 2
 	CONC(me,me[3])
   tryDerefCode(me,e2.tag,e2.tp)
+  if (from2Tp~=toTp and (from2Tp=='float' or toTp=='float')) then
+--print("code::Op2_any: cast exp2",e1.tp,e2.tp,from2Tp,toTp)
+    codeB = LINE(me,'cast '..from2Tp..' '..toTp,nil,'// cast <type> ')
+    BYTECODE(me,codeB,'op_cast',from2Tp,toTp)
+  end
+  -- exp 1
 	CONC(me,me[2])
   tryDerefCode(me,e1.tag,e1.tp)
+  if (from1Tp~=toTp and (from1Tp=='float' or toTp=='float')) then
+--print("code::Op2_any: cast exp1",e1.tp,e2.tp,from2Tp,toTp)
+    codeB = LINE(me,'cast '..from1Tp..' '..toTp,nil,'// cast <type> ')
+    BYTECODE(me,codeB,'op_cast',from1Tp,toTp)
+  end
+  -- operation
 	codeB = LINE(me,mnemonic,nil,'// stack0 = stack0 '..mnemonic..' stack1')
   BYTECODE(me,codeB,'op2_any',mnemonic)
 end
@@ -540,40 +557,42 @@ function SetExp(me)
 --R+ pointer   = data
 
 
---    if x1.auxtag2 == 'Var*' and x2.auxtag2 == 'Var*' and x1.arr and x2.arr then
---        codeB = LINE(me,'memcpy '..math.min(_ENV.c[_TP.deref(x2.tp)].len*x1.arr,_ENV.c[_TP.deref(x2.tp)].len*x2.arr)..'B. '..x2.id..' -> '..x1.id,nil,'// memcpy v2[] v1[]')        
---        BYTECODE(me,codeB,'op_memcpy',math.min(_ENV.c[_TP.deref(x1.tp)].len*x1.arr,_ENV.c[_TP.deref(x2.tp)].len*x2.arr),x2.val,x1.val)      
---    elseif x1.auxtag2 == 'Var*' and x2.auxtag2 == 'Var*' and not x1.arr and not x2.arr then
---        codeB = LINE(me,x1.id ..'(pointer) = '.. x2.id..'(pointer)',nil,'// SetExp:: set pointer = pointer')        
---        BYTECODE(me,codeB,'op_set_v',x1.ntp,x1.val,x2.val)
---    elseif x1.auxtag2 == 'Var*' and not x1.arr and (x2.auxtag2 == '&Var' or x2.auxtag2 == '&Var*' or x2.auxtag2 == 'Reg' or (x2.auxtag2 == 'Var*' and x2.arr)) then
---          codeB = LINE(me,x1.id ..' = '.. x2.id,nil,'// SetExp:: set var*=&var' )        
---          BYTECODE(me,codeB,'op_set_c',x1.ntp,x1.val,x2.val)
 
-    if     x1.auxtag2 == 'Var' and x2.auxtag2 == 'Const' then
-        codeB = LINE(me,x1.id ..' = '.. x2.id,nil,'// SetExp:: set var=const' )        
-        BYTECODE(me,codeB,'op_set_c',x1.tp,x1.val,x2.val)
-
-    elseif x1.auxtag2 == 'Var' and x2.auxtag2 == 'Var' then
-        codeB = LINE(me,x1.id ..' = '.. x2.id..'',nil,'// SetExp:: set var = var')        
-        BYTECODE(me,codeB,'op_set_v',x1.ntp,x2.ntp,x1.val,x2.val)
-
-    elseif x1.auxtag2 == 'Var' and x2.auxtag2 == 'AwaitInt' then
+    if     x1.auxtag2 == 'Var' and x2.auxtag2 == 'Const'  then
+      local toTp = _TP.getCastType(x1.tp)  
+      local fromTp = _TP.getCastType(x2.tp)          
+      if (toTp~=fromTp and (toTp=='float' or fromTp=='float')) then
         CONC(me,e2)
-        codeB = LINE(me,x1.id ..' = '.. x2.id..'',nil,'// SetExp:: set var = var')        
-        BYTECODE(me,codeB,'op_set_v',x1.ntp,x2.ntp,x1.val,x2.val)
-
---    elseif x1.auxtag2 == 'Var*' and x2.auxtag2 == 'Exp' then
---        CONC(me,e2)
---        codeB = LINE(me,'pop_ *'..x1.id,nil,'// SetExp:: pop to pointer')
---        BYTECODE(me,codeB,'op_pop','ushort',x1.val) 
-
-    elseif x1.auxtag2 == 'Var' and x2.auxtag2 == 'Exp' then
-        CONC(me,e2)
+        codeB = LINE(me,'cast '..fromTp..' '..toTp,nil,'// cast <type> ')
+        BYTECODE(me,codeB,'op_cast',fromTp,toTp)      
         codeB = LINE(me,'pop '..x1.id,nil,'// SetExp:: pop to var')
         BYTECODE(me,codeB,'op_pop',x1.tp,x1.val)  
+      else  codeB = LINE(me,x1.id ..' = '.. x2.id,nil,'// SetExp:: set var=const' )        
+        codeB = LINE(me,x1.id ..' = '.. x2.id,nil,'// SetExp:: set var=const' )        
+        BYTECODE(me,codeB,'op_set_c',x1.tp,x1.val,x2.auxval or x2.val)
+      end
+  
+    elseif x1.auxtag2 == 'Var' and x2.auxtag2 == 'Var'  and (x1.tp~= 'float' and x2.tp~='float') then
+        codeB = LINE(me,x1.id ..' = '.. x2.id..'',nil,'// SetExp:: set var = var')        
+        BYTECODE(me,codeB,'op_set_v',x1.ntp,x2.ntp,x1.val,x2.val)
+      
+    elseif x1.auxtag2 == 'Var' and x2.auxtag2 == 'AwaitInt'  then
+        CONC(me,e2)
+        codeB = LINE(me,x1.id ..' = '.. x2.id..'',nil,'// SetExp:: set var = var')        
+        BYTECODE(me,codeB,'op_set_v',x1.ntp,x2.ntp,x1.val,x2.val)
 
-    elseif x1.auxtag2 == 'Var[Var]' and x2.auxtag2 == 'Var' then
+    elseif x1.auxtag2 == 'Var' and x2.auxtag2 == 'Exp'  then
+      CONC(me,e2)
+      local toTp = _TP.getCastType(x1.tp)  
+      local fromTp = _TP.getCastType(x2.tp)          
+      if (toTp~=fromTp and (toTp=='float' or fromTp=='float')) then
+        codeB = LINE(me,'cast '..fromTp..' '..toTp,nil,'// cast <type> ')
+        BYTECODE(me,codeB,'op_cast',fromTp,toTp)
+      end      
+        codeB = LINE(me,'pop '..x1.id,nil,'// SetExp:: pop to var')
+        BYTECODE(me,codeB,'op_pop',x1.tp,x1.val)  
+      
+    elseif x1.auxtag2 == 'Var[Var]' and x2.auxtag2 == 'Var' and (x1.tp~= 'float' and x2.tp~='float') then
         codeB = LINE(me,''..x1.id..' = '..x2.id,nil,'// set array[var] with var')        
         BYTECODE(me,codeB,'op_setarr_vv',x1.ntp,x1.val,x1.idxtp,x1.idxval,x1.idxmax,x2.tp,x2.val)
 
@@ -582,39 +601,37 @@ function SetExp(me)
         codeB = LINE(me,''..x1.id..' = '..x2.id,nil,'// set array[var] with var')        
         BYTECODE(me,codeB,'op_setarr_vv',x1.ntp,x1.val,x1.idxtp,x1.idxval,x1.idxmax,x2.tp,x2.val)
 
---    elseif x1.auxtag2 == 'Var*[Var]' and x2.auxtag2 == 'Var*' then
---        codeB = LINE(me,''..x1.id..' = '..x2.id,nil,'// set array*[var] with var')        
---        BYTECODE(me,codeB,'op_setarr_vv',x1.ntp,x1.val,x1.idxtp,x1.idxval,x1.idxmax,x2.ntp,x2.val)
-
-    elseif x1.auxtag2 == 'Var[Var]' and x2.auxtag2 == 'Const' then
+    elseif x1.auxtag2 == 'Var[Var]' and x2.auxtag2 == 'Const' and (x1.tp~= 'float' and x2.tp~='float') then
         codeB = LINE(me,''..x1.id..' = '..x2.id,nil,'// set array[var] with Const')        
         BYTECODE(me,codeB,'op_setarr_vc',x1.ntp,x1.val,x1.idxtp,x1.idxval,x1.idxmax,x2.val)
-
-    elseif x1.auxtag2 == 'Var[Var]' and x2.auxtag2 == 'Exp' then
+    elseif x1.auxtag2 == 'Var[Var]' and x2.auxtag2 == 'Exp' and (x1.tp~= 'float' and x2.tp~='float') then
         CONC(me,e2)
         codeB = LINE(me,'pop to '..x1.id,nil,'// pop to array[var] ')        
         BYTECODE(me,codeB,'op_poparr_v',x1.ntp,x1.idxtp,x1.idxval,x1.idxmax,x1.val)
 
---    elseif x1.auxtag2 == 'Var*[Var]' and x2.auxtag2 == 'Exp' then
---        CONC(me,e2)
---        codeB = LINE(me,'pop to '..x1.id,nil,'// pop to array*[var]')        
---        BYTECODE(me,codeB,'op_poparr_v',x1.ntp,x1.idxtp,x1.idxval,x1.idxmax,x1.val)
-
-    elseif x1.auxtag2 == 'Reg' and x2.auxtag2 == 'Reg' then
+    elseif x1.auxtag2 == 'Reg' and x2.auxtag2 == 'Reg' and (x1.tp~= 'float' and x2.tp~='float') then
         codeB = LINE(me,'memcpy '..math.min(_ENV.c[x1.tp].len,_ENV.c[x2.tp].len)..'B. '..x2.id..' -> '..x1.id,nil,'// memcpy v2 v1')        
         BYTECODE(me,codeB,'op_memcpy',math.min(_ENV.c[x1.tp].len,_ENV.c[x2.tp].len),x2.val,x1.val)
-
---    elseif x1.auxtag2 == 'Reg' and x2.auxtag2 == 'Var*' and x2.arr then
---        codeB = LINE(me,'memcpy '..math.min(_ENV.c[x1.tp].len,_ENV.c[x2.ntp].len*x2.arr)..'B. '..x2.id..' -> '..x1.id,nil,'// memcpy v2[] v1')        
---        BYTECODE(me,codeB,'op_memcpy',math.min(_ENV.c[x1.tp].len,_ENV.c[x2.ntp].len*x2.arr),x2.val,x1.val)
---    elseif x1.auxtag2 == 'Var*' and x2.auxtag2 == 'Reg' and x1.arr then
---        codeB = LINE(me,'memcpy '..math.min(_ENV.c[x1.ntp].len*x1.arr,_ENV.c[x2.tp].len)..'B. '..x2.id..' -> '..x1.id,nil,'// memcpy v2 v1[]')        
---        BYTECODE(me,codeB,'op_memcpy',math.min(_ENV.c[x1.ntp].len*x1.arr,_ENV.c[x2.tp].len),x2.val,x1.val)
-
+        
     else
       -- ??) All other cases
       CONC(me,e2)
-      CONC(me,e1)
+      local toTp = _TP.getCastType(x1.tp)  
+      local fromTp = _TP.getCastType(x2.tp)          
+      if (toTp~=fromTp and (toTp=='float' or fromTp=='float')) then
+--print("code::SetExp: additional cast from "..fromTp..' to '..toTp)
+        codeB = LINE(me,'cast '..fromTp..' '..toTp,nil,'// cast <type> ')
+        BYTECODE(me,codeB,'op_cast',fromTp,toTp)      
+      end
+
+
+      if x1.auxtag2 == 'Var' then
+        codeB = LINE(me,'push_c &'..x1.id..':'..x1.tp,nil,'// push Var ')
+        BYTECODE(me,codeB,'op_push_c',x1.val)
+      else
+        CONC(me,e1)
+      end
+
       codeB = LINE(me,'set ('.. e1.tp ..')*(pop1) = pop2',nil,'// SetExp:: pop stk1 to stk2')         
       BYTECODE(me,codeB,'op_set_e',x1.ntp)  
   end
@@ -716,21 +733,25 @@ F = {
 --        LINE(me, '//> ceu_track_ins(CEU->stack,' ..top.lbl_out.tree..', 1,'
 --                    ..top.lbl_out.id..');')
         codeB = LINE(me, 'insert track '.. top.lbl_out.id .. ' tree '.. top.lbl_out.tree,nil,'// Return to '..top.lbl_out.id)
-		BYTECODE(me,codeB,'op_tkins_z',1,top.lbl_out.tree,top.lbl_out.n)
+		    BYTECODE(me,codeB,'op_tkins_z',1,top.lbl_out.tree,top.lbl_out.n)
         HALT(me)
     end,
 
     Block = function (me)
         for _, var in ipairs(me.vars) do
---print("code::Block:",me[1].tag,var.id)
+--print("code::Block:",me[1].tag,var.id,var.ln)
             if var.isEvt then
 --                LINE(me, '//> *PTR(ubyte*,'..var.awt0..') = '..var.n_awaits..';')  -- #gtes
               codeB = LINE(me, 'event '..var.id..' = '..var.n_awaits..' gates',nil,'// set event ')
       				BYTECODE(me,codeB,'op_set_c','ubyte',var.awt0,var.n_awaits)
 --                LINE(me, '//> memset(CEU->mem+'..var.awt0..'+1, 0, '   -- gtes[i]=0
 --                        ..(var.n_awaits*_ENV.c.tceu_nlbl.len)..');')
-      				codeB = LINE(me, 'clear '.. var.id ..' '..var.n_awaits..' wait(s) ',nil,'// clear event waits') 
-      				BYTECODE(me,codeB,'op_memclr', var.n_awaits*_ENV.c.tceu_nlbl.len, var.awt0+1)
+              WRN(var.n_awaits > 0, var.ln,'event "'..var.id ..'" without any await.')
+              if var.n_awaits > 0 then
+          				codeB = LINE(me, 'clear '.. var.id ..' '..var.n_awaits..' wait(s) ',nil,'// clear event waits') 
+          				BYTECODE(me,codeB,'op_memclr', var.n_awaits*_ENV.c.tceu_nlbl.len, var.awt0+1)
+              else
+          		end
             end
         end
         CONC_ALL(me)
@@ -807,7 +828,7 @@ F = {
         CASE(me, me.lbl_tst)
         for i, sub in ipairs(me) do
 --afb             LINE(me, 'if (! *PTR(ubyte*,'..(me.off+i-1)..'))')
-			codeB = LINE(me,'if (gate '..(i-1)..' == 0) PC=PC+1',nil,'')
+			codeB = LINE(me,me.lbl_ana_out.id .. ' -- if (gate '..(i-1)..' == 0) PC=PC+1',nil,'')
 			BYTECODE(me,codeB,'op_chkret', (me.off+i-1))
             HALT(me)
         end
@@ -936,6 +957,7 @@ F = {
         else
 --            LINE(me, 'ceu_track_ins(CEU->stack,' ..top.lbl_out.tree..', 1,'
 --                        ..top.lbl_out.id..');')
+--print("code::Break:",top.lbl_out.tree,top.lbl_out.n)
           codeB = LINE(me, 'insert track '.. top.lbl_out.id .. ' tree '.. top.lbl_out.tree,nil,'// Break:: ')
           BYTECODE(me,codeB,'op_tkins_z',1,top.lbl_out.tree,top.lbl_out.n)
         end
@@ -947,14 +969,14 @@ F = {
         CONC(me,blk)
     end,
 
-    CallStmt = function (me)
--- afb: Not implemented
+-- afb: Not implemented in Terra
+--    CallStmt = function (me)
 --        local call = unpack(me)
 --        EXP(me, call)
 --        if not _OPTS.analysis_run then
 --            LINE(me, call.val..';')
 --        end
-    end,
+--    end,
 
     EmitExtS = function (me)
         local e1, e2 = unpack(me)
@@ -970,7 +992,8 @@ F = {
 
           if(e2[1].tag=='CONST') then
             codeB = LINE(me,'emit '..e1.ext.id..' len='..par_len..' const='..e2[1].val,nil,'// EmitExtS:: const ')
-            BYTECODE(me,codeB,'op_outevt_c',e1.ext.idx,e2[1].val)
+            local auxval = (e2[1].tp=='float' and _TP.float2hex(tonumber(e2[1].val))) or e2[1].val
+            BYTECODE(me,codeB,'op_outevt_c',e1.ext.idx,auxval)
           elseif (x1.auxtag2=='Var' and _TP.deref(e1.ext.tp)) then
             codeB = LINE(me,'emit '..e1.ext.id..' len='..par_len..' var='..x1.id,nil,'// EmitExtS:: var')
             BYTECODE(me,codeB,'op_outevt_v',e1.ext.idx,x1.val, par_tp)
@@ -1058,7 +1081,8 @@ F = {
       if (exp[1].tag == "CONST") then
         if (typelen[int.tp] >= typelen[exp.tp]) then
           codeB = LINE(me,'emit '..int.var.id..'('..exp.val..')',nil,'// EmitInt:: Const')
-          BYTECODE(me,codeB,'op_set_c',int.tp,int.val,exp.val)
+          local auxval = (exp.tp=='float' and _TP.float2hex(tonumber(exp.val))) or exp.val
+          BYTECODE(me,codeB,'op_set_c',int.tp,int.val,auxval)
         else
           CONC(me,exp)
           codeB = LINE(me,'emit '..int.fst.id..' from stack',nil,'// EmitInt:: pop to ')					
@@ -1117,18 +1141,7 @@ F = {
 
   AwaitInt = function (me)
     local int, zero = unpack(me)
-    --    COMM(me, 'emit '..int.var.id)
-
-    --        -- emit vs await
-    --        if _OPTS.analysis_run then -- int not Exp
-    --            SWITCH(me, me.lbl_ana)
-    --            CASE(me, me.lbl_ana)
-    --        end
-
-    -- defer await: can only react once (0=defer_to_end_of_reaction)
     if not zero then
-      --            LINE(me, '//> ceu_track_ins(0, CEU_TREE_MAX, 0,'
-      --                        ..me.lbl_awt.id..');')
       codeB = LINE(me, 'insert track '.. me.lbl_awt.id,nil,'// AwaitInt:: defer await')
       BYTECODE(me,codeB,'op_tkins_max',0,me.lbl_awt.n)
       HALT(me)
@@ -1209,12 +1222,13 @@ F = {
         HALT(me) 
         CASE(me, me.lbl)
     end,
+--[[
     Op2_call = function (me)
         local _, f, exps = unpack(me)
 --print(print_r(me,"code::Op2_call: me"))
         ASR(false,me,'"call" is not implemented! ')
-
     end,
+--]]    
     ['Op2_-'] = function (me) Op2_any(me,'sub') end,  
     ['Op2_+'] = function (me) Op2_any(me,'add') end,  
     ['Op2_%']   = function (me) Op2_any(me,'mod') end,
@@ -1299,10 +1313,16 @@ F = {
 
   Op1_cast = function (me)
     local tp, exp = unpack(me)
---print("code::Op1_cast:",tp)
     CONC(me,exp)
-    codeB = LINE(me,'cast '..tp,nil,'// cast <type> ')
-    BYTECODE(me,codeB,'op_cast',tp)
+    local fromTp = ((exp.tp=='ubyte' or exp.tp=='ushort' or exp.tp=='ulong') and 'ulong') or ((exp.tp=='byte' or exp.tp=='short' or exp.tp=='long') and 'long') or 'float'  
+    local toTp = ((tp=='ubyte' or tp=='ushort' or tp=='ulong') and 'ulong') or ((tp=='byte' or tp=='short' or tp=='long') and 'long') or 'float'  
+    codeB = LINE(me,'cast '..fromTp..' '..toTp,nil,'// cast <type> ')
+--print("code::Op1_cast:",tp,exp.tp,fromTp,toTp)
+    if (fromTp~=toTp and (fromTp=='float' or toTp=='float')) then
+      BYTECODE(me,codeB,'op_cast',fromTp,toTp)
+    else
+      WRN(false,me, 'Discarding ineffective "cast" from '..fromTp..' to '..toTp..'.')    
+    end
   end,
   ['SIZEOF'] = function (me)
     --      LINE(me,'push '..me.tp..' '.. me[1]..'   // CONST| '..me[1])
@@ -1314,7 +1334,9 @@ F = {
     --    	LINE(me,'push '..me.tp..' '.. me[1]..'   // CONST| '..me[1])
     --    	codeB = LINE(me,'push_c '.._TP.getConstLen(me[1])..' '..me[1],nil,'// push '.. me.tp ..' '.. me[1]..' :: CONST| '..me[1])
     codeB = LINE(me,'push '..me[1],nil,'// push Const ')
-    BYTECODE(me,codeB,'op_push_c',me[1])
+    local auxval = (me.tp=='float' and _TP.float2hex(tonumber(me[1]))) or me[1]
+--print("code::CONST:",me.tp,me[1],auxval)
+    BYTECODE(me,codeB,'op_push_c',auxval)
   end,  
   
   ['Var'] = function (me)
@@ -1344,7 +1366,6 @@ F = {
 --print("code::LExp:",me[1].tag,me[1].tp,(_TP.deref(me[1].tp) and 'ushort') or me[1].tp,me.tp,me[1][2].tag,me.val)
     local tp = (_TP.deref(me[1].tp) and 'ushort') or me[1].tp
     if (me[1].code=="") then me[1].code='TODO' end -- ???? very old!! why??
-
     if me[1].tag=='Var' then
         codeB = LINE(me,'push_c &'..me[1][1]..':'..tp,nil,'// push Var ')
         BYTECODE(me,codeB,'op_push_c',me.val)
@@ -1373,13 +1394,20 @@ F = {
     end
   end,
 
+  -- Terra call --- function without attribution
+  Call = function (me)
+    CONC(me,me[2]);
+    codeB = LINE(me,'popx ',nil,'')
+    BYTECODE(me,codeB,'op_popx')
+  end,
+
   Func = function (me)
 --print("code::Func:",me.ext.id, me.ext.tp,me.ext.idx)
 --print("code::Func: args:",#me[2],#me.ext.args)
     ASR(#me[2]==#me.ext.args,me,'invalid number of arguments for function ['.. me.ext.id ..'], received '.. #me[2] .. ' and it was expecting '..#me.ext.args  )
     for k,arg in ipairs(me.ext.args) do
       local error, cast, ntp1, ntp2, len1, len2 =  _TP.tpCompat(arg,(me[2][k].supertp or me[2][k].tp))
-      ASR(not error ,me,'argument #'..k ..' in function ['.. me.ext.id ..'] must be compatible to "'.. arg.. '/'.. len1 ..'" type, it received "'.. me[2][k].tp..'/'.. len2 .. '" type')
+      ASR(not error ,me,'argument #'..k ..' in function ['.. me.ext.id ..'] must be compatible to "'.. arg.. '/'.. len1 ..'" type, it received "'.. (me[2][k].supertp or me[2][k].tp) ..'/'.. len2 .. '" type')
       WRN(not cast,me, 'Applying the minimum size: "'.. arg..'/'..len1 ..'" <--> "' .. me[2][k].tp ..'/'..len2 ..'". ')
     end
     CONC(me,me[2]);
@@ -1398,7 +1426,7 @@ F = {
     if (arr.tag == 'Var') and (idx.tag=='CONST') then  -- push direct the addr+idx
         ASR((idx.val*1 < arr.arr*1),me,'array index out of range, 0..'.. arr.arr-1 ..'.')
         codeB = LINE(me,'push_c &'..arr[1]..'['..idx.val..']',nil,'')
-        BYTECODE(me,codeB,'op_push_c',arr.val+(idx.val*_ENV.c[idx_tp].len))  
+        BYTECODE(me,codeB,'op_push_c',arr.val+(idx.val*(_ENV.c[_TP.deref(_TP.deref(arr.tp)) or _TP.deref(arr.tp)].len)))  
     elseif (arr.tag == 'Var') and (idx.tag=='Var') then  -- push direct the addr and idx
         codeB = LINE(me,'pusharr_v &'..arr[1]..'['..idx[1]..']',nil,'')
         BYTECODE(me,codeB,'op_pusharr_v',_TP.deref(arr.tp),idx.tp,idx.val,arr.arr*1,arr.val)  
@@ -1413,7 +1441,8 @@ F = {
         ASR((idx.val*1 < arr.arr*1),me,'array index out of range, 0..'.. arr.arr-1 ..'.')
         if (idx.val*1) > 0 then -- push only idx > 0
           codeB = LINE(me,'push_c '..'['..idx.val..'] offset',nil,'')
-          BYTECODE(me,codeB,'op_push_c',(idx.val*_ENV.c[idx_tp].len))  
+--          BYTECODE(me,codeB,'op_push_c',(idx.val*_ENV.c[idx_tp].len))  
+          BYTECODE(me,codeB,'op_push_c',(idx.val*(_ENV.c[_TP.deref(_TP.deref(arr.tp)) or _TP.deref(arr.tp)].len)))  
           codeB = LINE(me,'add: array base addr + len position')
           BYTECODE(me,codeB,'op2_any','add')
         end

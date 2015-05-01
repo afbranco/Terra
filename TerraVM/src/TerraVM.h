@@ -15,9 +15,19 @@
 #include "VMData.h"
 #include "VMError.h"
 
-#define LIMIT_8BIT_OPER 0x1B
-#define LIMIT_6BIT_OPER 0x9F
-#define LIMIT_4BIT_OPER 0xFF
+/*
+ * Instruction Set Range & Mask
+ * {start,end,mask}
+ */
+#define IS_RangeMask_size 	6
+const uint8_t IS_RangeMask[][3]={
+	{0,47,0x00},	// 8 Bits Group
+	{48,63,0x01},	// 7 Bits Group
+	{64,103,0x03},	// 6 Bits Group
+	{104,143,0x07},	// 5 Bits Group
+	{144,191,0x0f},	// 4 Bits Group
+	{192,255,0x3f},	// 2 Bits Group
+};
 
 #define CEU_STACK_MIN 0x01    // min prio for `stack´
 #define CEU_TREE_MAX 0xFF     // max prio for `tree´
@@ -39,6 +49,10 @@
 
 #define _TFstr(n) (n)?"TRUE":"FALSE"
 
+#ifdef TOSSIM
+typedef float nx_float;
+#endif
+
 // short names for types
 typedef int64_t  s64;
 typedef uint64_t u64;
@@ -48,7 +62,7 @@ typedef int16_t  s16;
 typedef uint16_t u16;
 typedef int8_t    s8;
 typedef uint8_t   u8;
-
+typedef float	 f32;
 
 enum {
 	
@@ -77,83 +91,96 @@ enum {
 	U8  = 0,
 	U16 = 1,
 	U32 = 2,
+	F32 = 3,
 	S8  = 4,
 	S16 = 5,
 	S32 = 6,
 
-	// Generic var time
+	// Generic var type
 	x8  = 0,
 	x16 = 1,
 	x32 = 2,
+
+	// Cast modes
+	U32_F = 0,
+	S32_F = 1,
+	F_U32 = 2,
+	F_S32 = 3, 
 	
 	// OpCodes
 	op_nop=0,
 	op_end=1,
+	op_bnot=2,
+	op_lnot=3,
+	op_neg=4,
+	op_sub=5,
+	op_add=6,
+	op_mod=7,
+	op_mult=8,
+	op_div=9,
+	op_bor=10,
+	op_band=11,
+	op_lshft=12,
+	op_rshft=13,
+	op_bxor=14,
+	op_eq=15,
+	op_neq=16,
+	op_gte=17,
+	op_lte=18,
+	op_gt=19,
+	op_lt=20,
+	op_lor=21,
+	op_land=22,
+	op_popx=23,
+
+	op_neg_f=25,
+	op_sub_f=26,
+	op_add_f=27,
+	op_mult_f=28,
+	op_div_f=29,
+	op_eq_f=30,
+	op_neq_f=31,
+	op_gte_f=32,
+	op_lte_f=33,
+	op_gt_f=34,
+	op_lt_f=35,
+	op_func=36,
+	op_outEvt_e=37,
+	op_outevt_z=38,
+	op_clken_e=39,
+	op_clken_v=40,
+	op_clken_c=41,
+	op_set_v=42,
+	op_setarr_vc=43,
+	op_setarr_vv=44,
 	
-	op_bnot=3,
-	op_lnot=4,
-	op_neg=5,
-	op_sub=6,
-	op_add=7,
-	op_mod=8,
-	op_mult=9,
-	op_div=10,
-	op_bor=11,
-	op_band=12,
-	op_lshft=13,
-	op_rshft=14,
-	op_bxor=15,
-	op_eq=16,
-	op_neq=17,
-	op_gte=18,
-	op_lte=19,
-	op_gt=20,
-	op_lt=21,
-	op_lor=22,
-	op_land=23,
-	op_set_c=24,
-	op_func=25,
-	op_outevt_z=26,
-	op_outevt_e=27,
-	op_pop=28,
-	op_popx=32,
-	op_poparr_v=36,
-	op_push_c=40,
-	op_push_v=44,
-	op_pushx_v=48,
-	op_pusharr_v=52,
-	op_deref=56,
+	op_poparr_v=48,
+	op_pusharr_v=50,
+	op_getextdt_e=52,
+	op_trg=54,
+	op_exec=56,
+	op_chkret=58,
+	op_tkins_z=60,
 	
-	op_set_e=64,
-	op_setarr_vc=68,
-	op_setarr_vv=72,
-	op_getextdt_e=76,
-	op_getextdt_v=80,
-	op_cast=84,
-	op_inc=88,
-	op_dec=92,
-	op_memcpy=96,
-	op_memcpyx=100,
-	op_outevt_c=104,
-	op_outevt_v=108,
-	op_outevtx_v=112,
-	op_exec=116,
-	op_memclr=120,
-	op_ifelse=124,
-	op_trg=128,
-	op_tkins_z=132,
-	op_tkclr=136,
-	op_chkret=140,
-	op_asen=144,
-	op_tkins_max=148,
-	
-	
-	op_clken_c=160,
-	op_clken_ve=176,
-	op_set16_c=192,
-	op_set8_v=208,
-	op_set16_v=224,
-	op_set32_v=240,
+	op_push_c=64,
+	op_cast=68,
+	op_memclr=72,
+	op_ifelse=76,
+	op_asen=80,
+	op_tkclr=84,
+	op_outEvt_c=88,
+	op_getextdt_v=92,
+	op_inc=96,
+	op_dec=100,
+	op_set_e=104,
+	op_deref=112,
+	op_memcpy=120,
+
+	op_tkins_max=136,
+	op_push_v=144,
+	op_pop=160,
+	op_outEvt_v=176,
+	op_set_c=192,
 
 };
 

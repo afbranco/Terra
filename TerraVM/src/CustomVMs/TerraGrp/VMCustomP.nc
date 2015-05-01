@@ -96,20 +96,13 @@ void setCurrMaxVote(uint16_t vote,uint16_t mote);
 /*
  * General use functions
  */
-uint32_t getMVal(uint16_t addr,uint8_t len){return signal VM.getMVal(addr,len);}
-void setMVal(uint32_t value, uint16_t Maddr, uint8_t len){signal VM.setMVal(value, Maddr, len);}
+uint32_t getMVal(uint16_t addr,uint8_t tp){return signal VM.getMVal(addr,tp);}
+void setMVal(uint32_t value, uint16_t Maddr, uint8_t fromTp, uint8_t toTp){signal VM.setMVal(value, Maddr, fromTp,toTp);}
 
 
 /*
  * Output Events implementation
  */
-/*
-void  proc_init(uint16_t id, uint32_t value){
-	uint32_t val = signal VM.pop();
-	dbg(APPNAME,"Custom::proc_init(): evt id=%d, val=%d\n",id,(uint16_t)val);
-	setMVal(TOS_NODE_ID,(uint16_t)val,2);
-}
-*/
 void  proc_leds(uint16_t id, uint32_t value){
 	dbg(APPNAME,"Custom::proc_leds(): evt id=%d, val=%d\n",id,(uint8_t)value);
 	call SA.setActuator(AID_LEDS, (uint8_t)(value & 0x07));
@@ -192,7 +185,7 @@ void  proc_req_custom_a(uint16_t id, uint32_t value){
 void  proc_send_bs(uint16_t id, uint32_t addr){
 	usrSendBS_t *usrMsg;
 	uint8_t stat;
-	usrMsg = (usrSendBS_t*)signal VM.getRealAddr((nx_uint16_t)addr,2);
+	usrMsg = (usrSendBS_t*)signal VM.getRealAddr((nx_uint16_t)addr);
 	dbg(APPNAME,"Custom::proc_send_bs(): evt id=%d, addr=%d\n",id,addr);
 	stat = call GrCtl.sendBS(usrMsg->evtId, SEND_DATA_SIZE, (uint8_t*)usrMsg->Data);
 	if (stat != SUCCESS) {		// Queue an error event
@@ -205,7 +198,7 @@ void  proc_send_gr(uint16_t id, uint32_t addr){
 	usrSendGR_t *usrMsg;
 	uint8_t inGrp,electionFlag,grParam, maxHops;
 	uint8_t stat;
-	usrMsg = (usrSendGR_t*)signal VM.getRealAddr((nx_uint16_t)addr,2);
+	usrMsg = (usrSendGR_t*)signal VM.getRealAddr((nx_uint16_t)addr);
 	dbg(APPNAME,"Custom::proc_send_gr(): evt id=%d, addr=%d\n",id,addr);
 	getGrpDefValue(usrMsg->grId, &inGrp, &electionFlag, &grParam, &maxHops);
 	stat = call GrCtl.sendGR(usrMsg->grId, grParam, maxHops, usrMsg->node, usrMsg->evtId, SEND_DATA_SIZE, (uint8_t*)usrMsg->Data);	
@@ -217,7 +210,7 @@ void  proc_send_gr(uint16_t id, uint32_t addr){
 	}
 void  proc_aggreg(uint16_t id, uint32_t addr){
 	aggregCtl_t *agCtl;
-	agCtl = (aggregCtl_t*)signal VM.getRealAddr((nx_uint16_t)addr,2);
+	agCtl = (aggregCtl_t*)signal VM.getRealAddr((nx_uint16_t)addr);
 	dbg(APPNAME,"Custom::proc_aggreg(): evt id=%d addr=%d\n",id,addr);
 	// insert queue
 	AggSeq++;
@@ -258,7 +251,7 @@ void func_groupInit(uint16_t id){
 	param = (uint8_t)signal VM.pop();
 	grId = (uint8_t)signal VM.pop();
 	value = (uint16_t)signal VM.pop();
-	grCtl = (groupCtl_t*)signal VM.getRealAddr(value,2);
+	grCtl = (groupCtl_t*)signal VM.getRealAddr(value);
 	// set struct
 	grCtl->leader = leader;
 	grCtl->elFlag = elFlag;
@@ -296,9 +289,9 @@ void func_aggregInit(uint16_t id){
 	agOper = (uint8_t)signal VM.pop();
 	sensorId = (uint8_t)signal VM.pop();
 	value = (uint16_t)signal VM.pop(); // Grp Addr
-	grCtl = (groupCtl_t*)signal VM.getRealAddr(value,2);
+	grCtl = (groupCtl_t*)signal VM.getRealAddr(value);
 	value = (uint16_t)signal VM.pop(); // Agg addr
-	agCtl = (aggregCtl_t*)signal VM.getRealAddr(value,2);
+	agCtl = (aggregCtl_t*)signal VM.getRealAddr(value);
 	// set struct
 	agCtl->refVal = refVal;
 	agCtl->agComp = agComp;
@@ -410,14 +403,14 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		uint8_t n;
 		groupCtl_t* next = firstGrp;
 		for (n=0; n < countGrp; n++)
-			if (grCtl==next) return TRUE; else next = (void*)signal VM.getRealAddr(next->nextGrp,2);
+			if (grCtl==next) return TRUE; else next = (void*)signal VM.getRealAddr(next->nextGrp);
 		return FALSE;
 	}
 	bool isAggAddrInitated(aggregCtl_t* agCtl){
 		uint8_t n;
 		aggregCtl_t* next = firstAgg;
 		for (n=0; n < countAgg; n++)
-			if (agCtl==next) return TRUE; else next = (void*)signal VM.getRealAddr(next->nextAgg,2);
+			if (agCtl==next) return TRUE; else next = (void*)signal VM.getRealAddr(next->nextAgg);
 		return FALSE;
 	}
 
@@ -428,9 +421,9 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		for (n=0; n < countGrp; n++){
 			dbg(APPNAME,"VM::findGroupAddr(): n=%d of %d, Id=%d\n",n,countGrp,next->grId);
 			if (next->grId == (grpId & 0x1F))
-				return ((void*)next - (void*)signal VM.getRealAddr(0,2)); // Var VM addr = (Var Real Addr) - (MEM Real Addr)
+				return ((void*)next - (void*)signal VM.getRealAddr(0)); // Var VM addr = (Var Real Addr) - (MEM Real Addr)
 			else
-				next = (void*)signal VM.getRealAddr(next->nextGrp,2);
+				next = (void*)signal VM.getRealAddr(next->nextGrp);
 		}
 		return 0;
 	}
@@ -442,9 +435,9 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		for (n=0; n < countAgg; n++){
 			dbg(APPNAME,"VM::findAggregAddr(): n=%d of %d, Id=%d\n",n,countAgg,next->agId);
 			if (next->agId == (aggId & 0x07))
-				return ((void*)next - (void*)signal VM.getRealAddr(0,2)); // Var VM addr = (Var Real Addr) - (MEM Real Addr)
+				return ((void*)next - (void*)signal VM.getRealAddr(0)); // Var VM addr = (Var Real Addr) - (MEM Real Addr)
 			else
-				next = (void*)signal VM.getRealAddr(next->nextAgg,2);
+				next = (void*)signal VM.getRealAddr(next->nextAgg);
 		}
 		return 0;
 	}
@@ -455,10 +448,10 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		dbg(APPNAME,"VM::getGrpDefValue():grpId=%d, grAddr=%d\n",grpId,grAddr);
 		if (grAddr==0) return FALSE;
 		// Get values from MEM
-		*inGrp = 		(bool)getMVal(grAddr+GRD_status_idx,GRD_status_len); 
-		*electionFlag = (uint8_t)getMVal(grAddr+GRD_elFlag_idx,GRD_elFlag_len);
-		*maxHops = 		(uint8_t)getMVal(grAddr+GRD_nHops_idx,GRD_nHops_len);
-		*grParam = 		(uint8_t)getMVal(grAddr+GRD_param_idx,GRD_param_len);
+		*inGrp = 		(bool)getMVal(grAddr+GRD_status_idx,GRD_status_tp); 
+		*electionFlag = (uint8_t)getMVal(grAddr+GRD_elFlag_idx,GRD_elFlag_tp);
+		*maxHops = 		(uint8_t)getMVal(grAddr+GRD_nHops_idx,GRD_nHops_tp);
+		*grParam = 		(uint8_t)getMVal(grAddr+GRD_param_idx,GRD_param_tp);
 		dbg(APPNAME,"VM::getGrpDefValue(): inGrp=%d, electionFlag=%d, grParam%d, maxHops=%d\n",*inGrp, *electionFlag, *grParam, *maxHops);
 		return TRUE;
 	}
@@ -472,17 +465,17 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		dbg(APPNAME,"VM::getGrpElctState():grpId=%d, grAddr=%d\n",grpId,grAddr);
 		if (grAddr==0) return FALSE;
 		// Get values from MEM
-		*electionFlag = (uint8_t)getMVal(grAddr+GRD_elFlag_idx,GRD_elFlag_len);
-		*electionState = (uint8_t)getMVal(grAddr+GRD_elState_idx,GRD_elState_len);
+		*electionFlag = (uint8_t)getMVal(grAddr+GRD_elFlag_idx,GRD_elFlag_tp);
+		*electionState = (uint8_t)getMVal(grAddr+GRD_elState_idx,GRD_elState_tp);
 		dbg(APPNAME,"VM::getGrpElctState(): grId=%d(%d), flag=%d, state=%d\n",grpId,(grpId & 0x01f),*electionFlag,*electionState);
 		return TRUE;
 	}
 	bool setGrpElctState(uint8_t grpId, uint8_t electionState){
 		uint16_t grAddr;
 		grAddr = findGroupAddr(grpId);
-		dbg(APPNAME,"VM::setGrpElctState():grpId=%d, grAddr=%d\n",grpId,grAddr);
+		dbg(APPNAME,"VM::setGrpElctState():grpId=%d, grAddr=%d, state=%d\n",grpId,grAddr,electionState);
 		if (grAddr==0) return FALSE;
-		setMVal(electionState,grAddr+GRD_elState_idx,GRD_elState_len);
+		setMVal(electionState,grAddr+GRD_elState_idx,U32,GRD_elState_tp);
 		return TRUE;
 	}
 	bool setGrpLeader(uint8_t grpId, uint16_t leaderId){
@@ -491,7 +484,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		grAddr = findGroupAddr(grpId);
 		dbg(APPNAME,"VM::setGrpLeader():grpId=%d, grAddr=%d\n",grpId,grAddr);
 		if (grAddr==0) return FALSE;
-		setMVal(leaderId,grAddr+GRD_leader_idx,GRD_leader_len);
+		setMVal(leaderId,grAddr+GRD_leader_idx,U32,GRD_leader_tp);
 			// Queue the message event
 		ExtDataLeader = leaderId;
 		if (leaderId==0){
@@ -695,12 +688,12 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		// get aggreg data
 		*structAddr = agAddr;
 		*type = S32; // Force to use always S32 type var
-		*grpId = 	(uint8_t)getMVal(agAddr+AG_grId_idx		,AG_grId_len);
-		*function = (uint8_t)getMVal(agAddr+AG_agOper_idx	,AG_agOper_len);
-		*sensorId= 	(uint8_t)getMVal(agAddr+AG_sensorId_idx	,AG_sensorId_len);
-		*compOper = (uint8_t)getMVal(agAddr+AG_agComp_idx	,AG_agComp_len);
-		*refValue = (uint32_t)getMVal(agAddr+AG_refValue_idx,AG_refValue_len);
-		setMVal(newSeq,agAddr+AG_seq_idx,AG_seq_len);
+		*grpId = 	(uint8_t)getMVal(agAddr+AG_grId_idx		,AG_grId_tp);
+		*function = (uint8_t)getMVal(agAddr+AG_agOper_idx	,AG_agOper_tp);
+		*sensorId= 	(uint8_t)getMVal(agAddr+AG_sensorId_idx	,AG_sensorId_tp);
+		*compOper = (uint8_t)getMVal(agAddr+AG_agComp_idx	,AG_agComp_tp);
+		*refValue = (uint32_t)getMVal(agAddr+AG_refValue_idx,AG_refValue_tp);
+		setMVal(newSeq,agAddr+AG_seq_idx,U32,AG_seq_tp);
 		return TRUE;
 	}
 	
@@ -728,6 +721,9 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		CurrAggData.countTrue=0;
 		CurrAggData.countFalse=0;
 		CurrAggData.value = 0;
+		
+		// Set AggTotal with big positive number in MIN aggregation
+		AggTotal = (CurrAggData.function==AO_MIN)?0x7fff:0;
 		
 		// Populate reqData struct
 		reqData.reqMote= TOS_NODE_ID;
@@ -769,12 +765,13 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 			dbg(APPNAME,"VM::AggTmr.fired(): EvtId=%d[%d]\n",EvtId,CurrentAggreg);
 			if (signal VM.getHaltedFlag() == TRUE) return;		
 			dbg(APPNAME,"VM::AggTmr.fired() CurrAggStructAddr=%d\n",CurrAggStructAddr);
+			dbg(APPNAME,"VM::AggTmr.fired() count=%d, value=%d\n",CurrAggData.count,CurrAggData.value);
 			// Save data value to a temp global 'ext_data'
 			ExtDataAggDone.agId = EvtId;
 			ExtDataAggDone.count = CurrAggData.count;
 			ExtDataAggDone.countTrue = CurrAggData.countTrue;
 			ExtDataAggDone.countFalse = CurrAggData.countFalse;
-			ExtDataAggDone.value = (int32_t)CurrAggData.value;
+			ExtDataAggDone.value = CurrAggData.value;
  			// Queue the message event
 			signal VM.queueEvt(I_AGGREG_DONE_ID, EvtId, &ExtDataAggDone);
 			signal VM.queueEvt(I_AGGREG_DONE   ,     0, &ExtDataAggDone);
@@ -828,8 +825,8 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		grAddr = findGroupAddr(grId);
 		dbg(APPNAME,"VM::getElectionLeader():grpId=%d, grAddr=%d\n",grId,grAddr);
 		if (grAddr==0) return 0;
-		dbg(APPNAME,"VM::getElectionLeader(): grId=%d, leader%d\n",grId,getMVal(grAddr+GRD_leader_idx,GRD_leader_len));
-		return (uint16_t)getMVal(grAddr+GRD_leader_idx,GRD_leader_len);
+		dbg(APPNAME,"VM::getElectionLeader(): grId=%d, leader%d\n",grId,getMVal(grAddr+GRD_leader_idx,GRD_leader_tp));
+		return (uint16_t)getMVal(grAddr+GRD_leader_idx,GRD_leader_tp);
 	}
 
 	void readElectionVote(uint8_t grId, uint16_t reqMote){
@@ -918,7 +915,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 				removeElectionQ(next->grId);
 				call electionQ.enqueue((uint8_t)(next->grId | (bitValue<<ELCT_INIT_BIT)));
 			}
-			next = (void*)signal VM.getRealAddr(next->nextGrp,2);
+			next = (void*)signal VM.getRealAddr(next->nextGrp);
 		}
 		post procLeaderQ();
 	}
@@ -1172,7 +1169,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 	 * Minimum
 	 */
 	void agMinP1(uint32_t Value){
-		dbg(APPNAME,"VM::agMinP1(): value=%d\n",Value);
+		dbg(APPNAME,"VM::agMinP1(): value=%d AggTotal=%d\n",Value,AggTotal);
 		CurrAggData.count++;
 		if(CurrAggData.vType <= U32){
 			*(uint32_t*)&AggTotal = ((uint32_t)AggTotal > (uint32_t)Value)?Value:AggTotal;

@@ -1,4 +1,5 @@
 m = require 'lpeg'
+
 m.setmaxstack(1000)
 
 function DBG (...)

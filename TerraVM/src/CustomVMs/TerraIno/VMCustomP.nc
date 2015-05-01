@@ -46,7 +46,7 @@ void  proc_init(uint16_t id, uint32_t value){
 void  proc_send_x(uint16_t id,uint16_t addr,uint8_t ack){
 	usrMsg_t* usrMsg;
 	uint8_t reqRetryAck;
-	usrMsg = (usrMsg_t*)signal VM.getRealAddr(addr,2);
+	usrMsg = (usrMsg_t*)signal VM.getRealAddr(addr);
 	dbg(APPNAME,"Custom::proc_sendx(): id=%d, target=%d, addr=%d, realAddr=%x, ack=%d\n",
 		id,usrMsg->target,addr,usrMsg, ack);
 	reqRetryAck = (ack)?(1<<REQ_ACK_BIT):0; // Define only ack without retry.
@@ -95,7 +95,7 @@ void  func_qPut(uint16_t id){
 	uint16_t value = (uint16_t)signal VM.pop();
 	dbg(APPNAME,"Custom::func_qPut(): id=%d, addr=%d\n",id,value);
 	// queue the usrMsg data
-	qData_p = (qData_t*)signal VM.getRealAddr(value,2);
+	qData_p = (qData_t*)signal VM.getRealAddr(value);
 	stat = call usrDataQ.put(qData_p);
 	signal VM.push(stat);
 	}
@@ -105,7 +105,7 @@ void  func_qGet(uint16_t id){
 	uint16_t value = (uint16_t)signal VM.pop();
 	dbg(APPNAME,"Custom::func_qGet(): id=%d, addr=%d\n",id,value);
 	// get the usrMsg data
-	qData_p = (qData_t*)signal VM.getRealAddr(value,2);
+	qData_p = (qData_t*)signal VM.getRealAddr(value);
 	stat = call usrDataQ.get(qData_p);
 	signal VM.push(stat);
 	}
@@ -242,7 +242,7 @@ void  func_logS(uint16_t id){
 	uint8_t len;
 	dbg(APPNAME,"Custom::func_logS(): id=%d\n",id);
 	len = (uint8_t) signal VM.pop();
-	data = signal VM.getRealAddr((uint16_t)signal VM.pop(),2);
+	data = signal VM.getRealAddr((uint16_t)signal VM.pop());
 	stat = SUCCESS;
 	call BSRadio.logS(data,len);
 	signal VM.push(stat);

@@ -149,6 +149,7 @@ do
     dofile 'mem.lua'
     dofile 'tight.lua'
     dofile 'labels.lua'
+--os.exit()
 --    _AST.dump(_AST.root)
 --print(print_r(_AST.root,"terrac: root"))
     dofile 'asm.lua'
@@ -323,6 +324,7 @@ endCode = pos;
 _AST.root.labeltable={}
 for x,op in ipairs(_AST.root.opcode) do
 	if (string.sub(op,1,1) == 'L') then 
+--print("terrac::L",op, tonumber('0x'..string.sub(op,2,5)))
 		_AST.root.labeltable[tonumber('0x'..string.sub(op,2,5))]={addr=_AST.root.op_addr[x]};
 	end	
 end
@@ -340,9 +342,9 @@ for x,op in pairs(_AST.root.opcode) do
         lblH = string.sub(op,2,3)
       else
         lblL = string.sub(op,2,3)
---print("--",lblH,lblL)
         local lbl = tonumber(('0x'..lblH))*256 + tonumber('0x'..lblL)
-        local addr = (_AST.root.labeltable[lbl].addr or 0)
+--print("terrac::--",lbl,lblH,lblL,_AST.root.labeltable[lbl])
+        local addr = ((_AST.root.labeltable[lbl] and _AST.root.labeltable[lbl] .addr) or 0)
 --print(string.format('>>%04d',_AST.root.op_addr[x-1]),lbl,addr,_TP.getConstBytes(addr,2))
         _AST.root.opcode_aux[x-1]=string.format('%02x',addr / 256)
         _AST.root.opcode_aux[x]=string.format('%02x',addr % 256)
@@ -439,25 +441,32 @@ local CtlVars  = codeAddr
 local Stack    = _AST.root.max_stack*4
 local TotalMem = CtlVars + CodeSize + Stack
 local RadioMsgs = ((codeAddr%24) == 0 and math.ceil((CodeSize)/24)) or 1+math.ceil((CodeSize-(24-codeAddr%24))/24)
+local lowMaxMem=999999
 --print((codeAddr%24) == 0 , ((LblTableEnd_addr-codeAddr)/24) , 1,LblTableEnd_addr-codeAddr,(24-codeAddr%24))
 print('---------------------------------------------------------------------')
-print('--   <<<<      Terra Compiler -- VM Version: '.. string.format('%12s',_ENV.vm_version) .. '    >>>>  --')
+print('-- Terra Compiler: '..string.format('%-20s',_ENV.vm_name)..'     VM Code: '.. string.format('%12s',_ENV.vm_version) .. '  --')
 print('---------------------------------------------------------------------')
 print('--   Memory allocation:  '.. ((_OPTS.opt and '(code optimized)    ') or '(code not optimized)') ..'                      --')
 print('--   Total =  Code + Ctl/Vars + Stack           |    Radio Msgs    --')
 print(string.format('--    %4d    %4d     %4d     %4d            |      %4d        --',
                     TotalMem,CodeSize,CtlVars,Stack,RadioMsgs))
 print('---------------------------------------------------------------------')
+print('--   Target platforms x Max program size                           --')
+for k,v in pairs(_ENV.motes_max_size) do
+  print(string.format('--   %16s x %4s %1s                                     --',k,v,(TotalMem>v and '?')or ' '))
+  lowMaxMem = ( v < lowMaxMem  and v) or lowMaxMem 
+end
+print('---------------------------------------------------------------------')
 
-if (lastBytes+_AST.root.max_stack*4 > (60*24)) then
-  WRN(false,_AST.root,'Program may be too long for VM memory. Please check the VM memory capacity!')
+if (TotalMem > lowMaxMem) then
+  WRN(false,_AST.root,'Please check the maximum program size for each mote type!')
 end
 
 if _WRN.n_wrns > 0 then
   if _WRN.n_wrns > 1 then
-    print('** Found '.. _WRN.n_wrns ..' warning messages **')
+    print('** Success with  '.. _WRN.n_wrns ..' warning messages **')
   else
-    print('** Found '.. _WRN.n_wrns ..' warning message **')
+    print('** Success with  '.. _WRN.n_wrns ..' warning message **')
   end
 end
 

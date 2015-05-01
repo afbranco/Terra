@@ -8,6 +8,7 @@
 #define VMCUSTOM_H
 
 #include "../../VMData.h"
+#include "../../TerraVM.h"
 
 enum{
 	
@@ -172,14 +173,14 @@ enum{
 
 	// GroupData structure
 	GRD_SIZE = 8, 
-	GRD_id_idx = 0,		GRD_id_len = 1,
-	GRD_param_idx = 1,	GRD_param_len = 1,
-	GRD_nHops_idx = 2,	GRD_nHops_len = 1,
-	GRD_status_idx = 3,	GRD_status_len = 1,
-	GRD_elFlag_idx = 4,	GRD_elFlag_len = 1,
-	GRD_elState_idx = 5,GRD_elState_len = 1,
-	GRD_leader_idx = 6,	GRD_leader_len = 2,
-	GRD_nextGrp_idx =8,	GRD_nextGrp_len = 2,
+	GRD_id_idx = 0,		GRD_id_len = 1,			GRD_id_tp = U8,
+	GRD_param_idx = 1,	GRD_param_len = 1,		GRD_param_tp = U8,
+	GRD_nHops_idx = 2,	GRD_nHops_len = 1,		GRD_nHops_tp = U8,
+	GRD_status_idx = 3,	GRD_status_len = 1,		GRD_status_tp = U8,
+	GRD_elFlag_idx = 4,	GRD_elFlag_len = 1,		GRD_elFlag_tp = U8,
+	GRD_elState_idx = 5,GRD_elState_len = 1,	GRD_elState_tp = U8,
+	GRD_leader_idx = 6,	GRD_leader_len = 2,		GRD_leader_tp = U16,
+	GRD_nextGrp_idx =8,	GRD_nextGrp_len = 2,	GRD_nextGrp_tp = U16,
 	
 	// group Flag bits/mask
 	GR_ENABLED_BIT = 5, 
@@ -209,21 +210,21 @@ enum{
 
 	// AggData Structure field indexes
 	AG_SIZE = 11,
-	AG_agId_idx = 0,		AG_agId_len = 1,
-	AG_seq_idx = 1,			AG_seq_len = 2,
-	AG_grId_idx = 3,		AG_grId_len = 1,
-	AG_sensorId_idx = 4,	AG_sensorId_len = 1,
-	AG_agOper_idx = 5,		AG_agOper_len = 1,
-	AG_agComp_idx = 6,		AG_agComp_len = 1,
-	AG_refValue_idx = 7,	AG_refValue_len = 4,
-	AG_nextAgg_idx = 11,	AG_nextAgg_len = 2,
+	AG_agId_idx = 0,		AG_agId_len = 1,	AG_agId_tp = U8,
+	AG_seq_idx = 1,			AG_seq_len = 2,		AG_seq_tp = U16,
+	AG_grId_idx = 3,		AG_grId_len = 1,	AG_grId_tp = U8,
+	AG_sensorId_idx = 4,	AG_sensorId_len = 1,AG_sensorId_tp = U8,
+	AG_agOper_idx = 5,		AG_agOper_len = 1,	AG_agOper_tp = U8,
+	AG_agComp_idx = 6,		AG_agComp_len = 1,	AG_agComp_tp = U8,
+	AG_refValue_idx = 7,	AG_refValue_len = 4,AG_refValue_tp = S32,
+	AG_nextAgg_idx = 11,	AG_nextAgg_len = 2,	AG_nextAgg_tp = U16,
 	
 	AGD_SIZE = 11,
-	AGD_agId_idx = 0,		AGD_agId_len=1,
-	AGD_count_idx = 1,		AGD_count_len=2,
-	AGD_countTrue_idx = 3,	AGD_countTrue_len=2,
-	AGD_countFalse_idx= 5,	AGD_countFalse_len=2,
-	AGD_value_idx=7,		AGD_value_len=4,
+	AGD_agId_idx = 0,		AGD_agId_len=1,			AGD_agId_tp = U8,
+	AGD_count_idx = 1,		AGD_count_len=2,		AGD_count_tp = U16,
+	AGD_countTrue_idx = 3,	AGD_countTrue_len=2,	AGD_countTrue_tp = U16,
+	AGD_countFalse_idx= 5,	AGD_countFalse_len=2,	AGD_countFalse_tp = U16,
+	AGD_value_idx=7,		AGD_value_len=4,		AGD_value_tp = S32,
 	
 	// Aggregation timeout
 	AG_DELTA_TIMEOUT = 200,
