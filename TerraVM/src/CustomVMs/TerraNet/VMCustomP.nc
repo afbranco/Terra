@@ -284,6 +284,14 @@ void  func_setupMic(uint16_t id){
 	signal VM.push(stat);
 
 }
+
+void  func_RFPower(uint16_t id){
+	uint8_t powerIdx;
+	powerIdx = (uint8_t)signal VM.pop();
+	call BSRadio.setRFPower(powerIdx);
+	signal VM.push(SUCCESS);
+}
+
 #ifdef M_VOLCANO
 void  func_GModelRead(uint16_t id){
 	error_t stat;
@@ -397,6 +405,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 #endif
 
 			case F_SETUP_MIC: func_setupMic(id); break;
+			case F_RFPOWER: func_RFPower(id); break;
 
 #ifdef M_VOLCANO
 			case F_GMODEL_READ   : func_GModelRead(id); break;

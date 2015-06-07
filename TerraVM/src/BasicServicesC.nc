@@ -75,6 +75,18 @@ implementation{
 	BS.snd_CUSTOM_9 -> RadioAM.AMSend[AM_CUSTOM_9];
 #endif
 
+// Radio RF Power
+#ifdef TOSSIM
+
+#elif defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS)
+	components CC2420ActiveMessageC as RadioAux;
+	BS.RadioAux -> RadioAux;
+#elif defined(PLATFORM_MICA2) || defined(PLATFORM_MICA2DOT)
+
+#elif defined(INO)
+
+#endif
+
 #ifndef MODULE_CTP
 	BS.RadioReceiver -> RadioAM.Receive;
 #else
@@ -118,10 +130,18 @@ implementation{
 	BS.BM -> Bitmap;	
 	
 	// IN & OUT Queues
-	components new dataQueueC(GenericData_t,IN_QSIZE,(char)unique("dataQueueC")) as inQueue;
-	components new dataQueueC(GenericData_t,OUT_QSIZE,(char)unique("dataQueueC")) as outQueue;
+#ifndef NO_BSTATION
+#define  MSG_IN_QSIZE (IN_QSIZE * 2)
+#define  MSG_OUT_QSIZE OUT_QSIZE
+#else
+#define  MSG_IN_QSIZE IN_QSIZE
+#define  MSG_OUT_QSIZE OUT_QSIZE
+#endif
+	components new dataQueueC(GenericData_t,MSG_IN_QSIZE,(char)unique("dataQueueC")) as inQueue;
+	components new dataQueueC(GenericData_t,MSG_OUT_QSIZE,(char)unique("dataQueueC")) as outQueue;
 	BS.inQ -> inQueue;
 	BS.outQ -> outQueue;	
+
 
 	// Timers
 	components new TimerMilliC() as TimerVM;	

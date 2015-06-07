@@ -36,6 +36,8 @@ aggDone_t   ExtDataAggDone; 			// last AggregDone calculation
 nx_uint8_t  ExtDataQReady;			// last queue ready - queue size 
 uint8_t 	ExtDataError;			// last error event
 nx_uint16_t	ExtDataLeader;			// last leader identifier
+nx_uint8_t	ExtDataSendBSStatus;	// last SENDBS_DONE Status
+nx_uint8_t	ExtDataSendGRStatus;	// last SENDGR_DONE Status
 
 // Maintain pointer to first and last Group/Aggreg Control
 groupCtl_t* firstGrp = NULL;
@@ -188,11 +190,10 @@ void  proc_send_bs(uint16_t id, uint32_t addr){
 	usrMsg = (usrSendBS_t*)signal VM.getRealAddr((nx_uint16_t)addr);
 	dbg(APPNAME,"Custom::proc_send_bs(): evt id=%d, addr=%d\n",id,addr);
 	stat = call GrCtl.sendBS(usrMsg->evtId, SEND_DATA_SIZE, (uint8_t*)usrMsg->Data);
-	if (stat != SUCCESS) {		// Queue an error event
-		ExtDataError = stat;
-		signal VM.queueEvt(I_ERROR_ID, stat, &ExtDataError);	
-		signal VM.queueEvt(I_ERROR   ,    0, &ExtDataError);	
-		}	
+	// Queue a SENDBS_DONE event
+	ExtDataSendBSStatus = stat;
+	signal VM.queueEvt(I_SENDBS_DONE_ID, usrMsg->evtId, &ExtDataSendBSStatus);	
+	signal VM.queueEvt(I_SENDBS_DONE   ,    0, &ExtDataSendBSStatus);	
 	}
 void  proc_send_gr(uint16_t id, uint32_t addr){
 	usrSendGR_t *usrMsg;
@@ -202,11 +203,10 @@ void  proc_send_gr(uint16_t id, uint32_t addr){
 	dbg(APPNAME,"Custom::proc_send_gr(): evt id=%d, addr=%d\n",id,addr);
 	getGrpDefValue(usrMsg->grId, &inGrp, &electionFlag, &grParam, &maxHops);
 	stat = call GrCtl.sendGR(usrMsg->grId, grParam, maxHops, usrMsg->node, usrMsg->evtId, SEND_DATA_SIZE, (uint8_t*)usrMsg->Data);	
-	if (stat != SUCCESS) {		// Queue an error event
-		ExtDataError = stat;
-		signal VM.queueEvt(I_ERROR_ID, stat, &ExtDataError);	
-		signal VM.queueEvt(I_ERROR   ,    0, &ExtDataError);	
-		}
+	// Queue a SENDGR_DONE event
+	ExtDataSendGRStatus = stat;
+	signal VM.queueEvt(I_SENDGR_DONE_ID, usrMsg->grId, &ExtDataSendGRStatus);	
+	signal VM.queueEvt(I_SENDGR_DONE   ,    0, &ExtDataSendGRStatus);	
 	}
 void  proc_aggreg(uint16_t id, uint32_t addr){
 	aggregCtl_t *agCtl;
@@ -237,6 +237,13 @@ void  func_random(uint16_t id){
 	dbg(APPNAME,"Custom::func_random(): func id=%d, Random=%d\n",id,stat);
 	signal VM.push(stat);
 	}	
+
+void  func_RFPower(uint16_t id){
+	uint8_t powerIdx;
+	powerIdx = (uint8_t)signal VM.pop();
+	call GrCtl.setRFPower(powerIdx);
+	signal VM.push(SUCCESS);
+}
 
 void func_groupInit(uint16_t id){
 	groupCtl_t *grCtl;
@@ -364,6 +371,8 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 			/* Terra Local functions */
 			case F_GETNODEID: func_getNodeId(id); break;
 			case F_RANDOM 	: func_random(id); break;
+
+			case F_RFPOWER: func_RFPower(id); break;
 			/* TerraGrp custom functions */
 			case F_GROUPINIT : func_groupInit(id); break;		
 			case F_AGGREGINIT: func_aggregInit(id); break;		

@@ -11,6 +11,7 @@ interface BSRadio{
 	event void sendDoneAck(uint8_t am_id,message_t* msg,void* dataMsg,error_t error, bool wasAcked);
 	event void receive(uint8_t am_id, message_t* msg, void* payload, uint8_t len);
 	command uint16_t source(message_t* msg);
+	command void setRFPower(uint8_t powerIdx);
 #ifdef MODULE_CTP
 	command error_t sendBS(void* dataMsg, uint8_t dataSize);
 	event void sendBSDone(message_t* msg,error_t error);
@@ -19,4 +20,5 @@ interface BSRadio{
 	// Log data to USB0
 	command void logS(uint8_t* data, uint8_t len);
 #endif	
+
 }

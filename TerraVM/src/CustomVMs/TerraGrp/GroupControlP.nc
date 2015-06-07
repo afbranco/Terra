@@ -35,11 +35,12 @@ implementation{
    	*/
 	error_t insertNHopsList(nx_uint16_t TargetMote, nx_uint16_t PrevMote,nx_uint16_t ReqNum){
 		nx_uint8_t i;
-		dbg(APPNAME, "CM::insertNHopsList(): Target=%hhu, Prev=%hhu, ReqNum=%hhu\n",TargetMote,PrevMote,ReqNum);
+		dbg(APPNAME, "GrCtl::insertNHopsList(): Target=%hhu, Prev=%hhu, ReqNum=%hhu, nextPos=%hhu\n",TargetMote,PrevMote,ReqNum,NHopsList.nextPos);
+		dbg(APPNAME, "GrCtl::insertNHopsList(): NHopsList addr=%x , size=%d\n",(int)&NHopsList,sizeof(NHopsList_t));
 		i=0;
 		while (i<NHOPS_LIST_SIZE) {
 			if ((NHopsList.TargetMote[i] == TargetMote) && ( NHopsList.RequestNumber[i] == ReqNum )){
-				dbg(APPNAME, "CM::insertNHopsList(): Duplicated entry\n");
+				dbg(APPNAME, "GrCtl::insertNHopsList(): Duplicated entry\n");
 				return FAIL;
 			}
 			i++;
@@ -59,12 +60,12 @@ implementation{
 		while (i<NHOPS_LIST_SIZE) {
 			if (NHopsList.TargetMote[i] == TargetMote) {
 				*NextMote = NHopsList.PrevMote[i];				
-				dbg(APPNAME, "CM::getNHopsList(): Target=%hhu. Next=%hhu.\n",TargetMote,*NextMote);
+				dbg(APPNAME, "GrCtl::getNHopsList(): Target=%hhu. Next=%hhu.\n",TargetMote,*NextMote);
 				return SUCCESS;
 				}
 			i++;
 			}
-		dbg(APPNAME, "CM::getNHopsList(): Target=%hhu. Next not found!\n",TargetMote);
+		dbg(APPNAME, "GrCtl::getNHopsList(): Target=%hhu. Next not found!\n",TargetMote);
 		return FAIL;
 	}
 	/**
@@ -78,7 +79,7 @@ implementation{
 			NHopsList.PrevMote[i]=0;
 			i++;
 			}
-		dbg(APPNAME, "CM::clearNHopsList(): \n");
+		dbg(APPNAME, "GrCtl::clearNHopsList(): \n");
 	}
 	
 	/**
@@ -154,6 +155,15 @@ implementation{
 		return call BSRadio.send(AM_SENDGR, sendToMote, &xData, sizeof(sendGR_t), reqRetryAck);
 
  	}
+
+	/**
+	 * Set RF Power for group radio messages
+	 * 
+	 * @param powerIdx index of Power Table
+	 */
+	command void GrCtl.setRFPower(uint8_t powerIdx){
+		call BSRadio.setRFPower(powerIdx);
+	}
 
 	/**
 	 * Process an aggregation value for a specific group
@@ -290,11 +300,11 @@ implementation{
 					leaderData_t *elctData = (leaderData_t*)Data->Data;
 					signal GrCtl.electionMsg((uint8_t) Data->evtId, elctData);							
 				} else {
+					// Discard others message
+					if (Data->TargetMote !=AM_BROADCAST_ADDR && Data->TargetMote != MoteID) { dbg(APPNAME, "GrCtl::BSRadio.receive(): Discarding others message!\n"); return;}
 					// Copy data from nx_uint8_t to uint8_t
-				// Discard others message
-				if (Data->TargetMote !=AM_BROADCAST_ADDR && Data->TargetMote != MoteID) { dbg(APPNAME, "GrCtl::BSRadio.receive(): Discarding others message!\n"); return;}
 					for (i=0; i < SEND_DATA_SIZE; i++) lData[i] = (uint8_t)Data->Data[i];
-					signal GrCtl.evtReady((uint8_t) Data->evtId, lData, (uint8_t)Data->grId,(uint16_t)Data->ReqMote);						
+					signal GrCtl.evtReady((uint8_t) Data->evtId, lData, (uint8_t)Data->grId,(uint16_t)Data->ReqMote);					
 				}
 			}
 		} else {

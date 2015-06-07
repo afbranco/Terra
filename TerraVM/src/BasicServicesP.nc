@@ -82,6 +82,18 @@ module BasicServicesP{
 #endif // INO x TinyOS
 
 
+// Radio RF Power
+#ifdef TOSSIM
+
+#elif defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS)
+	uses interface CC2420Packet as RadioAux;
+
+#elif defined(PLATFORM_MICA2) || defined(PLATFORM_MICA2DOT)
+
+#elif defined(INO)
+
+#endif
+
 	// Base Station
 #ifndef NO_BSTATION
 	uses interface SplitControl as SerialControl;
@@ -155,6 +167,8 @@ implementation{
 	
 	uint8_t sendCounter;				// Count the send retries
 	reqProgBlock_t serialReqProgBlock;	// Serial Req Message buffer
+	
+	uint8_t userRFPowerIdx;				// Radio RF power defined by the user - default is CC2420_DEF_RFPOWER
 
 	// Request prog/data state
 	uint8_t ReqState = ST_IDLE;
@@ -255,14 +269,19 @@ implementation{
 	*/ 
 	
 	event void TOSBoot.booted(){
-		uint32_t rnd=0;
+		uint32_t rnd=0;	
 		dbg(APPNAME, "BS::TOSBoot.booted().\n");
+#if defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS)
+		userRFPowerIdx = CC2420_DEF_RFPOWER;
+#else
+		userRFPowerIdx=0;
+#endif
 
 // log afb
 #ifdef INO
 call Uart0Ctl.start();
 #endif
-logS("A",1);
+//logS("A",1);
 		MoteID = TOS_NODE_ID;
 		rnd = call Random.rand32() & 0x0f;
 		reSendDelay = RESEND_DELAY + (rnd * 5);
@@ -285,7 +304,7 @@ logS("A",1);
 	 * Radio started event.
 	 */
 	event void RadioControl.startDone(error_t error) {
-logS("B",1);
+//logS("B",1);
 		dbg(APPNAME, "BS::RadioControl.startDone().\n");
 #ifdef MODULE_CTP
 		call RoutingControl.start(); 		// CTP
@@ -322,8 +341,16 @@ logS("B",1);
 		dbg(APPNAME, "BS::RadioControl.stopDone().\n");
 	}
 
-
-
+	command void BSRadio.setRFPower(uint8_t powerIdx){
+		dbg(APPNAME, "BS::BSRadio.setRFPower(%d).\n",powerIdx);
+#if defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS)
+		if (powerIdx < RFPower_IDs) {
+			userRFPowerIdx = powerIdx;
+		}
+#endif		
+	}
+	
+	
 /*******************************
  * VM Main Timer operation
  *****************************/
@@ -570,17 +597,18 @@ logS("B",1);
 #else
 	message_t * RadioReceiver_receive(am_id_t id,message_t *msg, void *payload, uint8_t len){
 #endif
-logS("r",1);
-		dbg(APPNAME, "BS::RadioReceiver.receive(). AM=%hhu from %hhu\n",id,call RadioAMPacket.source(msg));
+//logS("r",1);
+		dbg(APPNAME, "BS::RadioReceiver.receive(). AM=%hhu from %hhu.\n",id,call RadioAMPacket.source(msg));
 		if (MoteID == BStation) {
 			// Copy data to temporarily buffer
 			memcpy(tempInputInQ.Data,payload,len);
-			tempInputInQ.AM_ID = id;
+			tempInputInQ.AM_ID = (uint8_t)id;
 			tempInputInQ.DataSize = len;
 			tempInputInQ.sendToMote = call RadioAMPacket.source(msg) | 0x8000; // (mote | 0x8000) means send to serial
 			// put message in the inQueue
 			if (call inQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::RadioReceiver.receive(): inQueue is full! Losting a message.\n");
 		} else {
+
 			// Switch AM_ID
 			switch (id){
 				case AM_NEWPROGVERSION : 
@@ -600,7 +628,9 @@ logS("r",1);
 					break;	
 				default:
 					if (id >= AM_CUSTOM_START && id <= AM_CUSTOM_END) { // AM_CUSTOM Range
-						if (loadingProgramFlag == FALSE) recCustomMsgNet_receive(msg,payload,len);
+						if (loadingProgramFlag == FALSE){
+							recCustomMsgNet_receive(msg,payload,len);
+							}
 					} else {
 						dbg(APPNAME, "BS::RadioReceiver.receive(). Received a undefined AM=%hhu from %hhu\n",id,call RadioAMPacket.source(msg));	 		
 					}
@@ -645,7 +675,7 @@ logS("r",1);
  		signal BSUpload.stop();
  		signal BSUpload.resetMemory();
  		TViewer("vmstop",0,0);
-logS("I",1);
+//logS("I",1);
  		// Get new version ID - If it is the BStation, use last loaded version + 1.
  		if (MoteID != BStation){
  			ProgVersion = Data->versionId;
@@ -696,17 +726,17 @@ logS("I",1);
 		 // Update memory and BitMap
 		 signal BSUpload.loadSection(Addr , (uint8_t)BLOCK_SIZE, &lData[0]);
 		 call BM.set((uint16_t)Data->blockId);
-logData[0]='M';
-logData[1]='0'+(Data->blockId%100)/10;
-logData[2]='0'+(Data->blockId%10)/1;
-logS(logData,3);
+//logData[0]='M';
+//logData[1]='0'+(Data->blockId%100)/10;
+//logData[2]='0'+(Data->blockId%10)/1;
+//logS(logData,3);
 		 // Reset timeOut counter
 		 ProgTimeOutCounter = 0;
 //		printf("pend%d.",call BM.countPend());printfflush();
 		 // Check if it was the last block
 		 if ( call BM.isAllBitSet()) {
-logData[0]='F';
-logS(logData,1);
+//logData[0]='F';
+//logS(logData,1);
 //		 	call Leds.set(0);
 		 	loadingProgramFlag = FALSE;
 		 	if (MoteID != BStation){
@@ -795,9 +825,9 @@ logS(logData,1);
 		 uint16_t nextBlock=CURRENT_MAX_BLOCKS;
 		 reqProgBlock_t Data;
 		 uint32_t timeout=getRequestTimeout();
-logData[0]='T';
-logData[1]='0'+ReqState;
-logS(logData,2);
+//logData[0]='T';
+//logData[1]='0'+ReqState;
+//logS(logData,2);
 		 nextBlock = getNextEmptyBlock();
 		 dbg(APPNAME, "BS::ProgReqTimer.fired(). nextBlock=%d\n",nextBlock);
 		 lastRecNewProgVersion = 0;
@@ -1089,7 +1119,7 @@ logS(logData,2);
 
 		error_t RadioSender_send(uint8_t am_id, uint16_t target, message_t* msg, uint8_t len){
 #ifndef MODULE_CTP
-logS("s",1);
+//logS("s",1);
 			return call RadioSender.send[tempOutputOutQ.AM_ID](tempOutputOutQ.sendToMote, &sendBuff, tempOutputOutQ.DataSize);
 #else
 			switch (am_id){
@@ -1125,6 +1155,15 @@ logS("s",1);
 		} else {
 			if (call RadioAck.noAck(&sendBuff) != SUCCESS) dbg(APPNAME, "BS::sendRadioN()(): requestNoAck() error!\n");			
 		}
+#ifdef TOSSIM
+
+#elif defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS)
+		if (tempOutputOutQ.RFPower > 0) call RadioAux.setPower(&sendBuff,tempOutputOutQ.RFPower);
+#elif defined(PLATFORM_MICA2) || defined(PLATFORM_MICA2DOT)
+
+#elif defined(INO)
+
+#endif
 		err = RadioSender_send(tempOutputOutQ.AM_ID,tempOutputOutQ.sendToMote, &sendBuff, tempOutputOutQ.DataSize);
 		if (err != SUCCESS) {
 			dbg(APPNAME,"BS::sendRadioN(): Error %hhu in sending Message AM=%hhu to node=%d via radio\n",err,tempOutputOutQ.AM_ID, tempOutputOutQ.sendToMote);
@@ -1456,6 +1495,11 @@ logS("s",1);
 		tempInputOutQ.DataSize = dataSize;
 		tempInputOutQ.sendToMote = target;
 		tempInputOutQ.reqAck = reqAck;
+#if defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS)
+		tempInputOutQ.RFPower = RFPowerTab[userRFPowerIdx];
+#else
+		tempInputOutQ.RFPower = 0;
+#endif
 		dbg("VMDBG","Radio: Sending user msg AM_ID=%d to node %d\n",am_id, target);		
 		if (call outQ.put(&tempInputOutQ)!= SUCCESS) {
 			dbg(APPNAME, "BS::BSRadio.send(): outQueue is full! Losting a message.\n");
@@ -1552,7 +1596,8 @@ logS("s",1);
 		dbg(APPNAME, "BS::SerialSender.sendDone[%hhu]():\n",am_id);		
 		call outQ.get(&tempOutputOutQ);
 		sendCounter=0;
-		call sendTimer.startOneShot(reSendDelay);
+//		call sendTimer.startOneShot(reSendDelay);
+		call sendTimer.startOneShot(1); // Doesn't wait too long to send next serial message'
 	}
 
 /*	

@@ -39,6 +39,13 @@ interface GroupControl{
  	command uint8_t sendGR(uint8_t grId, uint8_t grParam, uint8_t maxHops, uint16_t targetNode, uint8_t evtId, uint8_t dataSize, uint8_t* data);
 
 	/**
+	 * Set RF Power for group radio messages
+	 * 
+	 * @param powerIdx index of Power Table
+	 */
+	command void setRFPower(uint8_t powerIdx);
+
+	/**
 	 * Process an aggregation value for a specific group
   	 * 
 	 * @param grId Group type identifier

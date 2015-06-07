@@ -212,22 +212,22 @@ endif
 # define VM memory use
 #
 ifeq ($(VM),NET)
-  MB_SHORT_ALL = 88
-  MB_SHORT_NOBS = 96
-  MB_LONG_ALL = 68
-  MB_LONG_NOBS = 75
+  MB_SHORT_ALL = 84
+  MB_SHORT_NOBS = 92
+  MB_LONG_ALL = 64
+  MB_LONG_NOBS = 71
   MB_TELOSB    = 250
 else ifeq ($(VM),GRP)
-  MB_SHORT_ALL =28
-  MB_SHORT_NOBS = 36
-  MB_LONG_ALL = 14
-  MB_LONG_NOBS = 14
+  MB_SHORT_ALL =24
+  MB_SHORT_NOBS = 32
+  MB_LONG_ALL = 10
+  MB_LONG_NOBS = 10
   MB_TELOSB    = 200
 else ifeq ($(VM),INO)
-  MB_SHORT_ALL =28
-  MB_SHORT_NOBS = 36
-  MB_LONG_ALL = 14
-  MB_LONG_NOBS = 14
+  MB_SHORT_ALL =24
+  MB_SHORT_NOBS = 32
+  MB_LONG_ALL = 10
+  MB_LONG_NOBS = 10
   MB_TELOSB    = 200
 endif
 
@@ -329,7 +329,7 @@ MBLOCKS_F = $(shell echo ${MBLOCKS}-${DM_MSGQ}-${DM_SETDATA}-${DM_FFT}-${DM_VOLC
 # force short memory - test with printf
 # MBLOCKS=40
 CFLAGS += -DVM_MEM_BLKS=$(MBLOCKS_F) -DTOSVER=$(TOSVERSION)
-$(info shell echo ${MBLOCKS}-${DM_MSGQ}-${DM_SETDATA}-${DM_FFT}-${DM_VOLCANO})
+#$(info shell echo ${MBLOCKS}-${DM_MSGQ}-${DM_SETDATA}-${DM_FFT}-${DM_VOLCANO})
 
 
 $(info ***********************)

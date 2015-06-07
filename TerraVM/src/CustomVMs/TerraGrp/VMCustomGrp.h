@@ -36,7 +36,7 @@ enum{
 	O_LED2			=8,
 	O_TEMP			=9,
 	O_PHOTO			=10,
-	O_VOLTS			=22,
+	O_VOLTS			=11,
 	O_PORT_A		=12,
 	O_PORT_B		=13,
 	O_CFG_PORT_A	=14,
@@ -46,6 +46,8 @@ enum{
 	O_CFG_INT_A		=18,
 	O_CFG_INT_B		=19,
 	O_CUSTOM_A		=20,	
+	O_REQ_MIC		=21,	
+	O_BEEP			=22,
 	// TerraGrp custom output events IDs
 	O_SEND_BS		=40,
 	O_SEND_GR		=41,
@@ -63,6 +65,7 @@ enum{
 	I_INT_B			=11,
 	I_CUSTOM_A_ID	=12,
 	I_CUSTOM_A		=13,
+	I_MIC			=14,
 	// TerraGrp custom input events IDs
 	I_REC_GR_ID		=40,
 	I_REC_GR		=41,
@@ -74,6 +77,8 @@ enum{
 	I_LEADER_NEW	=47,
 	I_LEADER_LOST_ID=48,
 	I_LEADER_LOST	=49,
+	I_SENDGR_DONE_ID=50,
+	I_SENDGR_DONE	=51,
 	
 	// TerraNet basic functions
 	F_GETNODEID 	= 0,
@@ -81,6 +86,8 @@ enum{
 	// TerraGrp Custom functions
 	F_GROUPINIT 	= 10,
 	F_AGGREGINIT 	= 11,
+	F_SETUP_MIC		= 16,
+	F_RFPOWER		= 17,
 	
 	
 	// Event Type ID - 3 msb bits of EvtId
@@ -94,7 +101,7 @@ enum{
 	TID_AGGREG = 7 << 5,
 		
 	// Sensor IDs (max 31)
-	SENSOR_COUNT = 8,
+	SENSOR_COUNT = 10,
 	SID_TEMP = 1,
 	SID_PHOTO = 2,
 	SID_LEDS = 3,
@@ -103,6 +110,7 @@ enum{
 	SID_IN2 = 6,
 	SID_INT1 = 7,
 	SID_INT2 = 8,
+	SID_MIC = 9,
 
 
 	// Comparison operators type (Group definition and Trigger Value)
@@ -349,7 +357,7 @@ typedef nx_struct usrSendBS{
 // Control list to avoid duplicated events
 typedef nx_struct receivedList {
 	nx_uint8_t nextPos;
-	nx_uint16_t TargetMote[NHOPS_LIST_SIZE];	// Request Mote Id
+	nx_uint16_t TargetMote[NHOPS_LIST_SIZE];	// Target Mote Id
 	nx_uint16_t PrevMote[NHOPS_LIST_SIZE];	// Request Mote Id
 	nx_uint16_t RequestNumber[NHOPS_LIST_SIZE];	// Request sequential Id	
 } NHopsList_t;

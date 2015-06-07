@@ -77,6 +77,7 @@ enum{
 	F_FFT_ALLOC 	= 14,
 	F_FFT 			= 15,
 	F_SETUP_MIC		= 16,
+	F_RFPOWER		= 17,
 	// Volcano custom functions
 	F_GMODEL_READ	= 20,
 	F_GET_RTIME		= 21,

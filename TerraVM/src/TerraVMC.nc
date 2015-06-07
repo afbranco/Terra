@@ -452,7 +452,7 @@ void ceu_track_ins (u8 stack, u8 tree, int chk, tceu_nlbl lbl)
 
 int ceu_track_rem (tceu_trk* trk, u8 N)
 {
-//	dbg(APPNAME,"CEU::ceu_track_rem: track_n=%d\n",CEU->tracks_n);
+	dbg(APPNAME,"CEU::ceu_track_rem: track_n=%d\n",CEU->tracks_n);
     if (CEU->tracks_n == 0)
         return 0;
 
@@ -513,6 +513,7 @@ void ceu_trigger (tceu_noff off, uint8_t auxId)
         	ceu_spawn((tceu_nlbl*)(CEU->p_mem+off+1+(i*slotSize)));
 		} else { // must test auxId
 			slotAuxId = *(char*)(CEU->p_mem+off+1+(i*slotSize));
+			dbg(APPNAME,"CEU::ceu_trigger(): testauxId -> slotAuxId=%d, auxId=%d\n",slotAuxId,auxId);
 			if (slotAuxId==auxId) {
 	        	ceu_spawn((tceu_nlbl*)(CEU->p_mem+off+2+(i*slotSize)));
 			}
@@ -579,6 +580,7 @@ int ceu_go_init (int* ret)
 int ceu_go_event (int* ret, int id, uint8_t auxId, void* data)
 {
    dbg(APPNAME,"CEU::ceu_go_event(): halted=%s - evt slotAddr=%d, auxId=%d\n",(haltedFlag)?"TRUE":"FALSE",id,auxId);
+
    if (haltedFlag) return(0);
 
     CEU->ext_data = data;
@@ -705,7 +707,6 @@ void execTrail(uint16_t lbl){
 	while (Opcode != op_end){
 	    if (haltedFlag) return;
 		Decoder(Opcode,Param1);
-dbg(APPNAME,"CEU::execTrail(): m[94/95/96/97]=%02x,%02x,%02x,%02x\n",*(uint8_t*)(MEM+94),*(uint8_t*)(MEM+95),*(uint8_t*)(MEM+96),*(uint8_t*)(MEM+97));
 		getOpCode(&Opcode,&Param1);
 	}
 	dbg(APPNAME,"CEU::execTrail(%d):: found an 'end' opcode\n",lbl);
@@ -736,6 +737,7 @@ int ceu_go (int* ret)
     }
 	procFlag = FALSE;
 	post procEvent();
+
     return 0;
 }
 
@@ -1124,7 +1126,7 @@ void f_clken_c(uint8_t Modifier){
 
 
 void f_set_v(uint8_t Modifier){
-	uint8_t v1_len,p1_1len,p2_1len,v2_len;
+	uint8_t p1_1len,p2_1len;
 	uint8_t tp1,tp2;
 	uint16_t Maddr1,Maddr2;
 	Modifier = getPar8(1);
@@ -1135,7 +1137,7 @@ void f_set_v(uint8_t Modifier){
 	Maddr1 = getPar16(p1_1len);
 	Maddr2 = getPar16(p2_1len);
 	
-	dbg(APPNAME,"VM::f_set_v(%02x): tp1=%d, tp2=%d, p1_1len=%d, p2_1len=%d, Maddr1=%d, Maddr2=%d\n",Modifier,v1_len,v2_len,p1_1len,p2_1len,Maddr1,Maddr2);
+	dbg(APPNAME,"VM::f_set_v(%02x): tp1=%d, tp2=%d, p1_1len=%d, p2_1len=%d, Maddr1=%d, Maddr2=%d\n",Modifier,tp1,tp2,p1_1len,p2_1len,Maddr1,Maddr2);
 
 	if (tp2 == F32){ 		// Source is a float
 		float buffer = getMValf(Maddr2);
@@ -1543,7 +1545,7 @@ void f_pop(uint8_t Modifier){
 }
 
 void f_popx(uint8_t Modifier){ 
-	int32_t Value=pop();
+	pop();
 	dbg(APPNAME,"VM::f_popx(%02x):\n",Modifier);
 }
 
@@ -1560,7 +1562,7 @@ void f_outevt_v(uint8_t Modifier){
 }
 
 void f_set_c(uint8_t Modifier){
-	uint8_t v1_len,p1_1len,p2_len, param, tp1;
+	uint8_t v1_len,p1_1len,p2_len, tp1;
 	uint16_t Maddr;
 	uint32_t Const;
 	tp1 = getBits(Modifier,0,2);
@@ -1679,6 +1681,7 @@ void f_set_c(uint8_t Modifier){
 #ifndef ONLY_BSTATION
 		evtData_t evtData;
 		dbg(APPNAME,"VM::VMCustom.queueEvt(): queueing evtId=%d, auxId=%d. procFlag=%s\n",evtId,auxId,(procFlag)?"TRUE":"FALSE");
+
 {
 //char data[20];
 //sprintf(data,"q%02d %02d %02d\n",evtId,auxId,call evtQ.size());	
@@ -1708,11 +1711,11 @@ void f_set_c(uint8_t Modifier){
 //logS(data,4);
 }
 		if (haltedFlag == TRUE) {
-			logS("-",1);
+			//logS("-",1);
 			call evtQ.dequeue(); 
 			return;
 		} else {
-			logS(">",1);			
+			//logS(">",1);			
 		}
 		// Verify if the queue has some event and if the processing is stopped
 		if ((call evtQ.size() > 0) && (procFlag==FALSE)){
@@ -1752,14 +1755,13 @@ void f_set_c(uint8_t Modifier){
 
 	event void* VMCustom.getRealAddr(uint16_t Maddr){
 #ifndef ONLY_BSTATION
-//		dbg(APPNAME,"VM::VMCustom.getRealAddr(): Maddr=%d, v1_len=%d,MVal = %x, RealMEM=%x\n",Maddr,v1_len,getMVal(Maddr,v1_len),(MEM + getMVal(Maddr,v1_len)));
-//		return (MEM + getMVal(Maddr,v1_len));
 		dbg(APPNAME,"VM::VMCustom.getRealAddr(): Maddr=%d,RealMEM=%x\n",Maddr,(MEM + Maddr));
 		return (MEM + Maddr);
 #else
 		return 0;
 #endif
 		}
+
 
 	event uint32_t VMCustom.pop(){
 #ifndef ONLY_BSTATION

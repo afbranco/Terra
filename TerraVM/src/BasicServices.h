@@ -60,6 +60,7 @@ enum{
 	OUT_QSIZE = 20,//10, //6
 #endif
 
+
 	// SetData last commands list size
 	SET_DATA_LIST_SIZE = 5,
 
@@ -149,6 +150,7 @@ typedef nx_struct GenericData {
 	nx_uint8_t DataSize;
 	nx_uint16_t sendToMote;
 	nx_uint8_t reqAck;
+	nx_uint8_t RFPower;
 	nx_uint8_t Data[MSG_BUFF_SIZE];
 } GenericData_t;
 
@@ -156,4 +158,9 @@ typedef nx_struct ctpMsg {
 	nx_uint8_t  data[MSG_BUFF_SIZE];
 } ctpMsg_t;
 
+#if defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS)
+#define RFPower_IDs 8
+uint8_t RFPowerTab[RFPower_IDs]={03, 07, 11, 15, 19, 23, 27, 31};
+
+#endif
 #endif /* BASIC_SERVICES_H */
