@@ -7,10 +7,11 @@ config
 	name : TerraNet_MsgQ ,
 	code:00.02.00 , 
 	{
-		tossim: 1920,
+		tossim: 1824,
 		telosb: 5808,
-		telosb_hyb: 2112,
-		micaz : 2112,
+		telosb_hyb: 2016,
+		micaz : 2016,
+		mica2 : 2016,
 	} 
 do
 /*
@@ -145,6 +146,7 @@ do
 	function nohold ubyte fftAlloc(ushort, ushort, ubyte*, ushort*)		14;
 	function nohold  ubyte fft(ubyte*, ulong*, ulong*)			15;
 	function ubyte setupMic(ushort*,ushort,ulong,ubyte)			16;
+	function ubyte setRFPower(ubyte)			17;
 	// Volcano custom functions
 	function ubyte  gModelRead(ubyte*) 		20;
 	function ulong  getRTime() 			21;

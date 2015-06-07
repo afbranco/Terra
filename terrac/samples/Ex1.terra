@@ -12,11 +12,12 @@
 var ushort nodeId = getNodeId();
 
 // Automatic base node setup - Avrora use 2 (nodes 0..9), TOSSIM use 11 (node 11..xx)
-var ushort baseNode = 2;
+var ushort baseNode = 8;
+/*
 if nodeId > 10 then
 	baseNode = 11;
 end
-
+*/
 var ubyte stat,hop;
 var ushort father=NO_FATHER;
 var ushort seqReq=0;

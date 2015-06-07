@@ -17,25 +17,19 @@ _AST.root.opcode_aux={}
 for x,op in pairs(_AST.root.opcode) do
   if (string.sub(op,1,1) ~= 'L') then
     if (string.sub(op,1,1) ~= '.') and (string.sub(op,1,1) ~= '_') then
---print("...",op)
+--print("...",op,_AST.root.code2[x])
       local op_num = tonumber('0x'..op)
-      local op_code = math.floor(op_num/2)*2 -- deref + 1bit flag
-      local op_mod = op_num % 2
+      local op_code = math.floor(op_num/4)*4 -- push_c + 2bit flag
+      local op_mod = op_num % 4
       if op_code == opcode.op_push_c  and string.sub((_AST.root.code2[x] or ''),1,6)=='push_c' then
         local next_op_num = tonumber('0x'.._AST.root.opcode[x+2+op_mod])
-        local next_op_code = math.floor(next_op_num/4)*4 -- deref + 2bit flag
-        local next_op_mod = next_op_num % 4
+        local next_op_code = math.floor(next_op_num/8)*8 -- deref + 3bit flag
+        local next_op_mod = next_op_num % 8
 --print("optm::deref:*",op,op_num,op_code,op_mod,string.sub((_AST.root.code2[x] or ''),1,6))
         if  next_op_code == opcode.op_deref then
 --print("optm::deref: ",_AST.root.opcode[x+2+op_mod],next_op_num,next_op_code,next_op_mod,string.sub((_AST.root.code2[x+2+op_mod] or ''),1,6))
-          if op_mod == 0 then
-            _AST.root.opcode[x]=string.format("%02x",opcode.op_push_v+next_op_mod)
-            local newOpText = 'push_v '.. varType[next_op_mod] .. ' ' .. tonumber('0x'.._AST.root.opcode[x+1])
-            newOpText = newOpText .. string.sub(_AST.root.code2[x],string.len(newOpText)+1) .. ' [Optm:: push_c addr + deref]'
-            _AST.root.code2[x]=  newOpText
-          else
-            _AST.root.opcode[x]=string.format("%02x",opcode.op_push_v+next_op_mod)
-          end
+          _AST.root.code2[x] = string.gsub(_AST.root.code2[x],"push_c", "push_v "..varType[next_op_mod]).." [Optm:: push_c addr + deref]"
+          _AST.root.opcode[x]=string.format("%02x",opcode.op_push_v+ (op_mod*8) + next_op_mod)
           _AST.root.opcode[x+2+op_mod]='_'
         end
       end      

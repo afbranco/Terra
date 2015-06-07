@@ -163,18 +163,20 @@ F = {
 
     ParEver_pos = function (me)
         me.ana.pos = { [false]=true }
-        local ok = false
+        local ok = true
         for _, sub in ipairs(me) do
-            if sub.ana.pos[false] then
-                ok = true
+--print("ana::ParEver_pos:",sub.ana.pos[false])
+            if sub.ana.pos[false]==nil or sub.ana.pos[false]==false  then
+                ok = false
                 break
             end
         end
         if not ok then
             --_ANA.ana.reachs = _ANA.ana.reachs + 1
-            WRN( INC(me, 'reachs'),
-                 me, 'all trails terminate')
+            --WRN( INC(me, 'reachs'), me, 'all trails must terminate')
+            INC(me, 'reachs')
         end
+        ASR(ok,me,'all trails must terminate')
     end,
 
     If = function (me)

@@ -5,10 +5,11 @@ config
 	name : TerraGrp ,
 	code:00.02.00 , 
 	{
-		tossim: 400,
-		telosb: 400,
-		telosb_hyb: 400,
-		micaz : 400,
+		tossim: 576,
+		telosb_full: 4800,
+		telosb_hyb: 768,
+		micaz : 768,
+		mica2 : 768,
 	} 
 do
 /*
@@ -146,6 +147,8 @@ do
 	output void 	CFG_INT_A		ubyte 18;
 	output void 	CFG_INT_B		ubyte 19;
 	output void 	REQ_CUSTOM_A	ubyte 20;
+	output void		REQ_MIC			void  21;
+	output void		BEEP			ushort  22;
 
 	// TerraNet Custom Output events
 	output void 	SEND_BS		msgBS_t	 40;
@@ -164,6 +167,7 @@ do
 	input ubyte 	INT_B 			void 	11;
 	input ubyte 	CUSTOM_A_ID		ubyte 	12;
 	input ubyte 	CUSTOM_A 		void 	13;
+	input ubyte 	MIC 			void 	14;
 
 	// TerraGrp input events
 	input msgGR_t 		REC_GR		ubyte 	40;
@@ -176,6 +180,8 @@ do
 	input ushort 		LEADER_NEW 	void 	47;
 	input ushort 		LEADER_LOST 	ubyte 	48;
 	input ushort 		LEADER_LOST 	void 	49;
+	input ushort 		SENDGR_DONE 	ubyte 	50;
+	input ushort 		SENDGR_DONE 	void 	51;
 
 
 	// Terra basic functions
@@ -186,6 +192,9 @@ do
 	function nohold ubyte groupInit(group_t, ubyte, ubyte, ubyte,  ubyte,  ubyte, ushort)	10;
 	//       		aggregInit( RegName,  grName, sensorId, agOper, agComp, refVal)
 	function nohold ubyte aggregInit(aggreg_t, group_t,    ubyte,  ubyte,  ubyte,  ulong)	11;
+	//
+	function ubyte setupMic(ushort*,ushort,ulong,ubyte)			16;
+	function ubyte setRFPower(ubyte)			17;
 
 // Request/await macros
 #define getTemp(var)  emit REQ_TEMP();  var=await TEMP 

@@ -10,6 +10,7 @@ _OPTS = {
     warn      = true,
     wstrong   = true,
     wweak     = false,
+    includePath="",
 
 }
 
@@ -36,7 +37,10 @@ do
     local p = params[i]
 
 --print("terrac::param:",params[i])
-    if p == '-' then
+    if p:sub(1,2) == '-I' then
+        _OPTS.includePath = _OPTS.includePath .. " ".. p
+
+    elseif p == '-' then
         _OPTS.input = '-'
 
     elseif string.sub(p, 1, 2) == '--' then
@@ -76,7 +80,7 @@ if not _OPTS.input then
         --warn    (--no-warn)    # activate warnings (warn)
         --wstrong (--no-wstrong) # warning strong nondeterminism (wstrong)
         --wweak   (--no-wweak)   # warning weak nondeterminism (no-wweak)
-
+        -Ipath                   # Path for include files (.defs)
 ]])
     os.exit(1)
 end
@@ -103,7 +107,7 @@ end
 local cpp_file = 'precomp.terra'
 -- Pre-processor phase
 --    local cpp = assert(io.popen('cpp -C '.._OPTS.input..' ' ..cpp_file, 'w'))
-    local cpp = assert(io.popen('cpp -C '.._OPTS.input..' ' ..cpp_file, 'w'))
+    local cpp = assert(io.popen('cpp -C '.._OPTS.input..' ' ..cpp_file .. _OPTS.includePath, 'w'))
     cpp:close()
 
 local test_file = io.open(cpp_file)
@@ -446,14 +450,14 @@ local lowMaxMem=999999
 print('---------------------------------------------------------------------')
 print('-- Terra Compiler: '..string.format('%-20s',_ENV.vm_name)..'     VM Code: '.. string.format('%12s',_ENV.vm_version) .. '  --')
 print('---------------------------------------------------------------------')
-print('--   Memory allocation:  '.. ((_OPTS.opt and '(code optimized)    ') or '(code not optimized)') ..'                      --')
+print('--   Memory allocation in bytes:  '.. ((_OPTS.opt and '(code optimized)    ') or '(code not optimized)') ..'             --')
 print('--   Total =  Code + Ctl/Vars + Stack           |    Radio Msgs    --')
 print(string.format('--    %4d    %4d     %4d     %4d            |      %4d        --',
                     TotalMem,CodeSize,CtlVars,Stack,RadioMsgs))
 print('---------------------------------------------------------------------')
 print('--   Target platforms x Max program size                           --')
 for k,v in pairs(_ENV.motes_max_size) do
-  print(string.format('--   %16s x %4s %1s                                     --',k,v,(TotalMem>v and '?')or ' '))
+  print(string.format('--   %16s = %4s bytes %1s                               --',k,v,(TotalMem>v and '?')or ' '))
   lowMaxMem = ( v < lowMaxMem  and v) or lowMaxMem 
 end
 print('---------------------------------------------------------------------')
