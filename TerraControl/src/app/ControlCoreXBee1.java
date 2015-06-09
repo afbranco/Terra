@@ -2,7 +2,6 @@ package app;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +12,6 @@ import com.rapplogic.xbee.api.PacketListener;
 import com.rapplogic.xbee.api.XBee;
 import com.rapplogic.xbee.api.XBeeAddress16;
 import com.rapplogic.xbee.api.XBeeException;
-import com.rapplogic.xbee.api.XBeePacket;
 import com.rapplogic.xbee.api.XBeeResponse;
 import com.rapplogic.xbee.api.wpan.RxResponse16;
 import com.rapplogic.xbee.api.wpan.TxRequest16;
@@ -21,13 +19,8 @@ import com.rapplogic.xbee.api.wpan.TxStatusResponse;
 
 import messages.*;
 import net.tinyos.message.Message;
-import net.tinyos.message.MessageListener;
-//import net.tinyos.message.MoteIF;
-import net.tinyos.packet.BuildSource;
-import net.tinyos.packet.PhoenixSource;
 import net.tinyos.tools.PrintfMsg;
 import net.tinyos.util.Messenger;
-import net.tinyos.util.PrintStreamMessenger;
 
 public class ControlCoreXBee1
 {
@@ -79,7 +72,6 @@ public class ControlCoreXBee1
         	try {
 				retryConnect();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
         }
@@ -102,7 +94,6 @@ public class ControlCoreXBee1
 		xbee.addPacketListener(new PacketListener() {
 			@Override
 			public void processResponse(XBeeResponse arg0) {
-				// TODO Auto-generated method stub
 				XBeeReceived(arg0);				
 			}
 		});		controlform.setTCP(true, TCPretries);
@@ -362,7 +353,6 @@ public class ControlCoreXBee1
 			try {
 				xbee.sendPacket(xMsg.getXBeePacket());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

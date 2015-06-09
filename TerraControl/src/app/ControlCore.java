@@ -3,7 +3,6 @@ package app;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.net.ConnectException;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
@@ -97,7 +96,6 @@ public class ControlCore implements MessageListener
 		try {
 			Thread.sleep(500);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		phoenix = BuildSource.makePhoenix("serial@/dev/ttyUSB0:micaz", PrintStreamMessenger.err);
