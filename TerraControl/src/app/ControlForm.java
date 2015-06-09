@@ -813,19 +813,23 @@ public class ControlForm {
 		lblDataMessages.setBounds(350, 20, 300, 30);
 		monitorPanel.add(lblDataMessages);
 
-		rdbtnmsgtype = new JRadioButton("Decimal");
-		rdbtnmsgtype.setToolTipText("Print msg -- Decinal= 4 byte,4 short, 2 long. Hexa=All bytes as hexa");
+		rdbtnmsgtype = new JRadioButton("Hexa");
+		rdbtnmsgtype.setToolTipText("Print msg -- Decinal= 4 byte,4 short, 2/1 long. Hexa=All bytes as hexa");
 		rdbtnmsgtype.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				rdbtnmsgtype.setText( (rdbtnmsgtype.isSelected()==false)?"Decimal":"Hexa");
+				//rdbtnmsgtype.setText( (rdbtnmsgtype.isSelected()==false)?"Decimal":"Hexa");
 				}
 		});
 		rdbtnmsgtype.setBounds(200, 40, 100, 23);
 		monitorPanel.add(rdbtnmsgtype);
 
-		JLabel lblMsgType = new JLabel("Message print [D/H]:");
-		lblMsgType.setBounds(200, 20, 400, 15);
+		JLabel lblMsgType = new JLabel("Message print");
+		lblMsgType.setBounds(210, 15, 400, 15);
 		monitorPanel.add(lblMsgType);
+
+		JLabel lblMsgType2 = new JLabel("(Decimal or Hexa)");
+		lblMsgType2.setBounds(200, 27, 400, 15);
+		monitorPanel.add(lblMsgType2);
 
 		JSeparator separator_d1 = new JSeparator();
 		separator_d1.setOrientation(SwingConstants.VERTICAL);

@@ -186,8 +186,23 @@ public class ControlCore implements MessageListener
 		// Received a sendBS
 		if (msg instanceof sendBSMsg) {
 			sendBSMsg omsg = (sendBSMsg)msg;
-			String Data="";
-			for (int i=0;i<16;i++) Data = Data + String.format("%02x,", omsg.getElement_Data(i));
+			String Data="";			
+			System.out.println("MsgType="+controlform.getMsgType());
+			if (controlform.getMsgType()) {				
+				for (int i=0; i<16; i++) {
+					Data = Data + String.format("%02x,",omsg.getElement_Data(i)); 				
+				}
+			} else{ 
+				for (int i=0; i<4; i++) {
+					Data = Data + String.format("%d,",omsg.getElement_Data(i)); 				
+				}
+				for (int i=4; i<12; i=i+2) {
+					Data = Data + String.format("%d,",(omsg.getElement_Data(i) << 8) + omsg.getElement_Data(i+1)); 				
+				}
+				for (int i=12; i<16; i=i+4) {
+					Data = Data + String.format("%d,",(omsg.getElement_Data(i) << 24) + (omsg.getElement_Data(i+1) << 16) + (omsg.getElement_Data(i+2) << 8) + omsg.getElement_Data(i+3)); 				
+				}
+			}
 			controlform.sendBSMsg(omsg.get_Sender(),omsg.get_evtId(),omsg.get_seq(),Data);
 			System.out.println(omsg.toString());
 		}
