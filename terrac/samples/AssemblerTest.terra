@@ -1,0 +1,162 @@
+#include "TerraNet.defs"
+
+pktype usrMsg1 from radioMsg with
+	var ubyte[4] d8;
+	var ushort[4] d16;
+	var ulong d32;
+	var float f32;
+end
+
+var ushort testStep;
+var ubyte testStatus;
+var usrMsg1 msgRadio;
+
+// set_c
+testStep=0;
+msgRadio.type=1;
+msgRadio.target=1;
+
+// set_v, outevt_v, push_v, pop
+#define SEND_MSG(status) msgRadio.d8[0]= status; msgRadio.d16[0]=testStep; emit SEND(msgRadio); await SEND_DONE(msgRadio.type); await 100ms;
+
+
+	//clken_c, memclr, end
+	await 1s;
+/*	--------------------------------------------
+	testStep = 01 :: Send first message
+	--------------------------------------------*/
+	// 
+	testStep = 01;
+	SEND_MSG(TRUE);
+
+/*	--------------------------------------------
+	testStep = 02 :: Loop count + inc
+	--------------------------------------------*/
+	// gte, ifelse, tkins_z, exec, push_c, inc
+	testStep = 02;
+do
+	var byte count=0;
+	loop i,10 do
+		inc count;
+	end
+	loop do
+		await 1ms;
+		inc count;
+		if count == 20 then break; end
+	end
+	msgRadio.d8[1]=count;
+	SEND_MSG(count==20);
+	msgRadio.d8[1]=0;
+end
+
+/*	--------------------------------------------
+	testStep = 03 :: par/end + Internal Event + neg/add
+	--------------------------------------------*/
+	// neg, tkins_max, add, trg, chkret
+	testStep = 03;
+do
+	event byte evt1;
+	var byte xx=-10;
+	par/and do
+		await evt1;
+		xx = xx + evt1;
+	with
+		emit evt1(11);
+	end
+	SEND_MSG(xx==1);
+end
+
+/*	--------------------------------------------
+	testStep = 04 :: par/or + await tight time + inc/dec
+	--------------------------------------------*/
+	// clken_e, clken_v, add, cast, dec 
+	testStep = 04;
+do
+	var byte xx=0;
+	var ulong time=<ulong>1.0e3;
+	par/or do
+		await (time+1)ms;
+		inc xx;
+	with
+		await (time)ms;
+		dec xx;
+	end
+	SEND_MSG(xx==-1);
+end
+
+/*	--------------------------------------------
+	testStep = 05 :: array + func + math + Logic + Bit
+	--------------------------------------------*/
+	// func, poparr_v, mult, div, add, sub, eq, lt, gt, lte, gte, neq, lnot, land, lor, lshift, rshift, band, bxor, bnot, bor,  
+	testStep = 05;
+do
+	var ushort moteid=getNodeId();
+	var byte idx=2;
+	var ushort[4] yy;
+	yy[idx]= ((moteid * 4)/2)/2;
+	var ushort xx = yy[2];
+	var ubyte stat=    ((moteid==xx    ) and not(moteid!=xx   ) 
+					and (moteid>=(xx-1)) and  (moteid<=(xx+1))
+					and (moteid>(xx-1) ) and  (moteid<(xx+1 )) );
+
+	stat = (stat or FALSE);
+	stat = ((((stat+2) << 2) & 0x04) >> 2) ^ 0;
+	stat = stat | ~0xff;
+	SEND_MSG(stat);	
+end	
+
+
+/*	--------------------------------------------
+	testStep = 06 :: array float, math float, casting, logical float
+	--------------------------------------------*/
+	// pusharr_v, set_e, neg_f, add_f, sub_f, mult_f, div_f, deref, mod, lte_t, gte_f, lt_f, gt_f, neq_f, eq_f
+	testStep = 06;
+do
+	var float[4] xx;
+	var byte idx=0;
+	xx[idx] = 10.15;
+	var float yy = xx[idx] - 0.1;
+	xx[idx] = yy + -0.1;
+	xx[idx+1] = (xx[idx]+0.30) * 100.0;
+	var ubyte stat = (<ubyte>(xx[1]/10) == 102);
+	var ubyte stat2 =   not(xx[0] == (10.15 - 0.2)) and (xx[0] != 10.15)
+					and (xx[0] < 10.15) 		and (xx[0] > 9.0) 
+					and not(xx[0]>= (10.15 - 0.2)) and (xx[0] <= (10.15 - 0.2));
+	
+	SEND_MSG(stat and stat2);	
+end
+
+/*	--------------------------------------------
+	testStep = 07 :: emit, wait ext, setarr
+	--------------------------------------------*/
+	// outevt_c, outevt_e, outevt_z, getextdt_e, outevt_z, getextdt_v, asen, setarr_vc, setarr_vv, memcpy, popx
+	testStep = 07;
+do
+	var ubyte stat=0;
+	var ubyte xx=OFF;
+	emit REQ_TEMP();
+	var ushort[2] temp;
+	temp[xx]= await TEMP();
+	emit LED0(ON);
+	emit REQ_PHOTO();
+	var ushort temp2 = await PHOTO();
+	emit LED1(xx+ON);
+	async (xx) do
+		var ushort[2] temp;
+		temp[xx]=10;
+		temp[xx]=xx;
+	end
+	var usrMsg1 msgRadio2;
+	msgRadio2 = msgRadio;
+	stat= qClear()==SUCCESS and msgRadio2.type == msgRadio.type ;
+	SEND_MSG(stat);
+end
+
+
+/*	--------------------------------------------
+	testStep = 999 :: Send final message
+	--------------------------------------------*/
+	testStep = 999;
+	SEND_MSG(TRUE);
+
+
