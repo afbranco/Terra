@@ -149,6 +149,7 @@ do
 	output void 	REQ_CUSTOM_A	ubyte 20;
 	output void		REQ_MIC			void  21;
 	output void		BEEP			ushort  22;
+	output void 	REQ_CUSTOM		void 23;
 
 	// TerraNet Custom Output events
 	output void 	SEND_BS		msgBS_t	 40;
@@ -168,6 +169,7 @@ do
 	input ubyte 	CUSTOM_A_ID		ubyte 	12;
 	input ubyte 	CUSTOM_A 		void 	13;
 	input ubyte 	MIC 			void 	14;
+	input ubyte 	CUSTOM 			void 	15;
 
 	// TerraGrp input events
 	input msgGR_t 		REC_GR		ubyte 	40;

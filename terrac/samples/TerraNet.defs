@@ -104,6 +104,7 @@ do
 	output void 	REQ_CUSTOM_A	ubyte 20;
 	output void		REQ_MIC			void  21;
 	output void		BEEP			ushort  22;
+	output void 	REQ_CUSTOM		void 23;
 	// TerraNet Custom Output events
 	output void 	SEND			radioMsg 40;
 	output void 	SEND_ACK		radioMsg 41;
@@ -123,6 +124,7 @@ do
 	input ubyte 	CUSTOM_A		ubyte 	12;
 	input ubyte 	CUSTOM_A 		void 	13;
 	input ubyte 	MIC 			void 	14;
+	input ubyte 	CUSTOM 			void 	15;
 	// TerraNet Custom Input events
 	input ubyte 	SEND_DONE 		ubyte	40;
 	input ushort 	SEND_DONE 		void 	41;
@@ -138,6 +140,7 @@ do
 	// Terra basic functions
 	function pure ushort getNodeId()		0;
 	function pure ushort random()			1;
+	function pure ubyte getMem(ushort)		2;
 	// TerraNet custom functions
 	function nohold ubyte qPut(radioMsg) 	10;
 	function nohold ubyte qGet(radioMsg) 	11;
@@ -148,11 +151,11 @@ do
 	function ubyte setupMic(ushort*,ushort,ulong,ubyte)			16;
 	function ubyte setRFPower(ubyte)			17;
 	// Volcano custom functions
-	function ubyte  gModelRead(ubyte*) 		20;
-	function ulong  getRTime() 			21;
-	function ubyte  setRTime(ulong) 		22;
-	function nohold ushort getNSamples(ubyte*,ubyte)	23;
-	function nohold ubyte  detect(ubyte*,ubyte,ulong*)	24;
+	function ubyte  gModelRead(ubyte*) 		50;
+	function ulong  getRTime() 			51;
+	function ubyte  setRTime(ulong) 		52;
+	function nohold ushort getNSamples(ubyte*,ubyte)	53;
+	function nohold ubyte  detect(ubyte*,ubyte,ulong*)	54;
 
 // Determinist
 

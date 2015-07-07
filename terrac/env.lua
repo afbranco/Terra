@@ -500,7 +500,7 @@ F = {
         local e1, e2 = unpack(me)
         ASR(e1.var.isEvt, me, 'event "'..e1.var.id..'" is not declared')
         if (e2) then
---print("env::EmitInt:",e1.var.tp,e2.tp)
+print("env::EmitInt:",e1.var.tp,e2.tp)
           err, cast,_,_, len1, len2 = _TP.tpCompat(e1.var.tp,e2.tp)
           ASR(not err,me,'type/size incompatibility: '.. e1.var.tp..'/'..len1 ..' <--> '.. e2.tp..'/'..len2..'')
           WRN(not cast,me, 'Automatic casting from `'.. e2.tp ..'´ to `' .. e1.var.tp ..'´. ')

@@ -22,10 +22,10 @@ var ubyte[POOL_LEN] buffer_pool_avail_map;
 var ubyte[1138] fft_cfg; //1138
 var ulong requested_rtime; // the rtime that BS requires the sensor to do detection
 var ubyte[GMODEL_SIZE] gModel;
-//var long[BUFFER_POOL_LEN] buffer_pool;
+var long[BUFFER_POOL_LEN] buffer_pool;
 
 
-
+emit LEDS(0);
 // Init
 do
   // fft alloc -> Format fft_cfg
@@ -47,10 +47,8 @@ end
 // MSG_START runs
 do
   loop z1, 200 do
-requested_rtime = z1;
-    par/and do
-      do
-    
+	requested_rtime = z1;
+    par/and do    
       // Local MSG_START run
       // Sensor Data
       var ulong m_addr = 0;
@@ -60,8 +58,7 @@ requested_rtime = z1;
       // Read Sensor Data
       var ushort count;
       emit RD_STREAM(sData);
-      count = await STREAM_RD_DONE();
-
+      //count = await STREAM_RD_DONE();
       rtime = getRTime() - 1;
 
 
@@ -110,9 +107,9 @@ requested_rtime = z1;
         if (buffer_pool_avail_map[i]) then
           loop j, count do
             if(sData.val[i] != INVALID_MEASUREMENT) then 
-              //buffer_pool[i*j] = sData.val[j] - intensity_mean;
+              buffer_pool[i*j] = sData.val[j] - intensity_mean;
             else
-              //buffer_pool[i*j] = 0;
+              buffer_pool[i*j] = 0;
             end
           end // loop j, count
           buffer_pool_scale[i] = scale;
@@ -125,9 +122,9 @@ requested_rtime = z1;
             oldest_index = i;
           else 
             if (buffer_pool_rtime_map[i] < buffer_pool_rtime_map[oldest_index]) then
-	      oldest_index = i;
+	      		oldest_index = i;
             else
-	      oldest_index = oldest_index;
+	      		oldest_index = oldest_index;
             end
           end
         end
@@ -152,11 +149,10 @@ requested_rtime = z1;
       emit SEND(dataMsg);
       await SEND_DONE();
      
-      end
 //
 // detect() from MSG_SEL message
 //
-/*
+
       do
         var ubyte decision=0;
         loop i, POOL_LEN do
@@ -164,8 +160,8 @@ requested_rtime = z1;
           if ((buffer_pool_avail_map[i]==FALSE) and (buffer_pool_rtime_map[i] == requested_rtime) ) then
             if getNSamples(gModel,buffer_pool_scale[i]) >= STAT_SIGNIFICANCE then
               var ulong[OUT_SIZE] outdata;
-              //stat = fft(fft_cfg,&buffer_pool[0],outdata);
-              //decision = detect(gModel,buffer_pool_scale[i],outdata);
+              stat = fft(fft_cfg,&buffer_pool[0],outdata);
+              decision = detect(gModel,buffer_pool_scale[i],outdata);
 
             end
             break;
@@ -198,7 +194,6 @@ requested_rtime = z1;
 
       end
          
-*/
     with
       await 1s;
       emit LED0(TOGGLE);
