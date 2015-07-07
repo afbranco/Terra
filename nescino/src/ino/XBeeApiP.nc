@@ -35,8 +35,9 @@ implementation{
 	event void Boot.booted(){
 		atomic{state = SM_CONFIG;}
 		call XBeeCtl.start();
-		state = SM_WAITING_DELIMITER;
-
+		atomic {
+			state = SM_WAITING_DELIMITER;
+		}
 		//logData[0]=':';
 		//signal XBeeApi.logUSB0(logData,1);
 	}
@@ -104,7 +105,8 @@ implementation{
 		signal XBeeApi.txStatus(recFrameAux[1], recFrameAux[2]);		
 	}
 	void xApiRxPacket(){
-		uint8_t dataLen = (uint8_t)(recFrameLenAux - 5);
+		uint8_t dataLen;
+		atomic{ dataLen = (uint8_t)(recFrameLenAux - 5);}
 		signal XBeeApi.rxPacket((recFrameAux[1]*256+recFrameAux[2]), recFrameAux[3], recFrameAux[4], recFrameAux+5, dataLen);		
 	}
 	void xApiRxPacketIO(){

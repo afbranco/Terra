@@ -77,6 +77,11 @@ implementation{
       
 	  //call InoIO.interruptRisingEdge(I0);
       call InoIO.pulseIn(I0, HIGH, 200000);
+      logdata[0]='$';
+      logdata[1]='\n';
+      logdata[2]='$';
+      logS(logdata, 2);
+      
   }
 
 	event void Timer2.fired(){

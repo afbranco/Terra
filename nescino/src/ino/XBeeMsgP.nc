@@ -34,7 +34,7 @@ implementation{
 	command error_t SplitControl.start(){
 		call SendTimeOut.startOneShot(RADIO_SEND_TIMEOUT);
 //		call XBeeApi.commandAT(currAckId, "FR", NULL, 0);
-		call XBeeApi.commandAT(currAckId, "MY", NULL, 0);
+		call XBeeApi.commandAT(currAckId, (uint8_t*)"MY", NULL, 0);
 		return SUCCESS;
 	}
 
@@ -83,7 +83,7 @@ implementation{
 		if (initFlag){
 			call SendTimeOut.startOneShot(RADIO_SEND_TIMEOUT);
 //			call XBeeApi.commandAT(currAckId, "FR", NULL, 0);
-			call XBeeApi.commandAT(currAckId, "MY", NULL, 0);
+			call XBeeApi.commandAT(currAckId, (uint8_t*)"MY", NULL, 0);
 		} else {
 			radioBusy = FALSE;
 			status = FAIL;

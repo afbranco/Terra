@@ -103,6 +103,7 @@ implementation{
 			case I1 : call pInt1.enableRisingEdge(); break;
 			case I2 : call pInt2.enableRisingEdge(); break;
 			case I3 : call pInt3.enableRisingEdge(); break;
+			default : break;
 		}
 	}
 
@@ -112,6 +113,7 @@ implementation{
 			case I1 : call pInt1.enableFallingEdge(); break;
 			case I2 : call pInt2.enableFallingEdge(); break;
 			case I3 : call pInt3.enableFallingEdge(); break;
+			default : break;
 		}
 	}
 
@@ -121,30 +123,37 @@ implementation{
 			case I1 : call pInt1.disable(); break;
 			case I2 : call pInt2.disable(); break;
 			case I3 : call pInt3.disable(); break;
+			default : break;
 		}
 	}
 
 	command void InoIO.pulseIn(interrupt_enum intPin, pinvalue_enum value, uint32_t timeout){
 		switch (intPin) {
-			case I0 : 	isPulse[0]=TRUE;
+			case I0 : 	atomic{isPulse[0]=TRUE;}
 						call pInt0.disable();
 						call pulseTimer0.startOneShot(timeout);
-						pulseStart[0] = 0;
-						pulseEnd[0] = 0;
-						pulseValue[0]=value;
+						atomic{
+							pulseStart[0] = 0;
+							pulseEnd[0] = 0;
+							pulseValue[0]=value;
+						}
 						if (value == HIGH)
 							call pInt0.enableRisingEdge();
 						else
 							call pInt0.enableFallingEdge();
+						break;
+			default: break;
 		}
 	}
 			
 	task void pInt0_pulseLen(){
 		uint32_t len;
-		len = pulseEnd[0]-pulseStart[0];
-		pulseEnd[0]=0;
-		pulseStart[0]=0;
-		isPulse[0]=FALSE;
+		atomic{
+			len = pulseEnd[0]-pulseStart[0];
+			pulseEnd[0]=0;
+			pulseStart[0]=0;
+			isPulse[0]=FALSE;
+		}
 		signal InoIO.pulseLen(I0,pulseValue[0],len);
 	}
 
@@ -171,9 +180,11 @@ implementation{
 
 	event void pulseTimer0.fired(){
 		call pInt0.disable();
-		isPulse[0]=0;
-		pulseStart[0]=0;
-		pulseEnd[0]=0;
+		atomic{
+			isPulse[0]=0;
+			pulseStart[0]=0;
+			pulseEnd[0]=0;			
+		}
 		signal InoIO.pulseLen(I0,pulseValue[0],0);		
 	}
 
