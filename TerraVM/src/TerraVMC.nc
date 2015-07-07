@@ -280,7 +280,7 @@ void setMVal(uint32_t buffer, uint16_t Maddr, uint8_t fromTp, uint8_t toTp){
 				case S16 : *(nx_int16_t*)(MEM+Maddr) = (int16_t)value; return;
 				case S32 : *(nx_int32_t*)(MEM+Maddr) = (int32_t)value; return;
 			}
-		} else {  // from signal integer
+		} else {  // from signaled integer
 			int32_t value=*(int32_t*)&buffer;
 			switch (toTp){
 				case U8  : *(nx_uint8_t*)(MEM+Maddr) = (uint8_t)value; return;
@@ -493,6 +493,7 @@ void ceu_track_clr (tceu_nlbl l1, tceu_nlbl l2) {
 
 void ceu_spawn (tceu_nlbl* lbl)
 {
+//printf("spw:%d\n",*(nx_uint16_t*)lbl);printfflush();
     if (*(nx_uint16_t*)lbl != Inactive) {
         ceu_track_ins(CEU->stack, CEU_TREE_MAX, 0, *(nx_uint16_t*)lbl);
         *(nx_uint16_t*)lbl = Inactive;
@@ -1728,6 +1729,7 @@ void f_set_c(uint8_t Modifier){
 //char data[20];
 //sprintf(data,"e%02d %02d %02d\n",ceuId,evtData.evtId,evtData.auxId);	
 //logS(data,10);
+//printf("e%02d %02d %02d\n",ceuId,evtData.evtId,evtData.auxId);printfflush();	
 }
 			if (ceuId==0) {
 				dbg(APPNAME,"VM::procEvent(): Discarding event %d\n",evtData.evtId);

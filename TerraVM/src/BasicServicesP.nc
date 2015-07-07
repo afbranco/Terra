@@ -85,12 +85,12 @@ module BasicServicesP{
 // Radio RF Power
 #ifdef TOSSIM
 
+#elif defined(INO)  // INO must be before to avoid radio chip component
+
 #elif defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS)
 	uses interface CC2420Packet as RadioAux;
-
 #elif defined(PLATFORM_MICA2) || defined(PLATFORM_MICA2DOT)
-
-#elif defined(INO)
+	uses interface CC1000Control as RadioAux;
 
 #endif
 
@@ -148,6 +148,11 @@ module BasicServicesP{
   }
 #endif
 
+
+#ifdef LPL_ON
+	uses interface LowPowerListening;
+#endif
+
 }
 implementation{
 
@@ -168,7 +173,7 @@ implementation{
 	uint8_t sendCounter;				// Count the send retries
 	reqProgBlock_t serialReqProgBlock;	// Serial Req Message buffer
 	
-	uint8_t userRFPowerIdx;				// Radio RF power defined by the user - default is CC2420_DEF_RFPOWER
+	uint8_t userRFPowerIdx;				// Radio RF power Index defined by the user - default is RFPOWER_IDX 0..7
 
 	// Request prog/data state
 	uint8_t ReqState = ST_IDLE;
@@ -189,6 +194,10 @@ implementation{
 	nx_uint16_t maxSeenDataSeq;
 	uint8_t DataTimeOutCounter=0;
 	nx_uint16_t NewDataMoteSource;	
+
+	// Filter others REQ_PROG_BLOCK
+	uint16_t disseminatorRoot=0;
+
 
 #ifndef NO_BSTATION
 #ifdef MODULE_CTP
@@ -271,8 +280,13 @@ implementation{
 	event void TOSBoot.booted(){
 		uint32_t rnd=0;	
 		dbg(APPNAME, "BS::TOSBoot.booted().\n");
-#if defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS)
-		userRFPowerIdx = CC2420_DEF_RFPOWER;
+#if defined(INO) 
+		userRFPowerIdx=0;
+#elif defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS) 
+		userRFPowerIdx = RFPOWER_IDX;
+#elif defined(PLATFORM_MICA2) || defined(PLATFORM_MICA2DOT)
+		userRFPowerIdx = RFPOWER_IDX;
+		atomic{call RadioAux.setRFPower(RFPowerTab[userRFPowerIdx]);};
 #else
 		userRFPowerIdx=0;
 #endif
@@ -288,6 +302,10 @@ call Uart0Ctl.start();
 
 		if (firstInic){
 			inicCtlData();
+#ifdef LPL_ON
+			call LowPowerListening.setLocalWakeupInterval( SLEEP );
+#endif
+
 			if (call RadioControl.start() != SUCCESS) dbg(APPNAME,"BS::Error in RadioControl.start()\n");
 #ifndef NO_BSTATION
 			if (MoteID == BStation)	if (call SerialControl.start() != SUCCESS) dbg(APPNAME,"BS::Error in SerialControl.start()\n");
@@ -343,7 +361,7 @@ call Uart0Ctl.start();
 
 	command void BSRadio.setRFPower(uint8_t powerIdx){
 		dbg(APPNAME, "BS::BSRadio.setRFPower(%d).\n",powerIdx);
-#if defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS)
+#if defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS) || defined(PLATFORM_MICA2) || defined(PLATFORM_MICA2DOT)
 		if (powerIdx < RFPower_IDs) {
 			userRFPowerIdx = powerIdx;
 		}
@@ -489,8 +507,8 @@ call Uart0Ctl.start();
 				}
 				// put message in the inQueue
 				if (call inQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recNewProgBlockNet_receive(): inQueue is full! Losting a message.\n");
-				// get source mote.
-				ProgMoteSource = call RadioAMPacket.source(msg);
+				// get source mote. Doesn't change it if the original is from the BS
+				if (ProgMoteSource != BStation) ProgMoteSource = call RadioAMPacket.source(msg);
 				// Forward the message
 				if (call outQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recNewProgBlockNet_receive(): outQueue is full! Losting a message.\n");
 			} else {
@@ -598,15 +616,21 @@ call Uart0Ctl.start();
 	message_t * RadioReceiver_receive(am_id_t id,message_t *msg, void *payload, uint8_t len){
 #endif
 //logS("r",1);
-		dbg(APPNAME, "BS::RadioReceiver.receive(). AM=%hhu from %hhu.\n",id,call RadioAMPacket.source(msg));
+		dbg(APPNAME, "BS::RadioReceiver.receive(). AM=%hhu from %hhu.  disseminatorRoot=%d\n",id,call RadioAMPacket.source(msg),disseminatorRoot);
 		if (MoteID == BStation) {
-			// Copy data to temporarily buffer
-			memcpy(tempInputInQ.Data,payload,len);
-			tempInputInQ.AM_ID = (uint8_t)id;
-			tempInputInQ.DataSize = len;
-			tempInputInQ.sendToMote = call RadioAMPacket.source(msg) | 0x8000; // (mote | 0x8000) means send to serial
-			// put message in the inQueue
-			if (call inQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::RadioReceiver.receive(): inQueue is full! Losting a message.\n");
+			uint16_t source = call RadioAMPacket.source(msg);	
+			if (id==AM_REQPROGBLOCK && disseminatorRoot==0) disseminatorRoot=source;
+			if ((id!=AM_REQPROGBLOCK) || (id==AM_REQPROGBLOCK && disseminatorRoot==source) ) {
+				// Copy data to temporarily buffer
+				memcpy(tempInputInQ.Data,payload,len);
+				tempInputInQ.AM_ID = (uint8_t)id;
+				tempInputInQ.DataSize = len;
+				tempInputInQ.sendToMote = source | 0x8000; // (mote | 0x8000) means send to serial
+				// put message in the inQueue
+				if (call inQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::RadioReceiver.receive(): inQueue is full! Losting a message.\n");
+			} else {
+				dbg(APPNAME, "BS::RadioReceiver.receive(). Discarding... \n");		
+			}
 		} else {
 
 			// Switch AM_ID
@@ -1150,6 +1174,9 @@ call Uart0Ctl.start();
 		error_t err;
 		dbg(APPNAME,"BS::sendRadioN(): AM=%hhu to %d, reqAck=%s\n",tempOutputOutQ.AM_ID, tempOutputOutQ.sendToMote, _TFstr((tempOutputOutQ.reqAck & (1<<REQ_ACK_BIT)) > 0));
 		memcpy(call RadioPacket.getPayload(&sendBuff,call RadioPacket.maxPayloadLength()), &tempOutputOutQ.Data, tempOutputOutQ.DataSize);
+#ifdef LPL_ON
+		call LowPowerListening.setRemoteWakeupInterval( &sendBuff, SLEEP );
+#endif
 		if ( (tempOutputOutQ.reqAck & (1<<REQ_ACK_BIT)) > 0){
 			if (call RadioAck.requestAck(&sendBuff) != SUCCESS) dbg(APPNAME, "BS::sendRadioN()(): requestAck() error!\n");
 		} else {
@@ -1157,11 +1184,12 @@ call Uart0Ctl.start();
 		}
 #ifdef TOSSIM
 
+#elif INO
+
 #elif defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS)
 		if (tempOutputOutQ.RFPower > 0) call RadioAux.setPower(&sendBuff,tempOutputOutQ.RFPower);
 #elif defined(PLATFORM_MICA2) || defined(PLATFORM_MICA2DOT)
-
-#elif defined(INO)
+		if (tempOutputOutQ.RFPower > 0) atomic {call RadioAux.setRFPower(tempOutputOutQ.RFPower);};
 
 #endif
 		err = RadioSender_send(tempOutputOutQ.AM_ID,tempOutputOutQ.sendToMote, &sendBuff, tempOutputOutQ.DataSize);
@@ -1203,6 +1231,10 @@ call Uart0Ctl.start();
 			if ( (tempOutputOutQ.sendToMote < AM_BROADCAST_ADDR) && (tempOutputOutQ.sendToMote >= 0x8000)) {
 				sendSerialN();
 			} else {
+				if (tempOutputOutQ.AM_ID==AM_NEWPROGVERSION) {
+					disseminatorRoot = 0;
+					dbg(APPNAME, "BS::sendMessage(): reset disseminatorRoot=%d.\n",disseminatorRoot);
+				}
 				sendRadioN();
 			}						
 			call outQ.get(&tempOutputOutQ);  // Remove message from buffer
@@ -1220,7 +1252,7 @@ call Uart0Ctl.start();
 					break;
 	#endif // MODULE_CTP
 				case AM_NEWPROGVERSION: sendRadioN(); break;
-				case AM_NEWPROGBLOCK: sendRadioN(); break;
+				case AM_NEWPROGBLOCK:  sendRadioN(); break;
 				case AM_REQPROGBLOCK: 
 					// Send to Radio or UART
 					if (MoteID != BStation){
@@ -1495,7 +1527,7 @@ call Uart0Ctl.start();
 		tempInputOutQ.DataSize = dataSize;
 		tempInputOutQ.sendToMote = target;
 		tempInputOutQ.reqAck = reqAck;
-#if defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS)
+#if defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS) || defined(PLATFORM_MICA2) || defined(PLATFORM_MICA2DOT)
 		tempInputOutQ.RFPower = RFPowerTab[userRFPowerIdx];
 #else
 		tempInputOutQ.RFPower = 0;
@@ -1725,4 +1757,5 @@ call Uart0Ctl.start();
 	event void InoIO.pulseLen(interrupt_enum intPin, pinvalue_enum value, uint32_t data){}
 	event void InoIO.analogReadDone(analog_enum pin, uint16_t data){}
 #endif
+
 }

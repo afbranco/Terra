@@ -46,12 +46,14 @@ implementation{
 	#endif
 
 #elif defined(PLATFORM_TELOSB)
+#ifndef M_VCN_DAT  // Disable sensors when using Volcano Data in TelosB
 	components new SensirionSht11C() as S_TEMP;
 	components new HamamatsuS1087ParC() as S_PHOTO;
 	components new VoltageC() as S_VOLT;
 	SensActP.S_TEMP -> S_TEMP.Temperature;
 	SensActP.S_PHOTO -> S_PHOTO;
 	SensActP.S_VOLT -> S_VOLT;
+#endif
 #endif
 	components LedsC as A_LEDS;
 

@@ -17,7 +17,7 @@ module VMCustomP{
 #ifdef M_FFT
 	uses interface kissFFT as KF;
 #endif
-#ifdef M_VOLCANO
+#ifdef M_VCN_DAT
     uses interface ReadStream<int32_t>;
     uses interface Set<uint32_t> as SetSensorRtime;
     uses interface Get<uint32_t> as GetSensorRtime;
@@ -150,7 +150,16 @@ void  proc_req_custom_a(uint16_t id, uint32_t value){
 	signal VM.queueEvt(I_CUSTOM_A   ,    0, &ExtDataCustomA);
 	}
 
-#ifdef M_VOLCANO
+void  proc_req_custom(uint16_t id, uint32_t value){
+	uint8_t auxId ;
+	dbg(APPNAME,"Custom::proc_req_custom(): id=%d\n",id);
+	// Queue the custom event
+	ExtDataCustomA = 0;
+	signal VM.queueEvt(I_CUSTOM   ,    0, &ExtDataCustomA);
+	}
+
+
+#ifdef M_VCN_DAT
 void  proc_rd_stream(uint16_t id, uint32_t value){
 	dbg(APPNAME,"Custom::proc_rd_stream(): id=%d value=%d\n",id,value);
 	UsrStreamBuffer = (nx_uint32_t*)signal VM.getRealAddr(value);
@@ -191,6 +200,14 @@ void  func_random(uint16_t id){
 	stat = call Random.rand16();
 	dbg(APPNAME,"Custom::func_random(): func id=%d, Random=%d\n",id,stat);
 	signal VM.push(stat);
+	}
+void  func_getMem(uint16_t id){
+	uint8_t val;
+	uint16_t Maddr;
+	Maddr = (uint16_t)signal VM.pop();
+	val = (uint8_t)signal VM.getMVal(Maddr, 0);
+	dbg(APPNAME,"Custom::func_getMem(): func id=%d, addr=%d, val=%d(%0x)\n",id,Maddr,val,val);
+	signal VM.push(val);
 	}
 #ifdef M_MSG_QUEUE
 void  func_qPut(uint16_t id){
@@ -292,7 +309,7 @@ void  func_RFPower(uint16_t id){
 	signal VM.push(SUCCESS);
 }
 
-#ifdef M_VOLCANO
+#ifdef M_VCN_DAT
 void  func_GModelRead(uint16_t id){
 	error_t stat;
 	uint8_t* gmodel;
@@ -331,6 +348,8 @@ void  func_getNSamples(uint16_t id){
 	else
 		signal VM.push(0);
 }
+#endif
+#ifdef M_VCN_DET
 #include "detect.c"
 void  func_detect(uint16_t id){
 
@@ -365,23 +384,24 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		case O_LED0 		: proc_led0(id,value); break;
 		case O_LED1 		: proc_led1(id,value); break;
 		case O_LED2 		: proc_led2(id,value); break;
-		case O_TEMP 	: proc_req_temp(id,value); break;
-		case O_PHOTO 	: proc_req_photo(id,value); break;
-		case O_VOLTS 	: proc_req_volts(id,value); break;
+		case O_TEMP 		: proc_req_temp(id,value); break;
+		case O_PHOTO 		: proc_req_photo(id,value); break;
+		case O_VOLTS 		: proc_req_volts(id,value); break;
 		case O_SEND 		: proc_send(id,value); break;
 		case O_SEND_ACK 	: proc_send_ack(id,value); break;
-		case O_PORT_A : proc_set_port_a(id,value); break;
-		case O_PORT_B : proc_set_port_b(id,value); break;
-		case O_CFG_PORT_A : proc_cfg_port_a(id,value); break;
-		case O_CFG_PORT_B : proc_cfg_port_b(id,value); break;
-		case O_REQ_PORT_A : proc_req_port_a(id,value); break;
-		case O_REQ_PORT_B : proc_req_port_b(id,value); break;
+		case O_PORT_A 		: proc_set_port_a(id,value); break;
+		case O_PORT_B 		: proc_set_port_b(id,value); break;
+		case O_CFG_PORT_A 	: proc_cfg_port_a(id,value); break;
+		case O_CFG_PORT_B 	: proc_cfg_port_b(id,value); break;
+		case O_REQ_PORT_A 	: proc_req_port_a(id,value); break;
+		case O_REQ_PORT_B 	: proc_req_port_b(id,value); break;
 		case O_CFG_INT_A 	: proc_cfg_int_a(id,value); break;
 		case O_CFG_INT_B 	: proc_cfg_int_b(id,value); break;
-		case O_CUSTOM_A : proc_req_custom_a(id,value); break;
-		case O_REQ_MIC: proc_req_mic(id,value); break;
-		case O_BEEP: proc_beep(id,value); break;
-#ifdef M_VOLCANO
+		case O_CUSTOM_A 	: proc_req_custom_a(id,value); break;
+		case O_REQ_MIC		: proc_req_mic(id,value); break;
+		case O_BEEP			: proc_beep(id,value); break;
+		case O_CUSTOM 		: proc_req_custom(id,value); break;
+#ifdef M_VCN_DAT
 		case O_RD_STREAM : proc_rd_stream(id,value); break;
 #endif
 	}
@@ -393,6 +413,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		switch (id){
 			case F_GETNODEID: func_getNodeId(id); break;
 			case F_RANDOM 	: func_random(id); break;
+			case F_GETMEM 	: func_getMem(id); break;
 #ifdef M_MSG_QUEUE
 			case F_QPUT 	: func_qPut(id); break;
 			case F_QGET 	: func_qGet(id); break;
@@ -407,11 +428,13 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 			case F_SETUP_MIC: func_setupMic(id); break;
 			case F_RFPOWER: func_RFPower(id); break;
 
-#ifdef M_VOLCANO
+#ifdef M_VCN_DAT
 			case F_GMODEL_READ   : func_GModelRead(id); break;
 			case F_GET_RTIME     : func_getRTime(id); break;
 			case F_SET_RTIME     : func_setRTime(id); break;
 			case F_GET_NSAMPLES  : func_getNSamples(id); break;
+#endif
+#ifdef M_VCN_DET
 			case F_DETECT        : func_detect(id); break;
 #endif
 		}
@@ -499,7 +522,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 /**
  * Volcano module
  */
-#ifdef M_VOLCANO
+#ifdef M_VCN_DAT
 	event void ReadStream.bufferDone(error_t result, int32_t* buf, uint16_t count){
 		uint16_t i;
 		ExtDataBufferRdDone = (result==SUCCESS)?count:0;

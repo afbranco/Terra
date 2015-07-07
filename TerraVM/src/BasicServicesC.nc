@@ -34,6 +34,35 @@ implementation{
 	BSUpload = BS.BSUpload;
 	BSRadio = BS.BSRadio;
 
+// Radio RF Power + LPLSend
+#ifdef TOSSIM
+	components ActiveMessageC as RadioAux;
+
+#elif defined(INO) // INO must be before the others
+
+#elif defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS)
+	components CC2420ActiveMessageC as RadioAux;
+	BS.RadioAux -> RadioAux;
+
+	#ifdef LPL_ON
+	BS.LowPowerListening -> RadioAux.LowPowerListening;
+	#endif
+
+#elif defined(PLATFORM_MICA2) || defined(PLATFORM_MICA2DOT)
+	components CC1000ControlP as RadioPwr;
+	BS.RadioAux -> RadioPwr;
+	components ActiveMessageC as RadioAux;//components CC1000ActiveMessageC as RadioAux;
+	//components CC1000CsmaRadioC as RadioAux;
+
+	#ifdef LPL_ON
+	BS.LowPowerListening -> RadioAux.LowPowerListening;
+	#endif
+
+
+
+#endif
+
+
 	// Communication wire
 #ifdef INO
 // Ino Radio configurations
@@ -52,51 +81,40 @@ implementation{
 	BS.RadioAMPacket -> RadioAM;
 	BS.RadioPacket -> RadioAM.Packet;
 	BS.RadioAck -> RadioAM.PacketAcknowledgements;
-#ifndef MODULE_CTP
+ #ifndef MODULE_CTP
 	BS.RadioSender -> RadioAM.AMSend;
-#else
-	BS.snd_NEWPROGVERSION -> RadioAM.AMSend[AM_NEWPROGVERSION];
-	BS.snd_NEWPROGBLOCK -> RadioAM.AMSend[AM_NEWPROGBLOCK];
-	BS.snd_REQPROGBLOCK -> RadioAM.AMSend[AM_REQPROGBLOCK];
-#ifdef MODE_SETDATA
-	BS.snd_SETDATAND -> RadioAM.AMSend[AM_SETDATAND];
-	BS.snd_REQDATA -> RadioAM.AMSend[AM_REQDATA];
-#endif
-	BS.snd_PINGMSG -> RadioAM.AMSend[AM_PINGMSG];
-	BS.snd_CUSTOM_0 -> RadioAM.AMSend[AM_CUSTOM_0];
-	BS.snd_CUSTOM_1 -> RadioAM.AMSend[AM_CUSTOM_1];
-	BS.snd_CUSTOM_2 -> RadioAM.AMSend[AM_CUSTOM_2];
-	BS.snd_CUSTOM_3 -> RadioAM.AMSend[AM_CUSTOM_3];
-	BS.snd_CUSTOM_4 -> RadioAM.AMSend[AM_CUSTOM_4];
-	BS.snd_CUSTOM_5 -> RadioAM.AMSend[AM_CUSTOM_5];
-	BS.snd_CUSTOM_6 -> RadioAM.AMSend[AM_CUSTOM_6];
-	BS.snd_CUSTOM_7 -> RadioAM.AMSend[AM_CUSTOM_7];
-	BS.snd_CUSTOM_8 -> RadioAM.AMSend[AM_CUSTOM_8];
-	BS.snd_CUSTOM_9 -> RadioAM.AMSend[AM_CUSTOM_9];
-#endif
+ #else
+	BS.snd_NEWPROGVERSION -> RadioAux.AMSend[AM_NEWPROGVERSION];
+	BS.snd_NEWPROGBLOCK -> RadioAux.AMSend[AM_NEWPROGBLOCK];
+	BS.snd_REQPROGBLOCK -> RadioAux.AMSend[AM_REQPROGBLOCK]; 
+  #ifdef MODE_SETDATA
+	BS.snd_SETDATAND -> RadioAux.AMSend[AM_SETDATAND];
+	BS.snd_REQDATA -> RadioAux.AMSend[AM_REQDATA];
+  #endif
 
-// Radio RF Power
-#ifdef TOSSIM
+	BS.snd_PINGMSG -> RadioAux.AMSend[AM_PINGMSG];
+	BS.snd_CUSTOM_0 -> RadioAux.AMSend[AM_CUSTOM_0];
+	BS.snd_CUSTOM_1 -> RadioAux.AMSend[AM_CUSTOM_1];
+	BS.snd_CUSTOM_2 -> RadioAux.AMSend[AM_CUSTOM_2];
+	BS.snd_CUSTOM_3 -> RadioAux.AMSend[AM_CUSTOM_3];
+	BS.snd_CUSTOM_4 -> RadioAux.AMSend[AM_CUSTOM_4];
+	BS.snd_CUSTOM_5 -> RadioAux.AMSend[AM_CUSTOM_5];
+	BS.snd_CUSTOM_6 -> RadioAux.AMSend[AM_CUSTOM_6];
+	BS.snd_CUSTOM_7 -> RadioAux.AMSend[AM_CUSTOM_7];
+	BS.snd_CUSTOM_8 -> RadioAux.AMSend[AM_CUSTOM_8];
+	BS.snd_CUSTOM_9 -> RadioAux.AMSend[AM_CUSTOM_9];
+ #endif
 
-#elif defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS)
-	components CC2420ActiveMessageC as RadioAux;
-	BS.RadioAux -> RadioAux;
-#elif defined(PLATFORM_MICA2) || defined(PLATFORM_MICA2DOT)
-
-#elif defined(INO)
-
-#endif
-
-#ifndef MODULE_CTP
+ #ifndef MODULE_CTP
 	BS.RadioReceiver -> RadioAM.Receive;
-#else
+ #else
 	BS.rec_NEWPROGVERSION -> RadioAM.Receive[AM_NEWPROGVERSION];
 	BS.rec_NEWPROGBLOCK -> RadioAM.Receive[AM_NEWPROGBLOCK];
 	BS.rec_REQPROGBLOCK -> RadioAM.Receive[AM_REQPROGBLOCK];
-#ifdef MODE_SETDATA
+  #ifdef MODE_SETDATA
 	BS.rec_SETDATAND -> RadioAM.Receive[AM_SETDATAND];
 	BS.rec_REQDATA -> RadioAM.Receive[AM_REQDATA];
-#endif
+  #endif
 	BS.rec_PINGMSG -> RadioAM.Receive[AM_PINGMSG];
 	BS.rec_CUSTOM_0 -> RadioAM.Receive[AM_CUSTOM_0];
 	BS.rec_CUSTOM_1 -> RadioAM.Receive[AM_CUSTOM_1];
@@ -108,7 +126,7 @@ implementation{
 	BS.rec_CUSTOM_7 -> RadioAM.Receive[AM_CUSTOM_7];
 	BS.rec_CUSTOM_8 -> RadioAM.Receive[AM_CUSTOM_8];
 	BS.rec_CUSTOM_9 -> RadioAM.Receive[AM_CUSTOM_9];
-#endif
+ #endif
 #endif // INO x TinyOS
 
 	// Base Station
@@ -186,5 +204,6 @@ implementation{
   components InoIOC;
   BS.InoIO -> InoIOC;
 #endif	
+
 
 }

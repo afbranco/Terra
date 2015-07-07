@@ -26,4 +26,19 @@ implementation{
 	custom.usrDataQ -> usrDataQ;
 #endif
 
+	// FFT Module
+#ifdef M_FFT
+	components kissFFTC as KF;
+	custom.KF -> KF;
+#endif
+	// Volcano Data Module (GModel & Sensor Stream)
+#ifdef M_VCN_DAT
+	components VolcanoDataC as VCN;
+	custom.ReadStream -> VCN.ReadStream;
+	custom.SetSensorRtime -> VCN;
+	custom.GetSensorRtime -> VCN;
+	custom.GModelBlockRead -> VCN.BlockRead;
+#endif
+
+
 }

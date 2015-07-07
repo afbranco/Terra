@@ -4,8 +4,8 @@
 # Define target VM to build: NET or GRP | default NET
 #    VM=GRP
 #
-# Define additional modules: FFT,VOLCANO,MSGQ | default ''
-#    MOD=FFT,VOLCANO | MOD=FFT
+# Define additional modules: FFT,VCN_DAT,VCN_DET,MSGQ | default ''
+#    MOD=FFT,VCN_DAT,VCN_DET | MOD=FFT
 #
 # Configure sensorboard: MTS300CA or MTS300CB(wired) or MDA100 | default MDA100
 #    SENSOR=MTS300CA
@@ -25,12 +25,14 @@
 # SetData functionality: YES or NO | default NO
 #    SETDATA=NO
 #
-# MicaZ/TelosB RF Power: 03 07 11 15 19 23 27 31 | default 03
-#    RFPOWER=03
-#                       Ref.: http://www.ti.com/lit/ds/symlink/cc2420.pdf ; pag-51, table:9
+# RF Power: 0 1 2 3 4 5 6 7 | default 1
+#    RFPOWER=1
 #
 # XBee USB Connection: 0 or 1 | default 1
 #    INO_XBEE_USB=0
+#
+# Low Power Listening mode: YES or NO | default NO
+#    LPL=NO
 #
 # Command line examples
 #  make micaz  VM=GRP TYPE=NOBS QUEUE=SHORT install.2 mib520,/dev/ttyUSB0 HYB=NO
@@ -92,21 +94,38 @@ endif
 
 INO_INSTALL_PORT ?= /dev/ttyACM0
 
-
-
-#TinyOS micaz default radio power
-RFPOWER ?= 03
-ifneq ($(findstring $(RFPOWER), 0 1 2 3 4 5 6 7 8 9),)
-    $(error 'RFPOWER must have 2 digit value: 03 07 11 15 19 23 27 31')
+LPL ?= NO
+ifneq ($(LPL),YES)
+  ifneq ($(LPL),NO)
+    $(error LPL must be "YES" or "NO")
+  endif
 endif
 
-ifeq ($(findstring $(RFPOWER), 03 07 11 15 19 23 27 31),)
-    $(error 'RFPOWER must have one of these numbers: 03 07 11 15 19 23 27 31')
+
+# Default radio power
+RFPOWER ?= 1
+ifeq ($(findstring $(RFPOWER), 0 1 2 3 4 5 6 7 ),)
+    $(error 'RFPOWER must have 1 digit value: 0 1 2 3 4 5 6 7')
 endif
 
 # Verbose mode
 ifeq ($(VERB),YES)
 	CFLAGS += -v
+endif
+
+
+# LPL config
+ifeq ($(LPL),YES)
+	CFLAGS += -DLPL_ON
+	# 90 ms radio OFF
+	SLEEP ?= 450
+	# 700=10ms radio ON
+	XCCA ?= 700
+	CFLAGS += -DLOW_POWER_LISTENING
+	CFLAGS += -DSLEEP=$(SLEEP) -DMAX_LPL_CCA_CHECKS=$(XCCA)
+	CFLAGS += -DLPL_DEF_LOCAL_WAKEUP=$(SLEEP)
+	CFLAGS += -DLPL_DEF_REMOTE_WAKEUP=$(SLEEP)
+	CFLAGS += -DDELAY_AFTER_RECEIVE=20
 endif
 
 
@@ -146,21 +165,27 @@ TOSVERSION = $(subst .,,$(subst /opt/tinyos-,,$(TOSROOT)))
 #
 ifeq (mica2,$(word 1,$(MAKECMDGOALS)))
   PFLAGS += -DCC1K_DEF_FREQ=916400000
+  PFLAGS += -DRFPOWER_IDX=$(RFPOWER)
   MOTE=mica2
   HYB=YES
 endif
 ifeq (mica2dot,$(word 1,$(MAKECMDGOALS)))
   PFLAGS += -DCC1K_DEF_FREQ=916400000
+  PFLAGS += -DRFPOWER_IDX=$(RFPOWER)
   MOTE=mica2dot
   HYB=YES
 endif
 ifeq (micaz,$(word 1,$(MAKECMDGOALS)))
-  PFLAGS += -DCC2420_DEF_RFPOWER=$(RFPOWER)
+  # cc2420 - Ref.: http://www.ti.com/lit/ds/symlink/cc2420.pdf ; pag-51, table:9
+  CC2420_RFPOWER = $(shell echo ${RFPOWER}*4+3 | bc)
+  PFLAGS += -DCC2420_DEF_RFPOWER=$(CC2420_RFPOWER) -DRFPOWER_IDX=$(RFPOWER)
   MOTE=micaz
   HYB=YES
 endif
 ifeq (telosb,$(word 1,$(MAKECMDGOALS)))
-  PFLAGS += -DCC2420_DEF_RFPOWER=$(RFPOWER)
+  # cc2420 - Ref.: http://www.ti.com/lit/ds/symlink/cc2420.pdf ; pag-51, table:9
+  CC2420_RFPOWER = $(shell echo ${RFPOWER}*4+3 | bc)
+  PFLAGS += -DCC2420_DEF_RFPOWER=$(CC2420_RFPOWER) -DRFPOWER_IDX=$(RFPOWER)
   MOTE=telosb
 endif
 ifeq (ino,$(word 2,$(MAKECMDGOALS)))
@@ -216,7 +241,7 @@ ifeq ($(VM),NET)
   MB_SHORT_NOBS = 92
   MB_LONG_ALL = 64
   MB_LONG_NOBS = 71
-  MB_TELOSB    = 250
+  MB_TELOSB    = 310
 else ifeq ($(VM),GRP)
   MB_SHORT_ALL =24
   MB_SHORT_NOBS = 32
@@ -224,11 +249,10 @@ else ifeq ($(VM),GRP)
   MB_LONG_NOBS = 10
   MB_TELOSB    = 200
 else ifeq ($(VM),INO)
-  MB_SHORT_ALL =24
-  MB_SHORT_NOBS = 32
-  MB_LONG_ALL = 10
-  MB_LONG_NOBS = 10
-  MB_TELOSB    = 200
+  MB_SHORT_ALL =120
+  MB_SHORT_NOBS = 120
+  MB_LONG_ALL = 150
+  MB_LONG_NOBS = 150
 endif
 
 ifeq ($(HYB),YES) # Same value for all types
@@ -275,8 +299,9 @@ endif
 # Define MemBlocks Size for each additional module/operations
 M_SETDATA = 14
 M_MSGQ = 8
-M_FFT = 0     # ???
-M_VOLCANO = 0 # ???
+M_FFT = 0    
+M_VCN_DAT = 7
+M_VCN_DET = 0
 
 
 #
@@ -305,11 +330,17 @@ ifneq ($(findstring FFT,$(MODULES)),)
 else
     DM_FFT = 0
 endif
-ifneq ($(findstring VOLCANO,$(MODULES)),)
-    CFLAGS += -DM_VOLCANO
-    DM_VOLCANO = $(M_VOLCANO)
+ifneq ($(findstring VCN_DAT,$(MODULES)),)
+    CFLAGS += -DM_VCN_DAT
+    DM_VCN_DAT = $(M_VCN_DAT)
 else
-    DM_VOLCANO = 0
+    DM_VCN_DAT = 0
+endif
+ifneq ($(findstring VCN_DET,$(MODULES)),)
+    CFLAGS += -DM_VCN_DET
+    DM_VCN_DET = $(M_VCN_DET)
+else
+    DM_VCN_DET = 0
 endif
 ifneq ($(findstring MSGQ,$(MODULES)),)
     CFLAGS += -DM_MSG_QUEUE
@@ -325,19 +356,20 @@ else
 endif
 
 # Calculate final MemBlocks
-MBLOCKS_F = $(shell echo ${MBLOCKS}-${DM_MSGQ}-${DM_SETDATA}-${DM_FFT}-${DM_VOLCANO} | bc)
+MBLOCKS_F = $(shell echo ${MBLOCKS}-${DM_MSGQ}-${DM_SETDATA}-${DM_FFT}-${DM_VCN_DAT}-${DM_VCN_DET} | bc)
 # force short memory - test with printf
 # MBLOCKS=40
 CFLAGS += -DVM_MEM_BLKS=$(MBLOCKS_F) -DTOSVER=$(TOSVERSION)
-#$(info shell echo ${MBLOCKS}-${DM_MSGQ}-${DM_SETDATA}-${DM_FFT}-${DM_VOLCANO})
+#$(info shell echo ${MBLOCKS}-${DM_MSGQ}-${DM_SETDATA}-${DM_FFT}-${DM_VCN_DAT}-${DM_VCN_DET})
 
 
 $(info ***********************)
 $(info **** Configuration ****)
 $(info VM          = $(VM))
-$(info MODULES     = $(MODULES) -- [FFT,VOLCANO,MSGQ])
+$(info MODULES     = $(MODULES) -- [FFT,VCN_DAT,VCN_DET,MSGQ])
 $(info MOTE        = $(MOTE))
 $(info RFPOWER     = $(RFPOWER))
+$(info LPL         = $(LPL))
 $(info SENSORBOARD = $(SENSORBOARD))
 $(info TYPE        = $(TYPE))
 $(info HYB         = $(HYB))
@@ -355,8 +387,8 @@ MSG_SIZE = 29
 
 CFLAGS += -DNO_DEBUG 
 CFLAGS += -I. -I$(VMDIR) -I$(XCOMPSDIR)
-#CFLAGS += -DPRINTF
-#CFLAGS += -I$(TOSDIR)/lib/printf
+//CFLAGS += -DPRINTF
+//CFLAGS += -I$(TOSDIR)/lib/printf
 
 COMPONENT   = TerraVMAppC
 

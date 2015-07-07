@@ -8,7 +8,7 @@ MAIN_HEX = $(BUILDDIR)/main.hex
 OBJDUMP = avr-objdump
 CPU=atmega2560
 
-OPT_1 = -fnesc-include=tos  -topdir=/home/branco/gitspace/Terra/nescino  -fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask -DPLATFORM_IRIS -o $(MAIN_EXE) -Os -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -fnesc-cfile=build/ino/app.c --param max-inline-insns-single=100000 -fnesc-dump=wiring   -fnesc-dumpfile=build/ino/wiring-check.xml $(COMPONENT).nc -lm -v -gcc=avr-gcc -mmcu=$(CPU) -fnesc-target=avr -fnesc-no-debug
+OPT_1 = -fnesc-include=tos  -topdir=/home/branco/gitspace/Terra/nescino  -fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask -DPLATFORM_IRIS -o $(MAIN_EXE) -Os -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -fnesc-cfile=build/ino/app.c --param max-inline-insns-single=100000 -fnesc-dump=wiring   -fnesc-dumpfile=build/ino/wiring-check.xml $(COMPONENT).nc -lm  -gcc=avr-gcc -mmcu=$(CPU) -fnesc-target=avr -fnesc-no-debug
 
 OPT_2 = $(CFLAGS)
 

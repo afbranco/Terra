@@ -32,9 +32,10 @@ enum{
 	O_REQ_PORT_B	=17,
 	O_CFG_INT_A		=18,
 	O_CFG_INT_B		=19,
-	O_CUSTOM_A		=20,	
+	O_CUSTOM_A		=20,
 	O_REQ_MIC		=21,	
 	O_BEEP			=22,	
+	O_CUSTOM		=23,
 	// TerraNet Custom Output events
 	O_SEND			=40,
 	O_SEND_ACK		=41,
@@ -54,6 +55,7 @@ enum{
 	I_CUSTOM_A_ID	=12,
 	I_CUSTOM_A		=13,
 	I_MIC			=14,
+	I_CUSTOM		=15,
 	// TerraNet Custom Input events
 	I_SEND_DONE_ID		=40,
 	I_SEND_DONE			=41,
@@ -69,6 +71,7 @@ enum{
 	// TerraNet basic functions
 	F_GETNODEID 	= 0,
 	F_RANDOM		= 1,
+	F_GETMEM		= 2,
 	// TerraNet custom functions
 	F_QPUT 			= 10,
 	F_QGET 			= 11,
@@ -79,11 +82,11 @@ enum{
 	F_SETUP_MIC		= 16,
 	F_RFPOWER		= 17,
 	// Volcano custom functions
-	F_GMODEL_READ	= 20,
-	F_GET_RTIME		= 21,
-	F_SET_RTIME		= 22,
-	F_GET_NSAMPLES	= 23,
-	F_DETECT		= 24,
+	F_GMODEL_READ	= 50,
+	F_GET_RTIME		= 51,
+	F_SET_RTIME		= 52,
+	F_GET_NSAMPLES	= 53,
+	F_DETECT		= 54,
 
 	// GModel internal constants
 	GMODEL_SIZE = (8*FEATURE_DIM) + 4  + ((8*MS_GAUSS_SCALES)*(1 + FEATURE_DIM)),

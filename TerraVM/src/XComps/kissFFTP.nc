@@ -31,7 +31,6 @@ implementation{
 
 
 
-
 /* function can reduce code size, but a little more execution time (less than 10ms on TelosB */
 #if defined(USE_ARITH_FUNC)
 kiss_fft_scalar smul(kiss_fft_scalar a,kiss_fft_scalar b){ return ( (SAMPPROD)(a)*(b) );}

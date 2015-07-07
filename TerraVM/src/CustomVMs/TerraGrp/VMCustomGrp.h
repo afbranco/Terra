@@ -48,6 +48,7 @@ enum{
 	O_CUSTOM_A		=20,	
 	O_REQ_MIC		=21,	
 	O_BEEP			=22,
+	O_CUSTOM		=23,
 	// TerraGrp custom output events IDs
 	O_SEND_BS		=40,
 	O_SEND_GR		=41,
@@ -66,6 +67,7 @@ enum{
 	I_CUSTOM_A_ID	=12,
 	I_CUSTOM_A		=13,
 	I_MIC			=14,
+	I_CUSTOM		=15,
 	// TerraGrp custom input events IDs
 	I_REC_GR_ID		=40,
 	I_REC_GR		=41,

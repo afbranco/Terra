@@ -184,6 +184,15 @@ void  proc_req_custom_a(uint16_t id, uint32_t value){
 	signal VM.queueEvt(I_CUSTOM_A   ,    0, &ExtDataCustomA);
 	}
 
+void  proc_req_custom(uint16_t id, uint32_t value){
+	uint8_t auxId ;
+	dbg(APPNAME,"Custom::proc_req_custom(): id=%d\n",id);
+	// Queue the custom event
+	ExtDataCustomA = 0;
+	signal VM.queueEvt(I_CUSTOM   ,    0, &ExtDataCustomA);
+	}
+
+
 void  proc_send_bs(uint16_t id, uint32_t addr){
 	usrSendBS_t *usrMsg;
 	uint8_t stat;
@@ -355,6 +364,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		case O_CFG_INT_A 	: proc_cfg_int_a(id,value); break;
 		case O_CFG_INT_B 	: proc_cfg_int_b(id,value); break;
 		case O_CUSTOM_A 	: proc_req_custom_a(id,value); break;
+		case O_CUSTOM 		: proc_req_custom(id,value); break;
 		/* TerraGrp custom output events */
 		case O_SEND_BS 		: proc_send_bs(id,value); break;
 		case O_SEND_GR 		: proc_send_gr(id,value); break;
@@ -410,43 +420,43 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 
 	bool isGrpAddrInitated(groupCtl_t* grCtl){
 		uint8_t n;
-		groupCtl_t* next = firstGrp;
+		groupCtl_t* next_ = firstGrp;
 		for (n=0; n < countGrp; n++)
-			if (grCtl==next) return TRUE; else next = (void*)signal VM.getRealAddr(next->nextGrp);
+			if (grCtl==next_) return TRUE; else next_ = (void*)signal VM.getRealAddr(next_->nextGrp);
 		return FALSE;
 	}
 	bool isAggAddrInitated(aggregCtl_t* agCtl){
 		uint8_t n;
-		aggregCtl_t* next = firstAgg;
+		aggregCtl_t* next_ = firstAgg;
 		for (n=0; n < countAgg; n++)
-			if (agCtl==next) return TRUE; else next = (void*)signal VM.getRealAddr(next->nextAgg);
+			if (agCtl==next_) return TRUE; else next_ = (void*)signal VM.getRealAddr(next_->nextAgg);
 		return FALSE;
 	}
 
 	uint16_t findGroupAddr(uint8_t grpId){
 		uint8_t n;
-		groupCtl_t* next = firstGrp;
+		groupCtl_t* next_ = firstGrp;
 		dbg(APPNAME,"VM::findGroupAddr(): grpId=%d/%d, countGrp=%d, firstGrp addr=%x\n",(grpId & 0x1F),grpId,countGrp,firstGrp);
 		for (n=0; n < countGrp; n++){
-			dbg(APPNAME,"VM::findGroupAddr(): n=%d of %d, Id=%d\n",n,countGrp,next->grId);
-			if (next->grId == (grpId & 0x1F))
-				return ((void*)next - (void*)signal VM.getRealAddr(0)); // Var VM addr = (Var Real Addr) - (MEM Real Addr)
+			dbg(APPNAME,"VM::findGroupAddr(): n=%d of %d, Id=%d\n",n,countGrp,next_->grId);
+			if (next_->grId == (grpId & 0x1F))
+				return ((void*)next_ - (void*)signal VM.getRealAddr(0)); // Var VM addr = (Var Real Addr) - (MEM Real Addr)
 			else
-				next = (void*)signal VM.getRealAddr(next->nextGrp);
+				next_ = (void*)signal VM.getRealAddr(next_->nextGrp);
 		}
 		return 0;
 	}
 
 	uint16_t findAggregAddr(uint8_t aggId){
 		uint8_t n;
-		aggregCtl_t* next = firstAgg;
+		aggregCtl_t* next_ = firstAgg;
 		dbg(APPNAME,"VM::findAggregAddr(): aggId=%d/%d, countAgg=%d, firstAgg addr=%x\n",(aggId & 0x07),aggId,countGrp,firstAgg);
 		for (n=0; n < countAgg; n++){
-			dbg(APPNAME,"VM::findAggregAddr(): n=%d of %d, Id=%d\n",n,countAgg,next->agId);
-			if (next->agId == (aggId & 0x07))
-				return ((void*)next - (void*)signal VM.getRealAddr(0)); // Var VM addr = (Var Real Addr) - (MEM Real Addr)
+			dbg(APPNAME,"VM::findAggregAddr(): n=%d of %d, Id=%d\n",n,countAgg,next_->agId);
+			if (next_->agId == (aggId & 0x07))
+				return ((void*)next_ - (void*)signal VM.getRealAddr(0)); // Var VM addr = (Var Real Addr) - (MEM Real Addr)
 			else
-				next = (void*)signal VM.getRealAddr(next->nextAgg);
+				next_ = (void*)signal VM.getRealAddr(next_->nextAgg);
 		}
 		return 0;
 	}
@@ -911,20 +921,20 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 
 	void queueLeaderProc(uint8_t bitValue){
 		uint8_t n;
-		groupCtl_t* next = firstGrp;
+		groupCtl_t* next_ = firstGrp;
 		uint8_t electionFlag, electionState;
 
 		dbg(APPNAME,"VM::queueLeaderProc():  countGrp=%d, firstGrp = %x\n",countGrp,(uint16_t)firstGrp);
 		for (n=0; n < countGrp; n++){
 			// Test if leader is enabled and queue a init/review Leader evt.
-			dbg(APPNAME,"VM::queueLeaderProc(): n=%d of %d, Id=%d, bitValue=%d\n",n,countGrp,next->grId,bitValue);
-			getGrpElctState(next->grId, &electionFlag, &electionState);
-			dbg(APPNAME,"VM::queueLeaderProc(): n=%d of %d, Id=%d, bitValue=%d, electionFlag=%d\n",n,countGrp,next->grId,bitValue,electionFlag);
+			dbg(APPNAME,"VM::queueLeaderProc(): n=%d of %d, Id=%d, bitValue=%d\n",n,countGrp,next_->grId,bitValue);
+			getGrpElctState(next_->grId, &electionFlag, &electionState);
+			dbg(APPNAME,"VM::queueLeaderProc(): n=%d of %d, Id=%d, bitValue=%d, electionFlag=%d\n",n,countGrp,next_->grId,bitValue,electionFlag);
 			if (electionFlag!=ELCT_OFF){
-				removeElectionQ(next->grId);
-				call electionQ.enqueue((uint8_t)(next->grId | (bitValue<<ELCT_INIT_BIT)));
+				removeElectionQ(next_->grId);
+				call electionQ.enqueue((uint8_t)(next_->grId | (bitValue<<ELCT_INIT_BIT)));
 			}
-			next = (void*)signal VM.getRealAddr(next->nextGrp);
+			next_ = (void*)signal VM.getRealAddr(next_->nextGrp);
 		}
 		post procLeaderQ();
 	}

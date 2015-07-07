@@ -11,14 +11,13 @@ configuration VMCustomC{
 implementation{
 	components VMCustomP as custom;
 	components BasicServicesC as BS;
-	components SensActC as SA;
-	
 	custom.VM = VMCustom;
 	custom.BSRadio -> BS;
-	custom.SA -> SA;
-	
 	components RandomC;
 	custom.Random -> RandomC;
+	
+	components SensActC as SA;
+	custom.SA -> SA;
 	
 	// Custom Queues
 #ifdef M_MSG_QUEUE
@@ -32,7 +31,7 @@ implementation{
 	custom.KF -> KF;
 #endif
 	// Volcano Data Module (GModel & Sensor Stream)
-#ifdef M_VOLCANO
+#ifdef M_VCN_DAT
 	components VolcanoDataC as VCN;
 	custom.ReadStream -> VCN.ReadStream;
 	custom.SetSensorRtime -> VCN;

@@ -45,8 +45,13 @@ enum{
 	MAX_SEND_RETRIES = 5,
 
 	// Request data/prog timeout
+#ifdef TOSSIM
+	REQUEST_TIMEOUT = 800L,
+	REQUEST_TIMEOUT_BS =  800L,
+#else
 	REQUEST_TIMEOUT = 500L,
-	REQUEST_TIMEOUT_BS =  500L,//2000L,
+	REQUEST_TIMEOUT_BS =  500L,
+#endif
 	REQUEST_VERY_LONG_TIMEOUT =600000L,
 	DISSEMINATION_TIMEOUT = 300L,
 
@@ -80,6 +85,16 @@ enum{
 	// Ack & Retry bits
 	REQ_ACK_BIT   = 0,
 	REQ_RETRY_BIT = 1,
+
+#ifdef LPL_ON
+/**
+ * SLEEP indica quanto tempo em mili-segundos o radio ficara dormindo.
+ */
+#ifndef SLEEP
+#define SLEEP 90
+#endif
+
+#endif //LPL_ON
 	
 };
 
@@ -159,8 +174,10 @@ typedef nx_struct ctpMsg {
 } ctpMsg_t;
 
 #if defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS)
-#define RFPower_IDs 8
-uint8_t RFPowerTab[RFPower_IDs]={03, 07, 11, 15, 19, 23, 27, 31};
-
+	#define RFPower_IDs 8
+	uint8_t RFPowerTab[RFPower_IDs]={03, 07, 11, 15, 19, 23, 27, 31};
+#elif defined(PLATFORM_MICA2) || defined(PLATFORM_MICA2DOT)
+	#define RFPower_IDs 8
+	uint8_t RFPowerTab[RFPower_IDs]={02, 05, 10, 51, 102, 153, 204, 255};
 #endif
 #endif /* BASIC_SERVICES_H */

@@ -15,10 +15,12 @@
 
 module SensActP{
 	provides interface SensAct as SA;
+	uses interface Leds as A_LEDS;	
+#if !(defined(M_VCN_DAT) && defined(PLATFORM_TELOSB))  // Disable sensors when using Volcano Data in TelosB
 	uses interface Read<uint16_t> as S_TEMP;
 	uses interface Read<uint16_t> as S_PHOTO;
 	uses interface Read<uint16_t> as S_VOLT;
-	uses interface Leds as A_LEDS;	
+#endif
 
 #if SBOARD == 300
 	uses interface ReadStream<uint16_t> as S_MIC;
@@ -121,6 +123,7 @@ implementation{
 
 	command void SA.reqSensor(uint8_t reqSource, uint8_t id){
 		dbg(APPNAME,"SA.reqSensor(): reSource=%d, id=%d\n",reqSource,id);
+#if !(defined(M_VCN_DAT) && defined(PLATFORM_TELOSB))
 		switch (id){
 			case SID_TEMP : call S_TEMP.read(); insertSReq(reqSource,id); TViewer("sensor",SID_TEMP,0); break;
 			case SID_PHOTO: call S_PHOTO.read(); insertSReq(reqSource,id);  TViewer("sensor",SID_PHOTO,0);break;
@@ -129,6 +132,7 @@ implementation{
 			case SID_IN1: dIn1 = (getPinX(SID_IN1)==TRUE)?1:0; signal SA.Ready(reqSource, TID_SENSOR_DONE | SID_IN1); break;
 			case SID_IN2: dIn2 = (getPinX(SID_IN2)==TRUE)?1:0; signal SA.Ready(reqSource, TID_SENSOR_DONE | SID_IN2); break;
 		}
+#endif
 	}
 
 // Adapt enable interrupt function for TinyOS Version
@@ -213,6 +217,7 @@ implementation{
 		return &dTemp;
 	}
 
+#if !(defined(M_VCN_DAT) && defined(PLATFORM_TELOSB))
 	event void S_TEMP.readDone(error_t result, uint16_t val){
 		uint8_t source;
 		dbg(APPNAME,"S_TEMP.readDone(): val=%d\n",val);		
@@ -237,7 +242,7 @@ implementation{
 		for (source=0;source<4;source++)
 			if (getSReq (source,SID_VOLT) == TRUE) signal SA.Ready(source, TID_SENSOR_DONE | SID_VOLT);		
 	}	
-
+#endif
 #ifndef TOSSIM
 #if defined(PLATFORM_MICAZ) || defined(PLATFORM_MICA2) || defined(PLATFORM_IRIS)
 	task void sigInt1(){signal SA.Ready(0,(uint8_t)(TID_SENSOR_DONE | SID_INT1));}
