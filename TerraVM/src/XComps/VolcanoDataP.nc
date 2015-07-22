@@ -27,7 +27,7 @@ implementation{
   //uint32_t blk_len;
 
   command void Set.set(uint32_t x) {
-    m_addr = x * sizeof(blockentry_t);
+    m_addr = x * sizeof(blk);
   }
 
   command uint32_t Get.get() {
@@ -39,7 +39,7 @@ implementation{
   {
 //    uint16_t auxCount = (count==0)?sizeof(blockentry_t):count;
 //    return (call BlockRead.read(m_addr, buf, auxCount));
-    return (call BlockRead.read(m_addr, &blk, sizeof(blockentry_t)));
+    return (call BlockRead.read(m_addr, &blk, sizeof(blk)));
   }
 
   command error_t ReadStream.read(uint32_t usPeriod)
@@ -50,7 +50,7 @@ implementation{
   event void BlockRead.readDone(storage_addr_t addr, void *buf, storage_len_t len, error_t error)
   {
   	//blockentry_t* pBlk = buf;
-    m_addr += sizeof(blockentry_t);
+    m_addr += sizeof(blk);
 	//blk_len = pBlk->len;
 	//blk_rtime = pBlk->rtime;
     //if(blk_len != 0) {

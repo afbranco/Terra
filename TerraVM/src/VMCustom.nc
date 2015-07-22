@@ -21,5 +21,6 @@ interface VMCustom{
 	event void* getRealAddr(uint16_t Maddr);
 	event bool getHaltedFlag();
 	event void evtError(uint8_t ecode);
+	event uint32_t getTime();
 
 }

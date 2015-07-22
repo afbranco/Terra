@@ -2,7 +2,7 @@
 exec > >(tee complog.txt)
 
 # RF Power: 0 1 2 3 4 5 6 7 | default 1
-RADIO_PWR=1
+RADIO_PWR=2
 RADIO_PWR2=4
 # LPL - Low Power Listening
 LPL=NO

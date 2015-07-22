@@ -209,6 +209,12 @@ void  func_getMem(uint16_t id){
 	dbg(APPNAME,"Custom::func_getMem(): func id=%d, addr=%d, val=%d(%0x)\n",id,Maddr,val,val);
 	signal VM.push(val);
 	}
+void  func_getTime(uint16_t id){
+	uint32_t val;
+	val = signal VM.getTime();
+	dbg(APPNAME,"Custom::func_getTime(): func id=%d, val=%d(%0x)\n",id,val,val);
+	signal VM.push(val);
+	}
 #ifdef M_MSG_QUEUE
 void  func_qPut(uint16_t id){
 	error_t stat;
@@ -414,6 +420,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 			case F_GETNODEID: func_getNodeId(id); break;
 			case F_RANDOM 	: func_random(id); break;
 			case F_GETMEM 	: func_getMem(id); break;
+			case F_GETTIME 	: func_getTime(id); break;
 #ifdef M_MSG_QUEUE
 			case F_QPUT 	: func_qPut(id); break;
 			case F_QGET 	: func_qGet(id); break;

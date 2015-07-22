@@ -241,7 +241,7 @@ ifeq ($(VM),NET)
   MB_SHORT_NOBS = 92
   MB_LONG_ALL = 64
   MB_LONG_NOBS = 71
-  MB_TELOSB    = 310
+  MB_TELOSB    = 200
 else ifeq ($(VM),GRP)
   MB_SHORT_ALL =24
   MB_SHORT_NOBS = 32

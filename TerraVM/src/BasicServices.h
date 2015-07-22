@@ -57,8 +57,13 @@ enum{
 
 #ifdef SHORT_QUEUES
 	// Queues and Lists Size
+#ifdef M_FFT
+	IN_QSIZE  = 2,//5,
+	OUT_QSIZE = 3,//10,//10, //6
+#else
 	IN_QSIZE  = 5,
 	OUT_QSIZE = 10,//10, //6
+#endif
 #else
 	// Queues and Lists Size
 	IN_QSIZE  = 10,

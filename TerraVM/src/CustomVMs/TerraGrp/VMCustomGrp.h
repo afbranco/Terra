@@ -85,6 +85,8 @@ enum{
 	// TerraNet basic functions
 	F_GETNODEID 	= 0,
 	F_RANDOM		= 1,
+	F_GETMEM		= 2,
+	F_GETTIME		= 3,
 	// TerraGrp Custom functions
 	F_GROUPINIT 	= 10,
 	F_AGGREGINIT 	= 11,

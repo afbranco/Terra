@@ -297,6 +297,7 @@ void setMVal(uint32_t buffer, uint16_t Maddr, uint8_t fromTp, uint8_t toTp){
 }
 
 
+
 // Return CEU internal slot offset for EvtId
 uint16_t getEvtCeuId(uint8_t EvtId){
 	uint8_t i=0;
@@ -1159,8 +1160,8 @@ void f_setarr_vc(uint8_t Modifier){
 	tp1 = getBits(Modifier,4,6);
 	p2_1len = getBitsPow(Modifier,3,3);
 	tp2 = getBits(Modifier,0,2);
-	p3_1len = getBitsPow(Modifier,2,2);
-	p4_len = (uint8_t)(getBits(Modifier,0,1)+1);
+	p3_1len = getBitsPow(Aux,2,2);
+	p4_len = (uint8_t)(getBits(Aux,0,1)+1);
 	v1_len = (tp1==F32)? 4 : 1<<(tp1&0x3);
 	v2_len = (tp2==F32)? 4 : 1<<(tp2&0x3);
 
@@ -1586,7 +1587,7 @@ void f_set_c(uint8_t Modifier){
 	void Decoder(uint8_t Opcode,uint8_t Modifier){
 //		dbg(APPNAME,"VM::Decoder()\n");
 		// Execute the respective operation
-		dbg(APPNAME,"VM::Decoder(): PC= %d opcode= %hhu modifier=%d\n",PC-1,Opcode,Modifier);
+		dbg(APPNAME,"VM::Decoder(): PC= %d opcode= %hhu modifier=%d Maddr[290]=%d\n",PC-1,Opcode,Modifier,getMVal(290,U8));
 		switch (Opcode){
 			case op_nop : f_nop(Modifier); break;
 			case op_end : f_end(Modifier); break;
@@ -1779,6 +1780,14 @@ void f_set_c(uint8_t Modifier){
 		return haltedFlag;
 	}
 
+
+	event uint32_t VMCustom.getTime(){
+#ifndef ONLY_BSTATION
+		return call BSTimerVM.getNow();
+#else
+		return 0;
+#endif
+		}
 
     event void BSTimerVM.fired()
     {

@@ -72,6 +72,7 @@ enum{
 	F_GETNODEID 	= 0,
 	F_RANDOM		= 1,
 	F_GETMEM		= 2,
+	F_GETTIME		= 3,
 	// TerraNet custom functions
 	F_QPUT 			= 10,
 	F_QGET 			= 11,
