@@ -165,7 +165,12 @@ public class ControlCore implements MessageListener
 						controlform.recReqProgBlockMsg(progBin.getBlockStart(),omsg.get_blockId(),progBin.getNumBlocks(),dest_addr);
 						System.out.println(omsg.toString());
 						if (omsg.get_blockId() == (progBin.getNumBlocks()+progBin.getBlockStart()-1)) CurrRequestMote=0;
-						sendNewProgBlock(omsg.get_blockId());
+							
+						//if (omsg.get_blockId() == progBin.getBlockStart()) {
+						//	sendNewProgBlockAll(omsg.get_blockId(),progBin.getNumBlocks()+progBin.getBlockStart());							
+						//} else {
+							sendNewProgBlock(omsg.get_blockId());							
+						//}
 					} else if (VersionId < omsg.get_versionId()){
 						VersionId = omsg.get_versionId();
 						CurrRequestMote = 0;
@@ -254,6 +259,41 @@ public class ControlCore implements MessageListener
         }
     }	
 	
+	
+	/**
+	 * Send program blocks starting from BlockStart until BlockEnd
+	 * @param BlockId	Requested data block number
+	 */
+/*
+	void sendNewProgBlockAll(int BlockStart,int BlockEnd){
+		controlform.appendControlMsg("ControlCore: sendNewProgBlockAll()");
+
+		newProgBlockMsg msg = new newProgBlockMsg();
+
+		for (int blkId=BlockStart;blkId<BlockEnd;blkId++) {
+			msg.set_blockId(blkId);
+			msg.set_versionId(VersionId);
+			
+			short[] ProgBlock = progBin.getProgBlock(blkId);
+			msg.set_data(ProgBlock);
+			System.out.println("sendNewProgBlockAll:");
+			System.out.println(msg.toString());
+			try {
+				mote.send(1, msg);
+			} catch (IOException e) {
+				erroCount++;
+				System.out.println("sendMsg::"+"NewProgBlock"+": Can not send message to Base Station");
+			}
+			try {
+				Thread.sleep(300);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+*/	
+	
 	/**
 	 * Send a specific program block
 	 * @param BlockId	Requested data block number
@@ -268,6 +308,7 @@ public class ControlCore implements MessageListener
 		
 		short[] ProgBlock = progBin.getProgBlock(BlockId);
 		msg.set_data(ProgBlock);
+		System.out.println("sendNewProgBlock:");
 		System.out.println(msg.toString());
 		TCPtimer.schedule(new sendMsg("NewProgBlock",msg), 10);
 	}
