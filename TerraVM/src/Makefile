@@ -25,7 +25,7 @@
 # SetData functionality: YES or NO | default NO
 #    SETDATA=NO
 #
-# RF Power: 0 1 2 3 4 5 6 7 | default 1
+# RF Power: 0 1 2 3 4 5 6 7 | default 3
 #    RFPOWER=1
 #
 # XBee USB Connection: 0 or 1 | default 1
@@ -241,7 +241,7 @@ ifeq ($(VM),NET)
   MB_SHORT_NOBS = 92
   MB_LONG_ALL = 64
   MB_LONG_NOBS = 71
-  MB_TELOSB    = 200
+  MB_TELOSB    = 119
 else ifeq ($(VM),GRP)
   MB_SHORT_ALL =24
   MB_SHORT_NOBS = 32
@@ -389,6 +389,7 @@ CFLAGS += -DNO_DEBUG
 CFLAGS += -I. -I$(VMDIR) -I$(XCOMPSDIR)
 //CFLAGS += -DPRINTF
 //CFLAGS += -I$(TOSDIR)/lib/printf
+
 
 COMPONENT   = TerraVMAppC
 

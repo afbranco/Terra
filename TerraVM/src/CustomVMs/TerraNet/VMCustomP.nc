@@ -18,7 +18,7 @@ module VMCustomP{
 	uses interface kissFFT as KF;
 #endif
 #ifdef M_VCN_DAT
-    uses interface ReadStream<int32_t>;
+    uses interface ReadStream<nx_int32_t>;
     uses interface Set<uint32_t> as SetSensorRtime;
     uses interface Get<uint32_t> as GetSensorRtime;
     uses interface BlockRead as GModelBlockRead;
@@ -40,7 +40,7 @@ nx_uint8_t ExtDataQReady;			// last queue ready - queue size
 nx_uint32_t ExtDataTimeStamp;		// last SLPL_FIRED - timestamp 
 nx_uint8_t ExtDataGModelRdDone;		// last GModelReadDone Status 
 nx_uint16_t ExtDataBufferRdDone;	// last StreamReadDone [error=0 | Count>0]
-nx_uint32_t* UsrStreamBuffer;		// Pointer to user data stream buffer
+nx_int32_t* UsrStreamBuffer;		// Pointer to user data stream buffer
 
 uint8_t MIC_flag;					// Indicate if Mic Sensor was setup
 nx_uint16_t* MIC_buf;				// Mic Sensor read buffer
@@ -151,7 +151,6 @@ void  proc_req_custom_a(uint16_t id, uint32_t value){
 	}
 
 void  proc_req_custom(uint16_t id, uint32_t value){
-	uint8_t auxId ;
 	dbg(APPNAME,"Custom::proc_req_custom(): id=%d\n",id);
 	// Queue the custom event
 	ExtDataCustomA = 0;
@@ -162,7 +161,7 @@ void  proc_req_custom(uint16_t id, uint32_t value){
 #ifdef M_VCN_DAT
 void  proc_rd_stream(uint16_t id, uint32_t value){
 	dbg(APPNAME,"Custom::proc_rd_stream(): id=%d value=%d\n",id,value);
-	UsrStreamBuffer = (nx_uint32_t*)signal VM.getRealAddr(value);
+	UsrStreamBuffer = (nx_int32_t*)signal VM.getRealAddr(value);
 	call ReadStream.postBuffer(NULL, 0);
 }
 #endif
@@ -253,43 +252,27 @@ void  func_qClear(uint16_t id){
 #endif //M_MSG_QUEUE
 
 #ifdef M_FFT
+  /* the memory required by FFT routine, the length
+     of if should be tested on each platform */
+  size_t fft_mem_len = 1138; // 1138 is for 100-point FFT on TelosB
+  int8_t fft_mem[1138];
+  const int fft_points = 100;
+  kiss_fftr_cfg fft_cfg;
+  kiss_fft_cpx outdata[SAMPLING_RATE/2 + 1];
+
+  int32_t buffer_pool[POOL_LEN][BUFFER_LEN]; // use integer to store data, to accelerate execution
+  
 void  func_fftAlloc(uint16_t id){
 	error_t stat;
-	nx_uint16_t nfft;
-	nx_uint8_t inverse_fft;
-	uint16_t varCfg;
-	uint16_t varLen;
-	void* mem;
-	nx_uint16_t* lenmem;
 	dbg(APPNAME,"Custom::func_fftAlloc(): id=%d\n",id);
-	varLen = (uint16_t)signal VM.pop();	
-	varCfg = (uint16_t)signal VM.pop();	
-	inverse_fft = (uint8_t)signal VM.pop();	
-	nfft = (nx_uint16_t)signal VM.pop();	
-
-	mem = (void*)signal VM.getRealAddr(varCfg);
-	lenmem = (void*)signal VM.getRealAddr(varLen);
-	stat = call KF.kiss_fftr_alloc(nfft, inverse_fft, mem, lenmem);
+	stat = call KF.kiss_fftr_alloc(fft_points, 0, fft_mem, &fft_mem_len);
 	if (stat!=SUCCESS) signal VM.evtError(E_IDXOVF);
 	signal VM.push(stat);
 	}
+
 void  func_fft(uint16_t id){
-	error_t stat;
-	uint16_t varCfg,varInData,varOutData;
-	kiss_fftr_cfg cfg;
-	const int32_t* timedata;
-	kiss_fft_cpx* freqdata;
-	dbg(APPNAME,"Custom::func_fft(): id=%d\n",id);
-	varOutData = (uint16_t)signal VM.pop();	
-	varInData = (uint16_t)signal VM.pop();	
-	varCfg = (uint16_t)signal VM.pop();	
+	error_t stat=SUCCESS;
 
-	cfg = (void*)signal VM.getRealAddr(varCfg);
-	timedata = (void*)signal VM.getRealAddr(varInData);
-	freqdata = (void*)signal VM.getRealAddr(varOutData);
-
-	call KF.kiss_fftr(cfg, timedata, freqdata);
-	stat = SUCCESS;
 	signal VM.push(stat);
 	}
 #endif	
@@ -316,14 +299,16 @@ void  func_RFPower(uint16_t id){
 }
 
 #ifdef M_VCN_DAT
+#include "bayes_model.h"
 void  func_GModelRead(uint16_t id){
 	error_t stat;
 	uint8_t* gmodel;
 	uint16_t varGModel;
+	uint32_t m_addr=0;
 	dbg(APPNAME,"Custom::func_GModelRead(): id=%d\n",id);
 	varGModel = (uint16_t)signal VM.pop();
 	gmodel = (void*)signal VM.getRealAddr(varGModel);
-	stat = call GModelBlockRead.read(0, gmodel, GMODEL_SIZE);
+	stat = call GModelBlockRead.read(m_addr, gmodel, sizeof(ms_gauss_model));
 	signal VM.push(stat);
 }
 void  func_getRTime(uint16_t id){
@@ -339,40 +324,127 @@ void  func_setRTime(uint16_t id){
 	call SetSensorRtime.set(rtime);
 	signal VM.push(SUCCESS);
 }
-#include "bayes_model.h"
+
 void  func_getNSamples(uint16_t id){
 	uint8_t scale;
 	uint16_t varGModel;
+	int32_t samples;
 	ms_gauss_model* gModel;
-	dbg(APPNAME,"Custom::func_setRTime(): id=%d\n",id);
+	dbg(APPNAME,"Custom::func_getNSamples(): id=%d\n",id);
 	scale = (uint16_t)signal VM.pop();
 	varGModel = (uint16_t)signal VM.pop();
 	gModel = (ms_gauss_model*)signal VM.getRealAddr(varGModel);
 	// return nSample value
-	if (scale < MS_GAUSS_SCALES)
-		signal VM.push(gModel->nsample[scale]);
+	if (scale < MS_GAUSS_SCALES){
+		samples = *(nxle_int32_t*)(gModel->nsample+scale);
+		signal VM.push(samples);
+		}
 	else
 		signal VM.push(0);
 }
 #endif
 #ifdef M_VCN_DET
 #include "detect.c"
-void  func_detect(uint16_t id){
 
-	uint8_t scale,decision;
-	uint16_t varGModel,varOutData;
+void  func_detect(uint16_t id){
+	uint8_t scale,decision,bufIdx;
+	uint16_t varGModel;
+	const kiss_fft_scalar * timedata;
 	ms_gauss_model* gModel;
-	kiss_fft_cpx* outData;
+	kiss_fftr_cfg st;
+	kiss_fft_cpx* freqdata;
+	
 	dbg(APPNAME,"Custom::func_setRTime(): id=%d\n",id);
-	varOutData = (uint16_t)signal VM.pop();
+	
+	bufIdx = (uint8_t)signal VM.pop();	
 	scale = (uint16_t)signal VM.pop();
 	varGModel = (uint16_t)signal VM.pop();
-	outData = (kiss_fft_cpx*)signal VM.getRealAddr(varOutData);
+
+	st = (kiss_fftr_cfg)fft_mem;
+	freqdata = (kiss_fft_cpx *)outdata;
+	timedata = (kiss_fft_scalar *)&buffer_pool[bufIdx][0];
 	gModel = (ms_gauss_model*)signal VM.getRealAddr(varGModel);
+
+	// call FFT
+	call KF.kiss_fftr(st, timedata, freqdata);
 	// calculate detect()
-	decision = detect(gModel,scale,outData);
+	decision = detect(gModel,scale,freqdata);
+
 	// return 'detect' value
-	signal VM.push(gModel->nsample[scale]);
+	//
+	//signal VM.push(st->substate->nfft);
+	signal VM.push(decision);
+}
+
+#include "energy.c"
+//ulong intensityMean(ulong* sData.val,ushort count,ushort* valid_count)	
+void  func_intensityMean(uint16_t id){
+	nx_int32_t* datap;
+	uint16_t count, dataAddr,valid_countAddr;
+	nx_uint16_t* valid_countp;
+	uint32_t intensity;
+	dbg(APPNAME,"Custom::func_intensityMean(): id=%d\n",id);
+	valid_countAddr = (uint16_t)signal VM.pop();
+	count = (uint16_t)signal VM.pop();
+	dataAddr = (uint16_t)signal VM.pop();
+	valid_countp = (nx_uint16_t*)signal VM.getRealAddr(valid_countAddr);
+	datap = (nx_int32_t*)signal VM.getRealAddr(dataAddr);
+	intensity = intensityMean(datap,count,valid_countp);
+	signal VM.push(intensity);
+}
+
+//ulong seismicEnergy(ulong* sData.val, ushort count, ulong intensity_mean)
+void  func_seismicEnergy(uint16_t id){
+	nx_uint32_t* datap;
+	uint16_t dataAddr, count;
+	uint32_t intensity;
+	uint32_t sEnergy;
+	dbg(APPNAME,"Custom::func_seismicEnergy(): id=%d\n",id);
+	intensity = (uint32_t)signal VM.pop();
+	count = (uint16_t)signal VM.pop();
+	dataAddr = (uint16_t)signal VM.pop();
+	datap = (nx_uint32_t*)signal VM.getRealAddr(dataAddr);
+	sEnergy = seismicEnergy(datap,count,intensity);
+	signal VM.push(sEnergy);
+}
+
+//ubyte energyScale(ulong seismic_energy)
+uint32_t possible_scales[8] = {10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000};
+void  func_energyScale(uint16_t id){
+	//return (int) log10(energy);
+	uint32_t seismic_energy;
+	uint8_t i;
+	dbg(APPNAME,"Custom::func_energyScale(): id=%d\n",id);
+	seismic_energy = (uint32_t)signal VM.pop();	
+	for(i = 0; i < 8; i++) {
+		if (seismic_energy < possible_scales[i]) {
+			break;
+		};
+	}
+	signal VM.push(i);
+}
+
+//ubyte copyBufferPool(buffer_pool_reg* buffer_pool,ushort count,ulong* sData.val, long intensity_mean, ubyte scale, ulong rtime)
+void  func_copyBufferPool(uint16_t id){
+	uint16_t dataAddr, count;
+	uint32_t rtime;
+	int32_t intensity;
+	uint8_t scale;
+	uint16_t buffer_poolAddr;
+	nx_int32_t* datap;
+	buffer_pool_reg* buffer_poolp;
+	dbg(APPNAME,"Custom::func_copyBufferPool(): id=%d\n",id);
+	rtime = (uint32_t)signal VM.pop();
+	scale = (uint8_t)signal VM.pop();
+	intensity=(uint32_t)signal VM.pop();
+	dataAddr=(uint16_t)signal VM.pop();
+	count=(uint16_t)signal VM.pop();
+	buffer_poolAddr=(uint16_t)signal VM.pop();
+	
+	datap = (nx_uint32_t*)signal VM.getRealAddr(dataAddr);
+	buffer_poolp = (buffer_pool_reg*)signal VM.getRealAddr(buffer_poolAddr);
+	copyBufferPool(buffer_poolp,count,datap,intensity,scale,rtime);
+	signal VM.push(SUCCESS);
 }
 #endif
 
@@ -442,7 +514,12 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 			case F_GET_NSAMPLES  : func_getNSamples(id); break;
 #endif
 #ifdef M_VCN_DET
-			case F_DETECT        : func_detect(id); break;
+			case F_DETECT        	: func_detect(id); break;
+			case F_INTENSITY_MEAN	: func_intensityMean(id); break;
+			case F_SEISMIC_ENERGY   : func_seismicEnergy(id); break;
+			case F_ENERGY_SCALE     : func_energyScale(id); break;
+			case F_COPY_BUFFER_POOL : func_copyBufferPool(id); break;
+			
 #endif
 		}
 	}
@@ -530,7 +607,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
  * Volcano module
  */
 #ifdef M_VCN_DAT
-	event void ReadStream.bufferDone(error_t result, int32_t* buf, uint16_t count){
+	event void ReadStream.bufferDone(error_t result, nx_int32_t* buf, uint16_t count){
 		uint16_t i;
 		ExtDataBufferRdDone = (result==SUCCESS)?count:0;
 		for (i=0; i < count;i++) UsrStreamBuffer[i] = buf[i];

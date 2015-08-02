@@ -31,7 +31,7 @@ implementation
 	// Mote Identifier
 	nx_uint16_t MoteID;					
 	// VM scrip memory
-	char CEU_data[BLOCK_SIZE * CURRENT_MAX_BLOCKS];   // Ceu data room for 'tracks', 'mem', 'Prog', and 'Stack'
+	nx_uint8_t CEU_data[BLOCK_SIZE * CURRENT_MAX_BLOCKS];   // Ceu data room for 'tracks', 'mem', 'Prog', and 'Stack'
 	// Program Counter (PC)
 	uint16_t PC;
 	// VM Halted Flag
@@ -51,7 +51,7 @@ implementation
 	uint16_t gate0;	
 	uint16_t inEvts;	
 	uint16_t async0;	
-	char* MEM;
+	nx_uint8_t* MEM;
 	
 	// Stack control
 	uint16_t currStack=(BLOCK_SIZE * CURRENT_MAX_BLOCKS)-1-4;
@@ -381,7 +381,7 @@ typedef struct {
     tceu_wclock*    wclk_cur;
     int             async_cur;
     tceu_trk*       p_tracks;  // 0 is reserved
-    char*           p_mem;
+    nx_uint8_t*     p_mem;
 } tceu;
 
 #define CEU (&CEU_)
