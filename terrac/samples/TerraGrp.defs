@@ -151,12 +151,12 @@ do
 	output void		BEEP			ushort  22;
 	output void 	REQ_CUSTOM		void 23;
 
-	// TerraNet Custom Output events
+	// TerraGrp Custom Output events
 	output void 	SEND_BS		msgBS_t	 40;
 	output void 	SEND_GR		msgGR_t	 41;
 	output void 	AGGREG		aggreg_t 42;
 
-	// TerraNet Local Input events
+	// TerraGrp Local Input events
 	input ubyte 	ERROR 		 	ubyte 	0;
 	input ubyte 	ERROR 			void	1;
 	input ushort 	TEMP 			void 	5;
@@ -189,6 +189,8 @@ do
 	// Terra basic functions
 	function pure ushort getNodeId()	0;
 	function pure ushort random()		1;
+	function pure ubyte getMem(ushort)		2;
+	function pure ulong getTime()			3;
 	// TerraGrp Custom functions
 	//                    groupInit(RegName,    Id, param, nhops, status, elFlag, leader)
 	function nohold ubyte groupInit(group_t, ubyte, ubyte, ubyte,  ubyte,  ubyte, ushort)	10;

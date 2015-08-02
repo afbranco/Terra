@@ -369,7 +369,7 @@ _GG = {
     , CfgParams = V'VM_Name' * K(',')* V'ID_version' * K(',') * V'Params'
     , VM_Name = (K'name' * K(':') * CK((Alphanum)^1)) + EM'"name: xxxx"'
     , ID_version  = K'code'*K(':')*PNUM*K'.'*PNUM*K'.'*PNUM + EM'config NUM.NUM.NUM SIZE do ... end'
-    , Params = K'{' * (V'ID_c' * K(':') * PNUM) * ((K',') * V'ID_c' *K(':') * PNUM)^1 * (K',')^-1 * K'}' 
+    , Params = K'{' * (V'ID_c' * K(':') * PNUM) * ((K',') * V'ID_c' *K(':') * PNUM)^0 * (K',')^-1 * K'}' 
 
     , ID_ext  = -KEYS * CK(m.R'AZ'*ALPHANUM^0)
  

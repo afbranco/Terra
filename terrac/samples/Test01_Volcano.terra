@@ -1,12 +1,12 @@
-#include "TerraNet.defs"
+#include "TerraVolcano.defs"
 pktype radioData from radioMsg with
   var ubyte[4] xx;
   var ushort[4] yy;
   var long[2] zz;
 end
+var radioData dataMsg;
 
 #define OUT_SIZE 102 // (2*ulong)*((FREQ/2)+1)=102
-#define INVALID_MEASUREMENT -2147483648
 
 //
 // Globals
@@ -14,7 +14,6 @@ end
 var ubyte stat;
 // Gauss Model
 // ms_gauss_model size = GMODEL_SIZE = 964 bytes
-//var ubyte[GMODEL_SIZE] gModel;
 var ubyte[POOL_LEN] buffer_pool_scale;
 var ushort[POOL_LEN] buffer_pool_count;
 var ulong[POOL_LEN] buffer_pool_rtime_map;
@@ -30,7 +29,7 @@ emit LEDS(0);
 do
   // fft alloc -> Format fft_cfg
   var ushort fft_mem_len = 1138; // 1138 is for 100-point FFT on TelosB; 1276 on TOSSIM
-  var ubyte fft_points=100; //100
+  var ubyte fft_points=100;
     stat = fftAlloc(fft_points,0,fft_cfg,&fft_mem_len);
     stat = gModelRead(gModel);
     stat = await GMODEL_RD_DONE;
@@ -135,7 +134,6 @@ do
       // Send Msg 1
       //
 
-      var radioData dataMsg;
       dataMsg.type=1;
       dataMsg.source = getNodeId();
       dataMsg.target = 1;
@@ -171,7 +169,6 @@ do
 	      // Send Msg 2
 	      //
 
-	      var radioData dataMsg;
 	      dataMsg.type=2;
 	      dataMsg.source = getNodeId();
 	      dataMsg.target = 1;
