@@ -5,7 +5,7 @@
 #endif
 
 configuration VolcanoDataC{
-  provides interface ReadStream<int32_t>;
+  provides interface ReadStream<nx_int32_t>;
   provides interface Set<uint32_t>;
   provides interface Get<uint32_t>;
   provides interface BlockRead;

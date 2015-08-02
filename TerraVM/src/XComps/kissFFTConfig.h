@@ -6,11 +6,11 @@
 #define USE_ARITH_FUNC // use functions instead of macros to reduce code size, but a bit increase of execution time (less than 10ms on telosb)
 /* FFT end */
 
-#define SAMPLING_RATE 50 //100 // 100 Hz
+#define SAMPLING_RATE 100 // 100 Hz
 //#define SAMPLING_PERIOD 1500 // in millisecond
-#define BUFFER_LEN 50 //100//128 // maximum supported sampling rate: 128 Hz
+#define BUFFER_LEN 128//128 // maximum supported sampling rate: 128 Hz
 #define POOL_LEN 5
-#define BUFFER_POOL_LEN 250 //500 //640 // 640=5 * 128
+#define BUFFER_POOL_LEN 640 //640 // 640=5 * 128
 #define INVALID_MEASUREMENT -2147483648 // invalid measurement in data trace
 #define NSENSOR 12 // the maximum possible number of sensors
 #define BS_NODE 0 // base station

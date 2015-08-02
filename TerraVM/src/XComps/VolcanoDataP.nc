@@ -1,23 +1,23 @@
 module VolcanoDataP{
 #if defined(INO)
-  provides interface ReadStream<int32_t>;
+  provides interface ReadStream<nx_int32_t>;
   provides interface Set<uint32_t>;
   provides interface Get<uint32_t>;
   provides interface BlockRead as BlockReadAux;
   uses interface SdStorage as BlockRead;
   uses interface SdStorage as AuxBlockRead;
 #else
-  provides interface ReadStream<int32_t>;
+  provides interface ReadStream<nx_int32_t>;
   provides interface Set<uint32_t>;
   provides interface Get<uint32_t>;
   uses interface BlockRead;
 #endif
 }
 implementation{
-  typedef struct blockentry {
-    uint32_t rtime;
-    uint32_t len;
-    int32_t data[128];
+  typedef nx_struct blockentry {
+    nx_uint32_t rtime;
+    nx_uint32_t len;
+    nx_int32_t data[128];
   } blockentry_t;
 
   //blockentry_t block;
@@ -35,7 +35,7 @@ implementation{
     return blk.rtime;
   }
 
-  command error_t ReadStream.postBuffer(int32_t *buf, uint16_t count)
+  command error_t ReadStream.postBuffer(nx_int32_t *buf, uint16_t count)
   {
 //    uint16_t auxCount = (count==0)?sizeof(blockentry_t):count;
 //    return (call BlockRead.read(m_addr, buf, auxCount));

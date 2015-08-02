@@ -191,7 +191,7 @@ void kf_factor(int16_t n,int16_t * facbuf)
 }
 
 
-command uint8_t KF.kiss_fftr_alloc(nx_uint16_t nfft, nx_uint16_t inverse_fft, uint8_t *mem, nx_uint16_t *lenmem)
+command uint8_t KF.kiss_fftr_alloc(int nfft,int inverse_fft,void * mem, size_t * lenmem)
 {
     int16_t i;
     kiss_fftr_cfg st = NULL;
@@ -484,6 +484,7 @@ command void KF.kiss_fftr(kiss_fftr_cfg st,const kiss_fft_scalar *timedata,kiss_
     C_FIXDIV(tdc,2);
     CHECK_OVERFLOW_OP(tdc.r ,+, tdc.i);
     CHECK_OVERFLOW_OP(tdc.r ,-, tdc.i);
+
     freqdata[0].r = tdc.r + tdc.i;
     freqdata[ncfft].r = tdc.r - tdc.i;
     freqdata[ncfft].i = freqdata[0].i = 0;
@@ -499,12 +500,14 @@ command void KF.kiss_fftr(kiss_fftr_cfg st,const kiss_fft_scalar *timedata,kiss_
         C_SUB( f2k, fpk , fpnk );
         C_MUL( tw , f2k , st->super_twiddles[k-1]);
 
+
         freqdata[k].r = HALF_OF(f1k.r + tw.r);
         freqdata[k].i = HALF_OF(f1k.i + tw.i);
         freqdata[ncfft-k].r = HALF_OF(f1k.r - tw.r);
         freqdata[ncfft-k].i = HALF_OF(tw.i - f1k.i);
 		dbg(APPNAME,"KF::kiss_fftr(): freqdata[%d].r=%d, freqdata[%d].i=%d, freqdata[%d].r=%d, freqdata[%d].i=%d\n",
 			k,freqdata[k].r,k,freqdata[k].i,ncfft-k,freqdata[ncfft-k].r,ncfft-k,freqdata[ncfft-k].i);
+
     }
 }
  
