@@ -199,6 +199,7 @@ do
 	//
 	function ubyte setupMic(ushort*,ushort,ulong,ubyte)			16;
 	function ubyte setRFPower(ubyte)			17;
+	function ubyte getParent()			18;
 
 // Request/await macros
 #define getTemp(var)  emit REQ_TEMP();  var=await TEMP 

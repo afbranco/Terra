@@ -92,8 +92,6 @@ do
 	// TerraNet Custom Output events
 	output void 	SEND			radioMsg 40;
 	output void 	SEND_ACK		radioMsg 41;
-	// Volcano Output event
-	output void 	RD_STREAM		streamData 50;
 
 	// TerraNet Local Input events
 	input ubyte 	ERROR 		 	ubyte 	0;
