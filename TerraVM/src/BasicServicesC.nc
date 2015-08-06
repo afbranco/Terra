@@ -189,6 +189,7 @@ implementation{
 	components CollectionC as Collector;
 	BS.RoutingControl -> Collector;
 	BS.RootControl -> Collector;
+	BS.CtpInfo -> Collector;
 	BS.recSendBS -> Collector.Receive[AM_SENDBS];
 	components new CollectionSenderC(AM_SENDBS) as sendBS;
 	BS.sendBSNet -> sendBS;

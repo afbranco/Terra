@@ -95,6 +95,8 @@ implementation{
 		}
 	}
 
+
+
 /* ****************************************************************************
  *         Send commands
 \* ***************************************************************************/
@@ -198,8 +200,17 @@ implementation{
 
   	}
   	
-	
-	 	
+	/**
+	 * Returns the parent node in the CTP tree
+	 * 
+	 * @return the parent node or 0
+	 */	
+#ifdef MODULE_CTP
+	command uint16_t GrCtl.getParent(){
+		return call BSRadio.getParent();
+	}	
+#endif // MODULE_CTP
+
 	/**
 	 * Send message to BaseStation (root mote on CTP)
 	 * 

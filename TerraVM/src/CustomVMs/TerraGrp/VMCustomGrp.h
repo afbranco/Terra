@@ -92,6 +92,7 @@ enum{
 	F_AGGREGINIT 	= 11,
 	F_SETUP_MIC		= 16,
 	F_RFPOWER		= 17,
+	F_GETPARENT		= 18,
 	
 	
 	// Event Type ID - 3 msb bits of EvtId

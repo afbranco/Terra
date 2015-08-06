@@ -15,6 +15,7 @@ interface BSRadio{
 #ifdef MODULE_CTP
 	command error_t sendBS(void* dataMsg, uint8_t dataSize);
 	event void sendBSDone(message_t* msg,error_t error);
+	command uint16_t getParent();
 #endif
 #ifdef INO
 	// Log data to USB0

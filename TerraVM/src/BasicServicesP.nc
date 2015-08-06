@@ -135,6 +135,7 @@ module BasicServicesP{
 	uses interface Send as sendBSNet;
 	uses interface StdControl as RoutingControl;
 	uses interface RootControl;
+	uses interface CtpInfo;
 #endif
 
 
@@ -1116,6 +1117,16 @@ call Uart0Ctl.start();
 /* *********************************************************************
 *              Messages send
 \* *********************************************************************/
+
+#ifdef MODULE_CTP
+	command uint16_t BSRadio.getParent(){
+		uint16_t parent;
+		if (call CtpInfo.getParent(&parent) == SUCCESS) return parent;
+		return 0;		
+	}
+#endif
+
+
 	/**
 	* Sends out a DataBS message to Radio
 	*/

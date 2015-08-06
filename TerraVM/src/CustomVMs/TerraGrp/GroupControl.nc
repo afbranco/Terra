@@ -66,6 +66,7 @@ interface GroupControl{
 	 */
 #ifdef MODULE_CTP
 	command uint8_t sendBS(uint8_t evtId, uint8_t dataSize, uint8_t* data);
+	command uint16_t getParent();
 #endif // MODULE_CTP
 
 	// Signals a received message event

@@ -270,6 +270,12 @@ void  func_RFPower(uint16_t id){
 	signal VM.push(SUCCESS);
 }
 
+void  func_getParent(uint16_t id){
+	uint16_t parent;
+	parent = call GrCtl.getParent();
+	signal VM.push(parent);
+}
+
 void func_groupInit(uint16_t id){
 	groupCtl_t *grCtl;
 	uint8_t elFlag,status,nhops,param,grId;
@@ -401,6 +407,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 			case F_GETTIME 	: func_getTime(id); break;
 
 			case F_RFPOWER: func_RFPower(id); break;
+			case F_GETPARENT: func_getParent(id); break;
 			/* TerraGrp custom functions */
 			case F_GROUPINIT : func_groupInit(id); break;		
 			case F_AGGREGINIT: func_aggregInit(id); break;		
