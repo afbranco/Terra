@@ -92,7 +92,7 @@ public class ControlCore implements MessageListener
 		}
 
 
-		// Waits do avoid connect immediately.
+		// Waits to avoid connect immediately.
 		try {
 			Thread.sleep(500);
 		} catch (InterruptedException e) {

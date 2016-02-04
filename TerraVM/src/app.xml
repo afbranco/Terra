@@ -5607,7 +5607,7 @@
         <interfacedef-ref qname="VMCustom"/>
         <type-function size="I:1" alignment="I:1">
           <type-int cname="int" size="I:4" alignment="I:4">
-            <typename><typedef-ref name="int32_t" ref="0x4020fd98"/></typename>
+            <typename><typedef-ref name="int32_t" ref="0x4003cd98"/></typename>
           </type-int>
           <function-parameters>
             <type-int cname="unsigned short" unsigned="" size="I:2" alignment="I:2">
@@ -5752,7 +5752,7 @@
         <interfacedef-ref qname="TossimPacket"/>
         <type-function size="I:1" alignment="I:1">
           <type-int cname="signed char" size="I:1" alignment="I:1">
-            <typename><typedef-ref name="int8_t" ref="0x4020f918"/></typename>
+            <typename><typedef-ref name="int8_t" ref="0x4003c918"/></typename>
           </type-int>
           <function-parameters>
             <type-pointer size="I:4" alignment="I:4">
@@ -6303,12 +6303,12 @@
         <long>&#10; The Read interface is intended for split-phase low-rate or&#10; high-latency reading of small values. The type of the value is&#10; given as a template argument. Because this interface is&#10; split-phase, these values may be backed by hardware, or a&#10; long-running computation.&#10;&#10; &#60;p>&#10; See TEP114 - SIDs: Source and Sink Independent Drivers for details.&#10; &#10; @param val_t the type of the object that will be returned&#10;&#10; @author Gilman Tolle &#60;gtolle@archrock.com>&#10; @version $Revision: 1.4 $ $Date: 2006-12-12 18:23:14 $&#10;</long>
       </documentation>
       <parameters>
-        <typedef name="val_t" ref="0x415bbaa0" loc="49:/opt/tinyos-2.1.2/tos/interfaces/Read.nc">
+        <typedef name="val_t" ref="0x415bb720" loc="49:/opt/tinyos-2.1.2/tos/interfaces/Read.nc">
           <interfacedef-ref qname="Read"/>
-          <type-var size="U:" alignment="U:"><typedef-ref name="val_t" scoped="" ref="0x415bbaa0"/></type-var>
+          <type-var size="U:" alignment="U:"><typedef-ref name="val_t" scoped="" ref="0x415bb720"/></type-var>
         </typedef>
       </parameters>
-      <function command="" provided="0" name="read" ref="0x415b8010" loc="55:/opt/tinyos-2.1.2/tos/interfaces/Read.nc">
+      <function command="" provided="0" name="read" ref="0x415bbbd0" loc="55:/opt/tinyos-2.1.2/tos/interfaces/Read.nc">
         <documentation loc="50:/opt/tinyos-2.1.2/tos/interfaces/Read.nc">
           <short>&#10; Initiates a read of the value.</short>
           <long>&#10; Initiates a read of the value.&#10; &#10; @return SUCCESS if a readDone() event will eventually come back.&#10;</long>
@@ -6324,7 +6324,7 @@
         <parameters>
         </parameters>
       </function>
-      <function event="" provided="0" name="readDone" ref="0x415b87c0" loc="63:/opt/tinyos-2.1.2/tos/interfaces/Read.nc">
+      <function event="" provided="0" name="readDone" ref="0x415b8398" loc="63:/opt/tinyos-2.1.2/tos/interfaces/Read.nc">
         <documentation loc="57:/opt/tinyos-2.1.2/tos/interfaces/Read.nc">
           <short>&#10; Signals the completion of the read().</short>
           <long>&#10; Signals the completion of the read().&#10;&#10; @param result SUCCESS if the read() was successful&#10; @param val the value that has been read&#10;</long>
@@ -6336,17 +6336,17 @@
             <type-int cname="unsigned char" unsigned="" size="I:1" alignment="I:1">
               <typename><typedef-ref name="error_t" ref="0x405c45c0"/></typename>
             </type-int>
-            <type-var size="U:" alignment="U:"><typedef-ref name="val_t" scoped="" ref="0x415bbaa0"/></type-var>
+            <type-var size="U:" alignment="U:"><typedef-ref name="val_t" scoped="" ref="0x415bb720"/></type-var>
           </function-parameters>
         </type-function>
         <parameters>
-          <variable name="result" ref="0x415b8490" loc="63:/opt/tinyos-2.1.2/tos/interfaces/Read.nc">
+          <variable name="result" ref="0x415b8068" loc="63:/opt/tinyos-2.1.2/tos/interfaces/Read.nc">
             <type-int cname="unsigned char" unsigned="" size="I:1" alignment="I:1">
               <typename><typedef-ref name="error_t" ref="0x405c45c0"/></typename>
             </type-int>
           </variable>
-          <variable name="val" ref="0x415b8660" loc="63:/opt/tinyos-2.1.2/tos/interfaces/Read.nc">
-            <type-var size="U:" alignment="U:"><typedef-ref name="val_t" scoped="" ref="0x415bbaa0"/></type-var>
+          <variable name="val" ref="0x415b8238" loc="63:/opt/tinyos-2.1.2/tos/interfaces/Read.nc">
+            <type-var size="U:" alignment="U:"><typedef-ref name="val_t" scoped="" ref="0x415bb720"/></type-var>
           </variable>
         </parameters>
       </function>
@@ -11850,21 +11850,21 @@
       <field name="fptr" ref="0x4036d920" bit-offset="I:0" size="I:4">
         <type-pointer size="I:4" alignment="I:4">
           <type-int cname="int" size="I:4" alignment="I:4">
-            <typename><typedef-ref name="int32_t" ref="0x4020fd98"/></typename>
+            <typename><typedef-ref name="int32_t" ref="0x4003cd98"/></typename>
           </type-int>
         </type-pointer>
       </field>
       <field name="rptr" ref="0x4036d980" bit-offset="I:32" size="I:4">
         <type-pointer size="I:4" alignment="I:4">
           <type-int cname="int" size="I:4" alignment="I:4">
-            <typename><typedef-ref name="int32_t" ref="0x4020fd98"/></typename>
+            <typename><typedef-ref name="int32_t" ref="0x4003cd98"/></typename>
           </type-int>
         </type-pointer>
       </field>
       <field name="state" ref="0x4036d9e0" bit-offset="I:64" size="I:4">
         <type-pointer size="I:4" alignment="I:4">
           <type-int cname="int" size="I:4" alignment="I:4">
-            <typename><typedef-ref name="int32_t" ref="0x4020fd98"/></typename>
+            <typename><typedef-ref name="int32_t" ref="0x4003cd98"/></typename>
           </type-int>
         </type-pointer>
       </field>
@@ -11880,7 +11880,7 @@
       <field name="end_ptr" ref="0x4036db60" bit-offset="I:192" size="I:4">
         <type-pointer size="I:4" alignment="I:4">
           <type-int cname="int" size="I:4" alignment="I:4">
-            <typename><typedef-ref name="int32_t" ref="0x4020fd98"/></typename>
+            <typename><typedef-ref name="int32_t" ref="0x4003cd98"/></typename>
           </type-int>
         </type-pointer>
       </field>
@@ -12805,8 +12805,8 @@
     <enum loc="54:/opt/tinyos-2.1.2/tos/platforms/micaz/sim/platform_hardware.h" ref="0x40a31d28" defined="" size="I:4" alignment="I:4">
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </enum>
-    <attribute name="nts" loc="17:/usr/lib/ncc/deputy_nodeputy.h" ref="0x4020f0f8" defined="" size="I:4" alignment="I:4">
-      <field name="dummy" ref="0x4020f2d0" bit-offset="I:0" size="I:4">
+    <attribute name="nts" loc="17:/usr/lib/ncc/deputy_nodeputy.h" ref="0x4003c0f8" defined="" size="I:4" alignment="I:4">
+      <field name="dummy" ref="0x4003c2d0" bit-offset="I:0" size="I:4">
         <type-int cname="int" size="I:4" alignment="I:4"></type-int>
       </field>
     </attribute>
@@ -13349,7 +13349,7 @@
       </field>
       <field name="strength" ref="0x40beeb20" bit-offset="I:288" size="I:1">
         <type-int cname="signed char" size="I:1" alignment="I:1">
-          <typename><typedef-ref name="int8_t" ref="0x4020f918"/></typename>
+          <typename><typedef-ref name="int8_t" ref="0x4003c918"/></typename>
         </type-int>
       </field>
       <field name="lost" ref="0x40beeb80" bit-offset="I:296" size="I:1">
@@ -13502,51 +13502,51 @@
         </type-pointer>
       </field>
     </struct>
-    <enum loc="935:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc" ref="0x414db010" defined="" scoped="" size="I:4" alignment="I:4">
+    <enum loc="82:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc" ref="0x415c2010" defined="" scoped="" size="I:4" alignment="I:4">
       <component-ref qname="VMCustomP"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </enum>
-    <enum loc="82:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc" ref="0x415c23a8" defined="" scoped="" size="I:4" alignment="I:4">
+    <enum loc="614:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc" ref="0x414d7dd0" defined="" scoped="" size="I:4" alignment="I:4">
       <component-ref qname="VMCustomP"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </enum>
-    <enum loc="615:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc" ref="0x415c31f8" defined="" scoped="" size="I:4" alignment="I:4">
+    <enum loc="934:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc" ref="0x413f0be8" defined="" scoped="" size="I:4" alignment="I:4">
       <component-ref qname="VMCustomP"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </enum>
-    <enum loc="610:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc" ref="0x415c3ab0" defined="" scoped="" size="I:4" alignment="I:4">
+    <enum loc="912:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc" ref="0x414d7520" defined="" scoped="" size="I:4" alignment="I:4">
       <component-ref qname="VMCustomP"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </enum>
-    <enum loc="913:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc" ref="0x414db928" defined="" scoped="" size="I:4" alignment="I:4">
+    <enum loc="609:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc" ref="0x415c36c0" defined="" scoped="" size="I:4" alignment="I:4">
       <component-ref qname="VMCustomP"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </enum>
-    <enum loc="67:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc" ref="0x41624b28" defined="" scoped="" size="I:4" alignment="I:4">
+    <enum loc="63:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc" ref="0x41624f40" defined="" scoped="" size="I:4" alignment="I:4">
       <component-ref qname="dataSensorP"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </enum>
-    <enum loc="63:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc" ref="0x41623478" defined="" scoped="" size="I:4" alignment="I:4">
+    <enum loc="67:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc" ref="0x41624628" defined="" scoped="" size="I:4" alignment="I:4">
       <component-ref qname="dataSensorP"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </enum>
-    <enum loc="59:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc" ref="0x41623da0" defined="" scoped="" size="I:4" alignment="I:4">
+    <enum loc="59:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc" ref="0x41623898" defined="" scoped="" size="I:4" alignment="I:4">
       <component-ref qname="dataSensorP"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </enum>
-    <struct loc="14:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc" ref="0x4161e010" defined="" scoped="" size="I:6" alignment="I:2">
+    <struct loc="14:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc" ref="0x41620d00" defined="" scoped="" size="I:6" alignment="I:2">
       <component-ref qname="dataSensorP"/>
-      <field name="temp" ref="0x4161e120" bit-offset="I:0" size="I:2">
+      <field name="temp" ref="0x41620e10" bit-offset="I:0" size="I:2">
         <type-int cname="unsigned short" unsigned="" size="I:2" alignment="I:2">
           <typename><typedef-ref name="uint16_t" ref="0x40214490"/></typename>
         </type-int>
       </field>
-      <field name="photo" ref="0x4161e180" bit-offset="I:16" size="I:2">
+      <field name="photo" ref="0x41620e70" bit-offset="I:16" size="I:2">
         <type-int cname="unsigned short" unsigned="" size="I:2" alignment="I:2">
           <typename><typedef-ref name="uint16_t" ref="0x40214490"/></typename>
         </type-int>
       </field>
-      <field name="volt" ref="0x4161e1e0" bit-offset="I:32" size="I:2">
+      <field name="volt" ref="0x41620ed0" bit-offset="I:32" size="I:2">
         <type-int cname="unsigned short" unsigned="" size="I:2" alignment="I:2">
           <typename><typedef-ref name="uint16_t" ref="0x40214490"/></typename>
         </type-int>
@@ -14927,43 +14927,43 @@
         <typename><typedef-ref name="nx_uint8_t" ref="0x402fd728"/></typename>
       </type-int>
     </variable>
-    <variable name="dPin2" ref="0x415b6d38" loc="49:/home/branco/gitspace/Terra/TerraVM/src/XComps/SensActP.nc">
+    <variable name="dPin2" ref="0x415b6938" loc="49:/home/branco/gitspace/Terra/TerraVM/src/XComps/SensActP.nc">
       <component-ref qname="SensActP"/>
       <type-int cname="unsigned short" unsigned="" size="I:2" alignment="I:1" network="nx_uint16_t">
         <typename><typedef-ref name="nx_uint16_t" ref="0x402fdba0"/></typename>
       </type-int>
     </variable>
-    <variable name="dMic" ref="0x415b6ea0" loc="49:/home/branco/gitspace/Terra/TerraVM/src/XComps/SensActP.nc">
+    <variable name="dMic" ref="0x415b6aa0" loc="49:/home/branco/gitspace/Terra/TerraVM/src/XComps/SensActP.nc">
       <component-ref qname="SensActP"/>
       <type-int cname="unsigned short" unsigned="" size="I:2" alignment="I:1" network="nx_uint16_t">
         <typename><typedef-ref name="nx_uint16_t" ref="0x402fdba0"/></typename>
       </type-int>
     </variable>
-    <variable name="dLeds" ref="0x415b6618" loc="49:/home/branco/gitspace/Terra/TerraVM/src/XComps/SensActP.nc">
+    <variable name="dLeds" ref="0x415b6218" loc="49:/home/branco/gitspace/Terra/TerraVM/src/XComps/SensActP.nc">
       <component-ref qname="SensActP"/>
       <type-int cname="unsigned short" unsigned="" size="I:2" alignment="I:1" network="nx_uint16_t">
         <typename><typedef-ref name="nx_uint16_t" ref="0x402fdba0"/></typename>
       </type-int>
     </variable>
-    <variable name="initFlag" ref="0x415b54e0" loc="51:/home/branco/gitspace/Terra/TerraVM/src/XComps/SensActP.nc">
+    <variable name="initFlag" ref="0x415b50e0" loc="51:/home/branco/gitspace/Terra/TerraVM/src/XComps/SensActP.nc">
       <component-ref qname="SensActP"/>
       <type-int cname="unsigned char" unsigned="" size="I:1" alignment="I:1">
         <typename><typedef-ref name="bool" ref="0x4051d750"/></typename>
       </type-int>
     </variable>
-    <variable name="dIn1" ref="0x415b68f0" loc="49:/home/branco/gitspace/Terra/TerraVM/src/XComps/SensActP.nc">
+    <variable name="dIn1" ref="0x415b64f0" loc="49:/home/branco/gitspace/Terra/TerraVM/src/XComps/SensActP.nc">
       <component-ref qname="SensActP"/>
       <type-int cname="unsigned short" unsigned="" size="I:2" alignment="I:1" network="nx_uint16_t">
         <typename><typedef-ref name="nx_uint16_t" ref="0x402fdba0"/></typename>
       </type-int>
     </variable>
-    <variable name="dPin1" ref="0x415b6bc8" loc="49:/home/branco/gitspace/Terra/TerraVM/src/XComps/SensActP.nc">
+    <variable name="dPin1" ref="0x415b67c8" loc="49:/home/branco/gitspace/Terra/TerraVM/src/XComps/SensActP.nc">
       <component-ref qname="SensActP"/>
       <type-int cname="unsigned short" unsigned="" size="I:2" alignment="I:1" network="nx_uint16_t">
         <typename><typedef-ref name="nx_uint16_t" ref="0x402fdba0"/></typename>
       </type-int>
     </variable>
-    <variable name="sensorsReqs" ref="0x415b52d0" loc="50:/home/branco/gitspace/Terra/TerraVM/src/XComps/SensActP.nc">
+    <variable name="sensorsReqs" ref="0x415b6eb8" loc="50:/home/branco/gitspace/Terra/TerraVM/src/XComps/SensActP.nc">
       <component-ref qname="SensActP"/>
       <type-array elements="I:14" size="I:14" alignment="I:1">
         <type-int cname="unsigned char" unsigned="" size="I:1" alignment="I:1">
@@ -14971,37 +14971,37 @@
         </type-int>
       </type-array>
     </variable>
-    <variable name="dTemp" ref="0x415b6330" loc="49:/home/branco/gitspace/Terra/TerraVM/src/XComps/SensActP.nc">
+    <variable name="dTemp" ref="0x415b7f08" loc="49:/home/branco/gitspace/Terra/TerraVM/src/XComps/SensActP.nc">
       <component-ref qname="SensActP"/>
       <type-int cname="unsigned short" unsigned="" size="I:2" alignment="I:1" network="nx_uint16_t">
         <typename><typedef-ref name="nx_uint16_t" ref="0x402fdba0"/></typename>
       </type-int>
     </variable>
-    <variable name="dPhoto" ref="0x415b64a8" loc="49:/home/branco/gitspace/Terra/TerraVM/src/XComps/SensActP.nc">
+    <variable name="dPhoto" ref="0x415b60a8" loc="49:/home/branco/gitspace/Terra/TerraVM/src/XComps/SensActP.nc">
       <component-ref qname="SensActP"/>
       <type-int cname="unsigned short" unsigned="" size="I:2" alignment="I:1" network="nx_uint16_t">
         <typename><typedef-ref name="nx_uint16_t" ref="0x402fdba0"/></typename>
       </type-int>
     </variable>
-    <variable name="dVolt" ref="0x415b6788" loc="49:/home/branco/gitspace/Terra/TerraVM/src/XComps/SensActP.nc">
+    <variable name="dVolt" ref="0x415b6388" loc="49:/home/branco/gitspace/Terra/TerraVM/src/XComps/SensActP.nc">
       <component-ref qname="SensActP"/>
       <type-int cname="unsigned short" unsigned="" size="I:2" alignment="I:1" network="nx_uint16_t">
         <typename><typedef-ref name="nx_uint16_t" ref="0x402fdba0"/></typename>
       </type-int>
     </variable>
-    <variable name="dIn2" ref="0x415b6a58" loc="49:/home/branco/gitspace/Terra/TerraVM/src/XComps/SensActP.nc">
+    <variable name="dIn2" ref="0x415b6658" loc="49:/home/branco/gitspace/Terra/TerraVM/src/XComps/SensActP.nc">
       <component-ref qname="SensActP"/>
       <type-int cname="unsigned short" unsigned="" size="I:2" alignment="I:1" network="nx_uint16_t">
         <typename><typedef-ref name="nx_uint16_t" ref="0x402fdba0"/></typename>
       </type-int>
     </variable>
-    <variable name="initialized" ref="0x41620850" loc="12:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc">
+    <variable name="initialized" ref="0x41620558" loc="12:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc">
       <component-ref qname="dataSensorP"/>
       <type-int cname="unsigned char" unsigned="" size="I:1" alignment="I:1">
         <typename><typedef-ref name="bool" ref="0x4051d750"/></typename>
       </type-int>
     </variable>
-    <variable name="file" ref="0x41620b10" loc="13:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc">
+    <variable name="file" ref="0x41620818" loc="13:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc">
       <component-ref qname="dataSensorP"/>
       <type-pointer size="I:4" alignment="I:4">
         <type-tag size="I:148" alignment="I:4"><struct-ref name="_IO_FILE" ref="0x404bd948"/>
@@ -15009,34 +15009,44 @@
         </type-tag>
       </type-pointer>
     </variable>
-    <variable name="lastReg" ref="0x4161e4a0" loc="15:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc">
+    <variable name="lastReg" ref="0x4161e218" loc="15:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc">
       <component-ref qname="dataSensorP"/>
-      <type-tag size="I:6" alignment="I:2"><struct-ref scoped="" ref="0x4161e010"/>
-        <typename><typedef-ref name="reg_t" scoped="" ref="0x4161e298"/></typename>
+      <type-tag size="I:6" alignment="I:2"><struct-ref scoped="" ref="0x41620d00"/>
+        <typename><typedef-ref name="reg_t" scoped="" ref="0x4161e010"/></typename>
       </type-tag>
     </variable>
-    <variable name="NHopsList" ref="0x41602658" loc="25:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/GroupControlP.nc">
+    <variable name="NHopsList" ref="0x41602268" loc="25:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/GroupControlP.nc">
       <component-ref qname="GroupControlP"/>
       <type-tag size="I:121" alignment="I:1"><nx_struct-ref name="receivedList" ref="0x41413478"/>
         <typename><typedef-ref name="NHopsList_t" ref="0x41411128"/></typename>
       </type-tag>
     </variable>
-    <variable name="MoteID" ref="0x41602878" loc="26:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/GroupControlP.nc">
+    <variable name="MoteID" ref="0x41602488" loc="26:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/GroupControlP.nc">
       <component-ref qname="GroupControlP"/>
       <type-int cname="unsigned short" unsigned="" size="I:2" alignment="I:2">
         <typename><typedef-ref name="uint16_t" ref="0x40214490"/></typename>
       </type-int>
     </variable>
-    <variable name="firstInic" ref="0x41602118" loc="23:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/GroupControlP.nc">
+    <variable name="firstInic" ref="0x41603ce0" loc="23:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/GroupControlP.nc">
       <component-ref qname="GroupControlP"/>
       <type-int cname="unsigned char" unsigned="" size="I:1" alignment="I:1">
         <typename><typedef-ref name="bool" ref="0x4051d750"/></typename>
       </type-int>
     </variable>
-    <variable name="sendSeq" ref="0x41602400" loc="24:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/GroupControlP.nc">
+    <variable name="yData" ref="0x4162dcc0" loc="222:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/GroupControlP.nc">
+      <documentation loc="214:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/GroupControlP.nc">
+        <short>&#10; Send message to BaseStation (root mote on CTP)&#10; &#10; </short>
+        <long>&#10; Send message to BaseStation (root mote on CTP)&#10; &#10; @param evtId Event identifier&#10; @param dataSize Data structure size&#10; @param data Pointer to data structure&#10;</long>
+      </documentation>
       <component-ref qname="GroupControlP"/>
-      <type-int cname="short" size="I:2" alignment="I:1" network="nx_int16_t">
-        <typename><typedef-ref name="nx_int16_t" ref="0x402f89f8"/></typename>
+      <type-tag size="I:21" alignment="I:1"><nx_struct-ref name="sendBS" ref="0x407733a8"/>
+        <typename><typedef-ref name="sendBS_t" ref="0x40773d08"/></typename>
+      </type-tag>
+    </variable>
+    <variable name="sendSeq" ref="0x41602010" loc="24:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/GroupControlP.nc">
+      <component-ref qname="GroupControlP"/>
+      <type-int cname="unsigned short" unsigned="" size="I:2" alignment="I:2">
+        <typename><typedef-ref name="uint16_t" ref="0x40214490"/></typename>
       </type-int>
     </variable>
   </variables>
@@ -18992,35 +19002,35 @@
       <component-ref qname="CtpRoutingEngineP"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </constant>
-    <constant cst="I:22" name="procNextAggLocalReq" ref="0x415c30e8" loc="615:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc">
+    <constant cst="I:22" name="procNextAggLocalReq" ref="0x414d7cc0" loc="614:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc">
       <component-ref qname="VMCustomP"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </constant>
-    <constant cst="I:21" name="procNextAggReq" ref="0x415c39a0" loc="610:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc">
+    <constant cst="I:21" name="procNextAggReq" ref="0x415c35b0" loc="609:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc">
       <component-ref qname="VMCustomP"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </constant>
-    <constant cst="I:24" name="firstElection" ref="0x413f0ec8" loc="935:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc">
+    <constant cst="I:24" name="firstElection" ref="0x413f0ad8" loc="934:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc">
       <component-ref qname="VMCustomP"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </constant>
-    <constant cst="I:20" name="procAggreg" ref="0x415c2298" loc="82:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc">
+    <constant cst="I:20" name="procAggreg" ref="0x415c3e58" loc="82:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc">
       <component-ref qname="VMCustomP"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </constant>
-    <constant cst="I:23" name="procLeaderQ" ref="0x414db818" loc="913:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc">
+    <constant cst="I:23" name="procLeaderQ" ref="0x414d7410" loc="912:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc">
       <component-ref qname="VMCustomP"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </constant>
-    <constant cst="I:25" name="tempRead" ref="0x41623c90" loc="59:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc">
+    <constant cst="I:25" name="tempRead" ref="0x41623788" loc="59:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc">
       <component-ref qname="dataSensorP"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </constant>
-    <constant cst="I:26" name="photoRead" ref="0x41623368" loc="63:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc">
+    <constant cst="I:26" name="photoRead" ref="0x41624e30" loc="63:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc">
       <component-ref qname="dataSensorP"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </constant>
-    <constant cst="I:27" name="voltRead" ref="0x41624a18" loc="67:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc">
+    <constant cst="I:27" name="voltRead" ref="0x41624518" loc="67:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc">
       <component-ref qname="dataSensorP"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </constant>
@@ -19568,9 +19578,9 @@
         <typename><typedef-ref name="Atm128Adcsra_t" ref="0x40a316d8"/></typename>
       </type-tag>
     </typedef>
-    <typedef name="int8_t" ref="0x4020f918" loc="37:/usr/include/stdint.h">
+    <typedef name="int8_t" ref="0x4003c918" loc="37:/usr/include/stdint.h">
       <type-int cname="signed char" size="I:1" alignment="I:1">
-        <typename><typedef-ref name="int8_t" ref="0x4020f918"/></typename>
+        <typename><typedef-ref name="int8_t" ref="0x4003c918"/></typename>
       </type-int>
     </typedef>
     <typedef name="sim_log_output_t" ref="0x405437b0" loc="54:/opt/tinyos-2.1.2/tos/lib/tossim/sim_log.c">
@@ -20226,9 +20236,9 @@
         <typename><typedef-ref name="__quad_t" ref="0x40340a60"/></typename>
       </type-int>
     </typedef>
-    <typedef name="int32_t" ref="0x4020fd98" loc="39:/usr/include/stdint.h">
+    <typedef name="int32_t" ref="0x4003cd98" loc="39:/usr/include/stdint.h">
       <type-int cname="int" size="I:4" alignment="I:4">
-        <typename><typedef-ref name="int32_t" ref="0x4020fd98"/></typename>
+        <typename><typedef-ref name="int32_t" ref="0x4003cd98"/></typename>
       </type-int>
     </typedef>
     <typedef name="uint64_t" ref="0x40214920" loc="59:/usr/include/stdint.h">
@@ -20586,9 +20596,9 @@
         <typename><typedef-ref name="int64_t" ref="0x40214010"/></typename>
       </type-int>
     </typedef>
-    <typedef name="int16_t" ref="0x4020fba8" loc="38:/usr/include/stdint.h">
+    <typedef name="int16_t" ref="0x4003cba8" loc="38:/usr/include/stdint.h">
       <type-int cname="short" size="I:2" alignment="I:2">
-        <typename><typedef-ref name="int16_t" ref="0x4020fba8"/></typename>
+        <typename><typedef-ref name="int16_t" ref="0x4003cba8"/></typename>
       </type-int>
     </typedef>
     <typedef name="ulong" ref="0x40353520" loc="151:/usr/include/i386-linux-gnu/sys/types.h">
@@ -20935,58 +20945,58 @@
         <type-int cname="int" size="I:4" alignment="I:4"></type-int>
       </type-array>
     </typedef>
-    <typedef name="__nesc_sillytask_procNextAggLocalReq" ref="0x415c3400" loc="615:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc">
+    <typedef name="__nesc_sillytask_procNextAggLocalReq" ref="0x415c3010" loc="614:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc">
       <component-ref qname="VMCustomP"/>
       <type-array elements="I:22" size="I:88" alignment="I:4">
         <type-int cname="int" size="I:4" alignment="I:4"></type-int>
       </type-array>
     </typedef>
-    <typedef name="__nesc_sillytask_procLeaderQ" ref="0x414dbb20" loc="913:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc">
+    <typedef name="__nesc_sillytask_procLeaderQ" ref="0x414d7718" loc="912:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc">
       <component-ref qname="VMCustomP"/>
       <type-array elements="I:23" size="I:92" alignment="I:4">
         <type-int cname="int" size="I:4" alignment="I:4"></type-int>
       </type-array>
     </typedef>
-    <typedef name="__nesc_sillytask_procNextAggReq" ref="0x415c3ca8" loc="610:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc">
+    <typedef name="__nesc_sillytask_procNextAggReq" ref="0x415c38b8" loc="609:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc">
       <component-ref qname="VMCustomP"/>
       <type-array elements="I:21" size="I:84" alignment="I:4">
         <type-int cname="int" size="I:4" alignment="I:4"></type-int>
       </type-array>
     </typedef>
-    <typedef name="__nesc_sillytask_procAggreg" ref="0x415c25a0" loc="82:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc">
+    <typedef name="__nesc_sillytask_procAggreg" ref="0x415c2208" loc="82:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc">
       <component-ref qname="VMCustomP"/>
       <type-array elements="I:20" size="I:80" alignment="I:4">
         <type-int cname="int" size="I:4" alignment="I:4"></type-int>
       </type-array>
     </typedef>
-    <typedef name="__nesc_sillytask_firstElection" ref="0x414db208" loc="935:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc">
+    <typedef name="__nesc_sillytask_firstElection" ref="0x413f0de0" loc="934:/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp/VMCustomP.nc">
       <component-ref qname="VMCustomP"/>
       <type-array elements="I:24" size="I:96" alignment="I:4">
         <type-int cname="int" size="I:4" alignment="I:4"></type-int>
       </type-array>
     </typedef>
-    <typedef name="__nesc_sillytask_photoRead" ref="0x41623670" loc="63:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc">
+    <typedef name="__nesc_sillytask_photoRead" ref="0x41623168" loc="63:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc">
       <component-ref qname="dataSensorP"/>
       <type-array elements="I:26" size="I:104" alignment="I:4">
         <type-int cname="int" size="I:4" alignment="I:4"></type-int>
       </type-array>
     </typedef>
-    <typedef name="__nesc_sillytask_tempRead" ref="0x4160a010" loc="59:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc">
+    <typedef name="__nesc_sillytask_tempRead" ref="0x41623a90" loc="59:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc">
       <component-ref qname="dataSensorP"/>
       <type-array elements="I:25" size="I:100" alignment="I:4">
         <type-int cname="int" size="I:4" alignment="I:4"></type-int>
       </type-array>
     </typedef>
-    <typedef name="__nesc_sillytask_voltRead" ref="0x41624d20" loc="67:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc">
+    <typedef name="__nesc_sillytask_voltRead" ref="0x41624820" loc="67:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc">
       <component-ref qname="dataSensorP"/>
       <type-array elements="I:27" size="I:108" alignment="I:4">
         <type-int cname="int" size="I:4" alignment="I:4"></type-int>
       </type-array>
     </typedef>
-    <typedef name="reg_t" ref="0x4161e298" loc="14:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc">
+    <typedef name="reg_t" ref="0x4161e010" loc="14:/home/branco/gitspace/Terra/TerraVM/src/XComps/dataSensorP.nc">
       <component-ref qname="dataSensorP"/>
-      <type-tag size="I:6" alignment="I:2"><struct-ref scoped="" ref="0x4161e010"/>
-        <typename><typedef-ref name="reg_t" scoped="" ref="0x4161e298"/></typename>
+      <type-tag size="I:6" alignment="I:2"><struct-ref scoped="" ref="0x41620d00"/>
+        <typename><typedef-ref name="reg_t" scoped="" ref="0x4161e010"/></typename>
       </type-tag>
     </typedef>
   </typedefs>

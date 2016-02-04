@@ -185,7 +185,6 @@ void  proc_req_custom_a(uint16_t id, uint32_t value){
 	}
 
 void  proc_req_custom(uint16_t id, uint32_t value){
-	uint8_t auxId ;
 	dbg(APPNAME,"Custom::proc_req_custom(): id=%d\n",id);
 	// Queue the custom event
 	ExtDataCustomA = 0;

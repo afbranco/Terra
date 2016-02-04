@@ -21,7 +21,7 @@ module GroupControlP{
 implementation{
 
 	bool firstInic=TRUE;	// First initialization flag
-	nx_int16_t sendSeq;		// Send msg sequential number
+	uint16_t sendSeq;		// Send msg sequential number
 	NHopsList_t NHopsList;	// Control list to avoid duplicated NHops events
 	uint16_t MoteID;
 
@@ -113,7 +113,7 @@ implementation{
 	 * @param data Pointer to data structure
   	 */
  	command uint8_t GrCtl.sendGR(uint8_t grId, uint8_t grParam, uint8_t maxHops, uint16_t targetNode, uint8_t evtId, uint8_t dataSize, uint8_t* data){
- 		sendGR_t xData;
+		sendGR_t xData;
  		uint8_t i=0,reqRetryAck;
 		bool toGr=TRUE;
 		nx_uint16_t sendToMote;
@@ -181,23 +181,23 @@ implementation{
 	command void GrCtl.aggreg(uint8_t grId, uint8_t grParam, uint8_t maxHops, uint8_t aggId, aggReqData_t *reqData){
  		sendGR_t xData;
 		dbg(APPNAME, "GrCtl:GrCtl.aggreg()\n");
- 		// Copy data value
- 		xData.grId = (nx_uint8_t)grId;
- 		xData.grParam = (nx_uint8_t)grParam;
- 		xData.MaxHops = (nx_uint8_t)maxHops;
- 		xData.evtId = (nx_uint8_t)aggId;
+ 		// Populate message control values
+ 		xData.HopNumber = 1;
+ 		xData.ReqMote = (nx_uint16_t)TOS_NODE_ID;
  		xData.TargetMote = (nx_uint16_t)AM_BROADCAST_ADDR;
+ 		// Copy data value
+ 		xData.grId = grId;
+ 		xData.grParam = grParam;
+ 		xData.MaxHops = maxHops;
+ 		xData.evtId = aggId;
+
 		// Copy reqData to xData.Data
 		memcpy(xData.Data,reqData,sizeof(aggReqData_t));
- 		// Populate message control values
- 		xData.HopNumber=1;
- 		xData.ReqMote = (nx_uint16_t)TOS_NODE_ID;
- 		xData.ReqSeq = (nx_uint16_t)sendSeq++;
+ 		xData.ReqSeq = sendSeq++;
 
 		dbg(APPNAME, "GrCtl:GrCtl.aggreg(): grId=%hhu[%hhu], grParam=%hhu\n",grId,grId&0x01f,grParam );  
 		// Send via BSRadio Custom Message
 		call BSRadio.send(AM_SENDGR, AM_BROADCAST_ADDR, &xData, sizeof(sendGR_t), FALSE);
-
   	}
   	
 	/**
@@ -219,15 +219,15 @@ implementation{
 	 * @param data Pointer to data structure
 	 */
 #ifdef MODULE_CTP
+	sendBS_t yData;
 	command uint8_t GrCtl.sendBS(uint8_t evtId, uint8_t dataSize, uint8_t* data){
-		sendBS_t xData;
 		uint8_t i=0;
 		dbg(APPNAME, "GrCtl:GrCtl.sendBS(): evtId=%d, dataSize=%d, data[0]=%d\n", evtId,dataSize, *(uint8_t*)data);
-		xData.evtId = evtId;
- 		for (i=0; i < dataSize; i++) xData.Data[i] = data[i];
-		xData.Sender = TOS_NODE_ID;
- 		xData.seq = sendSeq++;
- 		return call BSRadio.sendBS(&xData, sizeof(sendBS_t));
+		yData.evtId = evtId;
+ 		for (i=0; i < dataSize; i++) yData.Data[i] = data[i];
+		yData.Sender = TOS_NODE_ID;
+ 		yData.seq = sendSeq++;
+ 		return call BSRadio.sendBS(&yData, sizeof(sendBS_t));
 	}
 #endif // MODULE_CTP
 	event void BSRadio.sendDone(uint8_t am_id,message_t* msg,void* dataMsg,error_t error) {

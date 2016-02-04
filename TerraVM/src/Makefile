@@ -166,12 +166,14 @@ TOSVERSION = $(subst .,,$(subst /opt/tinyos-,,$(TOSROOT)))
 ifeq (mica2,$(word 1,$(MAKECMDGOALS)))
   PFLAGS += -DCC1K_DEF_FREQ=916400000
   PFLAGS += -DRFPOWER_IDX=$(RFPOWER)
+  CFLAGS += -O2
   MOTE=mica2
   HYB=YES
 endif
 ifeq (mica2dot,$(word 1,$(MAKECMDGOALS)))
   PFLAGS += -DCC1K_DEF_FREQ=916400000
   PFLAGS += -DRFPOWER_IDX=$(RFPOWER)
+  CFLAGS += -O2
   MOTE=mica2dot
   HYB=YES
 endif
@@ -179,6 +181,7 @@ ifeq (micaz,$(word 1,$(MAKECMDGOALS)))
   # cc2420 - Ref.: http://www.ti.com/lit/ds/symlink/cc2420.pdf ; pag-51, table:9
   CC2420_RFPOWER = $(shell echo ${RFPOWER}*4+3 | bc)
   PFLAGS += -DCC2420_DEF_RFPOWER=$(CC2420_RFPOWER) -DRFPOWER_IDX=$(RFPOWER)
+  CFLAGS += -O2
   MOTE=micaz
   HYB=YES
 endif
@@ -186,6 +189,7 @@ ifeq (telosb,$(word 1,$(MAKECMDGOALS)))
   # cc2420 - Ref.: http://www.ti.com/lit/ds/symlink/cc2420.pdf ; pag-51, table:9
   CC2420_RFPOWER = $(shell echo ${RFPOWER}*4+3 | bc)
   PFLAGS += -DCC2420_DEF_RFPOWER=$(CC2420_RFPOWER) -DRFPOWER_IDX=$(RFPOWER)
+  CFLAGS += -Os
   MOTE=telosb
 endif
 ifeq (ino,$(word 2,$(MAKECMDGOALS)))
@@ -237,8 +241,8 @@ endif
 # define VM memory use
 #
 ifeq ($(VM),NET)
-  MB_SHORT_ALL = 84
-  MB_SHORT_NOBS = 92
+  MB_SHORT_ALL = 80
+  MB_SHORT_NOBS = 88
   MB_LONG_ALL = 64
   MB_LONG_NOBS = 71
   MB_TELOSB    = 119
@@ -385,7 +389,7 @@ PFLAGS += -fno-strict-aliasing # required for accessing VARS
 MSG_SIZE = 29
 #MSG_SIZE = 34
 
-CFLAGS += -DNO_DEBUG 
+CFLAGS += -DNO_DEBUG
 CFLAGS += -I. -I$(VMDIR) -I$(XCOMPSDIR)
 //CFLAGS += -DPRINTF
 //CFLAGS += -I$(TOSDIR)/lib/printf
