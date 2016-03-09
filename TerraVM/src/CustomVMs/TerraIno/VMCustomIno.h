@@ -10,8 +10,6 @@
 #include "VMData.h" //"../../VMData.h"
 #include "VMError.h" //"../../VMError.h"
 
-#include "kissFFTConfig.h"
-
 enum{
 	
 	// TerraIno local Output events
@@ -21,8 +19,6 @@ enum{
 	// TerraNet Custom Output events
 	O_SEND			=40,
 	O_SEND_ACK		=41,
-	// Volcano Output event
-	O_RD_STREAM		=50,
 
 	// TerraNet Local Input events
 //	I_ERROR_id		=0,  // Defined in VMError.h
@@ -45,20 +41,16 @@ enum{
 	I_RECEIVE_ID		=44,
 	I_RECEIVE			=45,
 	I_Q_READY 			=46,
-	// Volcano Input events
-	I_GMODEL_RD_DONE 	=50,
-	I_STREAM_RD_DONE	=51,
 	
 	// Terra basic functions
 	F_GETNODEID 	= 0,
 	F_RANDOM		= 1,
+	F_GETCLOCKMICRO	= 2,
 	// Terra Queue custom functions
 	F_QPUT 			= 10,
 	F_QGET 			= 11,
 	F_QSIZE 		= 12,
 	F_QCLEAR 		= 13,
-	F_FFT_ALLOC 	= 14,
-	F_FFT 			= 15,
 	// TerraIno Specific custom functions
 	F_PIN_MODE 			= 20,
 	F_DIGITAL_WRITE 	= 21,
@@ -70,17 +62,6 @@ enum{
 	F_INT_FALLING_EDGE	= 27,
 	F_INT_DISABLE 		= 28,
 	F_PULSE_IN 			= 29,
-	F_LOGS 				= 30,
-	// Volcano custom functions
-	F_GMODEL_READ	= 50,
-	F_GET_RTIME		= 51,
-	F_SET_RTIME		= 52,
-	F_GET_NSAMPLES	= 53,
-	F_DETECT		= 54,
-	
-	// GModel internal constants
-	GMODEL_SIZE = (8*FEATURE_DIM) + 4  + ((8*MS_GAUSS_SCALES)*(1 + FEATURE_DIM)),
-	
 
 	// Event Type ID - 3 msb bits of EvtId
 	TID_SENSOR_DONE = 0 << 5,

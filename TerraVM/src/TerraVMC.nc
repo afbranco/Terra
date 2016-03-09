@@ -72,7 +72,8 @@ implementation
 
 
 	void logS(uint8_t* data, uint8_t len){
-#ifdef INO
+#if defined(INOS)
+#elif defined(INOX)
 		call BSUpload.logS(data,len);
 #endif
 	}

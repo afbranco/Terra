@@ -38,7 +38,7 @@ implementation{
 #ifdef TOSSIM
 	components ActiveMessageC as RadioAux;
 
-#elif defined(INO) // INO must be before the others
+#elif defined(INOS) || defined(INOX) // INO must be before the others
 
 #elif defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS)
 	components CC2420ActiveMessageC as RadioAux;
@@ -64,7 +64,26 @@ implementation{
 
 
 	// Communication wire
-#ifdef INO
+#if defined(INOS)
+// Ino Radio configurations
+/*
+	components XBeeMsgC as RadioAM;
+	BS.RadioControl -> RadioAM;
+	BS.RadioAck -> RadioAM;
+	BS.RadioSender -> RadioAM.AMSend;
+	BS.RadioReceiver -> RadioAM.Receive;
+	BS.RadioAMPacket -> RadioAM;
+	BS.RadioPacket -> RadioAM;
+*/
+	components SerialActiveMessageC as SerialAM;
+	BS.RadioControl -> SerialAM.SplitControl;
+	BS.RadioSender -> SerialAM.AMSend;
+	BS.RadioReceiver -> SerialAM.Receive;
+	BS.RadioPacket -> SerialAM.Packet;
+	BS.RadioAMPacket -> SerialAM.AMPacket;
+	BS.RadioAck -> SerialAM.PacketAcknowledgements;
+
+#elif defined(INOX)
 // Ino Radio configurations
 	components XBeeMsgC as RadioAM;
 	BS.RadioControl -> RadioAM;
@@ -195,13 +214,18 @@ implementation{
 	BS.sendBSNet -> sendBS;
 #endif
 
-#ifdef INO
+#ifdef INOX
 // afb
   components Atm128Uart0C as UART0;
   BS.Uart0 -> UART0;
   BS.Uart0Ctl -> UART0;
   components new QueueC(uint8_t, 100) as LogQ;
   BS.LogQ -> LogQ;
+  components InoIOC;
+  BS.InoIO -> InoIOC;
+#endif	
+#ifdef INOS
+
   components InoIOC;
   BS.InoIO -> InoIOC;
 #endif	

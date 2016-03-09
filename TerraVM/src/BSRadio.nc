@@ -17,7 +17,8 @@ interface BSRadio{
 	event void sendBSDone(message_t* msg,error_t error);
 	command uint16_t getParent();
 #endif
-#ifdef INO
+#if defined(INOS)
+#elif defined(INOX)
 	// Log data to USB0
 	command void logS(uint8_t* data, uint8_t len);
 #endif	

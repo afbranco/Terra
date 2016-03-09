@@ -45,8 +45,10 @@
 VM ?= NET
 ifneq ($(VM),NET)
  ifneq ($(VM),GRP)
-  ifneq ($(VM),INO)
-    $(error VM must be "NET" or "GRP" or "INO")
+  ifneq ($(VM),INOX)
+   ifneq ($(VM),INOS)
+     $(error VM must be "NET" or "GRP" or "INOX" or "INOS")
+   endif
   endif
  endif
 endif
@@ -146,9 +148,13 @@ ifeq ($(VM),GRP)
 	PFLAGS += -DMODULE_CTP
 	CFLAGS += -I$(TOSDIR)/lib/net/ -I$(TOSDIR)/lib/net/4bitle -I$(TOSDIR)/lib/net/ctp 
 endif
-ifeq ($(VM),INO)
+ifeq ($(VM),INOX)
 	VMDIR = $(APPDIR)/CustomVMs/TerraIno
-	CFLAGS += -I$(INODIR) -DINO -DINO_XBEE_USB=$(INO_XBEE_USB)
+	CFLAGS += -I$(INODIR) -DINOX -DINO_XBEE_USB=$(INO_XBEE_USB)
+endif
+ifeq ($(VM),INOS)
+	VMDIR = $(APPDIR)/CustomVMs/TerraIno
+	CFLAGS += -I$(INODIR) -DINOS -DINO_XBEE_USB=$(INO_XBEE_USB)
 endif
 
 #
@@ -252,7 +258,12 @@ else ifeq ($(VM),GRP)
   MB_LONG_ALL = 10
   MB_LONG_NOBS = 10
   MB_TELOSB    = 200
-else ifeq ($(VM),INO)
+else ifeq ($(VM),INOX)
+  MB_SHORT_ALL =120
+  MB_SHORT_NOBS = 120
+  MB_LONG_ALL = 150
+  MB_LONG_NOBS = 150
+else ifeq ($(VM),INOS)
   MB_SHORT_ALL =120
   MB_SHORT_NOBS = 120
   MB_LONG_ALL = 150
@@ -418,8 +429,10 @@ usrMsg.java: CustomVMs/TerraNet/usrMsg.h
 	mig java -target=$(PLATFORM) $(CFLAGS) -java-classname=usrMsg CustomVMs/TerraNet/usrMsg.h usrMsg -o $@
 
 ifeq (ino,$(word 2,$(MAKECMDGOALS)))
-  ifneq ($(VM),INO)
-  $(error VM must be "INO" for 'ino' platforms)
+  ifneq ($(VM),INOX)
+   ifneq ($(VM),INOS)
+    $(error VM must be "INOX" or "INOS" for 'ino' platforms)
+   endif 
   endif 
   include Makefile_ino
 else

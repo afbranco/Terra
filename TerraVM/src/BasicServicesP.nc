@@ -21,7 +21,24 @@ module BasicServicesP{
 
 	uses interface Boot as TOSBoot;
 
-#ifdef INO
+#if defined(INOS)
+// Ino Radio Configuration
+/*
+    uses interface AMSend as RadioSender[am_id_t id];
+    uses interface Receive as RadioReceiver[am_id_t id];
+	uses interface SplitControl as RadioControl;
+	uses interface Packet as RadioPacket;
+
+    uses interface PacketAcknowledgements as RadioAck;
+	uses interface AMPacket as RadioAMPacket;
+*/
+	uses interface SplitControl as RadioControl;
+	uses interface AMSend as RadioSender[am_id_t id];
+	uses interface Receive as RadioReceiver[am_id_t id];
+	uses interface Packet as RadioPacket;
+	uses interface AMPacket as RadioAMPacket;
+    uses interface PacketAcknowledgements as RadioAck;
+#elif defined(INOX)
 // Ino Radio Configuration
     uses interface AMSend as RadioSender[am_id_t id];
     uses interface Receive as RadioReceiver[am_id_t id];
@@ -83,11 +100,12 @@ module BasicServicesP{
 
 
 // Radio RF Power
-#ifdef TOSSIM
+#if defined(TOSSIM)
 
-#elif defined(INO)  // INO must be before to avoid radio chip component
+#elif defined(INOS) || defined(INOX) // INO must be before to avoid radio chip component
 
-#elif defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS)
+#elif defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || (defined(PLATFORM_IRIS) && !(defined(INOS) || defined(INOX)))
+#error "Passei no MICAZ"
 	uses interface CC2420Packet as RadioAux;
 #elif defined(PLATFORM_MICA2) || defined(PLATFORM_MICA2DOT)
 	uses interface CC1000Control as RadioAux;
@@ -139,7 +157,18 @@ module BasicServicesP{
 #endif
 
 
-#ifdef INO
+#if defined(INOS)
+// afb log
+  uses {
+#if defined(INOS)
+#else
+  	interface UartStream as Uart0;
+  	interface StdControl as Uart0Ctl;
+  	interface Queue<uint8_t> as LogQ;
+#endif
+  	interface InoIO;
+  }
+#elif defined(INOX)
 // afb log
   uses {
   	interface UartStream as Uart0;
@@ -147,6 +176,7 @@ module BasicServicesP{
   	interface Queue<uint8_t> as LogQ;
   	interface InoIO;
   }
+
 #endif
 
 
@@ -225,7 +255,9 @@ implementation{
 		}	
 // afb
   uint8_t logData[10];  
-#ifdef INO
+#if defined(INOS)
+
+#elif defined(INOX)
   uint8_t logIdle=TRUE;
   task void logProc(){
   	uint8_t logByte;
@@ -281,7 +313,11 @@ implementation{
 	event void TOSBoot.booted(){
 		uint32_t rnd=0;	
 		dbg(APPNAME, "BS::TOSBoot.booted().\n");
-#if defined(INO) 
+#if defined(INOS)
+	TOS_NODE_ID = 2;	
+#endif
+
+#if defined(INOS) || defined(INOX) 
 		userRFPowerIdx=0;
 #elif defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS) 
 		userRFPowerIdx = RFPOWER_IDX;
@@ -293,7 +329,9 @@ implementation{
 #endif
 
 // log afb
-#ifdef INO
+#if defined(INOS)
+
+#elif defined(INOX)
 call Uart0Ctl.start();
 #endif
 //logS("A",1);
@@ -304,9 +342,12 @@ call Uart0Ctl.start();
 		if (firstInic){
 			inicCtlData();
 #ifdef LPL_ON
+#if defined(INOS) || defined(INOX)
+
+#else
 			call LowPowerListening.setLocalWakeupInterval( SLEEP );
 #endif
-
+#endif
 			if (call RadioControl.start() != SUCCESS) dbg(APPNAME,"BS::Error in RadioControl.start()\n");
 #ifndef NO_BSTATION
 			if (MoteID == BStation)	if (call SerialControl.start() != SUCCESS) dbg(APPNAME,"BS::Error in SerialControl.start()\n");
@@ -314,7 +355,6 @@ call Uart0Ctl.start();
 		} else {
 			signal BSBoot.booted();
 		}
-
 	}
 
 	uint32_t getRequestTimeout(){return (ProgMoteSource==1)?REQUEST_TIMEOUT_BS:REQUEST_TIMEOUT;}
@@ -355,7 +395,9 @@ call Uart0Ctl.start();
 #endif
 #endif
 		signal BSBoot.booted();
+call Leds.led1On();
 	}
+	
 	event void RadioControl.stopDone(error_t error) {
 		dbg(APPNAME, "BS::RadioControl.stopDone().\n");
 	}
@@ -504,14 +546,22 @@ call Uart0Ctl.start();
 			if (!call BM.get(xmsg->blockId)){
 				if (xmsg->blockId == ProgBlockStart){
 					// Now can forward NewProgVersion message
+#if defined(INOS)
+
+#else
 					if (call outQ.put(&lastNewProgVersion)!=SUCCESS) dbg(APPNAME, "BS::recNewProgBlockNet_receive(): outQueue is full! Losting a message.\n");		
+#endif
 				}
 				// put message in the inQueue
 				if (call inQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recNewProgBlockNet_receive(): inQueue is full! Losting a message.\n");
 				// get source mote. Doesn't change it if the original is from the BS
 				if (ProgMoteSource != BStation) ProgMoteSource = call RadioAMPacket.source(msg);
 				// Forward the message
+#if defined(INOS)
+
+#else
 				if (call outQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recNewProgBlockNet_receive(): outQueue is full! Losting a message.\n");
+#endif
 			} else {
 				dbg(APPNAME, "BS::recNewProgBlockNet_receive(): Discarding duplicated message - block is 0!\n");
 			}
@@ -562,10 +612,14 @@ call Uart0Ctl.start();
 		// Get source mote.
 		NewDataMoteSource = call RadioAMPacket.source(msg);
 		// if it is a normal message, then broadcast it
+#if defined(INOS)
+
+#else
 		if (xmsg->seq == (NewDataSeq+1)){
 			tempInputInQ.sendToMote=AM_BROADCAST_ADDR;
 			if (call outQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recSetDataNDNet_receive(): outQueue is full! Losting a message.\n");		
 			}
+#endif
 	}
 
 
@@ -1188,14 +1242,16 @@ call Uart0Ctl.start();
 #ifdef LPL_ON
 		call LowPowerListening.setRemoteWakeupInterval( &sendBuff, SLEEP );
 #endif
+
 		if ( (tempOutputOutQ.reqAck & (1<<REQ_ACK_BIT)) > 0){
 			if (call RadioAck.requestAck(&sendBuff) != SUCCESS) dbg(APPNAME, "BS::sendRadioN()(): requestAck() error!\n");
 		} else {
 			if (call RadioAck.noAck(&sendBuff) != SUCCESS) dbg(APPNAME, "BS::sendRadioN()(): requestNoAck() error!\n");			
 		}
+
 #ifdef TOSSIM
 
-#elif INO
+#elif defined(INOS) || defined(INOX)
 
 #elif defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS)
 		if (tempOutputOutQ.RFPower > 0) call RadioAux.setPower(&sendBuff,tempOutputOutQ.RFPower);
@@ -1752,7 +1808,12 @@ call Uart0Ctl.start();
 // afb
 
 	// Log data to USB0
-#ifdef INO
+#if defined(INOS)
+
+	event void InoIO.interruptFired(interrupt_enum intPin){}
+	event void InoIO.pulseLen(interrupt_enum intPin, pinvalue_enum value, uint32_t data){}
+	event void InoIO.analogReadDone(analog_enum pin, uint16_t data){}
+#elif defined(INOX)
 	command void BSUpload.logS(uint8_t* data, uint8_t len){logS(data,len);}
 	command void BSRadio.logS(uint8_t* data, uint8_t len){logS(data,len);}
 
