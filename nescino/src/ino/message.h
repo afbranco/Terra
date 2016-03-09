@@ -11,6 +11,8 @@
 #define TOS_BCAST_ADDR 0xFFFF
 #endif
 
+#if defined(INOX)
+
 typedef nx_struct message_t {
   nx_uint16_t target;
   nx_uint16_t source;
@@ -23,6 +25,14 @@ typedef nx_struct message_t {
   nx_uint8_t data[TOSH_DATA_LENGTH];
 } message_t;
 
+#elif defined(INOS)
+typedef nx_struct message_t {
+  nx_uint8_t header[sizeof(message_header_t)];
+  nx_uint8_t data[TOSH_DATA_LENGTH];
+  nx_uint8_t footer[sizeof(message_footer_t)];
+  nx_uint8_t metadata[sizeof(message_metadata_t)];
+} message_t;
+#endif
 /*
  * This resource is used to arbitrate access between ActiveMessageC,
  * Ieee154MessageC and possibly future MessageC components to the 

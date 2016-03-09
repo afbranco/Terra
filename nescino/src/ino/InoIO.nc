@@ -99,4 +99,8 @@ interface InoIO{
   	 */
 	event void pulseLen(interrupt_enum intPin, pinvalue_enum value, uint32_t len);
 
+	/**
+	 * Reads current micro seconds clock/counter
+  	 */
+	command uint32_t getClockMicro();
 }

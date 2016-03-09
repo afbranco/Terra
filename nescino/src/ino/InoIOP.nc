@@ -161,8 +161,8 @@ implementation{
 		if (isPulse[0]==TRUE){	// is a pulse interruption
 			if (pulseStart[0]==0) { // pulse start
 				pulseStart[0] = getClockMicro();
-				call pulseTimer0.stop();
-				call pulseTimer0.startOneShot(5L*60L*1000L); // len max = 5 min.; 2nd timeout			
+				//call pulseTimer0.stop();
+				//call pulseTimer0.startOneShot(5L*60L*1000L); // len max = 5 min.; 2nd timeout			
 				if (pulseValue[0]== HIGH) // wait end of pulse
 					call pInt0.enableFallingEdge();
 				else
@@ -186,6 +186,13 @@ implementation{
 			pulseEnd[0]=0;			
 		}
 		signal InoIO.pulseLen(I0,pulseValue[0],0);		
+	}
+
+	/*
+	 * Get micro seconds clock/counter
+	 */
+	command uint32_t InoIO.getClockMicro(){
+		return getClockMicro();
 	}
 
 
