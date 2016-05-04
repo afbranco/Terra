@@ -75,6 +75,7 @@ public class ControlForm {
 	private Integer GrNdIdLen = 0;
 */	
 	private String lastDir=".";
+	private Integer lastVersionSeq=0;
 	private String userHome="";
 	Properties prop;
 	
@@ -105,6 +106,7 @@ public class ControlForm {
 	JButton btnSendGR;
 
 	JRadioButton rdbtnmsgtype;
+	JLabel lbllastVersion;
 	
 	int ControlMsgsLine = 0;
 	private ControlTableModel ControlTableModel;
@@ -191,14 +193,18 @@ public class ControlForm {
     	try {
 			prop.load(new FileInputStream(userHome+"/.TerraConfig"));
 			lastDir=prop.getProperty("lastDir");
+			lastVersionSeq=Integer.decode(prop.getProperty("lastVersionSeq"));
 		} catch (Exception e) {
 			lastDir=".";
+			lastVersionSeq=1;
 			prop.setProperty("lastDir", ".");
+			prop.setProperty("lastVersionSeq", "1");
 			prop.store(new FileOutputStream(new File(userHome+"/.TerraConfig")), null);
 		}
 		this.textFolder.setText(lastDir);
 		fillComboPrefix();
-		terracore = new ControlCore(this,"localhost",9002);
+		lbllastVersion.setText("Last ver.: "+lastVersionSeq.toString());
+		terracore = new ControlCore(this,"localhost",9002,lastVersionSeq);
 	}
 	
 	class updClock extends TimerTask {
@@ -265,6 +271,7 @@ public class ControlForm {
 		
 		JButton btnDir = new JButton("");
 		btnDir.setIcon(new ImageIcon(ControlForm.class.getResource("/javax/swing/plaf/metal/icons/sortDown.png")));
+		btnDir.setBounds(483, 42, 20, 24);
 		btnDir.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				selectedDir = new File(textFolder.getText());
@@ -346,8 +353,22 @@ public class ControlForm {
 		comboPrefix.setBounds(530, 41, 218, 24);
 		controlPanel.add(comboPrefix);
 		fillComboPrefix();
-		btnDir.setBounds(483, 42, 20, 24);
 
+		JButton btnRefresh = new JButton("");
+		btnRefresh.setIcon(new ImageIcon(ControlForm.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeLeaf.gif")));
+		
+		btnRefresh.setBounds(728, 25, 20, 18);
+		btnRefresh.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				fillComboPrefix();
+			}
+		});
+		controlPanel.add(btnRefresh);
+
+		lbllastVersion = new JLabel("Last ver.: 000");
+		lbllastVersion.setBounds(762, 10, 140, 15);
+		controlPanel.add(lbllastVersion);
+		
 		
 //------------------------------------------------------			
 	
@@ -932,7 +953,19 @@ public class ControlForm {
 		reqConfigDigits=1;
 		StartTime = System.currentTimeMillis();
 		CountElapsedTime = true;
-		terracore.newData(progBin);
+		lastVersionSeq = terracore.newData(progBin);
+		lbllastVersion.setText("Last ver.: "+lastVersionSeq.toString());
+		prop.setProperty("lastVersionSeq", lastVersionSeq.toString());
+		try {
+			prop.store(new FileOutputStream(new File(userHome+"/.TerraConfig")), null);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	private void fillComboPrefix(){

@@ -45,11 +45,12 @@ public class ControlCore implements MessageListener
 	Timer TCPtimer;
 	Timer Sendtimer;
 
-	public ControlCore(ControlForm Form,String Host,int Port) throws InterruptedException, IOException  {
+	public ControlCore(ControlForm Form,String Host,int Port, int lastVersionSeq) throws InterruptedException, IOException  {
 		super();
 		controlform = Form;
 		host=Host; // "localhost";
 		port=Port; // 9002;
+		VersionId = lastVersionSeq;
 		TCPretries = 0;
 //		serviceOFF = true;
 		TCPtimer = new Timer();
@@ -125,13 +126,13 @@ public class ControlCore implements MessageListener
 		}
 	
 
-	public void newData(ProgBin Binary){
+	public int newData(ProgBin Binary){
 		progBin = Binary;
 //		pauseConfig=false;
 		erroCount=0;
 		CurrentBlockId=-1;
 		controlform.appendControlMsg("ControlCore: newData button.");
-		sendNewProgVersion(true);
+		return sendNewProgVersion(true);
 	}
 	
 	public void newSetData(List<SetData> SetDataArray){
@@ -314,7 +315,7 @@ public class ControlCore implements MessageListener
 	}
 
 
-	void sendNewProgVersion(boolean incVersionId){
+	int sendNewProgVersion(boolean incVersionId){
 		controlform.appendControlMsg("ControlCore: sendNewProgVersion()");
 		newProgVersionMsg msg = new newProgVersionMsg();
 		CurrRequestMote = 0;
@@ -334,6 +335,7 @@ public class ControlCore implements MessageListener
 		
 		System.out.println(msg.toString());		
 		TCPtimer.schedule(new sendMsg("NewProgVersion",msg), 10);
+		return VersionId;
 	}
 
 	void sendNewSetData(Integer idx){
