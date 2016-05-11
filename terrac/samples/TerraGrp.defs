@@ -6,10 +6,13 @@ config
 	code:00.02.00 , 
 	{
 		tossim: 576,
-		telosb_full: 4800,
+		iris_full: 4416,
+		telosb_full: 4416,
+		iris_hyb: 768,
 		telosb_hyb: 768,
 		micaz : 768,
 		mica2 : 768,
+		mica2dot : 768,
 	} 
 do
 /*

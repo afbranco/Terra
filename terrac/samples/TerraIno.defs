@@ -5,11 +5,7 @@ config
 	name : TerraIno_MsgQ ,
 	code:00.02.00 , 
 	{
-		tossim: 1824,
-		telosb: 5808,
-		telosb_hyb: 2016,
-		micaz : 2016,
-		mica2 : 2016,
+		inoMega: ????,
 	} 
 do
 /*
@@ -90,7 +86,7 @@ do
 
 	// PJ ???? 
 
-#define A0   0 	// PF0 (ADC0)  
+#define LUZ   0 	// PF0 (ADC0)  
 #define A1   1 	// PF1 (ADC1)  
 #define A2   2 	// PF2 (ADC2)  
 #define A3   3 	// PF3 (ADC3)  

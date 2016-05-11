@@ -307,7 +307,7 @@ _GG = {
                 (NUM * K'ms'  + Cc(0)) *
 --                (NUM * K'us'  + Cc(0)) *
 --                (NUM * EM'<h,min,s,ms,us>')^-1
-                (NUM * EM'<h,min,s,ms,us>')^-1
+                (NUM * EM'<h,min,s,ms>')^-1
     , WCLOCKE = K'(' * V'Exp' * EK')' * C(
                     K'h' + K'min' + K's' + K'ms' --+ K'us'
 --                  + EM'<h,min,s,ms,us>'

@@ -7,11 +7,14 @@ config
 	name : TerraNet_MsgQ ,
 	code:00.02.00 , 
 	{
-		tossim: 1824,
-		telosb: 5808,
-		telosb_hyb: 2016,
-		micaz : 2016,
-		mica2 : 2016,
+		tossim: 1728,
+		telosb_full: 4224,
+		iris_full: 4224,
+		telosb_hyb: 1920,
+		iris_hyb: 1920,
+		micaz : 1920,
+		mica2 : 1920,
+		mica2dot : 1920,
 	} 
 do
 /*
