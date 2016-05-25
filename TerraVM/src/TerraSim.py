@@ -84,8 +84,8 @@ class Network:
         self.tossim.addChannel("LedsC", outCMD)
         
         #--------------------------------------
-        self.tossim.addChannel("terra", outDBG)
-        self.tossim.addChannel("TVIEW", outDBG)
+        #self.tossim.addChannel("terra", outDBG)
+        #self.tossim.addChannel("TVIEW", outDBG)
         self.tossim.addChannel("TVIEW", outCMD)
         self.tossim.addChannel("VMDBG", outVM)
         self.ExecTime = 0
