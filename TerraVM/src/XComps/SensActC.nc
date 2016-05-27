@@ -30,7 +30,7 @@ implementation{
 	SensActP.S_PHOTO -> S_PHOTO;
 	SensActP.S_VOLT -> S_VOLT;
 */
-#elif defined(PLATFORM_MICAZ) || defined(PLATFORM_MICA2) || defined(PLATFORM_MICA2DOT) || defined(PLATFORM_IRIS)
+#elif defined(PLATFORM_MICAZ) || defined(PLATFORM_MICA2) || defined(PLATFORM_IRIS)
 	components new TempC() as S_TEMP;
 	components new PhotoC() as S_PHOTO;
 	components new VoltageC() as S_VOLT;
@@ -44,6 +44,14 @@ implementation{
 		SensActP.S_MIC_CFG -> MicStream;
 		SensActP.A_SOUNDER -> SounderC;
 	#endif
+
+#elif defined(PLATFORM_MICA2DOT)
+	components new TempC() as S_TEMP;
+	components new DemoSensorC() as S_PHOTO; // USe DemoSensor for Photo and Volt
+	components new DemoSensorC() as S_VOLT;
+	SensActP.S_TEMP -> S_TEMP;
+	SensActP.S_PHOTO -> S_PHOTO;
+	SensActP.S_VOLT -> S_VOLT;
 
 #elif defined(PLATFORM_TELOSB)
 #ifndef M_VCN_DAT  // Disable sensors when using Volcano Data in TelosB
@@ -61,7 +69,7 @@ implementation{
 	SensActP.A_LEDS -> A_LEDS;
 
 #ifndef TOSSIM
-#if defined(PLATFORM_MICAZ) || defined(PLATFORM_MICA2)
+#if defined(PLATFORM_MICAZ) || defined(PLATFORM_MICA2) || defined(PLATFORM_IRIS)
 	components MicaBusC as Bus;
 	SensActP.A_PIN1 -> Bus.PW4;
 	SensActP.A_PIN2 -> Bus.PW5;

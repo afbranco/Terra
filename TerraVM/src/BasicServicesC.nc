@@ -40,13 +40,22 @@ implementation{
 
 #elif defined(INOS) || defined(INOX) // INO must be before the others
 
-#elif defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS)
+#elif defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB)
 	components CC2420ActiveMessageC as RadioAux;
 	BS.RadioAux -> RadioAux;
 
 	#ifdef LPL_ON
 	BS.LowPowerListening -> RadioAux.LowPowerListening;
 	#endif
+
+#elif defined(PLATFORM_IRIS)
+	components RF230ActiveMessageC as RadioAux;
+	BS.RadioAux -> RadioAux.PacketTransmitPower;
+
+	#ifdef LPL_ON
+	BS.LowPowerListening -> RadioAux.LowPowerListening;
+	#endif
+
 
 #elif defined(PLATFORM_MICA2) || defined(PLATFORM_MICA2DOT)
 	components CC1000ControlP as RadioPwr;
@@ -66,15 +75,6 @@ implementation{
 	// Communication wire
 #if defined(INOS)
 // Ino Radio configurations
-/*
-	components XBeeMsgC as RadioAM;
-	BS.RadioControl -> RadioAM;
-	BS.RadioAck -> RadioAM;
-	BS.RadioSender -> RadioAM.AMSend;
-	BS.RadioReceiver -> RadioAM.Receive;
-	BS.RadioAMPacket -> RadioAM;
-	BS.RadioPacket -> RadioAM;
-*/
 	components SerialActiveMessageC as SerialAM;
 	BS.RadioControl -> SerialAM.SplitControl;
 	BS.RadioSender -> SerialAM.AMSend;

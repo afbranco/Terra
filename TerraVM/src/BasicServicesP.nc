@@ -104,9 +104,12 @@ module BasicServicesP{
 
 #elif defined(INOS) || defined(INOX) // INO must be before to avoid radio chip component
 
-#elif defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || (defined(PLATFORM_IRIS) && !(defined(INOS) || defined(INOX)))
-#error "Passei no MICAZ"
+#elif defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) && !((defined(PLATFORM_IRIS) || defined(INOS) || defined(INOX)))
+//#error "Passei no MICAZ"
 	uses interface CC2420Packet as RadioAux;
+#elif (defined(PLATFORM_IRIS) && !(defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(INOS) || defined(INOX)))
+//#error "Passei no IRIS"
+	uses interface PacketField<uint8_t> as RadioAux;
 #elif defined(PLATFORM_MICA2) || defined(PLATFORM_MICA2DOT)
 	uses interface CC1000Control as RadioAux;
 
@@ -301,7 +304,7 @@ implementation{
 			maxSeenDataSeq=0;
 			NewDataMoteSource = AM_BROADCAST_ADDR;
 			
-			ProgBlockLen = 10;//CURRENT_MAX_BLOCKS;
+			ProgBlockLen = CURRENT_MAX_BLOCKS;
 			ProgMoteSource = 0;
 		}
 	}
@@ -1253,8 +1256,10 @@ call Leds.led1On();
 
 #elif defined(INOS) || defined(INOX)
 
-#elif defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS)
+#elif defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB)
 		if (tempOutputOutQ.RFPower > 0) call RadioAux.setPower(&sendBuff,tempOutputOutQ.RFPower);
+#elif defined(PLATFORM_IRIS)
+		if (tempOutputOutQ.RFPower > 0) call RadioAux.set(&sendBuff,tempOutputOutQ.RFPower);
 #elif defined(PLATFORM_MICA2) || defined(PLATFORM_MICA2DOT)
 		if (tempOutputOutQ.RFPower > 0) atomic {call RadioAux.setRFPower(tempOutputOutQ.RFPower);};
 

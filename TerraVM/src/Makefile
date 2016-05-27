@@ -1,7 +1,7 @@
 #
 #TerraVM make parameters
 #
-# Define target VM to build: NET or GRP | default NET
+# Define target VM to build: NET, GRP, INOX or INOS | default NET
 #    VM=GRP
 #
 # Define additional modules: FFT,VCN_DAT,VCN_DET,MSGQ | default ''
@@ -16,7 +16,7 @@
 # Configure runtime type: BS or NOBS or ALL | default ALL
 #    TYPE=BS
 #
-# Hybrid mode: YES => TelosB Mem.Blocks = micaz Mem.Blocks or NO=> TelosB Large Mem.Blocks | Default YES
+# Hybrid mode: YES => TelosB/Iris Mem.Blocks = micaz Mem.Blocks or NO=> TelosB?Iris Large Mem.Blocks | Default YES
 #    HYB=NO
 #
 # Verbose Compilation mode: YES or NO | Default NO
@@ -191,6 +191,13 @@ ifeq (micaz,$(word 1,$(MAKECMDGOALS)))
   MOTE=micaz
   HYB=YES
 endif
+ifeq (iris,$(word 1,$(MAKECMDGOALS)))
+  # cc2420 - Ref.: http://www.ti.com/lit/ds/symlink/cc2420.pdf ; pag-51, table:9
+  CC2420_RFPOWER = $(shell echo ${RFPOWER}*4+3 | bc)
+  PFLAGS += -DCC2420_DEF_RFPOWER=$(CC2420_RFPOWER) -DRFPOWER_IDX=$(RFPOWER)
+  CFLAGS += -O2
+  MOTE=iris
+endif
 ifeq (telosb,$(word 1,$(MAKECMDGOALS)))
   # cc2420 - Ref.: http://www.ti.com/lit/ds/symlink/cc2420.pdf ; pag-51, table:9
   CC2420_RFPOWER = $(shell echo ${RFPOWER}*4+3 | bc)
@@ -198,30 +205,56 @@ ifeq (telosb,$(word 1,$(MAKECMDGOALS)))
   CFLAGS += -Os
   MOTE=telosb
 endif
+
 ifeq (ino,$(word 2,$(MAKECMDGOALS)))
     MOTE=ino
     ifeq (mega,$(word 1,$(MAKECMDGOALS)))
-        MODEL=mega
-    else
-        $(error Invalid Arduino Board)
+        MODEL=MEGA
+        CPU=atmega2560
+    else 
+    	ifeq (uno,$(word 1,$(MAKECMDGOALS)))
+        	MODEL=UNO
+        	CPU=atmega328p
+        	$(error Ainda falta terminar a implementação para UNO/ATmega328. Entender melhor as alterações de https://github.com/jmattsson/tinyos-arduino para aplicar em Terra.)
+    	else
+        	$(error Invalid Arduino Board)
+    	endif
     endif
+    CFLAGS += -D$(MODEL)
 endif
 
 #
 # Validate SENSOR and define SENSORBOARD
 #
 ifeq ($(MAKECMDGOALS), mica2dot)
-  SENSOR ?=MTS310CA
-  ifneq ($(SENSOR),MTS310CA)
-    $(error Invalid SENSOR value "$(SENSOR)" for "mica2dot". Option is: MTS310CA)
-  endif
-  ifeq ($(SENSOR),MTS310CA)
-    SENSORBOARD = mts300
-    CFLAGS += -DMTS310CA -DSBOARD=300
+  ifneq ($(SENSOR),)
+    $(error Invalid SENSOR value "$(SENSOR)" for "mica2dot". Currently Mica2Dot supports only internal temperature sensor.)
   endif
 endif
 ifneq ($(MAKECMDGOALS), mica2dot)
 ifneq ($(findstring mica,$(MAKECMDGOALS)),)
+  SENSOR ?= MDA100
+  ifeq ($(SENSOR) , MTS300CA)
+    SENSORBOARD = mts300
+    CFLAGS += -DMTS300CA -DSBOARD=300
+  endif
+  ifeq ($(SENSOR) , MTS300CB)
+    SENSORBOARD = mts300
+    CFLAGS += -DMTS300CB -DSBOARD=300
+  endif
+  ifeq ($(SENSOR) , MDA100)
+    SENSORBOARD = mda100
+    CFLAGS += -DMDA100
+    CFLAGS += -I$(TOSDIR)/sensorboards/mda100/cb -DSBOARD=100
+  endif
+  ifndef SENSORBOARD
+    $(error Invalid SENSOR value "$(SENSOR)" for "mica2/micaz". Options are: MTS300CA, MTS300CB, MDA100)
+  endif	
+endif
+endif
+# repetindo para o Iris mote
+ifneq ($(MAKECMDGOALS), mica2dot)
+ifneq ($(findstring iris,$(MAKECMDGOALS)),)
   SENSOR ?= MDA100
   ifeq ($(SENSOR) , MTS300CA)
     SENSORBOARD = mts300
@@ -251,13 +284,15 @@ ifeq ($(VM),NET)
   MB_SHORT_NOBS = 88
   MB_LONG_ALL = 64
   MB_LONG_NOBS = 71
-  MB_TELOSB    = 119
+  MB_TELOSB    = 184
+  MB_IRIS    = 184
 else ifeq ($(VM),GRP)
   MB_SHORT_ALL =24
   MB_SHORT_NOBS = 32
   MB_LONG_ALL = 10
   MB_LONG_NOBS = 10
-  MB_TELOSB    = 200
+  MB_TELOSB    = 184
+  MB_IRIS    = 184
 else ifeq ($(VM),INOX)
   MB_SHORT_ALL =120
   MB_SHORT_NOBS = 120
@@ -300,6 +335,10 @@ else # HYB=NO
         MBLOCKS = $(MB_LONG_NOBS)             # Mica?; NOBS; LONG
       endif
     endif
+  endif
+# Iris
+  ifeq ($(MOTE),iris)
+    MBLOCKS = $(MB_IRIS)               # Iris; NO HYB
   endif
 # TelosB
   ifeq ($(MOTE),telosb)
@@ -382,7 +421,7 @@ $(info ***********************)
 $(info **** Configuration ****)
 $(info VM          = $(VM))
 $(info MODULES     = $(MODULES) -- [FFT,VCN_DAT,VCN_DET,MSGQ])
-$(info MOTE        = $(MOTE))
+$(info MOTE        = $(MOTE) $(MODEL))
 $(info RFPOWER     = $(RFPOWER))
 $(info LPL         = $(LPL))
 $(info SENSORBOARD = $(SENSORBOARD))

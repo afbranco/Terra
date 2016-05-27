@@ -60,6 +60,9 @@ enum{
 #ifdef M_FFT
 	IN_QSIZE  = 2,//5,
 	OUT_QSIZE = 3,//10,//10, //6
+#elif defined(INOS)
+	IN_QSIZE  = 1,//5,
+	OUT_QSIZE = 1,//10,//10, //6
 #else
 	IN_QSIZE  = 5,
 	OUT_QSIZE = 10,//10, //6
