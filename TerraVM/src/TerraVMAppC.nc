@@ -16,7 +16,11 @@ implementation
 {
 	// Main modules
     components TerraVMC as terra;
+#ifdef IX
+    components BasicServicesIxC as BS;
+#else
     components BasicServicesC as BS;
+#endif
 	terra.BSBoot -> BS;
 	terra.BSUpload -> BS;
 	terra.BSTimerVM -> BS.BSTimerVM;

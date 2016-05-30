@@ -1,7 +1,7 @@
 #
 #TerraVM make parameters
 #
-# Define target VM to build: NET, GRP, INOX or INOS | default NET
+# Define target VM to build: NET, GRP, INOX, INOS, IX | default NET
 #    VM=GRP
 #
 # Define additional modules: FFT,VCN_DAT,VCN_DET,MSGQ | default ''
@@ -47,7 +47,9 @@ ifneq ($(VM),NET)
  ifneq ($(VM),GRP)
   ifneq ($(VM),INOX)
    ifneq ($(VM),INOS)
-     $(error VM must be "NET" or "GRP" or "INOX" or "INOS")
+    ifneq ($(VM),IX)
+      $(error VM must be "NET" or "GRP" or "INOX" or "INOS" or "IX")
+    endif
    endif
   endif
  endif
@@ -136,6 +138,7 @@ endif
 #
 APPDIR = $(shell pwd)
 INODIR = /home/branco/gitspace/Terra/nescino/src/ino
+IXDIR = /home/branco/gitspace/Terra/nescix/src
 
 #
 # Define VM path
@@ -155,6 +158,10 @@ endif
 ifeq ($(VM),INOS)
 	VMDIR = $(APPDIR)/CustomVMs/TerraIno
 	CFLAGS += -I$(INODIR) -DINOS -DINO_XBEE_USB=$(INO_XBEE_USB)
+endif
+ifeq ($(VM),IX)
+	VMDIR = $(APPDIR)/CustomVMs/TerraIx
+	CFLAGS += -I$(IXDIR) -DIX
 endif
 
 #
@@ -222,6 +229,11 @@ ifeq (ino,$(word 2,$(MAKECMDGOALS)))
     endif
     CFLAGS += -D$(MODEL)
 endif
+
+ifeq (ix,$(word 1,$(MAKECMDGOALS)))
+  MOTE=ix
+endif
+
 
 #
 # Validate SENSOR and define SENSORBOARD
@@ -299,6 +311,11 @@ else ifeq ($(VM),INOX)
   MB_LONG_ALL = 150
   MB_LONG_NOBS = 150
 else ifeq ($(VM),INOS)
+  MB_SHORT_ALL =120
+  MB_SHORT_NOBS = 120
+  MB_LONG_ALL = 150
+  MB_LONG_NOBS = 150
+else ifeq ($(VM),IX)
   MB_SHORT_ALL =120
   MB_SHORT_NOBS = 120
   MB_LONG_ALL = 150
@@ -475,7 +492,14 @@ ifeq (ino,$(word 2,$(MAKECMDGOALS)))
   endif 
   include Makefile_ino
 else
-  include $(MAKERULES)
+  ifeq (ix,$(word 1,$(MAKECMDGOALS)))
+    ifneq ($(VM),IX)
+      $(error VM must be "IX" for 'ix' platforms)
+    endif 
+    include Makefile_ix
+  else
+    include $(MAKERULES)
+  endif
 endif
 
 

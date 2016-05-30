@@ -1,0 +1,24 @@
+
+PLATFORM=ix
+BUILDDIR ?= build/$(PLATFORM)
+MAIN_EXE = $(BUILDDIR)/main.exe
+GCC=gcc
+
+OPT_1 = -fnesc-include=tos  -topdir=/home/branco/gitspace/Terra/nescix  -fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask  -o $(MAIN_EXE) -Os -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -fnesc-cfile=build/ix/app.c --param max-inline-insns-single=100000 -fnesc-dump=wiring   -fnesc-dumpfile=build/ino/wiring-check.xml $(COMPONENT).nc -lm  -gcc=gcc  -fnesc-no-debug
+
+OPT_2 = $(CFLAGS) 
+
+OPT_3 =  -I/opt/tinyos-2.1.2/tos/platforms/null -I/opt/tinyos-2.1.2/tos/lib/serial -I/opt/tinyos-2.1.2/tos/lib/timer  -I/opt/tinyos-2.1.2/tos/lib/diagmsg -I/opt/tinyos-2.1.2/tos/interfaces -I/opt/tinyos-2.1.2/tos/types -I/opt/tinyos-2.1.2/tos/system -DMHZ=16
+
+
+exe: 
+	@echo "    compiling $(COMPONENT) to a $(PLATFORM) binary"
+	nescc $(OPT_1) $(OPT_2) $(OPT_3) -gcc=$(GCC)
+	@echo "    compiled $(COMPONENT) to $(MAIN_EXE)"
+	
+ix: builddir exe
+	@:
+		
+builddir: 
+	mkdir -p $(BUILDDIR)
+	

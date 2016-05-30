@@ -9,9 +9,12 @@
  * Used to upload code and variables values into VM controller.
  * 
  */
- 
-#include "BasicServices.h"
 
+#ifdef IX 
+  #include "BasicServicesIx.h"
+#else
+  #include "BasicServices.h"
+#endif
 interface BSUpload{	
 	// Stops de current vm procenssing
 	event void stop();
