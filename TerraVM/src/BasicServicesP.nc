@@ -360,7 +360,7 @@ call Uart0Ctl.start();
 		}
 	}
 
-	uint32_t getRequestTimeout(){return (ProgMoteSource==1)?REQUEST_TIMEOUT_BS:REQUEST_TIMEOUT;}
+	uint32_t getRequestTimeout(){return (ProgMoteSource==BStation)?REQUEST_TIMEOUT_BS:REQUEST_TIMEOUT;}
 
 	/**
 	 * Radio started event.

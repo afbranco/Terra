@@ -38,7 +38,12 @@ enum{
 #endif			
 	AM_RESERVED_END = 127,
 
-	BStation = 1, 				// Base Station Mote ID
+#ifdef BSID
+	BStation = BSID, 				// Base Station Mote ID
+#else
+	BStation = 1, 				
+#endif
+
 	// Send message control
 	RESEND_DELAY = 20L,
 	SEND_TIMEOUT = 1000L,

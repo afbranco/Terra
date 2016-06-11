@@ -16,6 +16,9 @@
 # Configure runtime type: BS or NOBS or ALL | default ALL
 #    TYPE=BS
 #
+# Configure BS node ID: integer 1..65534 | default 1
+#    BSID=1
+#
 # Hybrid mode: YES => TelosB/Iris Mem.Blocks = micaz Mem.Blocks or NO=> TelosB?Iris Large Mem.Blocks | Default YES
 #    HYB=NO
 #
@@ -87,6 +90,11 @@ ifneq ($(findstring sim,$(MAKECMDGOALS)),)
   ifneq ($(TYPE),ALL)
     $(error 'If target is the simulator, then TYPE must be ALL')
   endif
+endif
+
+BSID ?= 1
+ifeq ($(shell echo "$(BSID)<1 || $(BSID)>65534" | bc), 1)
+    $(error 'BSID must be in 1..65534')
 endif
 
 INO_XBEE_USB ?= 1
@@ -387,6 +395,9 @@ ifeq ($(QUEUE) , SHORT)
     CFLAGS += -DSHORT_QUEUES
 endif
 
+# Define the BSID  node number
+CFLAGS += -DBSID=$(BSID)
+
 
 # Reset MODULES if VM!=NET
 ifeq ($(VM) , GRP)
@@ -439,6 +450,7 @@ $(info **** Configuration ****)
 $(info VM          = $(VM))
 $(info MODULES     = $(MODULES) -- [FFT,VCN_DAT,VCN_DET,MSGQ])
 $(info MOTE        = $(MOTE) $(MODEL))
+$(info BSID        = $(BSID))
 $(info RFPOWER     = $(RFPOWER))
 $(info LPL         = $(LPL))
 $(info SENSORBOARD = $(SENSORBOARD))
