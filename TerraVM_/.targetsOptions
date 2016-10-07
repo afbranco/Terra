@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<buildTargets>
+<default version="4">
+<default>true</default>
+<project/>
+<target>null</target>
+<make-extras/>
+<includes>
+<include global="false" include="source" ncc="true" recursive="true">/opt/tinyos-2.1.2/tos/lib/net/ctp</include>
+<include global="false" include="source" ncc="true" recursive="false">/home/branco/gitspace/Terra/nescino/src/ino</include>
+<include global="false" include="source" ncc="true" recursive="true">/opt/tinyos-2.1.2/tos/lib/net</include>
+</includes>
+<excludes>
+<exclude>.*\.svn.*</exclude>
+</excludes>
+<typedefs/>
+<macros>
+<macro content="1" name="INOX" ncc="true" yeti="true"/>
+<macro content="1" name="NO_BSTATION" ncc="false" yeti="true"/>
+</macros>
+<boards/>
+<no-std-incl>false</no-std-incl>
+<component/>
+<component-file/>
+<include-last-build>true</include-last-build>
+<include-env-default-paths>true</include-env-default-paths>
+<environment_variables/>
+</default>
+<client-data/>
+</buildTargets>
