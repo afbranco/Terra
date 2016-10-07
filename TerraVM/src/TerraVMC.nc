@@ -562,7 +562,7 @@ void ceu_wclock_enable (int gte, s32 us, tceu_nlbl lbl) {
 void ceu_async_enable (int gte, tceu_nlbl lbl) {
     PTR(tceu_nlbl*,async0)[gte] = lbl;
 	if (!call BSTimerAsync.isRunning()) 
-		call BSTimerAsync.startOneShot(ASYNC_DELAY); // afb: moved to here to avoid timer cicles without active async 
+		call BSTimerAsync.startOneShot(ASYNC_DELAY); // afb: moved to here to avoid timer cycles without active async 
 }
 
 /**********************************************************************/
