@@ -1,22 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <buildTargets>
-    <default version="4">
-        <default>true</default>
-        <project/>
-        <target>micaz</target>
-        <make-extras/>
-        <includes/>
-        <excludes>
-            <exclude>.*\.svn.*</exclude>
-        </excludes>
-        <typedefs/>
-        <macros/>
-        <boards/>
-        <no-std-incl>false</no-std-incl>
-        <component/>
-        <component-file/>
-        <include-last-build>true</include-last-build>
-        <include-env-default-paths>true</include-env-default-paths>
-        <environment_variables/>
-    </default>
+<default version="4">
+<default>true</default>
+<project/>
+<target>micaz</target>
+<make-extras/>
+<includes>
+<include global="false" include="system" ncc="true" recursive="true">/home/branco/gitspace/Terra/TerraVM/src/platforms/inoMega</include>
+<include global="false" include="system" ncc="true" recursive="false">/opt/tinyos-2.1.2/tos/lib/net/ctp</include>
+<include global="false" include="none" ncc="true" recursive="false">/home/branco/gitspace/Terra/TerraVM/src/interfaces</include>
+<include global="false" include="none" ncc="true" recursive="false">/home/branco/gitspace/Terra/TerraVM/src/lib</include>
+<include global="false" include="none" ncc="true" recursive="false">/home/branco/gitspace/Terra/TerraVM/src/system</include>
+</includes>
+<excludes>
+<exclude>.*\.svn.*</exclude>
+</excludes>
+<typedefs/>
+<macros>
+<macro content="" name="WITH_BSTATION" ncc="true" yeti="true"/>
+<macro content="" name="NRF24" ncc="true" yeti="true"/>
+<macro content="" name="PLATFORM_MICAZ" ncc="false" yeti="true"/>
+<macro content="1" name="TERRA_NODE_ID" ncc="true" yeti="true"/>
+<macro content="" name="WITH_AUX_BSTATION" ncc="true" yeti="true"/>
+</macros>
+<boards>
+<board>mda100</board>
+</boards>
+<no-std-incl>false</no-std-incl>
+<component/>
+<component-file/>
+<include-last-build>true</include-last-build>
+<include-env-default-paths>true</include-env-default-paths>
+<environment_variables/>
+</default>
+<client-data/>
 </buildTargets>

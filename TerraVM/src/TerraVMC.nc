@@ -10,9 +10,6 @@
  * 
  */
 #include "TerraVM.h"
-#include "stdio.h"
-//#include "AvroraPrint.h"
-
 
 module TerraVMC @safe()
 {
@@ -60,7 +57,6 @@ implementation
 	/*
 	 * Some prototypes
 	 */
-#ifndef ONLY_BSTATION
 	task void procEvent();
 	void Decoder(uint8_t Opcode, uint8_t Modifier);
 	void ceu_boot();
@@ -68,36 +64,25 @@ implementation
 	uint32_t pop();
 	void pushf(float value);
 	float popf();
-#endif
-
-
-	void logS(uint8_t* data, uint8_t len){
-#if defined(INOS)
-#elif defined(INOX)
-		call BSUpload.logS(data,len);
-#endif
-	}
 
 // Ceu intrinsic functions
 	void ceu_out_wclock(uint32_t ms){ if (ms != CEU_WCLOCK_NONE ) {call BSTimerVM.startOneShot(ms);}}
-
 
 
 	/**
 	 * Initialization 
 	 */
 	event void BSBoot.booted(){
+#ifdef TERRA_NODE_ID // For non TinyOS platforms like Ino and RPI
+		TOS_NODE_ID = TERRA_NODE_ID;
+#endif 		
 		MoteID = TOS_NODE_ID;
-		if (MoteID==BStation) {
-			haltedFlag = TRUE;
-		}
 	}	
 
 
 	/*
 	 * Auxiliary functions
 	 */
-#ifndef ONLY_BSTATION // Start large code for ONLY_BSTATION suppression 
 
 	uint8_t getOpCode(uint8_t* Opcode, uint8_t* Modifier){
 		uint8_t i;
@@ -220,10 +205,10 @@ void push(uint32_t value){
 }
 void pushf(float value){
 	currStack = currStack - 4 ;
-	dbg(APPNAME,"VM::pushf(): newStack=%d, value=%f (0x%08x), ProgEnd=%d\n",currStack,value,*(uint32_t*)&value,ProgEnd);
-	if ((currStack) > ProgEnd) 
+//	dbg(APPNAME,"VM::pushf(): newStack=%d, value=%f (0x%08x), ProgEnd=%d\n",currStack,value,*(uint32_t*)&value,ProgEnd);
+	if ((currStack) > ProgEnd) {
 		*(float*)(CEU_data+currStack)=value;
-	else {
+	} else {
 		evtError(E_STKOVF);
 		// stop VM execution to prevent unexpected state
 		dbg(APPNAME,"VM::pushf(): Stack Overflow - VM execution stopped\n");
@@ -319,15 +304,6 @@ dbg(APPNAME,"VM::getEvtCeuId(): EvtId?=%d : currSlot=%d,  slotId=%d, slotSize=%d
 	}
 	return currSlot+1; // Return addr of 'n' gates for EvtId
 
-/*
-	for (i=1; i<= EvtId;i++){
-		CeuId = CeuId + ((*(nx_uint8_t*)(MEM+CeuId)) * 2) + 1;
-dbg(APPNAME,"VM::getEvtCeuId(): Salto anterior: addr=%ld, value=%d\n",MEM+CeuId,*(nx_uint8_t*)(MEM+CeuId));
-dbg(APPNAME,"VM::getEvtCeuId(): EvtId=%d, gate0=%d, i=%d ,CeuId=%d\n",EvtId,gate0,i,CeuId);
-		}
-dbg(APPNAME,"VM::getEvtCeuId(): EvtId=%d, gate0=%d, i=%d ,CeuId=%d\n",EvtId,gate0,i,CeuId);
-	return CeuId;
-*/
 }
 
 	// Get size from data type
@@ -345,10 +321,6 @@ dbg(APPNAME,"VM::getEvtCeuId(): EvtId=%d, gate0=%d, i=%d ,CeuId=%d\n",EvtId,gate
 		return size;
 	}
 	
-
-//******************************************************************************
-// Included here the code of _ceu_code.c
-//******************************************************************************
 
 typedef u16 tceu_noff;
 typedef u16 tceu_nlbl;
@@ -569,7 +541,7 @@ void ceu_async_enable (int gte, tceu_nlbl lbl) {
 
 int ceu_go_init (int* ret)
 {
-//	dbg(APPNAME,"CEU::ceu_go_init(): halted=%s\n",(haltedFlag)?"TRUE":"FALSE");
+	//	dbg(APPNAME,"CEU::ceu_go_init(): halted=%s\n",(haltedFlag)?"TRUE":"FALSE");
    if (haltedFlag) return(0);
 
    CEU->p_tracks = (tceu_trk*)CEU_data+0;
@@ -637,8 +609,6 @@ int ceu_go_wclock (int* ret, s32 dt, s32* nxt)
     int i;
     s32 min_togo = CEU_WCLOCK_NONE;
     tceu_wclock* CLK0 = PTR(tceu_wclock*,wClock0);
-//    if (BStation!=TOS_NODE_ID && CEU->wclk_cur)
-//    	dbg(APPNAME,"CEU::ceu_go_wclock(): dt=%d, togo=%d lbl=%d\n",dt, CEU->wclk_cur->togo,CEU->wclk_cur->lbl);
 
     CEU->stack = CEU_STACK_MIN;
 
@@ -651,8 +621,6 @@ int ceu_go_wclock (int* ret, s32 dt, s32* nxt)
     if (CEU->wclk_cur->togo <= dt) {
         min_togo = CEU->wclk_cur->togo;
         CEU->wclk_late = dt - CEU->wclk_cur->togo;   // how much late the wclock is
-//        if (BStation!=TOS_NODE_ID && CEU->wclk_cur)
-//         	dbg(APPNAME,"CEU::ceu_go_wclock(): Ajustando togo: CEU->wclk_cur->togo=%d, dt=%d, lbl=%d\n",CEU->wclk_cur->togo, dt,CEU->wclk_cur->lbl);
      }
 
     // spawns all togo/ext
@@ -662,8 +630,7 @@ int ceu_go_wclock (int* ret, s32 dt, s32* nxt)
     for (i=0; i<wClocks; i++)
     {
         tceu_wclock* tmr = &CLK0[i];
-        if (BStation!=TOS_NODE_ID)
-         	dbg(APPNAME,"CEU::ceu_go_wclock(): Loop1 nos wClocks: tmr->togo=%d, tmr->lbl=%d\n",(nx_uint32_t)(tmr->togo), *(nx_uint16_t*)&(tmr->lbl));
+        dbg(APPNAME,"CEU::ceu_go_wclock(): Loop1 nos wClocks: tmr->togo=%d, tmr->lbl=%d\n",(nx_uint32_t)(tmr->togo), *(nx_uint16_t*)&(tmr->lbl));
         if (tmr->lbl == Inactive)
             continue;
 
@@ -679,8 +646,6 @@ int ceu_go_wclock (int* ret, s32 dt, s32* nxt)
             } else
             	ceu_wclock_lt(tmr);             // next? (sets CEU->wclk_cur)
         }
-//        if (BStation!=TOS_NODE_ID)
-//         	dbg(APPNAME,"CEU::ceu_go_wclock(): Loop2 nos wClocks: tmr->togo=%d, tmr->lbl=%d\n",tmr->togo, tmr->lbl);
     }
 
 //    dbg(APPNAME,"CEU::ceu_go_wclock(): 1 \n",*(uint8_t*)(CEU->p_mem+4));
@@ -964,7 +929,8 @@ void f_neg_f(uint8_t Modifier){
 	v1 = popf();
 	dbg(APPNAME,"VM::f_neg_f(%02x): -(v1=%f) =%f\n",Modifier,v1,-1*v1);
 	dbg("VMDBG","VM:: negative float operation: (-%f) = %f \n",v1,-1*v1);
-	pushf(-1*v1);
+	v1 = -1*v1;
+	pushf(v1);
  }
 void f_sub_f(uint8_t Modifier){ 
 	float v1,v2;
@@ -1005,7 +971,7 @@ void f_eq_f(uint8_t Modifier){
 	v2 = popf();
 	dbg(APPNAME,"VM::f_eq_f(%02x): (v1=%f == v2=%f) = %s\n",Modifier,v1,v2,_TFstr(v1 == v2));
 	dbg("VMDBG","VM:: equality test: (%f == %f) = %s \n",v1,v2,_TFstr(v1 == v2));
-	pushf(v1==v2);
+	push(v1==v2);
 }
 
 void f_neq_f(uint8_t Modifier){
@@ -1014,7 +980,7 @@ void f_neq_f(uint8_t Modifier){
 	v2 = popf();
 	dbg(APPNAME,"VM::f_neq_f(%02x): (v1=%f != v2=%f) = %s\n",Modifier,v1,v2,_TFstr(v1 != v2));
 	dbg("VMDBG","VM:: inequality test: (%f != %f) = %s \n",v1,v2,_TFstr(v1 != v2));
-	pushf(v1!=v2);
+	push(v1!=v2);
 }
 void f_gte_f(uint8_t Modifier){
 	float v1,v2;
@@ -1022,7 +988,7 @@ void f_gte_f(uint8_t Modifier){
 	v2 = popf();
 	dbg(APPNAME,"VM::f_gte_f(%02x): (v1=%f >= v2=%f) = %s\n",Modifier,v1,v2,_TFstr(v1>=v2));
 	dbg("VMDBG","VM::  greater-than-equal test: (%f >= %f) = %s \n",v1,v2,_TFstr(v1 >= v2));
-	pushf(v1>=v2);
+	push(v1>=v2);
 }
 void f_lte_f(uint8_t Modifier){
 	float v1,v2;
@@ -1030,7 +996,7 @@ void f_lte_f(uint8_t Modifier){
 	v2 = popf();
 	dbg(APPNAME,"VM::f_lte_f(%02x): (v1=%f <= v2=%f) = %s\n",Modifier,v1,v2,_TFstr(v1<=v2));
 	dbg("VMDBG","VM:: less-than-equal test: (%f <= %f) = %s \n",v1,v2,_TFstr(v1 <= v2));
-	pushf(v1<=v2);
+	push(v1<=v2);
 }
 void f_gt_f(uint8_t Modifier){
 	float v1,v2;
@@ -1038,7 +1004,7 @@ void f_gt_f(uint8_t Modifier){
 	v2 = popf();
 	dbg(APPNAME,"VM::f_gt_f(%02x): (v1=%f > v2=%f) = %s\n",Modifier,v1,v2,_TFstr(v1 > v2));
 	dbg("VMDBG","VM::  greater-than test: (%f > %f) = %s \n",v1,v2,_TFstr(v1 > v2));
-	pushf(v1>v2);
+	push(v1>v2);
 }
 void f_lt_f(uint8_t Modifier){
 	float v1,v2;
@@ -1046,7 +1012,7 @@ void f_lt_f(uint8_t Modifier){
 	v2 = popf();
 	dbg(APPNAME,"VM::f_lt_f(%02x): (v1=%f < v2=%f) = %s\n",Modifier,v1,v2,_TFstr(v1 < v2));
 	dbg("VMDBG","VM:: less-than test: (%f < %f) = %s \n",v1,v2,_TFstr(v1 < v2));
-	pushf(v1<v2);
+	push(v1<v2);
 }
 
 void f_func(uint8_t Modifier){ 
@@ -1672,7 +1638,6 @@ void f_set_c(uint8_t Modifier){
 	
 	}
 
-#endif // End large ONLY_BSTATION 
 //******************************************************************************
 // Final da re-edição de WDCeuVM
 //******************************************************************************
@@ -1681,15 +1646,8 @@ void f_set_c(uint8_t Modifier){
 	 * Inserts an event in the event queue
 	 */
 	event void VMCustom.queueEvt(uint8_t evtId, uint8_t auxId, void *data){
-#ifndef ONLY_BSTATION
 		evtData_t evtData;
 		dbg(APPNAME,"VM::VMCustom.queueEvt(): queueing evtId=%d, auxId=%d. procFlag=%s\n",evtId,auxId,(procFlag)?"TRUE":"FALSE");
-
-{
-//char data[20];
-//sprintf(data,"q%02d %02d %02d\n",evtId,auxId,call evtQ.size());	
-//logS(data,10);
-}
 
 		// Queue the message event
 		evtData.evtId = evtId;
@@ -1697,28 +1655,18 @@ void f_set_c(uint8_t Modifier){
 		evtData.data = data;
 		call evtQ.enqueue(evtData);
 		if (procFlag==FALSE) post procEvent();		
-#endif
 	}
 	
 	/**
 	 * Process next event, if it exists
 	 */
-#ifndef ONLY_BSTATION
 	task void procEvent(){
 		evtData_t evtData;
 		uint16_t ceuId;
 		dbg(APPNAME,"VM::procEvent(): haltedFlag = %s, procFlag=%s\n",(haltedFlag)?"TRUE":"FALSE",(procFlag)?"TRUE":"FALSE");
-{
-//char data[20];
-//sprintf(data,">%02d\n",call evtQ.size());	
-//logS(data,4);
-}
 		if (haltedFlag == TRUE) {
-			//logS("-",1);
 			call evtQ.dequeue(); 
 			return;
-		} else {
-			//logS(">",1);			
 		}
 		// Verify if the queue has some event and if the processing is stopped
 		if ((call evtQ.size() > 0) && (procFlag==FALSE)){
@@ -1727,12 +1675,6 @@ void f_set_c(uint8_t Modifier){
 			evtData=call evtQ.dequeue();
 			dbg(APPNAME,"VM::procEvent(): ... calling ceu_go_event() for evtId=%d, auxId=%d\n", evtData.evtId,evtData.auxId );
 			ceuId = getEvtCeuId(evtData.evtId);
-{
-//char data[20];
-//sprintf(data,"e%02d %02d %02d\n",ceuId,evtData.evtId,evtData.auxId);	
-//logS(data,10);
-//printf("e%02d %02d %02d\n",ceuId,evtData.evtId,evtData.auxId);printfflush();	
-}
 			if (ceuId==0) {
 				dbg(APPNAME,"VM::procEvent(): Discarding event %d\n",evtData.evtId);
 				post procEvent(); // Try next event
@@ -1742,40 +1684,25 @@ void f_set_c(uint8_t Modifier){
 		}
 		dbg(APPNAME,"VM::procEvent()...\n");
 	}
-#endif
 
 	event int32_t VMCustom.getMVal(uint16_t Maddr, uint8_t tp){
-#ifndef ONLY_BSTATION
 		return getMVal(Maddr,tp);
-#else
-		return 0;
-#endif
 		}
 	event void VMCustom.setMVal(uint32_t value,uint16_t Maddr, uint8_t fromTp, uint8_t toTp){
-#ifndef ONLY_BSTATION
 		setMVal(value, Maddr,fromTp,toTp);
-#endif
 		}
 
 	event void* VMCustom.getRealAddr(uint16_t Maddr){
-#ifndef ONLY_BSTATION
 		dbg(APPNAME,"VM::VMCustom.getRealAddr(): Maddr=%d,RealMEM=%x\n",Maddr,(MEM + Maddr));
 		return (MEM + Maddr);
-#else
-		return 0;
-#endif
 		}
 
 
 	event uint32_t VMCustom.pop(){
-#ifndef ONLY_BSTATION
 		return pop();
-#endif
 	}
 	event void VMCustom.push(uint32_t value){
-#ifndef ONLY_BSTATION
 		push(value);
-#endif
 	}
 	event bool VMCustom.getHaltedFlag(){
 		return haltedFlag;
@@ -1783,27 +1710,20 @@ void f_set_c(uint8_t Modifier){
 
 
 	event uint32_t VMCustom.getTime(){
-#ifndef ONLY_BSTATION
 		return call BSTimerVM.getNow();
-#else
-		return 0;
-#endif
 		}
 
     event void BSTimerVM.fired()
     {
-#ifndef ONLY_BSTATION
         u32 now = (u32)call BSTimerVM.getNow();
         s32 dt = now - old;
         old = now;
 		dbg(APPNAME,"VM::BSTimerVM.fired(): dt=%d\n",dt);
         ceu_go_wclock(NULL, dt, NULL); // TODO: "binary" time
-#endif
     }
 
     
 	bool hasAsync(){
-#ifndef ONLY_BSTATION
 		uint8_t i;
 	    tceu_nlbl* ASY0 = PTR(tceu_nlbl*,async0);
         for (i=0 ; i < asyncs ; i++) {
@@ -1811,18 +1731,14 @@ void f_set_c(uint8_t Modifier){
                 return TRUE;
             }
         }
-#endif
         return FALSE;
 	}
     
 	event void BSTimerAsync.fired()
     {
-#ifndef ONLY_BSTATION
 		dbg(APPNAME,"VM::BSTimerAsync.fired()\n");
 		if (hasAsync()) call BSTimerAsync.startOneShot(ASYNC_DELAY);
 	    ceu_go_async(NULL,NULL);
-	     
-#endif
     }
 
 
@@ -1875,18 +1791,13 @@ void f_set_c(uint8_t Modifier){
 			size = call evtQ.size();
 			for (i=0; i < size; i++) call evtQ.dequeue();
 		}
-		if (MoteID==BStation)
-			haltedFlag = TRUE;
-		else
-			haltedFlag = FALSE;	
+		haltedFlag = FALSE;	
 
-#ifndef ONLY_BSTATION
 		// Reset VMCustom
 		call VMCustom.reset();
 		TViewer("error",0,0); // Reset simulator viewer error flag
 		// Give control do Ceu
 		ceu_boot();
-#endif
 	}
 
 	event uint8_t* BSUpload.getSection(uint16_t Addr){
@@ -1912,9 +1823,7 @@ void f_set_c(uint8_t Modifier){
 	}
 	
 	event void VMCustom.evtError(uint8_t ecode){ 
-#ifndef ONLY_BSTATION
 	evtError(ecode);
-#endif
 	}
 	
 	
