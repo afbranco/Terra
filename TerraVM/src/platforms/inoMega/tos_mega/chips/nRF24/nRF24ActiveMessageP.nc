@@ -21,7 +21,7 @@ module nRF24ActiveMessageP{
     interface SpiPacket;
     interface FastSpiByte;
     interface Resource as SpiResource;
-    interface HplAtm2560IoInterrupt as nRF24_IRQ;
+    interface HplAtm8IoInterrupt as nRF24_IRQ;
     interface GeneralIO as CSNpin;
     interface GeneralIO as CEpin;
     interface GeneralIO as IRQpin;
@@ -679,7 +679,7 @@ uint8_t irqStat;
 	}
 
 	async event void nRF24_IRQ.fired(){ 
-PORTF = (PORTF  & 0xf0) | ((PORTF+2) & 0x0f);	
+//PORTF = (PORTF  & 0xf0) | ((PORTF+2) & 0x0f);	
 		call nRF24_IRQ.clear();
 		call nRF24_IRQ.disable();
 		post IRQ_fired();

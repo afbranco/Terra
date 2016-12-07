@@ -135,6 +135,7 @@ typedef nx_struct serial_packet {
 
 typedef nx_struct serial_metadata {
   nx_uint8_t ack;
+  nx_uint8_t rf_power;
 } serial_metadata_t;
     
 #endif

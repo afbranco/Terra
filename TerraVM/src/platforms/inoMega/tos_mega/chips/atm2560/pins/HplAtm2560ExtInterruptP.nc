@@ -31,27 +31,27 @@
  */
 generic module HplAtm2560ExtInterruptP (uint8_t pin)
 {
-  provides interface HplAtm2560IoInterrupt;
+  provides interface HplAtm8IoInterrupt;
   uses interface HplAtm2560Isr;
 }
 implementation
 {
-  async command void HplAtm2560IoInterrupt.enable ()
+  async command void HplAtm8IoInterrupt.enable ()
   {
     SFR_SET_BIT(EIMSK, pin);
   }
 
-  async command void HplAtm2560IoInterrupt.disable ()
+  async command void HplAtm8IoInterrupt.disable ()
   {
     SFR_CLR_BIT(EIMSK, pin);
   }
 
-  async command void HplAtm2560IoInterrupt.clear ()
+  async command void HplAtm8IoInterrupt.clear ()
   {
     SFR_SET_BIT(EIFR, pin);
   }
 
-  async command void HplAtm2560IoInterrupt.configure (IoInterruptMode m)
+  async command void HplAtm8IoInterrupt.configure (IoInterruptMode m)
   {
     atomic {
       uint8_t offs = 2 * pin;
@@ -64,8 +64,8 @@ implementation
 
   async event void HplAtm2560Isr.fired ()
   {
-    signal HplAtm2560IoInterrupt.fired ();
+    signal HplAtm8IoInterrupt.fired ();
   }
 
-  default async event void HplAtm2560IoInterrupt.fired () {}
+  default async event void HplAtm8IoInterrupt.fired () {}
 }

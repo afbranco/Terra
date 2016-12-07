@@ -168,7 +168,6 @@ implementation{
 	 * Initialize the data  (reset all data)
 	 */
 	void inicCtlData(){
-DDRF=0xFE;
 		dbg(APPNAME, "BS::inicCtlData().\n");
 		// Only for first initialization (boot)
 		if (firstInic){
@@ -1011,7 +1010,7 @@ DDRF=0xFE;
 			if (tempOutputOutQ.AM_ID != AM_SENDBS && target != 0){
 #endif
 #endif
-if (tempOutputOutQ.AM_ID== AM_NEWPROGVERSION) PORTF = PORTF + 0x10;
+//if (tempOutputOutQ.AM_ID== AM_NEWPROGVERSION) PORTF = PORTF + 0x10;
 				stat =  call RadioSender.send[tempOutputOutQ.AM_ID](tempOutputOutQ.sendToMote, &sendBuff, tempOutputOutQ.DataSize);
 #ifdef WITH_BSTATION
 #ifdef MODULE_CTP

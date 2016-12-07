@@ -100,6 +100,7 @@ void  proc_req_custom(uint16_t id, uint32_t value){
 void  proc_req_ana0_read(uint16_t id, uint32_t value){
 	dbg(APPNAME,"Custom::proc_req_ana0_read(): id=%d\n",id);
 	// Request a Analog 0 read
+	if (call D22.isOutput()) call D22.makeInput();
 	call Ana0.read();
 	}
 event void Ana0.readDone(error_t result, uint16_t val){

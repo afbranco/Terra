@@ -34,7 +34,7 @@ typedef enum {
   INTR_LEVEL = 0, INTR_TOGGLE = 1, INTR_FALLING_EDGE = 2, INTR_RISING_EDGE = 3
 } IoInterruptMode;
 
-interface HplAtm2560IoInterrupt
+interface HplAtm8IoInterrupt
 {
 
   async command void enable ();

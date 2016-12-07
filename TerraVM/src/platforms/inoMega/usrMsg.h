@@ -24,4 +24,6 @@ typedef nx_struct usrMsg {
 	nx_uint8_t data[22];
 } usrMsg_t;
 
+
+
 #endif /* USR_MSG_H */

@@ -33,14 +33,14 @@ configuration HplAtm2560ExtInterruptC
 {
   provides
   {
-    interface HplAtm2560IoInterrupt as Int0;
-    interface HplAtm2560IoInterrupt as Int1;
-    interface HplAtm2560IoInterrupt as Int2;
-    interface HplAtm2560IoInterrupt as Int3;
-    interface HplAtm2560IoInterrupt as Int4;
-    interface HplAtm2560IoInterrupt as Int5;
-    interface HplAtm2560IoInterrupt as Int6;
-    interface HplAtm2560IoInterrupt as Int7;
+    interface HplAtm8IoInterrupt as Int0;
+    interface HplAtm8IoInterrupt as Int1;
+    interface HplAtm8IoInterrupt as Int2;
+    interface HplAtm8IoInterrupt as Int3;
+    interface HplAtm8IoInterrupt as Int4;
+    interface HplAtm8IoInterrupt as Int5;
+    interface HplAtm8IoInterrupt as Int6;
+    interface HplAtm8IoInterrupt as Int7;
   }
 }
 implementation

@@ -33,8 +33,8 @@ configuration HplAtm328pExtInterruptC
 {
   provides
   {
-    interface HplAtm328pIoInterrupt as Int0;
-    interface HplAtm328pIoInterrupt as Int1;
+    interface HplAtm8IoInterrupt as Int0;
+    interface HplAtm8IoInterrupt as Int1;
   }
 }
 implementation

@@ -31,27 +31,27 @@
  */
 generic module HplAtm328pExtInterruptP (uint8_t pin)
 {
-  provides interface HplAtm328pIoInterrupt;
+  provides interface HplAtm8IoInterrupt;
   uses interface HplAtm328pIsr;
 }
 implementation
 {
-  async command void HplAtm328pIoInterrupt.enable ()
+  async command void HplAtm8IoInterrupt.enable ()
   {
     SFR_SET_BIT(EIMSK, pin);
   }
 
-  async command void HplAtm328pIoInterrupt.disable ()
+  async command void HplAtm8IoInterrupt.disable ()
   {
     SFR_CLR_BIT(EIMSK, pin);
   }
 
-  async command void HplAtm328pIoInterrupt.clear ()
+  async command void HplAtm8IoInterrupt.clear ()
   {
     SFR_SET_BIT(EIFR, pin);
   }
 
-  async command void HplAtm328pIoInterrupt.configure (IoInterruptMode m)
+  async command void HplAtm8IoInterrupt.configure (IoInterruptMode m)
   {
     atomic {
       uint8_t offs = 2 * pin;
@@ -64,8 +64,8 @@ implementation
 
   async event void HplAtm328pIsr.fired ()
   {
-    signal HplAtm328pIoInterrupt.fired ();
+    signal HplAtm8IoInterrupt.fired ();
   }
 
-  default async event void HplAtm328pIoInterrupt.fired () {}
+  default async event void HplAtm8IoInterrupt.fired () {}
 }
