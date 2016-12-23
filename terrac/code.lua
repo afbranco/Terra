@@ -119,8 +119,9 @@ function BLOCK_GATES (me)
             if n > 0 then
 --                LINE(me, '//> memset(PTR_EXT(IN_'..ext.id..','..t[1]..'), 0, '
 --                    ..n..'*sizeof(tceu_nlbl));')
-		        codeB = LINE(me, 'clear EXT gates for '..ext.id,nil,'// stop awaiting inner externals') 
-		        BYTECODE(me,codeB,'op_memclr', n*_ENV.c.tceu_nlbl.len, _MEM.gtes[ext.n]+2)
+            local gateLen = ((ext.inArg and 1) or 0) + 2
+		        codeB = LINE(me, 'clear EXT gates for '..ext.id..'['.. t[1] ..']',nil,'// stop awaiting inner externals') 
+		        BYTECODE(me,codeB,'op_memclr', n*_ENV.c.tceu_nlbl.len + ((ext.inArg and 1) or 0), _MEM.gtes[ext.n]+2+t[1]*gateLen)
             end
         end
     end
