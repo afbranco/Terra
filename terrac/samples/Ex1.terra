@@ -1,5 +1,7 @@
 #include "TerraNet.defs"
 
+setRFPower(7);
+
 // No father id
 #define NO_FATHER 0xfffe
 
@@ -12,12 +14,8 @@
 var ushort nodeId = getNodeId();
 
 // Automatic base node setup - Avrora use 2 (nodes 0..9), TOSSIM use 11 (node 11..xx)
-var ushort baseNode = 8;
-/*
-if nodeId > 10 then
-	baseNode = 11;
-end
-*/
+var ushort baseNode = 1;
+
 var ubyte stat,hop;
 var ushort father=NO_FATHER;
 var ushort seqReq=0;
@@ -87,11 +85,17 @@ msgData.type = ID_DATA;
 msgData.source = nodeId;
 msgData.d16_3 = nodeId;
 
+
+emit LEDS(7);
+await 2s;
+
 msgTopo.source = nodeId;
 
 if nodeId == baseNode then
-	father = 1;
+	father = 0;
 	seqReq = 1;
+else
+	father = 1;
 end
 
 par do
@@ -209,7 +213,7 @@ with
 			if qSize() > 0 then
 				reply=0;
 				stat = qGet(msgRadio);
-				if msgRadio.target == BROADCAST then
+				if msgRadio.target == BROADCAST or msgRadio.target == 0 then
 					emit SEND(msgRadio);
 					await SEND_DONE(msgRadio.type);
 				else

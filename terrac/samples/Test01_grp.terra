@@ -3,8 +3,10 @@
 pktype msgBS from msgBS_t with
 	var ubyte seq;
 	var ubyte count;
+	var ubyte[2] xa;
 	var ushort value;
 end
+
 
 pktype msgGR from msgGR_t with
 	var ubyte seq;
@@ -12,8 +14,9 @@ pktype msgGR from msgGR_t with
 	var ushort val;
 end
 
-var ubyte stat;
+var ubyte stat,flag=0;
 var msgBS dataBS;
+var msgBS sensorBS;
 dataBS.seq = 0;
 
 var ubyte grId1 = 1;
@@ -32,26 +35,45 @@ stat = groupInit(grp1   ,   grId1,grParam1,    6,   TRUE,   eACTIVE,      0);
 //     aggregInit( RegName, grName, sensorId, agOper, agComp, refVal)
 stat = aggregInit(     ag1,   grp1, SID_TEMP,   fAVG,   opGT,  0);
 
-await (grParam1)s;
-loop do
-  if getNodeId() == grp1.leader then
-    emit LED0(ON);
-    emit LED1(OFF);
-    emit AGGREG(ag1);
-    agDone1 = await AGGREG_DONE();
-
-    dataBS.msgId = 5;
-    dataBS.seq = dataBS.seq + 1;
-    dataBS.count = agDone1.count;
-    dataBS.value = agDone1.value;
-    emit SEND_BS(dataBS);
-  else
-    emit LED0(OFF);
-    emit LED1(ON);
-  end
-  await 10s;
+await (grParam1+1)s;
+par do
+	loop do
+	  if getNodeId() == grp1.leader then
+	    emit LED0(ON);
+	    emit LED1(OFF);
+	    emit AGGREG(ag1);
+	    agDone1 = await AGGREG_DONE();
+	
+	    dataBS.msgId = 5;
+	    dataBS.seq = dataBS.seq + 1;
+	    dataBS.count = agDone1.count;
+	    dataBS.value = agDone1.value;
+	    emit SEND_BS(dataBS);
+	  else
+	    emit LED0(OFF);
+	    emit LED1(ON);
+	  end
+	  await 10s;
+	  inc flag;
+	end
+with
+	loop do
+		await (((flag%2)*500) + 150) ms;
+		emit LED2(ON);
+		await ((((flag+1)%2)*500) + 150) ms;
+		emit LED2(OFF);
+	end
+with
+	loop do
+	    sensorBS.msgId = 6;
+	    sensorBS.seq = sensorBS.seq + 1;
+	    sensorBS.count = 0;
+	    emit REQ_TEMP;
+	    sensorBS.value = await TEMP;
+	    emit SEND_BS(sensorBS);
+	    await 30s;		
+	end
 end
-
 /*
 
 */

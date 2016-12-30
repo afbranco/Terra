@@ -98,7 +98,8 @@ local EV = function (rule)
 end
 
 local EM = function (msg)
-    return m.Cmt(P'',
+--    return m.Cmt(P'',
+    return m.Cmt(P'_',
         function (_,i)
             if i > ERR_i then
                 ERR_i = i
@@ -149,17 +150,18 @@ _GG = {
 
 ------
     , CfgBlk = KEY'config' * V'CfgParams' * EKEY'do' * V'CfgStmts' * EKEY'end'
---    , CfgBlk = KEY'config' * V'ID_version' * EKEY'do' * V'CfgStmts' * EKEY'end'
     , CfgStmts = ((V'_CfgStmt' * (EK';'*K';'^0) + EM'`;´') +
-                  (V'_CfgStmtB' * (K';'^-1*K';'^0) + EM'`;´' ) )^0 
-
-    , _CfgStmt =  V'_Dcl_ext' + V'_Dcl_func'
-                + V'Dcl_det'  
+                  (V'_CfgStmtB' * (K';'^-1*K';'^0) + EM'`;´' ) )^0
+    , _CfgStmt =  V'_Dcl_ext' + V'_Dcl_func' + V'Dcl_det'  
             --+ EM'config statement (usually a missing `input/output/function/regtype/packet´)'
+                  
+
     , _CfgStmtB = V'_Dcl_regt' + V'_Dcl_packet'
             --+ EM'config statement (usually a missing `regtype varName with varDefs end´)'
+
     ,_Dcl_func = ((CKEY'function' * (CKEY'pure'+CKEY'nohold'+Cc(false)) * (CKEY(TYPES) + EM'a basic type' )) 
                   * ((V'ID_c' + EM'a valid function identifier') * K'(' * V'Arg_list' * K')') ) * PNUM
+
     
     , Arg_list = ( V'ID_arg_type' * (EK',' * EV'ID_type')^0  )^-1
     
@@ -172,6 +174,7 @@ _GG = {
              * ( V'_LstStmt' * ((EK';'*K';'^0) + EM'`;´')  +
                  V'_LstStmtB' * ((K';'^-1*K';'^0) + EM'`;´') 
                )^-1  
+
     , Block  = V'_Block'
     , BlockN = V'_Block'
 
@@ -356,8 +359,8 @@ _GG = {
                     *  K'['*PNUM*K']'
                     *    (V'ID_var' + EM'a valid identifier')  
                         
-    , _Dcl_regt   = KEY'regtype' * EV'ID_var' * EKEY'with' * (V'_Dcl_field' * (EK';'*K';'^0))^0 * EKEY'end'
-    , _Dcl_pktype = KEY'pktype' * EV'ID_var' * EKEY'from'  * EV'ID_var' * EKEY'with' * (V'_Dcl_field' * (EK';'*K';'^0))^0 * EKEY'end'
+    , _Dcl_regt   = KEY'regtype' * EV'ID_var' * EKEY'with' * (V'_Dcl_field' * (EK';'*K';'^0))^1 * EKEY'end'
+    , _Dcl_pktype = KEY'pktype' * EV'ID_var' * EKEY'from'  * EV'ID_var' * EKEY'with' * (V'_Dcl_field' * (EK';'*K';'^0))^1 * EKEY'end'
     
 --    , Func     = V'ID_var' * K'(' * Cc'call' * V'ExpList' * EK')'
     , Func     = V'ID_var' * K'(' * V'ExpList' * EK')'

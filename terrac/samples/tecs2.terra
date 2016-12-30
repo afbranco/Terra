@@ -1,0 +1,26 @@
+#include "TerraNet.defs"
+
+//input ushort TEMP;
+event ubyte e;
+ // TRAIL 0 − lbl Main
+ par/and do
+ // TRAIL 0 − lbl Main
+ await e;
+ // TRAIL 0 − lbl Awake e
+ // TRAIL 0 − lbl And chk
+ with
+ // TRAIL 1 − lbl And sub 2
+ await TEMP;
+ // TRAIL 1 − lbl Awake A 1
+ emit e;
+ // TRAIL 1 − lbl Emit cont
+ // TRAIL 1 − lbl And chk
+ end
+ // TRAIL 0 − lbl And out
+ await TEMP;
+ // TRAIL 0 − lbl Awake A 2
+ 
+
+
+
+

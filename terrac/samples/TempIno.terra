@@ -1,0 +1,62 @@
+#include "TerraIno.defs"
+var ushort nodeId = getNodeId();
+
+setRFPower(0);
+pktype usrMsg from radioMsg with
+	var ubyte[4]  d8;
+	var ushort[4] d16;
+	var ulong[2]  d32;
+end
+var usrMsg msgRadio;
+msgRadio.type = 1;
+msgRadio.d8[0] = 0;
+
+var usrMsg msgRadio2;
+
+if nodeId == 10 then
+	par do
+	    msgRadio.source = nodeId;
+	    msgRadio.target = BROADCAST;
+	    loop do
+	        await 5s;
+	        inc msgRadio.d8[0];
+	        emit REQ_TEMP();
+	        msgRadio.d16[0] = await TEMP;
+	        msgRadio.d32[0] = msgRadio.d16[0]*1.1/1.024;
+	        emit SEND(msgRadio);
+	        await SEND_DONE;
+	    end 
+	with
+		loop do
+		    msgRadio2 = await RECEIVE;
+			emit LED0(TOGGLE);
+			//msgRadio2.type = 2;
+		    msgRadio2.target = 0;
+	        emit SEND(msgRadio2);
+	        await SEND_DONE;
+		end
+	end
+else
+	par do	
+		loop do
+		    msgRadio2 = await RECEIVE;
+		    emit LEDS(msgRadio2.d8[0]);
+		end
+	with
+		await 2s;
+		msgRadio.type = 1;
+	    msgRadio.source = nodeId;
+	    msgRadio.target = 10;
+	    loop do
+	        await 5s;
+	        inc msgRadio.d8[0];
+	        emit REQ_TEMP();
+	        msgRadio.d16[0] = await TEMP;
+	        msgRadio.d32[0] = msgRadio.d16[0]*1.1/1.024;
+	        emit SEND_ACK(msgRadio);
+	        await SEND_DONE_ACK;
+			emit LED0(TOGGLE);
+	    end 	
+	end 
+end
+

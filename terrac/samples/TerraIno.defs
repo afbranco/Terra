@@ -5,7 +5,7 @@ config
 	name : TerraIno_MsgQ ,
 	code:00.02.00 , 
 	{
-		inoMega: ????,
+		inoMega: 1000,
 	} 
 do
 /*
@@ -27,6 +27,7 @@ do
 // Leds Constants
 #define ON 1
 #define OFF 0
+#define TOGGLE 2
 
 
 
@@ -86,7 +87,7 @@ do
 
 	// PJ ???? 
 
-#define LUZ   0 	// PF0 (ADC0)  
+#define A0   0 	// PF0 (ADC0)  
 #define A1   1 	// PF1 (ADC1)  
 #define A2   2 	// PF2 (ADC2)  
 #define A3   3 	// PF3 (ADC3)  
@@ -116,6 +117,8 @@ do
 #define I1 1 
 #define I2 2 
 #define I3 3 
+#define I4 4 
+#define I5 5 
 
 	/*
 	 * Pin mode
@@ -169,24 +172,34 @@ do
 
 	// Terra local Output events
 //	output void		INIT			ubyte 0;
+	output void		LEDS			ubyte 5;
+	output void		LED0			ubyte 6;
+	output void		LED1			ubyte 7;
+	output void		LED2			ubyte 8;
+	output void		REQ_TEMP		void  9;
 	output void 	REQ_CUSTOM_A	ubyte 20;
 	// TerraNet Custom Output events
 	output void 	SEND			radioMsg 40;
 	output void 	SEND_ACK		radioMsg 41;
 
+	output void 	ANA0_READ		void 30;
+
 	// TerraNet Local Input events
 	input ubyte 	ERROR 		 	ubyte 	0;
 	input ubyte 	ERROR 			void	1;
-	input ubyte 	CUSTOM_A_ID		ubyte 	10;
+	input ushort 	TEMP 			void 	5;
+	input ubyte 	CUSTOM_A		ubyte 	10;
 	input ubyte 	CUSTOM_A 		void 	11;
 
 	// Ino EVents
 	input ushort	ANA_READ_DONE_ID	ubyte	20;
 	input ushort	ANA_READ_DONE		void	21;
-	input ubyte	INT_FIRED_ID		ubyte	22;
+	input ubyte	INT_FIRED		ubyte	22;
 	input ubyte	INT_FIRED		void	23;
-	input ulong	INT_PULSE_LEN_ID	ubyte	24;
+	input ulong	INT_PULSE_LEN	ubyte	24;
 	input ulong	INT_PULSE_LEN		void	25;
+
+	input ushort	ANA0_READ_DONE	void	30;
 
 
 	// TerraNet Custom Input events
@@ -201,12 +214,13 @@ do
 	// Terra basic functions
 	function pure ushort getNodeId()		0;
 	function pure ushort random()			1;
-	function pure ulong getClockMicro()	2;
+	function pure ulong getClockMicro()		2;
 	// TerraNet custom functions
 	function nohold ubyte qPut(radioMsg) 	10;
 	function nohold ubyte qGet(radioMsg) 	11;
 	function pure ubyte qSize()				12;
 	function pure ubyte qClear()			13;
+	function ubyte setRFPower(ubyte)		17;
 
 	// TerraIno Specific custom functions
 	function ubyte pinMode(ubyte,ubyte) 		20;
