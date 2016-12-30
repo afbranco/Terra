@@ -26,7 +26,10 @@ typedef uint8_t bool;
 enum { FALSE = 0, TRUE = 1 };
 
 typedef nx_int8_t nx_bool;
-uint16_t TOS_NODE_ID = 1;
+#ifndef TERRA_NODE_ID
+#define TERRA_NODE_ID 1
+#endif
+uint16_t TOS_NODE_ID = TERRA_NODE_ID;
 
 /* This macro is used to mark pointers that represent ownership
    transfer in interfaces. See TEP 3 for more discussion. */
@@ -45,7 +48,22 @@ struct @exactlyonce { };
 #define platform_bootstrap() {}
 #endif
 
-#ifndef TOSSIM
+#if defined(TOSSIM)
+
+#elif defined(LINUX)
+extern void dbgIx(char* canal, char* format, ...);
+#ifndef NO_DEBUG
+#define dbg dbgIx
+#define dbg_clear dbgIx 
+#define dbgerror dbgIx 
+#define dbgerror_clear dbgIx 
+#else
+#define dbg(s, ...) 
+#define dbg_clear(s, ...) 
+#define dbgerror dbgIx 
+#define dbgerror_clear dbgIx 
+#endif
+#else
 #define dbg(s, ...) 
 #define dbgerror(s, ...) 
 #define dbg_clear(s, ...) 

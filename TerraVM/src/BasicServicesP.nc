@@ -483,11 +483,11 @@ implementation{
 	 * Receive ReqProgBlockNet and queue it in input queue
 	 */
 	void recReqProgBlockNet_receive(message_t *msg, void *payload, uint8_t len){
-		reqProgBlock_t *xmsg;
+		//reqProgBlock_t *xmsg;
 		dbg(APPNAME, "BS::recReqProgBlockNet_receive().\n");
 		// Copy data to temporarily buffer
 		memcpy(tempInputInQ.Data,payload,sizeof(reqProgBlock_t));
-		xmsg = (reqProgBlock_t*)tempInputInQ.Data;
+		//xmsg = (reqProgBlock_t*)tempInputInQ.Data;
 		tempInputInQ.AM_ID = AM_REQPROGBLOCK;
 		tempInputInQ.DataSize = sizeof(reqProgBlock_t);
 		// put message in the inQueue
@@ -532,11 +532,11 @@ implementation{
 	* Receive ReqDataNet and queue it in input queue
 	*/
 	void recReqDataNet_receive(message_t *msg, void *payload, uint8_t len){
-		reqData_t *xmsg;
+		//reqData_t *xmsg;
 		dbg(APPNAME, "BS::recReqDataNet_receive().\n");
 		// Copy data to temporarily buffer
 		memcpy(tempInputInQ.Data,payload,sizeof(reqData_t));
-		xmsg = (reqData_t*)tempInputInQ.Data;
+		//xmsg = (reqData_t*)tempInputInQ.Data;
 		tempInputInQ.AM_ID = AM_REQDATA;
 		tempInputInQ.DataSize = sizeof(reqData_t);
 		// put message in the inQueue
@@ -998,7 +998,7 @@ implementation{
 
 
 		error_t RadioSender_send(uint8_t am_id, uint16_t target, message_t* msg, uint8_t len){
-			error_t stat;
+			error_t stat=SUCCESS;
 #ifdef WITH_BSTATION
 			uint8_t tempSendCounter;
 			memcpy(&serialAux,&sendBuff,sizeof(message_t));
@@ -1135,13 +1135,14 @@ implementation{
 	* @param error Error status
 	*/
 	event void RadioSender.sendDone[am_id_t id](message_t *msg, error_t error){
-	  bool doneStatus, reqRetry, reqAck;
+	  bool doneStatus, reqAck;
+	  //bool reqRetry;
 	  //GenericData_t tempBuff;		
 	  if (id > AM_RESERVED_END) {
 	  	call outQ.read(&tempOutputOutQ);
 	  	doneStatus = (error == SUCCESS);
 	  	reqAck   = (tempOutputOutQ.reqAck & (1<<REQ_ACK_BIT)) > 0; 
-	  	reqRetry = (tempOutputOutQ.reqAck & (1<<REQ_RETRY_BIT)) > 0; 
+	  	//reqRetry = (tempOutputOutQ.reqAck & (1<<REQ_RETRY_BIT)) > 0; 
 	  	if (doneStatus && reqAck) doneStatus = (uint8_t)call RadioAck.wasAcked(msg);  
 		if (doneStatus) {						// Get next message
 			dbg(APPNAME, "BS::sendDone(): SUCCESS SendCounter=%hhu\n",sendCounter);

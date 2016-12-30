@@ -83,8 +83,10 @@ implementation
 
   async command bool BitVector.get(uint16_t bitnum)
   {
-dbg(APPNAME,"VM::BitVector.get(): bitnum=%d, bits=%0x, ARRAY_SIZE=%d\n",bitnum,(uint8_t)m_bits[getIndex(bitnum)],ARRAY_SIZE);
-    atomic {return (m_bits[getIndex(bitnum)] & getMask(bitnum)) ? TRUE : FALSE;}
+    atomic {
+		dbg(APPNAME,"VM::BitVector.get(): bitnum=%d, bits=%0x, ARRAY_SIZE=%d\n",bitnum,(uint8_t)m_bits[getIndex(bitnum)],ARRAY_SIZE);
+    	return (m_bits[getIndex(bitnum)] & getMask(bitnum)) ? TRUE : FALSE;
+    	}
   }
 
   async command void BitVector.set(uint16_t bitnum)

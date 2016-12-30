@@ -1,3 +1,4 @@
+#include <unistd.h>
 module McuSleepC @safe() {
 	
   provides {
@@ -8,7 +9,8 @@ module McuSleepC @safe() {
 implementation{
 	
 	async command void McuSleep.sleep(){
-		// TODO Auto-generated method stub
+		// sleep until a signal arrives (linux signal)
+		sleep(30);
 	}
 
 	async command void McuPowerState.update(){

@@ -15,7 +15,7 @@ configuration TerraActiveMessageC{
   }
 }
 implementation{
-	components UdpActiveMessageC as AM;
+	components UDPActiveMessageC as AM;
 	
 	SplitControl = AM;
   

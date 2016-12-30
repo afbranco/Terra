@@ -300,6 +300,14 @@ uint8_t nRF_wrReg(uint8_t reg, uint8_t value){
 	ssOff();
 	return stat;
 }
+uint8_t nRF_rdReg(uint8_t reg){
+	uint8_t stat;
+	ssOn();
+	call SpiByte.write(reg );					
+	stat = call SpiByte.write(0x00);
+	ssOff();
+	return stat;
+}
 
 uint8_t nRF_toggleFeature(){
 	uint8_t stat;
@@ -679,6 +687,8 @@ uint8_t irqStat;
 	}
 
 	async event void nRF24_IRQ.fired(){ 
+//PORTD |= 0x80;
+
 //PORTF = (PORTF  & 0xf0) | ((PORTF+2) & 0x0f);	
 		call nRF24_IRQ.clear();
 		call nRF24_IRQ.disable();

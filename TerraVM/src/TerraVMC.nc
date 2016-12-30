@@ -477,11 +477,12 @@ void ceu_spawn (tceu_nlbl* lbl)
 void ceu_trigger (tceu_noff off, uint8_t auxId)
 {
     int i;
-    uint8_t slotSize, evtId, slotAuxId;
+    uint8_t slotSize,  slotAuxId;
+    //uint8_t evtId;
     int n = *(char*)(CEU->p_mem+off) & 0x7f; //int n = CEU->mem[off];
-	evtId = *(char*)(CEU->p_mem+off-1);
+	//evtId = *(char*)(CEU->p_mem+off-1);
 	slotSize = (*(char*)(CEU->p_mem+off) & 0x80)?3:2;
-    dbg(APPNAME,"CEU::ceu_trigger(): evtId=%d, auxId=%d, slotSize=%d, gate addr=%d, nGates=%d\n",evtId,auxId,slotSize,off,n);
+    dbg(APPNAME,"CEU::ceu_trigger(): evtId=%d, auxId=%d, slotSize=%d, gate addr=%d, nGates=%d\n",*(char*)(CEU->p_mem+off-1),auxId,slotSize,off,n);
     for (i=0 ; i<n ; i++) {
         //ceu_spawn((tceu_nlbl*)&CEU->mem[off+1+(i*sizeof(tceu_nlbl))]);
 		if (slotSize==2){ // doesn't test auxId
@@ -1117,7 +1118,8 @@ void f_set_v(uint8_t Modifier){
 	}	
 }
 void f_setarr_vc(uint8_t Modifier){
-	uint8_t v1_len,p1_1len,p2_1len,v2_len,p3_1len,p4_len,Aux,tp1,tp2;
+	uint8_t v1_len,p1_1len,p2_1len,p3_1len,p4_len,Aux,tp1,tp2;
+	//uint8_t v2_len;
 	uint16_t Maddr,Vidx,Max;
 	uint32_t Const;
 	Modifier = getPar8(1);
@@ -1130,7 +1132,7 @@ void f_setarr_vc(uint8_t Modifier){
 	p3_1len = getBitsPow(Aux,2,2);
 	p4_len = (uint8_t)(getBits(Aux,0,1)+1);
 	v1_len = (tp1==F32)? 4 : 1<<(tp1&0x3);
-	v2_len = (tp2==F32)? 4 : 1<<(tp2&0x3);
+	//v2_len = (tp2==F32)? 4 : 1<<(tp2&0x3);
 
 	Maddr = getPar16(p1_1len);
  	Vidx  = getPar16(p2_1len);
@@ -1151,7 +1153,8 @@ void f_setarr_vc(uint8_t Modifier){
 }
 
 void f_setarr_vv(uint8_t Modifier){
-	uint8_t v1_len,p1_1len,p2_1len,v2_len,p3_1len,p4_1len,v4_len,Aux,tp1,tp2,tp4;
+	uint8_t v1_len,p1_1len,p2_1len,p3_1len,p4_1len,Aux,tp1,tp2,tp4;
+	//uint8_t v2_len,v4_len;
 	uint16_t Maddr1,Vidx,Max,Maddr2;
 	Modifier = getPar8(1);
 	Aux = getPar8(1);
@@ -1166,8 +1169,8 @@ void f_setarr_vv(uint8_t Modifier){
 	tp4 = getBits(Aux,0,2);
 
 	v1_len = (tp1==F32)? 4 : 1<<(tp1&0x3);
-	v2_len = (tp2==F32)? 4 : 1<<(tp2&0x3);
-	v4_len = (tp4==F32)? 4 : 1<<(tp4&0x3);
+	//v2_len = (tp2==F32)? 4 : 1<<(tp2&0x3);
+	//v4_len = (tp4==F32)? 4 : 1<<(tp4&0x3);
 
 	Maddr1 = getPar16(p1_1len);
  	Vidx   = getPar16(p2_1len);
@@ -1192,7 +1195,8 @@ void f_setarr_vv(uint8_t Modifier){
 
 
 void f_poparr_v(uint8_t Modifier){
-	uint8_t v1_len,p1_1len,v2_len,p2_1len,p3_1len,Aux,tp1,tp2;
+	uint8_t v1_len,p1_1len,p2_1len,p3_1len,Aux,tp1,tp2;
+	//uint8_t v2_len;
 	uint16_t Maddr,Vidx,Max;
 
 	p3_1len = getBitsPow(Modifier,0,0);
@@ -1203,7 +1207,7 @@ void f_poparr_v(uint8_t Modifier){
 	tp2 = getBits(Aux,0,2);
 
 	v1_len = (tp1==F32)? 4 : 1<<(tp1&0x3);
-	v2_len = (tp2==F32)? 4 : 1<<(tp2&0x3);
+	//v2_len = (tp2==F32)? 4 : 1<<(tp2&0x3);
 
 	Maddr = getPar16(p1_1len);
  	Vidx  = getPar16(p2_1len);
@@ -1480,11 +1484,12 @@ void f_tkins_max(uint8_t Modifier){
 }
 
 void f_push_v(uint8_t Modifier){
-	uint8_t v1_len,tp1,p1_1len;
+	uint8_t tp1,p1_1len;
+	//uint8_t v1_len;
 	uint16_t Maddr;
 	p1_1len = getBitsPow(Modifier,3,3);
 	tp1 = getBits(Modifier,0,2);
-	v1_len = (tp1==F32)? 4 : 1<<(tp1&0x3);
+	//v1_len = (tp1==F32)? 4 : 1<<(tp1&0x3);
 	Maddr = getPar16(p1_1len);
 	if (tp1 == F32){
 		dbg(APPNAME,"VM::f_push_v(%02x): tp1=%d, Maddr=%d, value=%f, \n",Modifier,tp1,Maddr,getMValf(Maddr));
@@ -1496,11 +1501,12 @@ void f_push_v(uint8_t Modifier){
 }
 
 void f_pop(uint8_t Modifier){ 
-	uint8_t v1_len,tp1,p1_1len;
+	uint8_t tp1,p1_1len;
+	//uint8_t v1_len;
 	uint16_t Maddr;
 	p1_1len = getBitsPow(Modifier,3,3);
 	tp1 = getBits(Modifier,0,2);
-	v1_len = (tp1==F32)? 4 : 1<<(tp1&0x3);
+	//v1_len = (tp1==F32)? 4 : 1<<(tp1&0x3);
 	Maddr = getPar16(p1_1len);
 	if (tp1 == F32){
 		float Value=popf();
@@ -1519,11 +1525,12 @@ void f_popx(uint8_t Modifier){
 }
 
 void f_outevt_v(uint8_t Modifier){
-	uint8_t v2_len,tp2,p2_1len,Cevt;
+	uint8_t p2_1len,Cevt;
+	//uint8_t v2_len,tp2;
 	uint16_t Maddr;
 	p2_1len = getBitsPow(Modifier,3,3);
-	tp2 = getBits(Modifier,0,2);
-	v2_len = (tp2==F32)? 4 : 1<<(tp2&0x3);
+	//tp2 = getBits(Modifier,0,2);
+	//v2_len = (tp2==F32)? 4 : 1<<(tp2&0x3);
 	Cevt  = getPar8(1);
 	Maddr = getPar16(p2_1len);
 	dbg(APPNAME,"VM::f_outevt_v(%02x): Cevt=%d, Maddr=%d\n",Modifier,Cevt,Maddr);

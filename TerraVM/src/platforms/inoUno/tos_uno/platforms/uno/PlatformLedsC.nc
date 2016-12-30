@@ -51,9 +51,9 @@ implementation
   components new noInvertedIOC () as noInv2;
   noInv2.SubIO -> Gpio.PortD3;
 
-  Led0 = noInv0;
-  Led1 = noInv1;
-  Led2 = noInv2;
+  Led0 = NoPinC;
+  Led1 = NoPinC;
+  Led2 = NoPinC;
 
 //  Led0 = Inv0;
 //  Led1 = NoPinC;

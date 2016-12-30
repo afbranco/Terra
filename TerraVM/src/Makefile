@@ -34,6 +34,9 @@
 # Low Power Listening mode: YES or NO | default NO
 #    LPL=NO
 #
+# Debug "dbg() mode for Linux: YES or NO | default NO
+#    DEBUG=YES
+#
 # Command line examples
 #  make micaz  VM=GRP TYPE=NOBS QUEUE=SHORT install.2 mib520,/dev/ttyUSB0
 #
@@ -45,8 +48,26 @@ TOS_TARGETS = micaz mica2 mica2dot telosb iris
 INO_TARGETS = uno mega
 IX_TARGETS = rpi
 
+#  Save makecmdgoals (a read only var) to goals so that we can modify it.
+GOALS += $(MAKECMDGOALS)
+
+#  Extract user options from goals of the form opt,arg, transform to opt=arg,
+#  and evaluate.  Then, reduce GOALS to have the args removed.
+OptRE := [,.]
+GoalOpts := $(shell perl -e 'print join " ", map {s{^(.*?)$(OptRE)}{\U$$1=};$$_} grep /$(OptRE)/, split /\s+/, "$(GOALS)";')
+GOALS := $(shell perl -e '$$_="$(GOALS)"; s{$(OptRE)\S*}{}g; print;')
+$(foreach opt,$(GoalOpts),$(eval $(opt)))
+
 # Extract Target mote
 MOTE = $(word 1,$(MAKECMDGOALS))
+
+# Check simulator sim-sf mode
+ifneq ($(filter sim-sf,$(GOALS)),)
+	TOSSIM=YES
+else
+	TOSSIM=NO
+endif
+
 
 # Valid motes
 ifeq ($(filter $(MOTE),$(ALL_TARGETS)),)
@@ -104,7 +125,28 @@ ifneq ($(findstring sim,$(MAKECMDGOALS)),)
   endif
 endif
 
+DEBUG ?= YES
+ifneq ($(DEBUG),YES)
+  ifneq ($(DEBUG),NO)
+    $(error DEBUG must be "YES" or "NO")
+  endif
+endif
+
+
+# If rpi, get default ID from local IP address
+ifeq ($(MOTE),rpi)
+	INSTALL ?= $(shell ip route get 8.8.8.8 | awk '{print $$NF; exit}' | awk -F'.' '{print $$3*256+$$4; exit}')
+else
+	INSTALL ?= 1
+endif
 ROOT_ID ?= 1
+
+ifneq ($(TYPE),NOBS)
+	ROOT_ID_AUX = $(INSTALL)
+else
+	ROOT_ID_AUX = $(ROOT_ID)
+endif
+
 ifeq ($(shell echo "$(ROOT_ID)<1 || $(ROOT_ID)>65534" | bc), 1)
     $(error 'ROOT_ID must be in 1..65534')
 endif
@@ -146,6 +188,11 @@ ifeq ($(VERB),YES)
 	CFLAGS += -v
 endif
 
+# dbg() mode in linux
+ifeq ($(DEBUG),NO)
+	CFLAGS += -DNO_DEBUG
+endif
+
 
 #----------------------------------------------------------------
 
@@ -177,11 +224,19 @@ ifneq ($(filter $(MOTE),$(TOS_TARGETS)),)
   ifeq ($(VM),NET)
 	COMMONDIR = $(APPDIR)/platforms/TinyOS/common
 	VMDIR = $(APPDIR)/platforms/TinyOS/Net
-	CFLAGS += -I. -I$(COMMONDIR) -I$(VMDIR) 
+	CFLAGS += -I. 
+	ifeq ($(TOSSIM) , YES)
+		CFLAGS += -I/opt/tinyos-2.1.2/tos/lib/tossim/sf/sim/ -I/opt/tinyos-2.1.2/tos/platforms/micaz/
+	endif
+	CFLAGS +=  -I$(COMMONDIR) -I$(VMDIR) 
   else
   	COMMONDIR = $(APPDIR)/platforms/TinyOS/common
 	VMDIR = $(APPDIR)/platforms/TinyOS/Grp
-	CFLAGS += -I. -I$(COMMONDIR) -I$(VMDIR) 
+	CFLAGS += -I. 
+	ifeq ($(TOSSIM) , YES)
+		CFLAGS += -I/opt/tinyos-2.1.2/tos/lib/tossim/sf/sim/ -I/opt/tinyos-2.1.2/tos/platforms/micaz/
+	endif
+	CFLAGS +=  -I$(COMMONDIR) -I$(VMDIR) 
 	PFLAGS += -DMODULE_CTP
 	CFLAGS += -I$(TOSDIR)/lib/net/ -I$(TOSDIR)/lib/net/4bitle -I$(TOSDIR)/lib/net/ctp 
   endif
@@ -199,7 +254,7 @@ ifeq ($(MOTE),mega)
 endif
 ifeq ($(MOTE),rpi)
 	VMDIR = $(APPDIR)/platforms/RPi
-	CFLAGS += -I. -I$(VMDIR) 
+	CFLAGS += -I. -I$(VMDIR) -DLINUX
 endif
 
 
@@ -353,7 +408,7 @@ ifeq ($(QUEUE) , SHORT)
 endif
 
 # Define the ROOT_ID  node number
-CFLAGS += -DROOT_ID=$(ROOT_ID)
+CFLAGS += -DROOT_ID=$(ROOT_ID_AUX)
 
 
 # Reset MODULES if VM!=NET
@@ -384,15 +439,18 @@ CFLAGS += -DVM_MEM_BLKS=$(MBLOCKS_F)
 ifneq ($(filter $(MOTE),$(TOS_TARGETS)),)
   CFLAGS += -DTOSVER=$(TOSVERSION)
 endif
-$(info shell echo ${MBLOCKS}-${DM_MSGQ}-${DM_SETDATA})
+#$(info shell echo ${MBLOCKS}-${DM_MSGQ}-${DM_SETDATA})
 
 
 $(info ***********************)
 $(info **** Configuration ****)
 $(info MOTE        = $(MOTE))
+$(info TOSSIM      = $(TOSSIM))
+$(info DEBUG       = $(DEBUG))
 $(info VM          = $(VM))
 $(info MODULES     = $(MODULES) -- [MSGQ])
-$(info ROOT_ID     = $(ROOT_ID))
+$(info MOTE_ID     = $(INSTALL))
+$(info ROOT_ID     = $(ROOT_ID_AUX))
 $(info RFPOWER     = $(RFPOWER))
 $(info LPL         = $(LPL))
 $(info SENSORBOARD = $(SENSORBOARD))
@@ -408,7 +466,7 @@ $(info Make Cmds- $(MAKECMDGOALS))
 PFLAGS += -fno-strict-aliasing # required for accessing VARS
 
 
-CFLAGS += -DNO_DEBUG
+
 #CFLAGS += -DPRINTF
 #CFLAGS += -I$(TOSDIR)/lib/printf
 

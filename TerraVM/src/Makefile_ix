@@ -1,0 +1,40 @@
+# Initial paths/files
+BUILDDIR = build/$(MOTE)
+MAIN_APPC = $(BUILDDIR)/app.c
+MAIN_EXE = $(BUILDDIR)/main.exe
+DUMP_FILE = $(BUILDDIR)/wiring-check.xml
+
+# programs and config "path/names"
+GCC = gcc
+
+
+OPT1=-fnesc-include=tos -topdir=$(APPDIR)
+OPT2=-fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask -o $(MAIN_EXE) -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -fnesc-cfile=$(MAIN_APPC) --param max-inline-insns-single=100000 -fnesc-dump=wiring   -fnesc-dumpfile=$(DUMP_FILE) -lm -fnesc-no-debug 
+OPT3 = $(CFLAGS)
+OPT4=-DTERRA_NODE_ID=$(INSTALL)
+OPT5=setTimer.o dbg.o
+
+rpi: builddir exe
+	$(info **********  Makefile RPi: *************)
+
+dbg.o: $(VMDIR)/dbg.c
+	gcc -c $(VMDIR)/dbg.c -o dbg.o
+
+setTimer.o: $(VMDIR)/setTimer.c
+	gcc -c $(VMDIR)/setTimer.c -o setTimer.o
+
+exe: dbg.o setTimer.o
+	@echo "    compiling $(COMPONENT) to a $(PLATFORM) binary"
+	nescc $(OPT1) $(OPT2) $(OPT3) $(OPT4) $(OPT5) -gcc=$(GCC) $(COMPONENT).nc
+	@echo "    compiled $(COMPONENT) to $(MAIN_EXE)"
+
+install.%: 
+	@echo "    O Install ainda não está implementado."
+
+install: 
+	@echo "    O Install ainda não está implementado."
+
+
+builddir: 
+	@mkdir -p $(BUILDDIR)
+

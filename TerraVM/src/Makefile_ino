@@ -36,17 +36,7 @@ else ifeq ($(MOTE),mega)
   AVRDUDEPROG = wiring
 endif
 
-#  Save makecmdgoals (a read only var) to goals so that we can modify it.
-GOALS += $(MAKECMDGOALS)
 
-#  Extract user options from goals of the form opt,arg, transform to opt=arg,
-#  and evaluate.  Then, reduce GOALS to have the args removed.
-OptRE := [,.]
-GoalOpts := $(shell perl -e 'print join " ", map {s{^(.*?)$(OptRE)}{\U$$1=};$$_} grep /$(OptRE)/, split /\s+/, "$(GOALS)";')
-GOALS := $(shell perl -e '$$_="$(GOALS)"; s{$(OptRE)\S*}{}g; print;')
-$(foreach opt,$(GoalOpts),$(eval $(opt)))
-
-INSTALL ?= 1
 USB ?= /dev/ttyACM0
 
 # Extract all "tos_uno"/"tos_mega" subdirectories as includes
@@ -58,10 +48,6 @@ OPT_1 =  -fnesc-include=tos -topdir=$(APPDIR) -fnesc-scheduler=TinySchedulerC,Ti
 OPT_2 =  -mmcu=$(MCU) -DMHZ=$(MCUCLK) -D$(DEVTYPE) -DF_CPU=$(F_CPU) -DTERRA_NODE_ID=$(INSTALL)
 
 OPT_3 =  $(INCDIRS) $(CFLAGS)
-
-# Tentativa para o UNO, falta recriar os arquivos de hardware/port/pins para o ATmega168/328
-#OPT_3 =  -I/home/branco/gitspace/Terra/nescino/src/ino/atm328p  -I/opt/tinyos-2.1.2/tos/platforms/mica -I/opt/tinyos-2.1.2/tos/platforms/iris/chips/rf230 -I/opt/tinyos-2.1.2/tos/chips/rf230 -I/opt/tinyos-2.1.2/tos/lib/rfxlink/layers -I/opt/tinyos-2.1.2/tos/lib/rfxlink/util  -I/opt/tinyos-2.1.2/tos/chips/atm128 -I/opt/tinyos-2.1.2/tos/chips/atm128/adc -I/opt/tinyos-2.1.2/tos/chips/atm128/timer -I/opt/tinyos-2.1.2/tos/chips/atm128 -I/opt/tinyos-2.1.2/tos/chips/atm128/adc -I/opt/tinyos-2.1.2/tos/chips/atm128/pins -I/opt/tinyos-2.1.2/tos/chips/atm128/spi -I/opt/tinyos-2.1.2/tos/chips/atm128/i2c -I/opt/tinyos-2.1.2/tos/chips/atm128/timer -I/opt/tinyos-2.1.2/tos/lib/timer -I/opt/tinyos-2.1.2/tos/lib/serial -I/opt/tinyos-2.1.2/tos/lib/power -I/opt/tinyos-2.1.2/tos/lib/diagmsg -I/opt/tinyos-2.1.2/tos/interfaces -I/opt/tinyos-2.1.2/tos/types -I/opt/tinyos-2.1.2/tos/system -DMHZ=4
-
 
 mega: builddir exe bytes $(BUILD_EXTRA_DEPS)
 	$(info **********  Makefile Ino: Mega *************)

@@ -6,7 +6,6 @@ module PlatformP{
 implementation{
 
 	command error_t Init.init(){
-		// TODO Auto-generated method stub
 		return SUCCESS;
 	}
 }

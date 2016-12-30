@@ -5,6 +5,10 @@
 #define F_CPU 16000000
 #endif
 
+#ifndef TERRA_NODE_ID
+#defined TERRA_NODE_ID 1
+#endif
+
 /*
  * nRF24 state machine
  */
