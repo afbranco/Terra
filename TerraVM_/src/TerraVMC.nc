@@ -1699,6 +1699,21 @@ void f_set_c(uint8_t Modifier){
 		if (procFlag==FALSE) post procEvent();		
 #endif
 	}
+
+	/**
+	 * Update the wall clock - old and late values
+	 * Called at external events to also update CEU->wclk_late.
+	 */
+
+	void update_wclk_late(){
+#ifndef ONLY_BSTATION
+		u32 now = (u32)call BSTimerVM.getNow();
+        s32 dt = now - old;
+		dbg(APPNAME,"VM::update_wclk_late(): now=%d, old=%d, dt=%d\n",now,old,dt);
+        old = now;
+		ceu_go_wclock(NULL, dt, NULL);
+#endif
+	}
 	
 	/**
 	 * Process next event, if it exists
@@ -1737,6 +1752,8 @@ void f_set_c(uint8_t Modifier){
 				dbg(APPNAME,"VM::procEvent(): Discarding event %d\n",evtData.evtId);
 				post procEvent(); // Try next event
 			} else {
+				// update wall clock on external event
+				update_wclk_late();
 				ceu_go_event(NULL,ceuId,evtData.auxId,evtData.data);
 			}
 		}
