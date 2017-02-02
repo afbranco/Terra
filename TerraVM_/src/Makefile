@@ -243,16 +243,20 @@ ifeq (ix,$(word 1,$(MAKECMDGOALS)))
 endif
 
 
+
 #
 # Validate SENSOR and define SENSORBOARD
 #
-ifeq ($(MAKECMDGOALS), mica2dot)
+ifneq ($(findstring mica2dot,$(MAKECMDGOALS)),)
   ifneq ($(SENSOR),)
     $(error Invalid SENSOR value "$(SENSOR)" for "mica2dot". Currently Mica2Dot supports only internal temperature sensor.)
   endif
+  SENSORBOARD=
 endif
-ifneq ($(MAKECMDGOALS), mica2dot)
 ifneq ($(findstring mica,$(MAKECMDGOALS)),)
+ifneq ($(findstring mica2dot,$(MAKECMDGOALS)),)
+
+else
   SENSOR ?= MDA100
   ifeq ($(SENSOR) , MTS300CA)
     SENSORBOARD = mts300
