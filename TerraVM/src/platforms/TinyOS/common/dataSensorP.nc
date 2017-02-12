@@ -1,5 +1,6 @@
 #include "stdio.h"
 module dataSensorP{
+	provides interface Get<uint8_t> as MoteType;
 	provides interface Read<uint16_t> as Temp;
 	provides interface Read<uint16_t> as Photo;
 	provides interface Read<uint16_t> as Volt;
@@ -11,7 +12,7 @@ implementation{
 
 	bool initialized = FALSE;
 	FILE *file;
-	typedef struct {uint16_t temp;uint16_t photo; uint16_t volt;} reg_t;
+	typedef struct {uint16_t temp;uint16_t photo; uint16_t volt; uint16_t moteType;} reg_t;
 	reg_t lastReg;
 
     void resetDataFile(){
@@ -23,6 +24,7 @@ implementation{
     		data[i].temp=500;	
     		data[i].photo=400;	
     		data[i].volt=1000;	
+    		data[i].moteType=1;	
     	}
     	file = fopen(F_NAME,"wb");
     	if (!file) {
@@ -36,7 +38,14 @@ implementation{
     }
 
 	event void Boot.booted(){
-		if (TOS_NODE_ID == 1) resetDataFile();
+		if (TOS_NODE_ID == 1) {
+    		file = fopen(F_NAME,"rb");
+	    	if (!file) {
+				resetDataFile();
+			} else {
+	    		fclose(file);
+			}
+		}
 	}
 	
 	
@@ -46,12 +55,17 @@ implementation{
     	if (!file) {
 			dbg(APPNAME,"dataSensor.readReg(): Unable to open %s file!\n",F_NAME);
     		printf("*******\n    Unable to open %s file!\n *******\n",F_NAME);
+    		lastReg.temp = 0;
+    		lastReg.photo = 0;
+    		lastReg.volt = 0;
+    		lastReg.moteType = 0;
     	} else {
     		fread(data,MAX_SENSORS*sizeof(reg_t),1,file);
     		fclose(file);
     		lastReg.temp = data[TOS_NODE_ID].temp;
     		lastReg.photo = data[TOS_NODE_ID].photo;
     		lastReg.volt = data[TOS_NODE_ID].volt;
+    		lastReg.moteType = data[TOS_NODE_ID].moteType;
     	}
 		
 	}
@@ -69,6 +83,8 @@ implementation{
 		signal Volt.readDone(SUCCESS, lastReg.volt);
 	}
 
+	command uint8_t MoteType.get(){readReg(); return (uint8_t)lastReg.moteType;}
+	
 	command error_t Temp.read(){post tempRead(); return SUCCESS;}
 	command error_t Photo.read(){post photoRead(); return SUCCESS;}
 	command error_t Volt.read(){post voltRead(); return SUCCESS;}
