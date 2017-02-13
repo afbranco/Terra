@@ -1,0 +1,113 @@
+# Initial paths/files
+BUILDDIR = build/$(MOTE)
+MAIN_APPC = $(BUILDDIR)/app.c
+MAIN_EXE = $(BUILDDIR)/main.elf
+DUMP_FILE = $(BUILDDIR)/wiring-check.xml
+
+# programs and config "path/names"
+GCC = xtensa-lx106-elf-gcc
+OBJDUMP = avr-objdump
+
+# Specif xtensa flags
+XCFLAGS = -DICACHE_FLASH -mlongcalls
+LDLIBS = -nostdlib -Wl,--start-group -lmain -lnet80211 -lwpa -llwip -lc -lpp -lphy -Wl,--end-group -lgcc
+LDFLAGS = -Teagle.app.v6.ld
+
+OPT1=-fnesc-include=tos -topdir=$(APPDIR)
+OPT2=-fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask -o $(MAIN_EXE) -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -fnesc-cfile=$(MAIN_APPC) --param max-inline-insns-single=100000 -fnesc-dump=wiring   -fnesc-dumpfile=$(DUMP_FILE) -lm -fnesc-no-debug 
+OPT3 =  $(XCFLAGS) $(CFLAGS)
+OPT4=-DTERRA_NODE_ID=$(INSTALL)
+OPT5= $(LDLIBS) $(LDFLAGS)
+
+
+esp: builddir bin bytes
+	$(info --------------------------------  App Compiled *************)
+
+$(MAIN_APPC):
+	@echo "    compiling $(COMPONENT) to a $(PLATFORM) binary"
+	nescc -conly $(OPT1) $(OPT2) $(OPT3) $(OPT4) $(OPT5) -gcc=$(GCC) -E $(COMPONENT).nc
+	#
+	@sed -i -e's/static[ ]*void/static void __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static[ ]*bool/static bool __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static[ ]*error_t/static error_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static[ ]*uint32_t/static uint32_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static[ ]*uint16_t/static uint16_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static[ ]*uint8_t/static uint8_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static[ ]*int32_t/static int32_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static[ ]*int16_t/static int16_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static[ ]*int8_t/static int8_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static[ ]*int /static int __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static[ ]*float/static float __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static[ ]*am_addr_t/static am_addr_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static[ ]*am_id_t/static am_id_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	#
+	@sed -i -e's/static inline[ ]*void/static void __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static inline[ ]*error_t/static error_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static inline[ ]*bool/static bool __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static inline[ ]*uint32_t/static uint32_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static inline[ ]*uint16_t/static uint16_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static inline[ ]*uint8_t/static uint8_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static inline[ ]*int32_t/static int32_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static inline[ ]*int16_t/static int16_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static inline[ ]*int8_t/static int8_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static inline[ ]*int /static int __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static inline[ ]*float/static float __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static inline[ ]*am_addr_t/static am_addr_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static inline[ ]*am_id_t/static am_id_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	#
+	@sed -i -e's/static __inline[ ]*void/static void __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static __inline[ ]*error_t/static error_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static __inline[ ]*bool/static bool __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static __inline[ ]*uint32_t/static uint32_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static __inline[ ]*uint16_t/static uint16_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static __inline[ ]*uint8_t/static uint8_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static __inline[ ]*int32_t/static int32_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static __inline[ ]*int16_t/static int16_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static __inline[ ]*int8_t/static int8_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static __inline[ ]*int /static int __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static __inline[ ]*float/static float __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static __inline[ ]*am_addr_t/static am_addr_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static __inline[ ]*am_id_t/static am_id_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	#
+	@sed -i -e's/static inline[ ]*message_t/static message_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static inline[ ]*serial_header_t/static serial_header_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static inline[ ]*TerraVMC__evtQ__t/static TerraVMC__evtQ__t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static inline[ ]*\/\*TerraVMAppC.evtQ\*\/QueueC__0__queue_t/static QueueC__0__queue_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	#
+	@sed -i -e's/static[ ]*\/\*TerraVMAppC.evtQ\*\/QueueC__0__queue_t/static QueueC__0__queue_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	#
+	@sed -i -e's/inline static[ ]*TerraVMC__evtQ__t/static TerraVMC__evtQ__t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/inline static[ ]*message_t/static message_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	#
+	@sed -i -e's/sint8 espconn/sint8 __attribute((section(".irom0.text"))) espconn/g' build/esp/app.c
+	#
+	@sed -i -e's/%hhu/%d/g' build/esp/app.c
+	@sed -i -e's/ memcpy/ ets_memcpy/g' build/esp/app.c
+	#
+	@echo "    compiled $(COMPONENT) to $(MAIN_EXE)"
+
+bin: elf
+	esptool.py elf2image $(MAIN_EXE) 
+
+elf: $(MAIN_APPC)
+	$(info ---------------------------------  Compile done *************)
+	$(GCC) $(MAIN_APPC) $(OPT3) $(OPT5) -o$(MAIN_EXE)
+
+install.%: $(MAIN_EXE)-0x00000.bin $(MAIN_EXE)-0x10000.bin 
+	$(info ---------------------------------  Start flashing to device *************)
+	esptool.py -b 115200 write_flash 0x00000 $(MAIN_EXE)-0x00000.bin 0x10000 $(MAIN_EXE)-0x10000.bin
+
+install: $(MAIN_EXE)-0x00000.bin $(MAIN_EXE)-0x10000.bin 
+	$(info ---------------------------------  Start flashing to device *************)
+	esptool.py -b 115200 write_flash 0x00000 $(MAIN_EXE)-0x00000.bin 0x10000 $(MAIN_EXE)-0x10000.bin
+
+
+builddir: 
+	@mkdir -p $(BUILDDIR)
+	@rm -f $(MAIN_APPC)
+
+bytes: 
+	@echo "******** Application memory size ***************"
+	@$(OBJDUMP) -h $(MAIN_EXE) | perl -ne '$$b{$$1}=hex $$2 if /^\s*\d+\s*\.(text|data|bss)\s+(\S+)/; END { printf("%16d bytes in ROM\n%16d bytes in RAM\n",$$b{text}+$$b{data},$$b{data}+$$b{bss}); }'
+	@echo "************************************************"
+
