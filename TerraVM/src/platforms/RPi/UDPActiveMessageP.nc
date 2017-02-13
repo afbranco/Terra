@@ -33,6 +33,10 @@ implementation{
 		return TCAST(serial_header_t* ONE, (uint8_t*)msg + offsetof(message_t, data) - sizeof(serial_header_t));
 	}
 	
+	serial_metadata_t* getMetadata(message_t* msg) {
+		return (serial_metadata_t*)(msg->metadata);
+	}
+
 	uint16_t getID_fromIP(){
 	
 		struct ifaddrs *ifaddr, *ifa;
@@ -70,12 +74,12 @@ implementation{
 	}
 	
 	task void send_doneAck(){
-		getHeader(lastSendMessage)->ackID = TRUE;
+		getMetadata(lastSendMessage)->ackID = TRUE;
 		signal AMSend.sendDone[getHeader(lastSendMessage)->type](lastSendMessage, SUCCESS);
 	}
 	
 	task void send_done(){
-		getHeader(lastSendMessage)->ackID = FALSE;
+		getMetadata(lastSendMessage)->ackID = FALSE;
 		signal AMSend.sendDone[getHeader(lastSendMessage)->type](lastSendMessage, SUCCESS);
 	}
 	
@@ -93,8 +97,9 @@ implementation{
 		int size;
 		//struct sockaddr *addrRcv;
 		//struct socklen_t *addRcvLen;
-	
 		size = recvfrom(socket_receiver, dgram, MAX_LENGTH, 0, (struct sockaddr*)&addr, (socklen_t*)&fromlen);
+//printf("Received some data - len=%d\n",size);	
+		dbgerror("UDP","UDP::UDP_HandleReceiver() - Received some data - len=%d\n",size);
 
 		if (size < 0) dbgerror("UDP","UDP::Erro recvfrom\n"); // incluir o signal do receive()
 		else{
@@ -106,11 +111,11 @@ implementation{
 			if (receiveAckMsg.dest == TOS_NODE_ID){
 //				printf("Recebi mensagem ACK %d\n", (*(nx_uint16_t*)dgram));
 //				printf("EH ACK! Dest: %d Src: %d AckID: %d\n", receiveAckMsg.dest, receiveAckMsg.src, receiveAckMsg.ackID);
-//				printf("Tos_node_id: %d, ackID: %d, dest: %d, Timer: %s\n", TOS_NODE_ID, getHeader(lastSendMessage)->ackID, getHeader(lastSendMessage)->dest, (call sendDoneTimer.isRunning())?"true":"false");
+//				printf("Tos_node_id: %d, ackID: %d, dest: %d, Timer: %s\n", TOS_NODE_ID, getMetadatata(lastSendMessage)->ackID, getHeader(lastSendMessage)->dest, (call sendDoneTimer.isRunning())?"true":"false");
 	
 				dbg("UDP","UDP::received an ack: %d \n", (uint16_t)call sendDoneTimer.getNow());
 				if (receiveAckMsg.src == getHeader(lastSendMessage)->dest
-							&& receiveAckMsg.ackID == getHeader(lastSendMessage)->ackID
+							&& receiveAckMsg.ackID == getMetadata(lastSendMessage)->ackID
 						&& call sendDoneTimer.isRunning()){
 					dbg("UDP","UDP::ACK RECEBIDO\n");
 					call sendDoneTimer.stop();
@@ -123,10 +128,10 @@ implementation{
 	
 			if (call AMPacket.isForMe(msg)) {	
 				memcpy(&lastReceiveMessage, msg, sizeof(message_t));
-				dbg("UDP","UDP::Received from %d -- reqAck: %d\n", call AMPacket.source(msg), getHeader(msg)->ackID);
+				dbg("UDP","UDP::Received from %d -- reqAck: %d\n", call AMPacket.source(msg), getMetadata(msg)->ackID);
 
 				// soh mando ack se for pra mim e se o remente requerir
-				if (getHeader(msg)->ackID != 0 && getHeader(msg)->dest == TOS_NODE_ID){
+				if (getMetadata(msg)->ackID != 0 && getHeader(msg)->dest == TOS_NODE_ID){
 					call timerDelay.startOneShot(1); // ack mto rápido
 				}
 				post receiveTask();
@@ -140,7 +145,7 @@ implementation{
 		ackMsg.ackCode = ACK_CODE;
 		ackMsg.src = TOS_NODE_ID;
 		ackMsg.dest = getHeader(&lastReceiveMessage)->src;
-		ackMsg.ackID = getHeader(&lastReceiveMessage)->ackID;
+		ackMsg.ackID = getMetadata(&lastReceiveMessage)->ackID;
 	
 		sendto(socket_sender, &ackMsg, sizeof(message_t), 0, (struct sockaddr *)&addrSender, sizeof(struct sockaddr_in));
 	
@@ -162,13 +167,14 @@ implementation{
 		pid_t pid;
 		int a_flags;
 		struct sigaction a_sa;
+		int ttl;
 	
 		const unsigned int zero = 0;
 		const unsigned int one = 1;
 		int status;
 	
-		TOS_NODE_ID = getID_fromIP();
-		if(TOS_NODE_ID == 0){
+//		TOS_NODE_ID = getID_fromIP(); // NODE_ID comes from compilation time
+		if(getID_fromIP() == 0){
 			dbgerror("UDP","UDP::Nenhuma interface ethernet AF_INET foi encontrada\n");
 			return FAIL;
 		}
@@ -210,7 +216,15 @@ implementation{
 			dbgerror("UDP","UDP::Erro.5 - %d\n", errno);
 			return FAIL;
 		}
-
+		
+		ttl = 2;
+		if(setsockopt(socket_receiver, IPPROTO_IP, IP_TTL, &ttl, sizeof(ttl))) {
+			close(socket_receiver);
+			dbgerror("UDP","UDP::Erro.5.1 - %d\n", errno);
+			return FAIL;
+		}
+		
+		
 		pid = getpid();
 
 		a_flags = fcntl(socket_receiver, F_GETFL);
@@ -264,14 +278,14 @@ implementation{
 	}
 	
 	event void sendDoneTimer.fired(){
-		getHeader(lastSendMessage)->ackID = FALSE;
+		getMetadata(lastSendMessage)->ackID = FALSE;
 		signal AMSend.sendDone[getHeader(lastSendMessage)->type](lastSendMessage, SUCCESS);
 	}
 
 	command error_t AMSend.send[am_id_t id](am_addr_t am_addr, message_t *msg, uint8_t len){
 
-		struct ip_mreq mcast_group;
-		message_header_t *header;
+		//struct ip_mreq mcast_group;
+		//message_header_t *header;
 	
 		call AMPacket.setSource(msg, TOS_NODE_ID);
 		call AMPacket.setDestination(msg, am_addr);
@@ -279,15 +293,15 @@ implementation{
 		call AMPacket.setType(msg, id);
 		dbg("UDP","UDP::Sending to %d am_d=%d\n",am_addr,id);
 		// setar o counter se houver ack
-		if (getHeader(msg)->ackID != 0){			
+		if (getMetadata(msg)->ackID != 0){			
 			counter = (counter==0)?1:counter+1; // se for diferente de zero, mantém; caso contrário, soma
-			getHeader(msg)->ackID = counter;
+			getMetadata(msg)->ackID = counter;
 		}
 		lastSendMessage = msg; // salva o endereço da ultima mensagem
 		sendto(socket_sender, msg, sizeof(message_t), 0, (struct sockaddr *)&addrSender, sizeof(struct sockaddr_in));	
 	
 		// sucesso no send sem ack
-		if(getHeader(msg)->ackID == 0)
+		if(getMetadata(msg)->ackID == 0)
 			post send_done();
 		else{ // inicio timeout do ack
 			call sendDoneTimer.startOneShot(SENDDONE_WAITTIME);
@@ -399,18 +413,18 @@ implementation{
 
 	async command bool PacketAcknowledgements.wasAcked(message_t *msg){
 	
-		return getHeader(msg)->ackID == ACK_TRUE;
+		return getMetadata(msg)->ackID == ACK_TRUE;
 	}
 
 	async command error_t PacketAcknowledgements.requestAck(message_t *msg){
 		// tem ack
-		getHeader(msg)->ackID = ACK_TRUE;
+		getMetadata(msg)->ackID = ACK_TRUE;
 		return SUCCESS;
 	}
 
 	async command error_t PacketAcknowledgements.noAck(message_t *msg){
 		// não tem ack
-		getHeader(msg)->ackID = ACK_FALSE;
+		getMetadata(msg)->ackID = ACK_FALSE;
 		return SUCCESS;
 	}
 	

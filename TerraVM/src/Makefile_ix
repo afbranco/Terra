@@ -29,10 +29,10 @@ exe: dbg.o setTimer.o
 	@echo "    compiled $(COMPONENT) to $(MAIN_EXE)"
 
 install.%: 
-	@echo "    O Install ainda não está implementado."
+	@echo "    Done! NodeId=" $(INSTALL) # Deve ser compilado na propria máquina.
 
 install: 
-	@echo "    O Install ainda não está implementado."
+	@echo "    Warning: Default value for NodeId=" $(INSTALL) 
 
 
 builddir: 

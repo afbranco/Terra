@@ -24,7 +24,7 @@ module TerraVMC @safe()
 }
 implementation
 {
-    u32 old;
+    uint32_t old;
 	// Mote Identifier
 	nx_uint16_t MoteID;					
 	// VM scrip memory
@@ -48,6 +48,7 @@ implementation
 	uint16_t gate0;	
 	uint16_t inEvts;	
 	uint16_t async0;	
+	uint16_t appSize;	
 	nx_uint8_t* MEM;
 	
 	// Stack control
@@ -194,7 +195,7 @@ void push(uint32_t value){
 	currStack = currStack - 4 ;
 	dbg(APPNAME,"VM::push(): newStack=%d, value=%d (0x%04x), ProgEnd=%d\n",currStack,value,value,ProgEnd);
 	if ((currStack) > ProgEnd) 
-		*(uint32_t*)(CEU_data+currStack)=value;
+		*(nx_uint32_t*)(CEU_data+currStack)=value;
 	else {
 		evtError(E_STKOVF);
 		// stop VM execution to prevent unexpected state
@@ -207,7 +208,7 @@ void pushf(float value){
 	currStack = currStack - 4 ;
 //	dbg(APPNAME,"VM::pushf(): newStack=%d, value=%f (0x%08x), ProgEnd=%d\n",currStack,value,*(uint32_t*)&value,ProgEnd);
 	if ((currStack) > ProgEnd) {
-		*(float*)(CEU_data+currStack)=value;
+		*(nx_float*)(CEU_data+currStack)=value;
 	} else {
 		evtError(E_STKOVF);
 		// stop VM execution to prevent unexpected state
@@ -219,11 +220,11 @@ void pushf(float value){
 
 uint32_t pop(){
 	currStack = currStack + 4 ;
-	return *(uint32_t*)(CEU_data+currStack-4);
+	return *(nx_uint32_t*)(CEU_data+currStack-4);
 }
 float popf(){
 	currStack = currStack + 4 ;
-	return *(float*)(CEU_data+currStack-4);
+	return *(nx_float*)(CEU_data+currStack-4);
 }
 
 uint32_t getMVal(uint16_t Maddr, uint8_t type){
@@ -321,11 +322,11 @@ dbg(APPNAME,"VM::getEvtCeuId(): EvtId?=%d : currSlot=%d,  slotId=%d, slotSize=%d
 		return size;
 	}
 	
-
+/*
 typedef u16 tceu_noff;
 typedef u16 tceu_nlbl;
 
-typedef struct {
+typedef nx_struct {
     s32 togo;
     tceu_nlbl lbl;
 } tceu_wclock;
@@ -335,7 +336,22 @@ typedef struct {
     u8 tree;
     tceu_nlbl lbl;
 } tceu_trk;
+ * 
+*/
+#define tceu_noff uint16_t
+#define tceu_nlbl uint16_t
 
+typedef nx_struct {
+    nx_int32_t togo;
+    nx_uint16_t lbl;
+} tceu_wclock;
+
+typedef nx_struct {
+    nx_uint8_t stack;
+    nx_uint8_t tree;
+    nx_uint16_t lbl;
+} tceu_trk;
+ 
 enum {
     Inactive = 0,
     Init = 1,
@@ -403,12 +419,10 @@ void ceu_track_ins (u8 stack, u8 tree, int chk, tceu_nlbl lbl)
 	{
 		int i;
 
-		tceu_trk trk = {
-			stack,
-			tree,
-			lbl
-		};
-
+		tceu_trk trk;
+		trk.stack = stack;
+		trk.tree = tree;
+		trk.lbl = lbl;
 
 		for ( i = ++CEU->tracks_n;
 					(i>1) && ceu_track_cmp(&trk,CEU->p_tracks+(i/2));
@@ -465,11 +479,11 @@ void ceu_track_clr (tceu_nlbl l1, tceu_nlbl l2) {
     }
 }
 
-void ceu_spawn (tceu_nlbl* lbl)
+void ceu_spawn (nx_uint16_t* lbl)
 {
 //printf("spw:%d\n",*(nx_uint16_t*)lbl);printfflush();
     if (*(nx_uint16_t*)lbl != Inactive) {
-        ceu_track_ins(CEU->stack, CEU_TREE_MAX, 0, *(nx_uint16_t*)lbl);
+        ceu_track_ins(CEU->stack, CEU_TREE_MAX, 0, *lbl);
         *(nx_uint16_t*)lbl = Inactive;
     }
 }
@@ -486,12 +500,12 @@ void ceu_trigger (tceu_noff off, uint8_t auxId)
     for (i=0 ; i<n ; i++) {
         //ceu_spawn((tceu_nlbl*)&CEU->mem[off+1+(i*sizeof(tceu_nlbl))]);
 		if (slotSize==2){ // doesn't test auxId
-        	ceu_spawn((tceu_nlbl*)(CEU->p_mem+off+1+(i*slotSize)));
+        	ceu_spawn((nx_uint16_t*)(CEU->p_mem+off+1+(i*slotSize)));
 		} else { // must test auxId
 			slotAuxId = *(char*)(CEU->p_mem+off+1+(i*slotSize));
 			dbg(APPNAME,"CEU::ceu_trigger(): testauxId -> slotAuxId=%d, auxId=%d\n",slotAuxId,auxId);
 			if (slotAuxId==auxId) {
-	        	ceu_spawn((tceu_nlbl*)(CEU->p_mem+off+2+(i*slotSize)));
+	        	ceu_spawn((nx_uint16_t*)(CEU->p_mem+off+2+(i*slotSize)));
 			}
 		}
     }
@@ -515,6 +529,7 @@ int ceu_wclock_lt (tceu_wclock* tmr) {
     return 0;
 }
 
+
 void ceu_wclock_enable (int gte, s32 us, tceu_nlbl lbl) {
 	tceu_wclock* tmr = (tceu_wclock*)(MEM+wClock0+(gte*sizeof(tceu_wclock)));
     s32 dt = us - CEU->wclk_late;
@@ -529,6 +544,7 @@ void ceu_wclock_enable (int gte, s32 us, tceu_nlbl lbl) {
     if (ceu_wclock_lt(tmr)){
         ceu_out_wclock(dt);
     }
+
 }
 
 
@@ -631,13 +647,13 @@ int ceu_go_wclock (int* ret, s32 dt, s32* nxt)
     for (i=0; i<wClocks; i++)
     {
         tceu_wclock* tmr = &CLK0[i];
-        dbg(APPNAME,"CEU::ceu_go_wclock(): Loop1 nos wClocks: tmr->togo=%d, tmr->lbl=%d\n",(nx_uint32_t)(tmr->togo), *(nx_uint16_t*)&(tmr->lbl));
+        dbg(APPNAME,"CEU::ceu_go_wclock(): Loop1 nos wClocks: tmr->togo=%d, tmr->lbl=%d\n",(nx_uint32_t)(tmr->togo), tmr->lbl);
         if (tmr->lbl == Inactive)
             continue;
 
         if ( tmr->togo==min_togo ) {
             tmr->togo = 0L;
-            dbg("VMDBG","VM:: timer fired for label %d\n",*(nx_uint16_t*)&(tmr->lbl));
+            dbg("VMDBG","VM:: timer fired for label %d\n",tmr->lbl);
             ceu_spawn(&tmr->lbl);           // spawns sharing phys/ext
         } else {
             tmr->togo -= dt;
@@ -700,6 +716,7 @@ int ceu_go (int* ret)
             continue;   // an escape may have cleared a `defer´ or `cont´
 
         _lbl_ = trk.lbl;
+    	dbg(APPNAME,"CEU::ceu_go(): trk.lbl=%d, _lbl_=%d \n",trk.lbl,_lbl_);
         
         execTrail(_lbl_);
 
@@ -1663,6 +1680,19 @@ void f_set_c(uint8_t Modifier){
 		call evtQ.enqueue(evtData);
 		if (procFlag==FALSE) post procEvent();		
 	}
+
+	/**
+	 * Update the wall clock - old and late values
+	 * Called at external events to also update CEU->wclk_late.
+	 */
+
+	void update_wclk_late(){
+		u32 now = (u32)call BSTimerVM.getNow();
+        s32 dt = now - old;
+		dbg(APPNAME,"VM::update_wclk_late(): now=%d, old=%d, dt=%d\n",now,old,dt);
+        old = now;
+		ceu_go_wclock(NULL, dt, NULL);
+	}
 	
 	/**
 	 * Process next event, if it exists
@@ -1686,6 +1716,8 @@ void f_set_c(uint8_t Modifier){
 				dbg(APPNAME,"VM::procEvent(): Discarding event %d\n",evtData.evtId);
 				post procEvent(); // Try next event
 			} else {
+				// update wall clock on external event
+				update_wclk_late();
 				ceu_go_event(NULL,ceuId,evtData.auxId,evtData.data);
 			}
 		}
@@ -1719,6 +1751,7 @@ void f_set_c(uint8_t Modifier){
 	event uint32_t VMCustom.getTime(){
 		return call BSTimerVM.getNow();
 		}
+
 
     event void BSTimerVM.fired()
     {
@@ -1768,6 +1801,7 @@ void f_set_c(uint8_t Modifier){
 		gate0 = data->gate0;
 		inEvts = data->inEvts;
 		async0 = data->async0;
+		appSize = data->appSize;
 
 		dbg(APPNAME,"VM::BSUpload.setEnv(): ProgStart=%d, ProgEnd=%d, nTracks=%d, wClocks=%d, asyncs=%d, wClock0=%d, gate0=%d, async0=%d\n",
 				ProgStart, ProgEnd, nTracks,wClocks,asyncs,wClock0,gate0,async0);
@@ -1784,6 +1818,7 @@ void f_set_c(uint8_t Modifier){
 		data->gate0 = gate0;
 		data->inEvts = inEvts;
 		data->async0 = async0;
+		data->appSize = appSize;
 		dbg(APPNAME,"VM::BSUpload.getEnv(): ProgStart=%d, ProgEnd=%d, nTracks=%d, wClocks=%d, asyncs=%d, wClock0=%d, gate0=%d, async0=%d\n",
 				ProgStart, ProgEnd,nTracks,wClocks,asyncs,wClock0,gate0,async0);
 	}

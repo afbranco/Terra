@@ -7,7 +7,7 @@
 enum{
 
 	MSG_BUFF_SIZE = 28,
-	BLOCK_SIZE = 24, // Must be conform to newProgBlock data structure
+	BLOCK_SIZE = 22, // Must be conform to newProgBlock data structure
 	SET_DATA_SIZE = 18, // Must be conform to setDataGR data structure
 	SEND_DATA_SIZE = 16, // Must be conform to sendDataGR data structure
 

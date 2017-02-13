@@ -51,8 +51,6 @@ const uint8_t IS_RangeMask[][3]={
 
 #ifdef TOSSIM
 typedef float nx_float;
-#endif
-
 // short names for types
 typedef int64_t  s64;
 typedef uint64_t u64;
@@ -63,6 +61,7 @@ typedef uint16_t u16;
 typedef int8_t    s8;
 typedef uint8_t   u8;
 typedef float	 f32;
+#endif
 
 enum {
 	

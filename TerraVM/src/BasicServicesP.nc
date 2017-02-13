@@ -38,6 +38,7 @@ module BasicServicesP{
 #endif
 		// Bitmap
 		interface vmBitVector as BM;
+		interface vmBitVector as BMaux;
 		/* Messages Queue */
 		interface dataQueue as inQ;
 		interface dataQueue as outQ;
@@ -82,8 +83,17 @@ module BasicServicesP{
 #endif
 #endif
 
+#ifdef TOSSIM
+	uses interface Get<uint8_t> as MoteType;
+#endif
+
 }
 implementation{
+
+#ifndef MOTE_TYPE
+#define MOTE_TYPE 1
+#endif
+	uint8_t TERRA_MOTE_TYPE =  MOTE_TYPE;
 
 	uint32_t LocalClock=0;
 	nx_uint16_t MoteID;					// Mote Identifier
@@ -95,6 +105,7 @@ implementation{
 	GenericData_t tempOutputInQ;			// Temporarily input message buffer
 	GenericData_t tempOutputOutQ;			// Temporarily output message buffer
 	GenericData_t lastNewProgVersion;		// Last received NewProgVersion
+	uint16_t lastRequestBlock;			// last block id requested
 	message_t sendBuff;					// Message send buffer
 	message_t usrMsgBuff;					// Message send buffer
 #ifdef WITH_BSTATION
@@ -123,6 +134,8 @@ implementation{
 	uint8_t ProgTimeOutCounter=0;
 	uint16_t DsmBlockCount=0;
 	nx_uint16_t lastRecNewProgVersion;
+	uint16_t lastRecParentId=0; // Store the currentParentId. Used for send message to BS
+	
 
 	// New Data load control	
 	nx_uint16_t NewDataSeq;
@@ -135,6 +148,10 @@ implementation{
 	
 	// Controls where last program was too big to the local VM Memory 
 	int32_t lastBigAppVersion = -1L;
+
+	// Controls last NewProgBlock version to check if it is duplicated
+	uint16_t lastRecNewProgBlock_versionId=0;
+	
 
 
 #ifdef MODULE_CTP
@@ -221,8 +238,11 @@ implementation{
 	 * Radio started event.
 	 */
 	event void RadioControl.startDone(error_t error) {
-		dbg(APPNAME, "BS::RadioControl.startDone().\n");
 		MoteID = TOS_NODE_ID;
+#ifdef TOSSIM
+		TERRA_MOTE_TYPE = call MoteType.get();
+#endif		
+		dbg(APPNAME, "BS::RadioControl.startDone(). TERRA_MOTE_TYPE = %d\n",TERRA_MOTE_TYPE);
 #ifdef MODULE_CTP
 		call RoutingControl.start(); 		// CTP
 #endif
@@ -234,17 +254,22 @@ implementation{
 			// Request initial program version
 			ReqState=RO_NEW_VERSION;
 			Data.reqOper=RO_NEW_VERSION;
+			Data.moteType = TERRA_MOTE_TYPE;
 			Data.versionId = 0;
 			Data.blockId = 0;
+		 	lastRequestBlock = 0;
 			ProgMoteSource = AM_BROADCAST_ADDR;
 			sendReqProgBlock(&Data);
 		 	// Wait next block up to time-out
 		 	call ProgReqTimer.startOneShot(getRequestTimeout());
 		}
 #ifdef MODULE_CTP
-		if (MoteID==RootNode) { 
+#ifdef WITH_BSTATION
+#ifdef TOSSIM
+			if (TOS_NODE_ID==1)
+#endif
 			call RootControl.setRoot();
-		}
+#endif		
 #endif
 		signal BSBoot.booted();
 	}
@@ -413,30 +438,72 @@ implementation{
 	 */
 	void recNewProgVersionNet_receive(message_t *msg, void *payload, uint8_t len){
 		newProgVersion_t *xmsg;
-		dbg(APPNAME, "BS::recNewProgVersionNet_receive(). from %hhu\n",call RadioAMPacket.source(msg));
 		// Copy data to temporarily buffer
 		memcpy(tempInputInQ.Data,payload,sizeof(newProgVersion_t));
 		xmsg = (newProgVersion_t*)tempInputInQ.Data;
-		// Test if the Local VM memory may accept the new app
-		if (xmsg->appSize > (BLOCK_SIZE * CURRENT_MAX_BLOCKS)) {
-			lastBigAppVersion = xmsg->versionId;		
-			return;
-		} else {
-			lastBigAppVersion = -1L;
-		}
-		
-		tempInputInQ.AM_ID = AM_NEWPROGVERSION;
-		tempInputInQ.DataSize = sizeof(newProgVersion_t);
+		dbg(APPNAME, "BS::recNewProgVersionNet_receive(). from %d, local MoteType= %d, Msg MoteType=%d\n",
+						call RadioAMPacket.source(msg),TERRA_MOTE_TYPE, xmsg->moteType);
+#ifdef ESP
+dbg(APPNAME,"\n\n len=%d\n",len);
+dbg(APPNAME,"%02x:%03d, %02x:%03d, %02x:%03d, %02x:%03d, ",
+		*(uint8_t*)(payload+0),*(uint8_t*)(payload+0),*(uint8_t*)(payload+1),*(uint8_t*)(payload+1),
+		*(uint8_t*)(payload+2),*(uint8_t*)(payload+2),*(uint8_t*)(payload+3),*(uint8_t*)(payload+3));
+dbg(APPNAME,"%02x:%03d, %02x:%03d, %02x:%03d, %02x:%03d\n",
+		*(uint8_t*)(payload+4),*(uint8_t*)(payload+4),*(uint8_t*)(payload+5),*(uint8_t*)(payload+5),
+		*(uint8_t*)(payload+6),*(uint8_t*)(payload+6),*(uint8_t*)(payload+7),*(uint8_t*)(payload+7));
+dbg(APPNAME,"%02x:%03d, %02x:%03d, %02x:%03d, %02x:%03d\n ",
+		tempInputInQ.Data[0],tempInputInQ.Data[0],tempInputInQ.Data[1],tempInputInQ.Data[1],
+		tempInputInQ.Data[2],tempInputInQ.Data[2],tempInputInQ.Data[3],tempInputInQ.Data[3]);
+#endif
+dbg(APPNAME,"versionId=%04x:%d, blockLen=%04x:%d, blockStart=%04x:%d, startProg=%04x:%d, endProg=%04x:%d, appSize=%04x:%d, \n",
+		xmsg->versionId,xmsg->versionId,xmsg->blockLen,xmsg->blockLen,xmsg->blockStart,xmsg->blockStart,
+		xmsg->startProg,xmsg->startProg,xmsg->endProg,xmsg->endProg,xmsg->appSize);
+
 		// Discard duplicated message
 		if ((xmsg->versionId <= ProgVersion) || (xmsg->versionId == lastRecNewProgVersion)) { dbg(APPNAME, "BS::recNewProgVersionNet_receive(): Discarding duplicated message!\n"); return;}
-		// put the message in inQueue
-		if (call inQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recNewProgVersionNet_receive(): inQueue is full! Losting a message.\n");
-		// get source mote.
-		ProgMoteSource = call RadioAMPacket.source(msg);
+		// Store the last received ProgVersion
 		lastRecNewProgVersion = xmsg->versionId; 
-		// Save NewProgVersion to Forward it later (after first NewProgBlock)
-		tempInputInQ.sendToMote = AM_BROADCAST_ADDR;
-		memcpy(&lastNewProgVersion,&tempInputInQ,sizeof(GenericData_t));
+		call BMaux.clearAll();
+		// Store the new ParentId
+		if (lastRecParentId==0) {
+			lastRecParentId = call RadioAMPacket.source(msg);
+			dbg(APPNAME, "BS::recNewProgVersionNet_receive(): ParentId=%d",lastRecParentId);	
+		}
+
+		// Test if has the same MoteType. if not, only forward the message
+		if ( xmsg->moteType == TERRA_MOTE_TYPE) {
+	dbg(APPNAME,"---> passo 1\n");
+			// Test if the Local VM memory may accept the new app
+			if (xmsg->appSize > (BLOCK_SIZE * CURRENT_MAX_BLOCKS)) {
+				lastBigAppVersion = xmsg->versionId;		
+	dbg(APPNAME,"---> passo 1.1\n");
+				return;
+			} else {
+				lastBigAppVersion = -1L;
+	dbg(APPNAME,"---> passo 1.2\n");
+			}
+			
+	dbg(APPNAME,"---> passo 2\n");
+			tempInputInQ.AM_ID = AM_NEWPROGVERSION;
+			tempInputInQ.DataSize = sizeof(newProgVersion_t);
+	dbg(APPNAME,"---> passo 3\n");
+			// put the message in inQueue
+			if (call inQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recNewProgVersionNet_receive(): inQueue is full! Losting a message.\n");
+			// get source mote.
+			ProgMoteSource = call RadioAMPacket.source(msg);
+			// Save NewProgVersion to Forward it later (after first NewProgBlock)
+			tempInputInQ.sendToMote = AM_BROADCAST_ADDR;
+			memcpy(&lastNewProgVersion,&tempInputInQ,sizeof(GenericData_t));
+	dbg(APPNAME,"---> passo 4\n");			
+		} else {
+			// Forward the message
+			// put the message in outQueue
+			tempInputInQ.AM_ID = AM_NEWPROGVERSION;
+			tempInputInQ.DataSize = sizeof(newProgVersion_t);
+			tempInputInQ.sendToMote = AM_BROADCAST_ADDR;
+			if (call outQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recNewProgVersionNet_receive(): inQueue is full! Losting a message.\n");
+			
+		}
 	}
 
 	/**
@@ -445,37 +512,53 @@ implementation{
 	 
 	void recNewProgBlockNet_receive(message_t *msg, void *payload, uint8_t len){
 		newProgBlock_t *xmsg;
-		dbg(APPNAME, "BS::recNewProgBlockNet_receive().\n");
 		// Copy data to temporarily buffer
 		memcpy(tempInputInQ.Data,payload,sizeof(newProgBlock_t));
 		xmsg = (newProgBlock_t*)tempInputInQ.Data;
 		tempInputInQ.AM_ID = AM_NEWPROGBLOCK;
 		tempInputInQ.DataSize = sizeof(newProgBlock_t);
-		// Discard duplicated/Old message
-		dbg(APPNAME, "BS::recNewProgBlockNet_receive(): (xmsg->versionId=%d,ProgVersion=%d, xmsg->blockId=%d, ProgBlockStart=%d\n",xmsg->versionId,ProgVersion,xmsg->blockId,ProgBlockStart);
-		if (xmsg->versionId == ProgVersion) {
-			if (!call BM.get(xmsg->blockId)){
-				if (xmsg->blockId == ProgBlockStart){
-					// Now can forward NewProgVersion message
-					if (call outQ.put(&lastNewProgVersion)!=SUCCESS) dbg(APPNAME, "BS::recNewProgBlockNet_receive(): outQueue is full! Losting a message.\n");		
+		dbg(APPNAME, "BS::recNewProgBlockNet_receive(): xmsg->moteType=%d, local MoteType=%d, xmsg->versionId=%d,ProgVersion=%d, xmsg->blockId=%d, ProgBlockStart=%d\n",
+						xmsg->moteType, TERRA_MOTE_TYPE, xmsg->versionId,ProgVersion,xmsg->blockId,ProgBlockStart);
+
+		// Discard duplicated/Old message and forward different MoteType
+		if ( xmsg->moteType == TERRA_MOTE_TYPE) {
+			if (xmsg->versionId == ProgVersion) {
+				if (!call BM.get(xmsg->blockId)){
+					if (xmsg->blockId == ProgBlockStart){
+						// Now can forward NewProgVersion message
+						if (call outQ.put(&lastNewProgVersion)!=SUCCESS) dbg(APPNAME, "BS::recNewProgBlockNet_receive(): outQueue is full! Losting a message.\n");		
+					}
+					// put message in the inQueue
+					if (call inQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recNewProgBlockNet_receive(): inQueue is full! Losting a message.\n");
+					// get source mote.
+					ProgMoteSource = call RadioAMPacket.source(msg);
+					// Forward the message
+					if (call outQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recNewProgBlockNet_receive(): outQueue is full! Losting a message.\n");
+				} else {
+					dbg(APPNAME, "BS::recNewProgBlockNet_receive(): Discarding duplicated message - block is 0!\n");
 				}
-				// put message in the inQueue
-				if (call inQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recNewProgBlockNet_receive(): inQueue is full! Losting a message.\n");
-				// get source mote.
-				ProgMoteSource = call RadioAMPacket.source(msg);
-				// Forward the message
-				if (call outQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recNewProgBlockNet_receive(): outQueue is full! Losting a message.\n");
 			} else {
-				dbg(APPNAME, "BS::recNewProgBlockNet_receive(): Discarding duplicated message - block is 0!\n");
+				if (xmsg->versionId > ProgVersion){
+					// Retry request. Avoids previous big program.
+					if (xmsg->versionId != lastBigAppVersion){
+						call ProgReqTimer.startOneShot(getRequestTimeout());
+					}
+				} else
+					dbg(APPNAME, "BS::recNewProgBlockNet_receive(): Discarding old version message!\n");
 			}
 		} else {
-			if (xmsg->versionId > ProgVersion){
-				// Retry request. Avoids previous big program.
-				if (xmsg->versionId != lastBigAppVersion){
-					call ProgReqTimer.startOneShot(getRequestTimeout());
-				}
-			} else
-				dbg(APPNAME, "BS::recNewProgBlockNet_receive(): Discarding old version message!\n");
+			// Forward the message -- different MoteType
+			dbg(APPNAME, "BS::recNewProgBlockNet_receive(): xmsg->versionId=%d, lastRecNewProgBlock_versionId=%d, xmsg->blockId=%d, BMaux.get()=%d\n",
+							xmsg->versionId,lastRecNewProgBlock_versionId,xmsg->blockId,call BMaux.get(xmsg->blockId));
+			if (xmsg->versionId != lastRecNewProgBlock_versionId || call BMaux.get(xmsg->blockId)==0 ){
+				lastRecNewProgBlock_versionId = xmsg->versionId;
+				call BMaux.set(xmsg->blockId);
+				tempInputInQ.sendToMote = AM_BROADCAST_ADDR;
+				dbg(APPNAME, "BS::recNewProgBlockNet_receive(): Forwarding different MoteType message!\n" );
+				if (call outQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recNewProgBlockNet_receive(): outQueue is full! Losting a message. (forwarding different MoteType)\n");
+			} else {
+				dbg(APPNAME, "BS::recNewProgBlockNet_receive(): Discarding different MoteType message!\n");
+			}
 		}
 	}
 
@@ -483,15 +566,27 @@ implementation{
 	 * Receive ReqProgBlockNet and queue it in input queue
 	 */
 	void recReqProgBlockNet_receive(message_t *msg, void *payload, uint8_t len){
-		//reqProgBlock_t *xmsg;
-		dbg(APPNAME, "BS::recReqProgBlockNet_receive().\n");
+		reqProgBlock_t *xmsg;
 		// Copy data to temporarily buffer
 		memcpy(tempInputInQ.Data,payload,sizeof(reqProgBlock_t));
-		//xmsg = (reqProgBlock_t*)tempInputInQ.Data;
-		tempInputInQ.AM_ID = AM_REQPROGBLOCK;
-		tempInputInQ.DataSize = sizeof(reqProgBlock_t);
-		// put message in the inQueue
-		if (call inQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recReqProgBlockNet_receive(): inQueue is full! Losting a message.\n");
+		xmsg = (reqProgBlock_t*)tempInputInQ.Data;
+		dbg(APPNAME, "BS::recReqProgBlockNet_receive(). Local MoteType=%d, Msg MoteType=%d\n", TERRA_MOTE_TYPE,xmsg->moteType );
+		// Test if it has same MoteType
+		if ( xmsg->moteType == TERRA_MOTE_TYPE){
+			tempInputInQ.AM_ID = AM_REQPROGBLOCK;
+			tempInputInQ.DataSize = sizeof(reqProgBlock_t);
+			// put message in the inQueue
+			if (call inQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recReqProgBlockNet_receive(): inQueue is full! Losting a message.\n");			
+		} else {
+			// TODO - Testar se é segunda mensagem e repassar para a Raiz
+			dbg(APPNAME, "BS::recReqProgBlockNet_receive(): Different MoteType. Forwarding to my Parent = %d.\n",lastRecParentId);
+				// Reset last values for same blockId
+				call BMaux.clear(xmsg->blockId);
+				tempInputInQ.AM_ID = AM_REQPROGBLOCK;
+				tempInputInQ.DataSize = sizeof(reqProgBlock_t);
+				tempInputInQ.sendToMote = lastRecParentId;
+				if (call outQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recReqProgBlockNet_receive(): outQueue is full! Losting a message to my parent.\n");			
+		}		
 	}
 
 
@@ -545,7 +640,7 @@ implementation{
 
 	// Centralized Radio Receiver
 	event message_t * RadioReceiver.receive[am_id_t id](message_t *msg, void *payload, uint8_t len){
-		dbg(APPNAME, "BS::RadioReceiver.receive(). AM=%hhu from %hhu.  disseminatorRoot=%d\n",id,call RadioAMPacket.source(msg),disseminatorRoot);
+		dbg(APPNAME, "BS::RadioReceiver.receive(). AM=%hhu from %d.  disseminatorRoot=%d\n",id,call RadioAMPacket.source(msg),disseminatorRoot);
 		// Switch AM_ID
 		switch (id){
 			case AM_NEWPROGVERSION : 
@@ -578,9 +673,12 @@ implementation{
 
 
 #ifdef WITH_BSTATION	
-	// Centralized Serial Receiver -- Used only with WITH_BSTATION and RootNode
+	// Centralized Serial Receiver -- Used only with WITH_BSTATION
 	event message_t * SerialReceiver.receive[am_id_t id](message_t *msg, void *payload, uint8_t len){
-		if (MoteID==RootNode) { 
+#ifdef TOSSIM
+			if (TOS_NODE_ID==1)
+#endif
+			{
 			dbg(APPNAME, "BS::SerialReceiver.receive(). AM=%hhu from %hhu.  disseminatorRoot=%d\n",id,0,disseminatorRoot);
 			// Switch AM_ID
 			switch (id){
@@ -589,6 +687,9 @@ implementation{
 					break;	
 				case AM_NEWPROGBLOCK :
 					recNewProgBlockNet_receive(msg,payload,len);
+					break;	
+				case AM_REQPROGBLOCK :
+					recReqProgBlockNet_receive(msg,payload,len);
 					break;	
 				default:
 					if (id >= AM_CUSTOM_START && id <= AM_CUSTOM_END) { // AM_CUSTOM Range
@@ -600,14 +701,17 @@ implementation{
 					}
 					break;
 			}
-		}
+			}
 		return msg;		
 	}
 
 #ifdef WITH_AUX_BSTATION	
-	// Centralized Serial Receiver -- Used only with WITH_AUX_BSTATION and RootNode
+	// Centralized Serial Receiver -- Used only with WITH_AUX_BSTATION
 	event message_t * Serial1Receiver.receive[am_id_t id](message_t *msg, void *payload, uint8_t len){
-		if (MoteID==RootNode) { 
+#ifdef TOSSIM
+			if (TOS_NODE_ID==1)
+#endif
+			{
 			dbg(APPNAME, "BS::Serial1Receiver.receive(). AM=%hhu from %hhu.  disseminatorRoot=%d\n",id,0,disseminatorRoot);
 			// Switch AM_ID
 			switch (id){
@@ -627,7 +731,7 @@ implementation{
 					}
 					break;
 			}
-		}
+			}
 		return msg;		
 	}
 #endif // WITH_AUX_BSTATION	
@@ -655,7 +759,7 @@ implementation{
  		ProgBlockLen = Data->blockLen;
  		// Update environment values: StartProg addr, etc..
  		signal BSUpload.setEnv(Data);
-		dbg(APPNAME, "BS::procNewProgVersion(). ProgBlockStart=%d, ProgBlockLen=%d \n",ProgBlockStart,ProgBlockLen);
+		dbg(APPNAME, "BS::procNewProgVersion(). ProgVersion=%d, ProgBlockStart=%d, ProgBlockLen=%d \n",ProgVersion,ProgBlockStart,ProgBlockLen);
  		// reset all memory (leave set unused blocks)
  		atomic call BM.resetRange(ProgBlockStart,(ProgBlockStart+ProgBlockLen)-1);
 		{
@@ -664,6 +768,7 @@ implementation{
 	 		ProgTimeOutCounter=0;
 		 	xData.reqOper=RO_DATA_FULL;
 		 	ReqState = RO_DATA_FULL;
+			xData.moteType = TERRA_MOTE_TYPE;
 		 	xData.versionId = ProgVersion;
 		 	xData.blockId = ProgBlockStart;
 		 	loadingProgramFlag = TRUE;
@@ -717,6 +822,7 @@ implementation{
 		switch (Data->reqOper){
 			case RO_NEW_VERSION: 
 				if ((ProgVersion > Data->versionId) && (ProgVersion > 0) && call BM.isAllBitSet()){
+					xVersion.moteType = TERRA_MOTE_TYPE;
 					xVersion.versionId = ProgVersion;
 				 	xVersion.blockLen = ProgBlockLen;
 				 	xVersion.blockStart = ProgBlockStart;
@@ -737,6 +843,7 @@ implementation{
 				break;
 			case RO_DATA_SINGLE:
 				 if ((ProgVersion == Data->versionId) && (ProgVersion > 0) && call BM.get(Data->blockId)){
+					  xBlock.moteType = TERRA_MOTE_TYPE;
 					  xBlock.versionId = ProgVersion;
 					  xBlock.blockId = Data->blockId;
 					  mem = signal BSUpload.getSection((Data->blockId * BLOCK_SIZE));
@@ -757,11 +864,11 @@ implementation{
 		 reqProgBlock_t Data;
 		 uint32_t timeout=getRequestTimeout();
 		 nextBlock = getNextEmptyBlock();
-		 dbg(APPNAME, "BS::ProgReqTimer.fired(). nextBlock=%d\n",nextBlock);
+		 dbg(APPNAME, "BS::ProgReqTimer.fired(). nextBlock=%d lastRequestBlock=%d, ReqState=%d, ProgTimeOutCounter=%d\n",nextBlock,lastRequestBlock,ReqState,ProgTimeOutCounter);
 		 lastRecNewProgVersion = 0;
 		 switch (ReqState){
 		 	case RO_NEW_VERSION:
-				 	ProgTimeOutCounter++;
+				 ProgTimeOutCounter++;
 		 		// If it reach the retry limit, wait for long time and retry again
 				 if (ProgTimeOutCounter>=3) {
 					ProgTimeOutCounter = 0;
@@ -769,8 +876,10 @@ implementation{
 				 	timeout = REQUEST_VERY_LONG_TIMEOUT;
 				 } 
 			 	Data.reqOper=RO_NEW_VERSION;
+				Data.moteType = TERRA_MOTE_TYPE;
 			 	Data.versionId = 0;
 			 	Data.blockId = ProgBlockStart;
+			 	lastRequestBlock = 0;
 			 	ProgMoteSource = AM_BROADCAST_ADDR;
 			 	sendReqProgBlock(&Data);
 			 	// Wait next block up to time-out
@@ -778,15 +887,33 @@ implementation{
 		 		break;
 		 	case RO_DATA_FULL:
 		 		// timeout on full data request, retry for the next block
-		 		nextBlock = getNextEmptyBlock();
+		 		//nextBlock = getNextEmptyBlock();
 			 	if (nextBlock < ProgBlockLen){
-				 	Data.reqOper=RO_DATA_FULL;
-					ReqState = RO_DATA_FULL;
-					Data.versionId = ProgVersion;
-					Data.blockId = nextBlock;
-					sendReqProgBlock(&Data);
-					// Wait next block up to time-out
-					call ProgReqTimer.startOneShot(getRequestTimeout());
+					// Check repeated requests
+					if (lastRequestBlock == nextBlock) ProgTimeOutCounter++;
+					if (ProgTimeOutCounter<=3) {
+						lastRequestBlock = nextBlock;
+					 	Data.reqOper=RO_DATA_FULL;
+						ReqState = RO_DATA_FULL;
+						Data.moteType = TERRA_MOTE_TYPE;
+						Data.versionId = ProgVersion;
+						Data.blockId = nextBlock;
+						sendReqProgBlock(&Data);
+						// Wait next block up to time-out
+						call ProgReqTimer.startOneShot(getRequestTimeout());
+					} else {
+						ReqState = RO_NEW_VERSION;
+					 	Data.reqOper=RO_NEW_VERSION;
+						Data.moteType = TERRA_MOTE_TYPE;
+					 	Data.versionId = 0;
+					 	Data.blockId = ProgBlockStart;
+						ProgTimeOutCounter=0;
+					 	lastRequestBlock = 0;
+					 	ProgMoteSource = AM_BROADCAST_ADDR;
+					 	sendReqProgBlock(&Data);
+					 	// Wait next block up to time-out
+					 	call ProgReqTimer.startOneShot(timeout);
+					}
 				 } else {
 					 // fill data has finished
 					 if ( call BM.isAllBitSet()) {
@@ -803,6 +930,7 @@ implementation{
 			 	if (nextBlock < CURRENT_MAX_BLOCKS){
 				 	Data.reqOper=RO_DATA_SINGLE;
 				 	ReqState = RO_DATA_SINGLE;
+					Data.moteType = TERRA_MOTE_TYPE;
 				 	Data.versionId = ProgVersion;
 				 	Data.blockId = nextBlock;
 				 	sendReqProgBlock(&Data);
@@ -833,6 +961,7 @@ implementation{
 		if (call BM.get(DsmBlockCount+ProgBlockStart)){
 			uint8_t *mem;
 			uint16_t i;
+ 		    xBlock.moteType = TERRA_MOTE_TYPE;
 			xBlock.versionId = ProgVersion;
 			xBlock.blockId = (uint16_t)(DsmBlockCount + ProgBlockStart);
 			mem = signal BSUpload.getSection(((DsmBlockCount+ProgBlockStart) * BLOCK_SIZE));
@@ -898,13 +1027,13 @@ implementation{
 				call DataReqTimer.startOneShot(getRequestTimeout());
 			} else { // DataSeq is not too old, Request Current value
 				if ((Data->seq < (NewDataSeq + SET_DATA_LIST_SIZE)) && (Data->seq > NewDataSeq)){
-				xData.versionId = ProgVersion;
-				xData.seq = NewDataSeq+1;
-				sendReqData(&xData);
-				// Reset retry counter
-				DataTimeOutCounter=0;
-				// wait for new data
-				call DataReqTimer.startOneShot(getRequestTimeout());
+					xData.versionId = ProgVersion;
+					xData.seq = NewDataSeq+1;
+					sendReqData(&xData);
+					// Reset retry counter
+					DataTimeOutCounter=0;
+					// wait for new data
+					call DataReqTimer.startOneShot(getRequestTimeout());
 				}
 			}
 		}	
@@ -1011,6 +1140,7 @@ implementation{
 #endif
 #endif
 //if (tempOutputOutQ.AM_ID== AM_NEWPROGVERSION) PORTF = PORTF + 0x10;
+				dbg(APPNAME, "BS::RadioSender_send(): MoteID=%d, AM=%d, to=%d\n",MoteID,tempOutputOutQ.AM_ID,tempOutputOutQ.sendToMote);			
 				stat =  call RadioSender.send[tempOutputOutQ.AM_ID](tempOutputOutQ.sendToMote, &sendBuff, tempOutputOutQ.DataSize);
 #ifdef WITH_BSTATION
 #ifdef MODULE_CTP
@@ -1020,13 +1150,15 @@ implementation{
 				sendCounter=0;
 			}
 #endif
-
-			if (MoteID == RootNode && tempSendCounter==1){
-				if (
-#ifdef MODULE_CTP
-					
+#ifdef TOSSIM
+		if (TOS_NODE_ID==1)
 #endif
-					tempOutputOutQ.AM_ID == AM_REQPROGBLOCK || (tempOutputOutQ.AM_ID >= AM_CUSTOM_START && tempOutputOutQ.AM_ID <= AM_CUSTOM_END)) {
+			if (tempSendCounter==1){
+				if (
+					tempOutputOutQ.AM_ID == AM_REQPROGBLOCK || 
+					tempOutputOutQ.AM_ID == AM_NEWPROGVERSION || 
+					tempOutputOutQ.AM_ID == AM_NEWPROGBLOCK || 
+					(tempOutputOutQ.AM_ID >= AM_CUSTOM_START && tempOutputOutQ.AM_ID <= AM_CUSTOM_END)) {
 					call SerialSender.send[tempOutputOutQ.AM_ID](0, &serialAux, tempOutputOutQ.DataSize);
 #ifdef WITH_AUX_BSTATION
 					call Serial1Sender.send[tempOutputOutQ.AM_ID](0, &serial1Aux, tempOutputOutQ.DataSize);
@@ -1068,16 +1200,21 @@ implementation{
 	task void sendMessage(){
 		sendCounter++;
 		if (call outQ.read(&tempOutputOutQ)==SUCCESS) {
-		dbg(APPNAME, "BS::sendMessage():AM=%hhu, senToMote=%d.\n",tempOutputOutQ.AM_ID, tempOutputOutQ.sendToMote);
+		dbg(APPNAME, "BS::sendMessage(): AM=%d, sendToMote=%d.\n",tempOutputOutQ.AM_ID, tempOutputOutQ.sendToMote);
 		switch (tempOutputOutQ.AM_ID) {
 #ifdef MODULE_CTP
 			case AM_SENDBS: 
 				// Send to Radio/CTP or UART
-				if (MoteID != RootNode){
-					sendBSN();
-				} else {
-					sendRadioN(); // Only to bypass to serial
-				}			
+#ifdef WITH_BSTATION
+#ifdef TOSSIM
+			if (TOS_NODE_ID==1)
+#endif
+				// WITH_BSTATION
+				sendRadioN(); 
+#else
+				// NO_BS
+				sendBSN();
+#endif
 				break;
 #endif // MODULE_CTP
 			case AM_NEWPROGVERSION: sendRadioN(); break;
@@ -1222,7 +1359,7 @@ implementation{
 	* @param Data Message data
 	*/
  	void sendReqProgBlock(reqProgBlock_t* Data){
-		dbg(APPNAME, "BS::sendReqProgBlock(): insert in outQueue --- BlkId=%d\n",Data->blockId);
+		dbg(APPNAME, "BS::sendReqProgBlock(): insert in outQueue --- BlkId=%d, versionId=%d, moteType=%d\n",Data->blockId, Data->versionId, Data->moteType );
 		memcpy(&tempInputOutQ.Data,Data,sizeof(reqProgBlock_t));
 		tempInputOutQ.AM_ID = AM_REQPROGBLOCK;
 		tempInputOutQ.DataSize = sizeof(reqProgBlock_t);

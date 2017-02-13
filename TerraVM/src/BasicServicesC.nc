@@ -65,6 +65,9 @@ implementation{
 	// Bit vector to control memory blocks
 	components new vmBitVectorC(CURRENT_MAX_BLOCKS) as Bitmap;
 	BS.BM -> Bitmap;	
+	// Bit vector to control Others blocks
+	components new vmBitVectorC(CURRENT_MAX_BLOCKS) as Bitmap2;
+	BS.BMaux -> Bitmap2;	
 	
 	// IN & OUT Queues
 #define  MSG_IN_QSIZE IN_QSIZE
@@ -109,5 +112,9 @@ implementation{
 #endif
 #endif
 
+#ifdef TOSSIM
+	components dataSensorC;
+	BS.MoteType -> dataSensorC.MoteType;
+#endif
 
 }

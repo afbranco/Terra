@@ -16,8 +16,6 @@
 # Configure runtime type: NOBS or BOTH or BOTH2| default BOTH
 #    TYPE=NOBS
 #
-# Configure ROOT node ID: integer 1..65534 | default 1
-#    ROOT_ID=1
 ##
 # Verbose Compilation mode: YES or NO | Default NO
 #    VERB=YES
@@ -40,13 +38,21 @@
 # Command line examples
 #  make micaz  VM=GRP TYPE=NOBS QUEUE=SHORT install.2 mib520,/dev/ttyUSB0
 #
+# ESP WIFI SSID:  <input ssid> | default iot_terra
+#    WIFI_SSID=ssid_rede
+#
+# ESP WIFI PASSWORD:  <input password> | default projeto_terra
+#    WIFI_PASSWD=senha_rede
+#
+
 #==================================================================================
 #==================================================================================
 
-ALL_TARGETS = micaz mica2 mica2dot telosb iris uno mega rpi
+ALL_TARGETS = micaz mica2 mica2dot telosb iris uno mega rpi esp
 TOS_TARGETS = micaz mica2 mica2dot telosb iris
 INO_TARGETS = uno mega
 IX_TARGETS = rpi
+ESP_TARGETS = esp
 
 #  Save makecmdgoals (a read only var) to goals so that we can modify it.
 GOALS += $(MAKECMDGOALS)
@@ -71,7 +77,7 @@ endif
 
 # Valid motes
 ifeq ($(filter $(MOTE),$(ALL_TARGETS)),)
-      $(error Target mote must be: micaz, mica2, mica2dot, telosb, uno, mega, or rpi)
+      $(error Target mote must be: micaz, mica2, mica2dot, telosb, uno, mega, rpi, or esp)
 endif
 
 #
@@ -88,6 +94,20 @@ else
   ifneq ($(VM),NET)
       $(error Mote "$(MOTE)" supports only VM=NET)
   endif
+endif
+
+
+ifneq ($(filter $(MOTE),$(ESP_TARGETS)),)
+	WIFI_SSID ?= iot_terra
+	WIFI_PASSWD ?= projeto_terra
+else
+  ifneq ($(WIFI_SSID),)
+      $(error WIFI_SSID must be used only for: $(ESP_TARGETS))
+  endif
+  ifneq ($(WIFI_PASSWD),)
+      $(error WIFI_PASSWD must be used only for: $(ESP_TARGETS))
+  endif
+  
 endif
 
 QUEUE ?= SHORT
@@ -124,6 +144,11 @@ ifneq ($(findstring sim,$(MAKECMDGOALS)),)
     $(error 'If target is the micaz simulator, then TYPE must be BOTH')
   endif
 endif
+ifneq ($(findstring rpi,$(MAKECMDGOALS)),)
+  ifneq ($(TYPE),NOBS)
+    $(error 'Target rpi must have TYPE=NOBS. TYPE=BOTH is not implemented, yet!')
+  endif
+endif
 
 DEBUG ?= YES
 ifneq ($(DEBUG),YES)
@@ -133,23 +158,12 @@ ifneq ($(DEBUG),YES)
 endif
 
 
-# If rpi, get default ID from local IP address
-ifeq ($(MOTE),rpi)
-	INSTALL ?= $(shell ip route get 8.8.8.8 | awk '{print $$NF; exit}' | awk -F'.' '{print $$3*256+$$4; exit}')
-else
-	INSTALL ?= 1
-endif
-ROOT_ID ?= 1
-
-ifneq ($(TYPE),NOBS)
-	ROOT_ID_AUX = $(INSTALL)
-else
-	ROOT_ID_AUX = $(ROOT_ID)
+INSTALL ?= 1
+ifeq ($(shell echo "$(INSTALL)<1 || $(INSTALL)>65534" | bc), 1)
+    $(error 'in [install,xx] , xx must be in 1..65534')
 endif
 
-ifeq ($(shell echo "$(ROOT_ID)<1 || $(ROOT_ID)>65534" | bc), 1)
-    $(error 'ROOT_ID must be in 1..65534')
-endif
+
 
 ifneq ($(filter $(MOTE),$(INO_TARGETS)),)
   INO_RADIO ?= NO_RADIO
@@ -256,6 +270,10 @@ ifeq ($(MOTE),rpi)
 	VMDIR = $(APPDIR)/platforms/RPi
 	CFLAGS += -I. -I$(VMDIR) -DLINUX
 endif
+ifeq ($(MOTE),esp)
+	VMDIR = $(APPDIR)/platforms/esp
+	CFLAGS += -I. -I$(VMDIR) -DESP
+endif
 
 
 CFLAGS += -I$(APPDIR)/interfaces
@@ -310,6 +328,10 @@ ifeq ($(MOTE),mega)
 endif
 ifeq ($(MOTE),rpi)
   CFLAGS += -Os
+endif
+ifeq ($(MOTE),esp)
+  CFLAGS += -Os
+  CFLAGS += -DWIFI_SSID=\"$(WIFI_SSID)\" -DWIFI_PASSWORD=\"$(WIFI_PASSWD)\"
 endif
 
 
@@ -386,6 +408,8 @@ else ifneq ($(filter $(MOTE),mega),) # 8KB RAM
         MBLOCKS = 220
 else ifneq ($(filter $(MOTE),rpi),) # xxxKB RAM
         MBLOCKS = 220  
+else ifneq ($(filter $(MOTE),esp),) # xxxKB RAM
+        MBLOCKS = 100  
 endif
 
 
@@ -406,9 +430,6 @@ endif
 ifeq ($(QUEUE) , SHORT)
     CFLAGS += -DSHORT_QUEUES
 endif
-
-# Define the ROOT_ID  node number
-CFLAGS += -DROOT_ID=$(ROOT_ID_AUX)
 
 
 # Reset MODULES if VM!=NET
@@ -432,6 +453,7 @@ else
 endif
 
 # Calculate final MemBlocks
+BLOCK_SIZE = 22
 MBLOCKS_F = $(shell echo ${MBLOCKS}-${DM_MSGQ}-${DM_SETDATA} | bc)
 # force short memory - test with printf
 # MBLOCKS=40
@@ -450,7 +472,6 @@ $(info DEBUG       = $(DEBUG))
 $(info VM          = $(VM))
 $(info MODULES     = $(MODULES) -- [MSGQ])
 $(info MOTE_ID     = $(INSTALL))
-$(info ROOT_ID     = $(ROOT_ID_AUX))
 $(info RFPOWER     = $(RFPOWER))
 $(info LPL         = $(LPL))
 $(info SENSORBOARD = $(SENSORBOARD))
@@ -458,7 +479,7 @@ $(info TYPE        = $(TYPE))
 $(info SETDATA     = $(SETDATA))
 $(info QUEUE       = $(QUEUE))
 $(info VM_MEM_BLKS = $(MBLOCKS_F))
-$(info VM_MEM      = $(shell echo ${MBLOCKS_F}*24 | bc))
+$(info VM_MEM      = $(shell echo ${MBLOCKS_F}*${BLOCK_SIZE} | bc))
 $(info TOSVERSION  = $(TOSVERSION))
 $(info ***********************)
 $(info Make Cmds- $(MAKECMDGOALS))
@@ -500,5 +521,7 @@ else ifneq ($(filter $(MOTE),$(INO_TARGETS)),)
   include Makefile_ino
 else ifneq ($(filter $(MOTE),$(IX_TARGETS)),)
   include Makefile_ix
+else ifneq ($(filter $(MOTE),$(ESP_TARGETS)),)
+  include Makefile_esp
 endif
 

@@ -228,7 +228,7 @@ class gNode:
                 pygame.display.update()
             else :
                 self.s4text = self.sfont.render(format(sData[(self.id*4)+stype-1],'02d'), 1, GREEN,BACKGROUND)
-                screen.blit(self.s4text, [self.xx+nodeSize-18*zoom,self.yy+nodeSize-11*zoom])
+                screen.blit(self.s4text, [self.xx+nodeSize-18*zoom,self.yy+nodeSize-10*zoom])
                 pygame.display.update()
         else:
             if stype == 1:
@@ -242,7 +242,7 @@ class gNode:
                 screen.blit(self.s3text, [self.xx+nodeSize-10*zoom,self.yy+nodeSize-19*zoom])
             else :
                 self.s4text = self.sfont.render('type', 1, GREEN,BACKGROUND)
-                screen.blit(self.s4text, [self.xx+nodeSize-18*zoom,self.yy+nodeSize-11*zoom])
+                screen.blit(self.s4text, [self.xx+nodeSize-18*zoom,self.yy+nodeSize-10*zoom])
         
 
     def sensor(self,stype):
@@ -512,7 +512,7 @@ def mouseClick(button,pos):
                 sId = 2
             elif (dy>=9 and dy <= 11):
                 sId = 1
-        if (dx>=2 and dx <=4) and (dy>=9 and dy <= 11):
+        if (dx>=2 and dx <=4) and (dy>=10 and dy <= 12):
             sId = 4
 
         if (sId>0):

@@ -403,10 +403,7 @@ implementation {
     case SERIAL_PROTO_PACKET_ACK: 
       return TRUE;
     case SERIAL_PROTO_ACK:
-      return FALSE;
     case SERIAL_PROTO_PACKET_NOACK:
-	  // afb: modified to support NOACK
-      return TRUE;
     default: 
       return FALSE;
     }
@@ -431,22 +428,9 @@ implementation {
         if (!valid_rx_proto(rxProto))
           goto nosync;
         // only supports serial proto packet ack
-        // afb: Modified to support NOACK
-        if (rxProto != SERIAL_PROTO_PACKET_ACK && rxProto != SERIAL_PROTO_PACKET_NOACK){
+        if (rxProto != SERIAL_PROTO_PACKET_ACK){
           goto nosync;
         }
-        switch (rxProto){
-        	case SERIAL_PROTO_PACKET_ACK:
-        		rxState = RXSTATE_TOKEN;
-        		break;
-        	case SERIAL_PROTO_PACKET_NOACK:
-        		rxState = RXSTATE_INFO;
-        		break;
-        	default:
-          		goto nosync;
-          		break;
-        }
-
         if (signal ReceiveBytePacket.startPacket() != SUCCESS){
           goto nosync;
         }
@@ -470,10 +454,9 @@ implementation {
           if (rxByteCnt >= 2) {
             if (rx_current_crc() == rxCRC) {
               signal ReceiveBytePacket.endPacket(SUCCESS);
-              // afb: Send an Ack only if it was requested
-              if (rxProto==SERIAL_PROTO_PACKET_ACK) ack_queue_push(rxSeqno);
-	      	  rxInit();
-	          call SerialFrameComm.resetReceive();
+              ack_queue_push(rxSeqno);
+	      rxInit();
+	      call SerialFrameComm.resetReceive();
 	      if (offPending) {
 		rxState = RXSTATE_INACTIVE;
 		testOff();
@@ -522,7 +505,6 @@ implementation {
     else if (isDelimeter) {
       rxState = RXSTATE_PROTO;
     }
-   	dbg("SerialP","rx_state_machine(): serial data - nosync. state=%d, isDelimeter=%d, data=%02x!\n",rxState,isDelimeter,data);
     
   done:
   }

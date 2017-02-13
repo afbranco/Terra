@@ -7,12 +7,12 @@
 public class newProgBlockMsg extends net.tinyos.message.Message {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 28;
+    public static final int DEFAULT_MESSAGE_SIZE = 27;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 161;
 
-    /** Create a new newProgBlockMsg of size 28. */
+    /** Create a new newProgBlockMsg of size 27. */
     public newProgBlockMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -85,6 +85,9 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
     public String toString() {
       String s = "Message <newProgBlockMsg> \n";
       try {
+        s += "  [moteType=0x"+Long.toHexString(get_moteType())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
         s += "  [versionId=0x"+Long.toHexString(get_versionId())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
@@ -92,7 +95,7 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [data=";
-        for (int i = 0; i < 24; i++) {
+        for (int i = 0; i < 22; i++) {
           s += "0x"+Long.toHexString(getElement_data(i) & 0xff)+" ";
         }
         s += "]\n";
@@ -103,9 +106,72 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
     // Message-type-specific access methods appear below.
 
     /////////////////////////////////////////////////////////
+    // Accessor methods for field: moteType
+    //   Field type: short, unsigned
+    //   Offset (bits): 0
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'moteType' is signed (false).
+     */
+    public static boolean isSigned_moteType() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'moteType' is an array (false).
+     */
+    public static boolean isArray_moteType() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'moteType'
+     */
+    public static int offset_moteType() {
+        return (0 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'moteType'
+     */
+    public static int offsetBits_moteType() {
+        return 0;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'moteType'
+     */
+    public short get_moteType() {
+        return (short)getUIntBEElement(offsetBits_moteType(), 8);
+    }
+
+    /**
+     * Set the value of the field 'moteType'
+     */
+    public void set_moteType(short value) {
+        setUIntBEElement(offsetBits_moteType(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'moteType'
+     */
+    public static int size_moteType() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'moteType'
+     */
+    public static int sizeBits_moteType() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
     // Accessor methods for field: versionId
     //   Field type: int, unsigned
-    //   Offset (bits): 0
+    //   Offset (bits): 8
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -127,14 +193,14 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'versionId'
      */
     public static int offset_versionId() {
-        return (0 / 8);
+        return (8 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'versionId'
      */
     public static int offsetBits_versionId() {
-        return 0;
+        return 8;
     }
 
     /**
@@ -168,7 +234,7 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: blockId
     //   Field type: int, unsigned
-    //   Offset (bits): 16
+    //   Offset (bits): 24
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -190,14 +256,14 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'blockId'
      */
     public static int offset_blockId() {
-        return (16 / 8);
+        return (24 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'blockId'
      */
     public static int offsetBits_blockId() {
-        return 16;
+        return 24;
     }
 
     /**
@@ -231,7 +297,7 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: data
     //   Field type: short[], unsigned
-    //   Offset (bits): 32
+    //   Offset (bits): 40
     //   Size of each element (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -253,8 +319,8 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'data'
      */
     public static int offset_data(int index1) {
-        int offset = 32;
-        if (index1 < 0 || index1 >= 24) throw new ArrayIndexOutOfBoundsException();
+        int offset = 40;
+        if (index1 < 0 || index1 >= 22) throw new ArrayIndexOutOfBoundsException();
         offset += 0 + index1 * 8;
         return (offset / 8);
     }
@@ -263,8 +329,8 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
      * Return the offset (in bits) of the field 'data'
      */
     public static int offsetBits_data(int index1) {
-        int offset = 32;
-        if (index1 < 0 || index1 >= 24) throw new ArrayIndexOutOfBoundsException();
+        int offset = 40;
+        if (index1 < 0 || index1 >= 22) throw new ArrayIndexOutOfBoundsException();
         offset += 0 + index1 * 8;
         return offset;
     }
@@ -273,7 +339,7 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
      * Return the entire array 'data' as a short[]
      */
     public short[] get_data() {
-        short[] tmp = new short[24];
+        short[] tmp = new short[22];
         for (int index0 = 0; index0 < numElements_data(0); index0++) {
             tmp[index0] = getElement_data(index0);
         }
@@ -307,14 +373,14 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
      * Return the total size, in bytes, of the array 'data'
      */
     public static int totalSize_data() {
-        return (192 / 8);
+        return (176 / 8);
     }
 
     /**
      * Return the total size, in bits, of the array 'data'
      */
     public static int totalSizeBits_data() {
-        return 192;
+        return 176;
     }
 
     /**
@@ -342,7 +408,7 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
      * Return the number of elements in the array 'data'
      */
     public static int numElements_data() {
-        return 24;
+        return 22;
     }
 
     /**
@@ -350,7 +416,7 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
      * for the given dimension.
      */
     public static int numElements_data(int dimension) {
-      int array_dims[] = { 24,  };
+      int array_dims[] = { 22,  };
         if (dimension < 0 || dimension >= 1) throw new ArrayIndexOutOfBoundsException();
         if (array_dims[dimension] == 0) throw new IllegalArgumentException("Array dimension "+dimension+" has unknown size");
         return array_dims[dimension];
@@ -372,7 +438,7 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
      * Read the array 'data' as a String
      */
     public String getString_data() { 
-         char carr[] = new char[Math.min(net.tinyos.message.Message.MAX_CONVERTED_STRING_LENGTH,24)];
+         char carr[] = new char[Math.min(net.tinyos.message.Message.MAX_CONVERTED_STRING_LENGTH,22)];
          int i;
          for (i = 0; i < carr.length; i++) {
              if ((char)getElement_data(i) == (char)0) break;

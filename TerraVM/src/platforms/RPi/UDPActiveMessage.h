@@ -6,10 +6,10 @@
 #include <string.h>
 #include <fcntl.h>
 #include <signal.h>
-#include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <sys/socket.h>
 #include <netdb.h>
 #include <ifaddrs.h>
 #include <stdlib.h>
@@ -17,7 +17,7 @@
 
 #define MAX_LENGTH 256
 #define PORT 5000
-#define GROUP "224.0.0.1"
+#define GROUP "224.0.2.1"
 
 #define SENDDONE_WAITTIME 100
 #define ACK_TRUE 1

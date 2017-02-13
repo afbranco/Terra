@@ -38,12 +38,6 @@ enum{
 #endif
 	AM_RESERVED_END = 127,
 
-#ifdef ROOT_ID
-	RootNode = ROOT_ID, 				// Root Mote ID
-#else
-	RootNode = 1, 				
-#endif
-
 	// Send message control
 	RESEND_DELAY = 20L,
 	SEND_TIMEOUT = 1000L,
@@ -117,6 +111,7 @@ enum{
  */
  
 typedef nx_struct newProgVersion{
+	nx_uint8_t  moteType;		// Hardware/Firmware type. Distinguishes different types of motes
 	nx_uint16_t versionId; 		// Version ID
 	nx_uint16_t blockLen; 		// Number of program blocks
 	nx_uint16_t blockStart; 	// first block
@@ -133,6 +128,7 @@ typedef nx_struct newProgVersion{
 } newProgVersion_t;	
 	
 typedef nx_struct newProgBlock{	
+	nx_uint8_t  moteType;		// Hardware/Firmware type. Distinguishes different types of motes
 	nx_uint16_t versionId; // Version ID
 	nx_uint16_t blockId; // Block number
 	nx_uint8_t data[BLOCK_SIZE]; // Data buffer
@@ -140,6 +136,7 @@ typedef nx_struct newProgBlock{
 	
 typedef nx_struct reqProgBlock{	
 	nx_uint8_t reqOper; 	// Request operation: Request newVersion, full data or single data
+	nx_uint8_t  moteType;	// Hardware/Firmware type. Distinguishes different types of motes
 	nx_uint16_t versionId; 	// Version ID
 	nx_uint16_t blockId; 	// Block number
 } reqProgBlock_t;	

@@ -12,20 +12,43 @@
 #include <sys/types.h>
 #endif
 
+#ifdef ESP
+#include "ets_sys.h"
+#include "osapi.h"
+#define _Bool uint8_t
+#include "user_interface.h"
+#include "espmissingincludes.h"
+#else
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
 #include <stddef.h>
 #include <ctype.h>
+typedef uint8_t bool;
+enum { FALSE = 0, TRUE = 1 };
+#endif
 
 /* TEMPORARY: include the Safe TinyOS macros so that annotations get
  * defined away for non-safe users */
 //#include "../lib/safe/include/annots_stage1.h" // afb - commented
 
-typedef uint8_t bool;
-enum { FALSE = 0, TRUE = 1 };
+
+// short names for types
+typedef int64_t  s64;
+typedef uint64_t u64;
+typedef int32_t  s32;
+typedef uint32_t u32;
+typedef int16_t  s16;
+typedef uint16_t u16;
+typedef int8_t    s8;
+typedef uint8_t   u8;
+typedef float	 f32;
+
+
 
 typedef nx_int8_t nx_bool;
+
+
 #ifndef TERRA_NODE_ID
 #define TERRA_NODE_ID 1
 #endif
@@ -49,6 +72,20 @@ struct @exactlyonce { };
 #endif
 
 #if defined(TOSSIM)
+
+#elif defined(ESP)
+#ifndef NO_DEBUG
+#define dbg(s,...) os_printf(__VA_ARGS__) 
+#define dbg_clear(s,...) os_printf(__VA_ARGS__) 
+#define dbgerror(s,...) os_printf(__VA_ARGS__) 
+#define dbgerror_clear(s,...) os_printf(__VA_ARGS__) 
+#else
+#define dbg(s, ...) 
+#define dbg_clear(s, ...) 
+#define dbgerror(s,...) os_printf(__VA_ARGS__) 
+#define dbgerror_clear(s,...) os_printf(__VA_ARGS__) 
+#endif
+
 
 #elif defined(LINUX)
 extern void dbgIx(char* canal, char* format, ...);

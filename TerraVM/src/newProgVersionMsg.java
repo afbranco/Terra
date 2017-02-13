@@ -7,12 +7,12 @@
 public class newProgVersionMsg extends net.tinyos.message.Message {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 26;
+    public static final int DEFAULT_MESSAGE_SIZE = 27;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 160;
 
-    /** Create a new newProgVersionMsg of size 26. */
+    /** Create a new newProgVersionMsg of size 27. */
     public newProgVersionMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -85,6 +85,9 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     public String toString() {
       String s = "Message <newProgVersionMsg> \n";
       try {
+        s += "  [moteType=0x"+Long.toHexString(get_moteType())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
         s += "  [versionId=0x"+Long.toHexString(get_versionId())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
@@ -129,9 +132,72 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     // Message-type-specific access methods appear below.
 
     /////////////////////////////////////////////////////////
+    // Accessor methods for field: moteType
+    //   Field type: short, unsigned
+    //   Offset (bits): 0
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'moteType' is signed (false).
+     */
+    public static boolean isSigned_moteType() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'moteType' is an array (false).
+     */
+    public static boolean isArray_moteType() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'moteType'
+     */
+    public static int offset_moteType() {
+        return (0 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'moteType'
+     */
+    public static int offsetBits_moteType() {
+        return 0;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'moteType'
+     */
+    public short get_moteType() {
+        return (short)getUIntBEElement(offsetBits_moteType(), 8);
+    }
+
+    /**
+     * Set the value of the field 'moteType'
+     */
+    public void set_moteType(short value) {
+        setUIntBEElement(offsetBits_moteType(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'moteType'
+     */
+    public static int size_moteType() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'moteType'
+     */
+    public static int sizeBits_moteType() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
     // Accessor methods for field: versionId
     //   Field type: int, unsigned
-    //   Offset (bits): 0
+    //   Offset (bits): 8
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -153,14 +219,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'versionId'
      */
     public static int offset_versionId() {
-        return (0 / 8);
+        return (8 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'versionId'
      */
     public static int offsetBits_versionId() {
-        return 0;
+        return 8;
     }
 
     /**
@@ -194,7 +260,7 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: blockLen
     //   Field type: int, unsigned
-    //   Offset (bits): 16
+    //   Offset (bits): 24
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -216,14 +282,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'blockLen'
      */
     public static int offset_blockLen() {
-        return (16 / 8);
+        return (24 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'blockLen'
      */
     public static int offsetBits_blockLen() {
-        return 16;
+        return 24;
     }
 
     /**
@@ -257,7 +323,7 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: blockStart
     //   Field type: int, unsigned
-    //   Offset (bits): 32
+    //   Offset (bits): 40
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -279,14 +345,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'blockStart'
      */
     public static int offset_blockStart() {
-        return (32 / 8);
+        return (40 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'blockStart'
      */
     public static int offsetBits_blockStart() {
-        return 32;
+        return 40;
     }
 
     /**
@@ -320,7 +386,7 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: startProg
     //   Field type: int, unsigned
-    //   Offset (bits): 48
+    //   Offset (bits): 56
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -342,14 +408,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'startProg'
      */
     public static int offset_startProg() {
-        return (48 / 8);
+        return (56 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'startProg'
      */
     public static int offsetBits_startProg() {
-        return 48;
+        return 56;
     }
 
     /**
@@ -383,7 +449,7 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: endProg
     //   Field type: int, unsigned
-    //   Offset (bits): 64
+    //   Offset (bits): 72
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -405,14 +471,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'endProg'
      */
     public static int offset_endProg() {
-        return (64 / 8);
+        return (72 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'endProg'
      */
     public static int offsetBits_endProg() {
-        return 64;
+        return 72;
     }
 
     /**
@@ -446,7 +512,7 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: nTracks
     //   Field type: int, unsigned
-    //   Offset (bits): 80
+    //   Offset (bits): 88
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -468,14 +534,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'nTracks'
      */
     public static int offset_nTracks() {
-        return (80 / 8);
+        return (88 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'nTracks'
      */
     public static int offsetBits_nTracks() {
-        return 80;
+        return 88;
     }
 
     /**
@@ -509,7 +575,7 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: wClocks
     //   Field type: int, unsigned
-    //   Offset (bits): 96
+    //   Offset (bits): 104
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -531,14 +597,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'wClocks'
      */
     public static int offset_wClocks() {
-        return (96 / 8);
+        return (104 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'wClocks'
      */
     public static int offsetBits_wClocks() {
-        return 96;
+        return 104;
     }
 
     /**
@@ -572,7 +638,7 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: asyncs
     //   Field type: int, unsigned
-    //   Offset (bits): 112
+    //   Offset (bits): 120
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -594,14 +660,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'asyncs'
      */
     public static int offset_asyncs() {
-        return (112 / 8);
+        return (120 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'asyncs'
      */
     public static int offsetBits_asyncs() {
-        return 112;
+        return 120;
     }
 
     /**
@@ -635,7 +701,7 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: wClock0
     //   Field type: int, unsigned
-    //   Offset (bits): 128
+    //   Offset (bits): 136
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -657,14 +723,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'wClock0'
      */
     public static int offset_wClock0() {
-        return (128 / 8);
+        return (136 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'wClock0'
      */
     public static int offsetBits_wClock0() {
-        return 128;
+        return 136;
     }
 
     /**
@@ -698,7 +764,7 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: gate0
     //   Field type: int, unsigned
-    //   Offset (bits): 144
+    //   Offset (bits): 152
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -720,14 +786,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'gate0'
      */
     public static int offset_gate0() {
-        return (144 / 8);
+        return (152 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'gate0'
      */
     public static int offsetBits_gate0() {
-        return 144;
+        return 152;
     }
 
     /**
@@ -761,7 +827,7 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: inEvts
     //   Field type: int, unsigned
-    //   Offset (bits): 160
+    //   Offset (bits): 168
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -783,14 +849,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'inEvts'
      */
     public static int offset_inEvts() {
-        return (160 / 8);
+        return (168 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'inEvts'
      */
     public static int offsetBits_inEvts() {
-        return 160;
+        return 168;
     }
 
     /**
@@ -824,7 +890,7 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: async0
     //   Field type: int, unsigned
-    //   Offset (bits): 176
+    //   Offset (bits): 184
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -846,14 +912,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'async0'
      */
     public static int offset_async0() {
-        return (176 / 8);
+        return (184 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'async0'
      */
     public static int offsetBits_async0() {
-        return 176;
+        return 184;
     }
 
     /**
@@ -887,7 +953,7 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: appSize
     //   Field type: int, unsigned
-    //   Offset (bits): 192
+    //   Offset (bits): 200
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -909,14 +975,14 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'appSize'
      */
     public static int offset_appSize() {
-        return (192 / 8);
+        return (200 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'appSize'
      */
     public static int offsetBits_appSize() {
-        return 192;
+        return 200;
     }
 
     /**

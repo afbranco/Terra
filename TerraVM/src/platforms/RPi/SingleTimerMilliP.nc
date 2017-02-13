@@ -9,7 +9,7 @@ implementation{
 
 	bool isRunning;
 	uint32_t now;
-	struct itimerval timer={0};
+	struct itimerval timer;
 	
 	// inicializo com zero
 	struct timeval t_initial={0};
@@ -23,9 +23,9 @@ implementation{
 	
 	void sigalrm_handler(int signum)
 	{
-		uint32_t currentTime;
+//		uint32_t currentTime;
 //		printf("SIGALRM received - isRunning=%d\n",isRunning);
-		currentTime = call TimerFrom.getNow();
+//		currentTime = call TimerFrom.getNow();
 //		if (currentTime>0) printf("Resultado Timer.getNow: %d\n", currentTime);
 	
 		if (isRunning) post tarefaTimer();

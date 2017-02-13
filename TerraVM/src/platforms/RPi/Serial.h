@@ -126,7 +126,6 @@ typedef nx_struct serial_header {
   nx_uint8_t length;
   nx_am_group_t group;
   nx_am_id_t type;
-  nx_uint16_t ackID;
 } serial_header_t;
 
 typedef nx_struct serial_packet {
@@ -136,6 +135,7 @@ typedef nx_struct serial_packet {
 
 typedef nx_struct serial_metadata {
   nx_uint8_t ack;
+  nx_uint16_t ackID;
 } serial_metadata_t;
     
 #endif
