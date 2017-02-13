@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 
 
 public class ProgBin {
-	static short BLOCK_SIZE = 24;
+	static short BLOCK_SIZE = 22;
 	static int MAX_BLOCKS = 500; //16;
 	static int MAX_TABLE_LEN = BLOCK_SIZE * MAX_BLOCKS;
 	private boolean validProg=false;
@@ -24,6 +24,7 @@ public class ProgBin {
 	private int gate0;
 	private int inEvts;
 	private int async0;
+	private int appSize;
 	
 	short[][] ProgData= new short[MAX_BLOCKS][BLOCK_SIZE];
 
@@ -55,6 +56,7 @@ public class ProgBin {
 	public int getGate0() {return gate0;}
 	public int getInEvts() {return inEvts;}
 	public int getAsync0() {return async0;}
+	public int getAppSize() {return appSize;}
 
 	public String getLastError() {return lastError;}
 	
@@ -69,7 +71,7 @@ public class ProgBin {
 			// Read first line to get environment parameters
 			if (((strLine = br.readLine()) != null)){
 				String params[] = strLine.split(" ");
-				if (params.length==9){
+				if (params.length==9 || params.length==10){
 					startProg = Integer.decode(params[0]);
 					endProg = Integer.decode(params[1]);
 					nTracks = Integer.decode(params[2]);					
@@ -79,6 +81,10 @@ public class ProgBin {
 					gate0 = Integer.decode(params[6]);
 					inEvts = Integer.decode(params[7]);
 					async0 = Integer.decode(params[8]);
+					if (params.length==10)
+						appSize = Integer.decode(params[9]);
+					else
+						appSize = endProg;
 				} else {
 					br.close();
 					return (String)(".vmx format error - incompatible header line.");	

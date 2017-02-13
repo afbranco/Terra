@@ -97,6 +97,7 @@ public class ControlForm {
 	JProgressBar barFSM;
 	JProgressBar barFSM2;
 	JComboBox<String> comboPrefix;
+	JComboBox<Integer> comboMoteType;
 	JTextArea DataMsgs;
 	JTextArea ControlMsgs;
 
@@ -297,7 +298,7 @@ public class ControlForm {
 			}
 		});
 		
-		btnApply.setBounds(760, 26, 113, 40);
+		btnApply.setBounds(760, 26+54, 113, 40);
 		btnApply.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				Apply();
@@ -354,6 +355,17 @@ public class ControlForm {
 		controlPanel.add(comboPrefix);
 		fillComboPrefix();
 
+		JLabel lblMoteType = new JLabel("Mote Type:");
+		lblMoteType.setBounds(530+250, 25, 212, 15);
+		controlPanel.add(lblMoteType);
+
+		comboMoteType = new JComboBox<Integer>();
+		comboMoteType.setFont(new Font("Dialog", Font.PLAIN, 12));
+		comboMoteType.setBounds(530+250, 41, 60, 24);
+		for (int i=1;i<=20;i++) comboMoteType.addItem(i);
+		controlPanel.add(comboMoteType);
+		
+
 		JButton btnRefresh = new JButton("");
 		btnRefresh.setIcon(new ImageIcon(ControlForm.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeLeaf.gif")));
 		
@@ -365,8 +377,8 @@ public class ControlForm {
 		});
 		controlPanel.add(btnRefresh);
 
-		lbllastVersion = new JLabel("Last ver.: 000");
-		lbllastVersion.setBounds(762, 10, 140, 15);
+		lbllastVersion = new JLabel("Last version: 00000");
+		lbllastVersion.setBounds(762-180, 10+80, 140, 15);
 		controlPanel.add(lbllastVersion);
 		
 		
@@ -452,7 +464,7 @@ public class ControlForm {
 		
 		JLabel lblControlMsgs = new JLabel("Control Commands and Messages");
 		lblControlMsgs.setFont(new Font("Dialog", Font.BOLD, 14));
-		lblControlMsgs.setBounds(297, 90, 278, 15);
+		lblControlMsgs.setBounds(297-100, 90, 278, 15);
 		controlPanel.add(lblControlMsgs);
 		
 		JSeparator separator_2 = new JSeparator();
@@ -915,7 +927,6 @@ public class ControlForm {
 		String AppPrefix = (String) comboPrefix.getSelectedItem();
 		String binFile = AppDir+AppPrefix + vmSufix;
 		// Dir and File exists?
-		// TODO
 		try {
 			FileInputStream fstream = new FileInputStream(binFile);
 			fstream.close();
@@ -924,7 +935,6 @@ public class ControlForm {
 			JOptionPane.showMessageDialog(mainFrame,"Please, select a vmx file.", "File not found!", JOptionPane.ERROR_MESSAGE);
 			return;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -953,16 +963,15 @@ public class ControlForm {
 		reqConfigDigits=1;
 		StartTime = System.currentTimeMillis();
 		CountElapsedTime = true;
-		lastVersionSeq = terracore.newData(progBin);
-		lbllastVersion.setText("Last ver.: "+lastVersionSeq.toString());
+		Integer moteType = (Integer)comboMoteType.getSelectedItem();
+		lastVersionSeq = terracore.newData(progBin,moteType.shortValue());
+		lbllastVersion.setText("Last version: "+lastVersionSeq.toString());
 		prop.setProperty("lastVersionSeq", lastVersionSeq.toString());
 		try {
 			prop.store(new FileOutputStream(new File(userHome+"/.TerraConfig")), null);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

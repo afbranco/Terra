@@ -7,12 +7,12 @@ package messages;
 public class reqProgBlockMsg extends net.tinyos.message.Message {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 5;
+    public static final int DEFAULT_MESSAGE_SIZE = 6;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 162;
 
-    /** Create a new reqProgBlockMsg of size 5. */
+    /** Create a new reqProgBlockMsg of size 6. */
     public reqProgBlockMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -86,6 +86,9 @@ public class reqProgBlockMsg extends net.tinyos.message.Message {
       String s = "Message <reqProgBlockMsg> \n";
       try {
         s += "  [reqOper=0x"+Long.toHexString(get_reqOper())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [moteType=0x"+Long.toHexString(get_moteType())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [versionId=0x"+Long.toHexString(get_versionId())+"]\n";
@@ -162,9 +165,72 @@ public class reqProgBlockMsg extends net.tinyos.message.Message {
     }
 
     /////////////////////////////////////////////////////////
+    // Accessor methods for field: moteType
+    //   Field type: short, unsigned
+    //   Offset (bits): 8
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'moteType' is signed (false).
+     */
+    public static boolean isSigned_moteType() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'moteType' is an array (false).
+     */
+    public static boolean isArray_moteType() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'moteType'
+     */
+    public static int offset_moteType() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'moteType'
+     */
+    public static int offsetBits_moteType() {
+        return 8;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'moteType'
+     */
+    public short get_moteType() {
+        return (short)getUIntBEElement(offsetBits_moteType(), 8);
+    }
+
+    /**
+     * Set the value of the field 'moteType'
+     */
+    public void set_moteType(short value) {
+        setUIntBEElement(offsetBits_moteType(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'moteType'
+     */
+    public static int size_moteType() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'moteType'
+     */
+    public static int sizeBits_moteType() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
     // Accessor methods for field: versionId
     //   Field type: int, unsigned
-    //   Offset (bits): 8
+    //   Offset (bits): 16
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -186,14 +252,14 @@ public class reqProgBlockMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'versionId'
      */
     public static int offset_versionId() {
-        return (8 / 8);
+        return (16 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'versionId'
      */
     public static int offsetBits_versionId() {
-        return 8;
+        return 16;
     }
 
     /**
@@ -227,7 +293,7 @@ public class reqProgBlockMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: blockId
     //   Field type: int, unsigned
-    //   Offset (bits): 24
+    //   Offset (bits): 32
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -249,14 +315,14 @@ public class reqProgBlockMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'blockId'
      */
     public static int offset_blockId() {
-        return (24 / 8);
+        return (32 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'blockId'
      */
     public static int offsetBits_blockId() {
-        return 24;
+        return 32;
     }
 
     /**

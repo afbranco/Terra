@@ -33,6 +33,7 @@ public class ControlCore implements MessageListener
 	private int TCPretries;
 	
 	private int VersionId=0;
+	private short lastMoteType=0;
 	private int setDataSeq=0;
 	private int CurrRequestMote=0;
 	
@@ -126,13 +127,14 @@ public class ControlCore implements MessageListener
 		}
 	
 
-	public int newData(ProgBin Binary){
+	public int newData(ProgBin Binary,short moteType){
 		progBin = Binary;
 //		pauseConfig=false;
 		erroCount=0;
 		CurrentBlockId=-1;
+		lastMoteType = moteType;
 		controlform.appendControlMsg("ControlCore: newData button.");
-		return sendNewProgVersion(true);
+		return sendNewProgVersion(true,moteType);
 	}
 	
 	public void newSetData(List<SetData> SetDataArray){
@@ -156,27 +158,31 @@ public class ControlCore implements MessageListener
 		if (msg instanceof reqProgBlockMsg) {
 			if (CurrRequestMote == 0 || CurrRequestMote==dest_addr) { // Doesn't answer a second requester until the first one are finished.
 				reqProgBlockMsg omsg = (reqProgBlockMsg)msg;
-				System.out.println("reqProgBlockMsg:: omsg.get_versionId()="+omsg.get_versionId()+" VersionId="+VersionId);
+				System.out.println("reqProgBlockMsg:: omsg.get_versionId()="+omsg.get_versionId()+" VersionId="+VersionId + " | req. moteType=" + omsg.get_moteType() + "lastMoteType="+lastMoteType);
 				if (VersionId > 0){
-					if (omsg.get_versionId()==0){
-						CurrRequestMote = 0;
-						sendNewProgVersion(false);				
-					}else if (VersionId == omsg.get_versionId()){
-						if (CurrRequestMote == 0) CurrRequestMote = dest_addr;
-						controlform.recReqProgBlockMsg(progBin.getBlockStart(),omsg.get_blockId(),progBin.getNumBlocks(),dest_addr);
-						System.out.println(omsg.toString());
-						if (omsg.get_blockId() == (progBin.getNumBlocks()+progBin.getBlockStart()-1)) CurrRequestMote=0;
-							
-						//if (omsg.get_blockId() == progBin.getBlockStart()) {
-						//	sendNewProgBlockAll(omsg.get_blockId(),progBin.getNumBlocks()+progBin.getBlockStart());							
-						//} else {
-							sendNewProgBlock(omsg.get_blockId());							
-						//}
-					} else if (VersionId < omsg.get_versionId()){
-						VersionId = omsg.get_versionId();
-						CurrRequestMote = 0;
-						sendNewProgVersion(false);				
+					if (lastMoteType==omsg.get_moteType()){
+						if (omsg.get_versionId()==0){
+							CurrRequestMote = 0;
+							sendNewProgVersion(false,lastMoteType);				
+						}else if (VersionId == omsg.get_versionId()){
+							if (CurrRequestMote == 0) CurrRequestMote = dest_addr;
+							controlform.recReqProgBlockMsg(progBin.getBlockStart(),omsg.get_blockId(),progBin.getNumBlocks(),dest_addr);
+							System.out.println(omsg.toString());
+							if (omsg.get_blockId() == (progBin.getNumBlocks()+progBin.getBlockStart()-1)) CurrRequestMote=0;
+								
+							//if (omsg.get_blockId() == progBin.getBlockStart()) {
+							//	sendNewProgBlockAll(omsg.get_blockId(),progBin.getNumBlocks()+progBin.getBlockStart());							
+							//} else {
+								sendNewProgBlock(omsg.get_blockId());							
+							//}
+						} else if (VersionId < omsg.get_versionId()){
+							VersionId = omsg.get_versionId();
+							CurrRequestMote = 0;
+							sendNewProgVersion(false,omsg.get_moteType());				
+						}
 					}
+				} else {
+					System.out.println("reqProgBlockMsg:: Not current MoteType! (req. moteType=" + omsg.get_moteType() + "lastMoteType="+lastMoteType+")");
 				}
 			}
 		}
@@ -303,7 +309,7 @@ public class ControlCore implements MessageListener
 		controlform.appendControlMsg("ControlCore: sendNewProgBlock()");
 
 		newProgBlockMsg msg = new newProgBlockMsg();
-
+		msg.set_moteType(lastMoteType);
 		msg.set_blockId(BlockId);
 		msg.set_versionId(VersionId);
 		
@@ -315,11 +321,12 @@ public class ControlCore implements MessageListener
 	}
 
 
-	int sendNewProgVersion(boolean incVersionId){
+	int sendNewProgVersion(boolean incVersionId, short moteType){
 		controlform.appendControlMsg("ControlCore: sendNewProgVersion()");
 		newProgVersionMsg msg = new newProgVersionMsg();
 		CurrRequestMote = 0;
 		if (incVersionId) VersionId++;
+		msg.set_moteType(moteType);
 		msg.set_versionId(VersionId);
 		msg.set_blockLen(progBin.getNumBlocks());
 		msg.set_blockStart(progBin.getBlockStart());
@@ -332,6 +339,7 @@ public class ControlCore implements MessageListener
 		msg.set_gate0(progBin.getGate0());
 		msg.set_inEvts(progBin.getInEvts());
 		msg.set_async0(progBin.getAsync0());
+		msg.set_appSize(progBin.getAppSize());
 		
 		System.out.println(msg.toString());		
 		TCPtimer.schedule(new sendMsg("NewProgVersion",msg), 10);
