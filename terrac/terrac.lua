@@ -436,13 +436,14 @@ for x,op in pairs(_AST.root.opcode) do
 	end	
 end
 
+local BlockSize = 22
 local CodeSize = endCode-codeAddr
 local Stack    = _AST.root.max_stack*4 + 6
 local Tracks = (ALL.n_tracks+1)*4
 local CtlVars  = codeAddr - Tracks
 --local LblTab   = LblTableEnd_addr-endCode
 local TotalMem = Tracks + CtlVars + CodeSize + Stack
-local RadioMsgs = ((codeAddr%24) == 0 and math.ceil((CodeSize)/24)) or 1+math.ceil((CodeSize-(24-codeAddr%24))/24)
+local RadioMsgs = ((codeAddr%BlockSize) == 0 and math.ceil((CodeSize)/BlockSize)) or 1+math.ceil((CodeSize-(BlockSize-codeAddr%BlockSize))/BlockSize)
 local lowMaxMem=999999
 
 -- ====  Environment parameters  ====
@@ -455,7 +456,7 @@ asmTextHeader = asmTextHeader ..' '.. TotalMem ..'\n'
 asmText = asmTextHeader .. asmText
 
 
---print((codeAddr%24) == 0 , ((LblTableEnd_addr-codeAddr)/24) , 1,LblTableEnd_addr-codeAddr,(24-codeAddr%24))
+--print((codeAddr%BlockSize) == 0 , ((LblTableEnd_addr-codeAddr)/BlockSize) , 1,LblTableEnd_addr-codeAddr,(BlockSize-codeAddr%BlockSize))
 print('---------------------------------------------------------------------')
 print('-- Terra Compiler: '..string.format('%-20s',_ENV.vm_name)..'     VM Code: '.. string.format('%12s',_ENV.vm_version) .. '  --')
 print('---------------------------------------------------------------------')
