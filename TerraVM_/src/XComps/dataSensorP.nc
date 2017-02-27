@@ -6,7 +6,7 @@ module dataSensorP{
 	uses interface Boot;
 }
 implementation{
-#define MAX_SENSORS 100
+#define MAX_SENSORS 1000
 #define F_NAME "sensors.bin"
 
 	bool initialized = FALSE;
@@ -15,23 +15,28 @@ implementation{
 	reg_t lastReg;
 
     void resetDataFile(){
-    	uint8_t i;
-		reg_t data[MAX_SENSORS];
+    	uint16_t i;
     	initialized = TRUE;
 		dbg(APPNAME,"dataSensor.resetDataFile():\n");
-    	for (i=0;i<MAX_SENSORS;i++){
-    		data[i].temp=500;	
-    		data[i].photo=400;	
-    		data[i].volt=1000;	
-    	}
     	file = fopen(F_NAME,"wb");
     	if (!file) {
 			dbg(APPNAME,"dataSensor.resetDataFile(): Unable to create %s file!\n",F_NAME);
     		printf("*******\n    Unable to create %s file!\n *******\n",F_NAME);
     		exit(0);
     	} else {
-    		fwrite(&data,MAX_SENSORS*sizeof(reg_t),1,file);
+    		reg_t reg;
+	    	for (i=0;i<MAX_SENSORS;i++){
+	    		reg.temp=500;	
+	    		reg.photo=400;	
+	    		reg.volt=1000;	
+	    		fwrite(&reg,sizeof(reg_t),1,file);
+	    		if (i%100 == 0){
+	    			fflush(file);
+					//dbg("TVIEW","flush step %d!\n",i);
+	    			}
+	    	}
     		fclose(file);
+			//dbg("TVIEW","Created new data sensor file!\n");
     	}
     }
 
@@ -40,32 +45,33 @@ implementation{
 	}
 	
 	
-	void readReg(){
-		reg_t data[MAX_SENSORS];
+	void readReg(uint16_t id){
+		reg_t reg;
     	file = fopen(F_NAME,"rb");
     	if (!file) {
 			dbg(APPNAME,"dataSensor.readReg(): Unable to open %s file!\n",F_NAME);
     		printf("*******\n    Unable to open %s file!\n *******\n",F_NAME);
     	} else {
-    		fread(data,MAX_SENSORS*sizeof(reg_t),1,file);
+    		fseek(file,id*sizeof(reg_t),SEEK_SET);
+    		fread(&reg,sizeof(reg_t),1,file);
     		fclose(file);
-    		lastReg.temp = data[TOS_NODE_ID].temp;
-    		lastReg.photo = data[TOS_NODE_ID].photo;
-    		lastReg.volt = data[TOS_NODE_ID].volt;
+    		lastReg.temp = reg.temp;
+    		lastReg.photo = reg.photo;
+    		lastReg.volt = reg.volt;
     	}
 		
 	}
 	
 	task void tempRead(){
-		readReg();
+		readReg(TOS_NODE_ID);
 		signal Temp.readDone(SUCCESS, lastReg.temp);
 	}
 	task void photoRead(){
-		readReg();
+		readReg(TOS_NODE_ID);
 		signal Photo.readDone(SUCCESS, lastReg.photo);
 	}
 	task void voltRead(){
-		readReg();
+		readReg(TOS_NODE_ID);
 		signal Volt.readDone(SUCCESS, lastReg.volt);
 	}
 

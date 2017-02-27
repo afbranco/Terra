@@ -464,7 +464,7 @@ def update(ScreenSize):
 
 
 def writeSData():
-    buff = pack('300H',*sData)
+    buff = pack('3000H',*sData)
     fData = open('sensors.bin', "wb")
     fData.write(buff)
     fData.close()
@@ -472,8 +472,8 @@ def writeSData():
 def readSData():
     global sData
     fData = open('sensors.bin', "rb")
-    buff = fData.read(600)
-    sData = unpack('300H',buff)
+    buff = fData.read(6000)
+    sData = unpack('3000H',buff)
     fData.close()
 
 def mouseClick(button,pos):
