@@ -36,6 +36,7 @@ implementation{
 	uint16_t Addr=0;
 	uint16_t blockId = 0;
 	uint16_t localVersionId = 2;
+	uint8_t localMoteType=1;
 	
 	// State control
 	enum state_t {START, SEND, DONE, EXIT};
@@ -44,6 +45,12 @@ implementation{
 	uint16_t lastBlock = 0;
 	uint8_t retry=0;
 	
+void printMsg(uint8_t* msg, uint8_t len){
+	uint8_t i;
+	for (i=0; i< len; i++) printf("%02x:%03d, ",msg[i],msg[i]);
+	printf("\n");
+}
+
 	void ReadVMXFile(char* file_name){
 		dbg(APPNAME, "ReadVMXFile:%s\n",file_name);
 		file = fopen(file_name, "r");
@@ -70,6 +77,7 @@ implementation{
 		newProgVersion.gate0 = (nx_uint16_t) gate0;
 		newProgVersion.inEvts = (nx_uint16_t) inEvts;
 		newProgVersion.async0 = (nx_uint16_t) async0;
+		newProgVersion.moteType = localMoteType;
 	
 		while(fgets(line,LINE_SIZE,file) != NULL){
 			if (j>=0){ // ignores first line
@@ -146,6 +154,7 @@ printf("Passo 5\n");
 		file = fopen(filename, "w");
 		if (file == 0){ // Write permission?!
 			dbgerror(APPNAME, "Error::Could not open file %s to write -- errno=%d\n",filename,errno);
+printf("Error: Could not open file %s to write -- errno=%d\n",filename,errno);
 			exit(EXIT_FAILURE);	
 		}
 		sprintf(linein[0],"#%s",asctime(localtime(&t)));
@@ -153,6 +162,7 @@ printf("Passo 5\n");
 		fprintf(file,linein[1]);
 		fprintf(file,"lastVersionSeq=%d\n",versionId);
 		fclose(file);
+printf("Passo 6\n");
 		return versionId;
 	}
 
@@ -170,9 +180,12 @@ printf("Passo 5\n");
 		state=SEND;
 		memcpy(call Packet.getPayload(&sendMessage, call Packet.maxPayloadLength()), &newProgVersion, sizeof(newProgVersion_t));
 		dbg(APPNAME, "UDP::UDPSender(): maxSize=%d\n", call Packet.maxPayloadLength());
+		//printMsg(&sendMessage,sizeof(newProgVersion_t));
 		stat =  call UDPSender.send[AM_NEWPROGVERSION](AM_BROADCAST_ADDR, &sendMessage, sizeof(newProgVersion_t));
 		// Time out of x seconds -> to check state
 		call Timer1.startOneShot(RETRY_TIMER);
+printf("Passo 7\n");
+
 	}
 
 	event void UDPSender.sendDone[am_id_t id](message_t *msg, error_t error){
@@ -181,7 +194,7 @@ printf("Passo 5\n");
 	event message_t * UDPReceiver.receive[am_id_t id](message_t *msg, void *payload, uint8_t len){
 		// TODO Auto-generated method stub
 		newProgBlock_t* newProgBlock;
-		dbg(APPNAME, "UDPReceiver::receive(): msg=%d, am_id=%d\n", call AMPacket.source(&msg), id);
+		dbg(APPNAME, "UDPReceiver::receive(): msg=%d, am_id=%d\n", call AMPacket.source(msg), id);
 		if (id == AM_REQPROGBLOCK)
 		{
 			reqProgBlock_t* reqMsg = payload;
@@ -192,6 +205,7 @@ printf("Passo 5\n");
 				
 				newProgBlock->versionId = localVersionId;
 				newProgBlock->blockId = reqMsg->blockId;
+				newProgBlock->moteType = localMoteType;
 				memcpy(newProgBlock->data, blocks[reqMsg->blockId], BLOCK_SIZE);
 				call UDPSender.send[AM_NEWPROGBLOCK](AM_BROADCAST_ADDR, &sendMessage, sizeof(newProgBlock_t));
 				

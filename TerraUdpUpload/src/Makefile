@@ -42,8 +42,11 @@ else
 	$(error Command must be 'make rpi')
 endif
 
-INSTALL ?= $(shell ip route get 8.8.8.8 | awk '{print $$NF; exit}' | awk -F'.' '{print $$3*256+$$4; exit}')
+#INSTALL ?= $(shell ip route get 8.8.8.8 | awk '{print $$NF; exit}' | awk -F'.' '{print $$3*256+$$4; exit}')
 ROOT_ID ?= 1
+INSTALL ?=4096
+
+#$(error $(INSTALL))
 
 CFLAGS += -I$(TERRADIR)
 CFLAGS += -I$(TERRADIR)/interfaces
