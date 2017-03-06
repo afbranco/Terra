@@ -342,7 +342,7 @@ if __name__ == '__main__':
             runTime=int(sys.argv[5])
             sys.stderr.write("{} {} {} {} {}\n".format(nLines,nColumnsA,nColumnsB,timeB,runTime))
             if ( nLines >= 1 and nLines <= 9 and \
-                 nColumnsA >= 1 and nColumnsA <=9 and \
+                 nColumnsA >= 0 and nColumnsA <=9 and \
                  nColumnsB >= 0 and nColumnsB <= 9 and \
                  (nColumnsA+nColumnsB) <= 9 and \
                  timeB >= 0 and timeB <= 3600 and \

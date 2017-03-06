@@ -16,6 +16,9 @@
 # Configure runtime type: NOBS or BOTH or BOTH2| default BOTH
 #    TYPE=NOBS
 #
+# Define mote type: 1..254 | Default 1
+#    MOTE_TYPE=2
+#
 ##
 # Verbose Compilation mode: YES or NO | Default NO
 #    VERB=YES
@@ -35,15 +38,24 @@
 # Debug "dbg() mode for Linux: YES or NO | default NO
 #    DEBUG=YES
 #
-# Command line examples
-#  make micaz  VM=GRP TYPE=NOBS QUEUE=SHORT install.2 mib520,/dev/ttyUSB0
-#
 # ESP WIFI SSID:  <input ssid> | default iot_terra
 #    WIFI_SSID=ssid_rede
 #
 # ESP WIFI PASSWORD:  <input password> | default projeto_terra
 #    WIFI_PASSWD=senha_rede
 #
+# NODE ID: 1..2047 | default 1
+# install.3 
+#
+# NET ID: 1..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee 
+# NET_ID=2
+#
+# Command line examples
+#  make micaz  VM=GRP TYPE=NOBS QUEUE=SHORT install.2 mib520,/dev/ttyUSB0
+#  make esp TYPE=BOTH MOD=MSGQ  DEBUG=YES WIFI_SSID=terra_iot WIFI_PASSWD=projeto_iot install.10 serial,/dev/ttyUSB0
+#  make rpi TYPE=NOBS MOD=MSGQ  DEBUG=YES install.4
+#  make mica2dot TYPE=BOTH VM=NET MOD=MSGQ install.2 mib520,/dev/ttyUSB0
+#  make mega TYPE=BOTH VM=NET MOD=MSGQ install.4
 
 #==================================================================================
 #==================================================================================
@@ -157,13 +169,16 @@ ifneq ($(DEBUG),YES)
   endif
 endif
 
+MOTE_TYPE ?= 1
+ifeq ($(shell echo "$(MOTE_TYPE)<1 || $(MOTE_TYPE)>254" | bc), 1)
+    $(error 'MOTE_TYPE must be 1..254')
+endif
+CFLAGS += -DMOTE_TYPE=$(MOTE_TYPE)
 
 INSTALL ?= 1
-ifeq ($(shell echo "$(INSTALL)<1 || $(INSTALL)>65534" | bc), 1)
-    $(error 'in [install,xx] , xx must be in 1..65534')
+ifeq ($(shell echo "$(INSTALL)<1 || $(INSTALL)>2047" | bc), 1)
+    $(error 'in [install,xx] , xx must be in 1..2047')
 endif
-
-
 
 ifneq ($(filter $(MOTE),$(INO_TARGETS)),)
   INO_RADIO ?= NO_RADIO
@@ -275,6 +290,31 @@ ifeq ($(MOTE),esp)
 	CFLAGS += -I. -I$(VMDIR) -DESP
 endif
 
+# default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee
+NETID_mica2 = 0
+NETID_mica2dot = 0
+NETID_micaz = 1
+NETID_telosb = 1
+NETID_iris = 1
+NETID_esp = 2
+NETID_rpi = 2
+NETID_megaNRF24 = 4
+NETID_megaXBEE0 = 5
+NETID_megaXBEE1 = 5
+NETID_megaNO_RADIO = 5
+NETID_unoNRF24 = 4
+NETID_unoXBEE0 = 5
+NETID_unoXBEE1 = 5
+NETID_unoNO_RADIO = 5
+
+NET_ID ?= $(NETID_$(MOTE)$(INO_RADIO))
+ifeq ($(shell echo "$(NET_ID)<0 || $(NET_ID)>30" | bc), 1)
+    $(error 'in NET_ID=xx , xx must be in 0..30')
+endif
+
+MOTE_ADDR = $(shell echo $(NET_ID)*2048 + $(INSTALL) | bc)
+CFLAGS += -DNET_ID=$(NET_ID)
+CFLAGS += -DTERRA_NODE_ID=$(MOTE_ADDR)
 
 CFLAGS += -I$(APPDIR)/interfaces
 CFLAGS += -I$(APPDIR)/system
@@ -316,7 +356,7 @@ ifeq ($(MOTE),telosb)
   # cc2420 - Ref.: http://www.ti.com/lit/ds/symlink/cc2420.pdf ; pag-51, table:9
   CC2420_RFPOWER = $(shell echo ${RFPOWER}*4+3 | bc)
   PFLAGS += -DCC2420_DEF_RFPOWER=$(CC2420_RFPOWER) -DRFPOWER_IDX=$(RFPOWER)
-  CFLAGS += -Os
+  CFLAGS += -Os 
 endif
 
 ifeq ($(MOTE),uno)
@@ -370,10 +410,11 @@ endif
 #
 
 ifneq ($(filter $(MOTE),$(TOS_TARGETS)),)
+  override INSTALL := $(MOTE_ADDR)
   ifneq ($(filter $(MOTE),micaz mica2 mica2dot),) # 4KB RAM
     ifeq ($(VM),NET)
-      MB_SHORT_ALL = 80
-      MB_SHORT_NOBS = 88
+      MB_SHORT_ALL = 90
+      MB_SHORT_NOBS = 100
       MB_LONG_ALL = 64
       MB_LONG_NOBS = 71
     else
@@ -400,7 +441,7 @@ ifneq ($(filter $(MOTE),$(TOS_TARGETS)),)
       endif
     endif
   else ifneq ($(filter $(MOTE),iris telosb),) # 8KB RAM
-        MBLOCKS = 220
+        MBLOCKS = 200
   endif
 else ifneq ($(filter $(MOTE),uno),) # 2KB RAM
         MBLOCKS = 14
@@ -412,9 +453,11 @@ else ifneq ($(filter $(MOTE),esp),) # xxxKB RAM
         MBLOCKS = 100  
 endif
 
+# Greayes value for MBLOCKS considering all platforms
+GENERAL_MAX__BLKS = 220
 
 # Define MemBlocks Size for each additional module/operations
-M_SETDATA = 14
+M_SETDATA = 16
 M_MSGQ = 8
 
 #
@@ -471,7 +514,10 @@ $(info TOSSIM      = $(TOSSIM))
 $(info DEBUG       = $(DEBUG))
 $(info VM          = $(VM))
 $(info MODULES     = $(MODULES) -- [MSGQ])
+$(info NET_ID      = $(NET_ID))
 $(info MOTE_ID     = $(INSTALL))
+$(info MOTE_ADDR   = $(MOTE_ADDR))
+$(info MOTE_TYPE   = $(MOTE_TYPE))
 $(info RFPOWER     = $(RFPOWER))
 $(info LPL         = $(LPL))
 $(info SENSORBOARD = $(SENSORBOARD))
@@ -488,8 +534,8 @@ PFLAGS += -fno-strict-aliasing # required for accessing VARS
 
 
 
-#CFLAGS += -DPRINTF
-#CFLAGS += -I$(TOSDIR)/lib/printf
+#PFLAGS += -I$(TOSROOT)/tos/lib/printf
+#PFLAGS += -DNEW_PRINTF_SEMANTICS
 
 # Force micaz as mig platform
 PLATFORM_MIG = micaz

@@ -26,8 +26,10 @@ typedef union message_footer {
   nx_uint8_t dummy;
 } message_footer_t;
 
-typedef union message_metadata {
-  nx_uint8_t dummy;
-} message_metadata_t;
+typedef serial_metadata_t message_metadata_t;
+
+//typedef union message_metadata {
+//  nx_uint8_t dummy;
+//} message_metadata_t;
 
 #endif

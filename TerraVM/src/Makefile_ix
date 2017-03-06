@@ -11,8 +11,7 @@ GCC = gcc
 OPT1=-fnesc-include=tos -topdir=$(APPDIR)
 OPT2=-fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask -o $(MAIN_EXE) -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -fnesc-cfile=$(MAIN_APPC) --param max-inline-insns-single=100000 -fnesc-dump=wiring   -fnesc-dumpfile=$(DUMP_FILE) -lm -fnesc-no-debug 
 OPT3 = $(CFLAGS)
-OPT4=-DTERRA_NODE_ID=$(INSTALL)
-OPT5=setTimer.o dbg.o
+OPT4=setTimer.o dbg.o
 
 rpi: builddir exe
 	$(info **********  Makefile RPi: *************)
@@ -25,7 +24,7 @@ setTimer.o: $(VMDIR)/setTimer.c
 
 exe: dbg.o setTimer.o
 	@echo "    compiling $(COMPONENT) to a $(PLATFORM) binary"
-	nescc $(OPT1) $(OPT2) $(OPT3) $(OPT4) $(OPT5) -gcc=$(GCC) $(COMPONENT).nc
+	nescc $(OPT1) $(OPT2) $(OPT3) $(OPT4) -gcc=$(GCC) $(COMPONENT).nc
 	@echo "    compiled $(COMPONENT) to $(MAIN_EXE)"
 
 install.%: 

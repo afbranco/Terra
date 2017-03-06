@@ -16,6 +16,12 @@ enum{
 #else
 	CURRENT_MAX_BLOCKS = 24,
 #endif
+
+#ifdef GENERAL_MAX__BLKS
+	GENERAL_MAX_BLOCKS = GENERAL_MAX__BLKS, // Max memory (in blocks of BLOCK_SIZE) allocated for VM script/data - Defined from Makefile
+#else
+	GENERAL_MAX_BLOCKS = 100,
+#endif
 		
 };
 

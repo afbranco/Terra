@@ -45,7 +45,7 @@ INCDIRS := $(addprefix -I,$(shell find $(VMDIR)/$(TOS_INO)/ -type d -print))
 
 OPT_1 =  -fnesc-include=tos -topdir=$(APPDIR) -fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask  -o $(MAIN_EXE) -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -fnesc-cfile=$(MAIN_APPC) --param max-inline-insns-single=100000 -fnesc-dump=wiring   -fnesc-dumpfile=$(DUMP_FILE) -lm  -fnesc-target=avr -fnesc-no-debug
 
-OPT_2 =  -mmcu=$(MCU) -DMHZ=$(MCUCLK) -D$(DEVTYPE) -DF_CPU=$(F_CPU) -DTERRA_NODE_ID=$(INSTALL)
+OPT_2 =  -mmcu=$(MCU) -DMHZ=$(MCUCLK) -D$(DEVTYPE) -DF_CPU=$(F_CPU)
 
 OPT_3 =  $(INCDIRS) $(CFLAGS)
 

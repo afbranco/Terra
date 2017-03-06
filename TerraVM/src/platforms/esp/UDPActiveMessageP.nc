@@ -19,6 +19,8 @@ module UDPActiveMessageP{
 	uses interface Timer<TMilli> as sendDoneTimer;
 	uses interface Timer<TMilli> as timerDelay;
 	uses interface Timer<TMilli> as timerCheckConn;
+	uses interface Timer<TMilli> as receiveTaskTimer;
+	uses interface Timer<TMilli> as sendDoneTaskTimer;
 	
 }
 implementation{	
@@ -26,6 +28,10 @@ implementation{
 	int socket_receiver;
 
 	int counter = 0;
+	int radioStarted = FALSE;
+	int lastSendAck = FALSE;
+	int sendDoneTimerCanceled=FALSE;
+	
 	message_t* lastSendMessage;
 	message_t lastReceiveMessage;	
 	struct sockaddr_in addrSender;	
@@ -68,7 +74,7 @@ implementation{
 		int size;
 		
 		size = length;
-		if (size < 0) { dbgerror("UDP","UDP::Ignoring message with size < 0\n"); return;}
+		if (size < 0) { dbg("UDP","UDP::Ignoring message with size < 0\n"); return;}
 
 		if ((*(nx_uint16_t*)dgram) == ACK_CODE){
 			// verificando se eh pra mim
@@ -78,11 +84,12 @@ implementation{
 //				os_printf("EH ACK! Dest: %d Src: %d AckID: %d\n", receiveAckMsg.dest, receiveAckMsg.src, receiveAckMsg.ackID);
 //				os_printf("Tos_node_id: %d, ackID: %d, dest: %d, Timer: %s\n", TOS_NODE_ID, getHeader(lastSendMessage)->ackID, getHeader(lastSendMessage)->dest, (call sendDoneTimer.isRunning())?"true":"false");
 	
-				dbg("UDP","UDP::received an ack: %d \n", (uint16_t)call sendDoneTimer.getNow());
+				dbg("UDP","UDP::received an ackID: %d from %d - time= %d us\n", receiveAckMsg.ackID, receiveAckMsg.src,system_get_time());
 				if (receiveAckMsg.src == getHeader(lastSendMessage)->dest
 							&& receiveAckMsg.ackID == getMetadata(lastSendMessage)->ackID
 						&& call sendDoneTimer.isRunning()){
 					dbg("UDP","UDP::ACK RECEBIDO\n");
+					sendDoneTimerCanceled=TRUE;
 					call sendDoneTimer.stop();
 					post send_doneAck();				
 				}	
@@ -93,27 +100,46 @@ implementation{
 	
 			if (call AMPacket.isForMe(msg)) {	
 				memcpy(&lastReceiveMessage, msg, sizeof(message_t));
-				dbg("UDP","UDP::Received from %d -- reqAck: %d\n", call AMPacket.source(msg), getMetadata(msg)->ackID);
-
-				// soh mando ack se for pra mim e se o remente requerir
+				dbg("UDP","UDP::Received from %d -- reqAck: %d - time = %d us\n", call AMPacket.source(msg), getMetadata(msg)->ackID,system_get_time());
+				// soh mando ack se for pra mim e se o remetente requerir
 				if (getMetadata(msg)->ackID != 0 && getHeader(msg)->dest == TOS_NODE_ID){
-					call timerDelay.startOneShot(1); // ack mto rápido
+					dbg("UDP","UDP:: Reply an Ack message\n");
+					call timerDelay.startOneShot(5); // ack muito rápido
+				} else {
+					call receiveTaskTimer.startOneShot(10);
 				}
-				post receiveTask();
 			}
 		}		
 	}
 
-	// ESP USP send done event
+	// ESP UDP send done event
 	void user_udp_sent_cb(void *arg) {
 		struct espconn *pespconn = arg;
-		// sucesso no send sem ack
-		if(getMetadata(lastSendMessage)->ackID == 0)
-			post send_done();
-		else{ // inicio timeout do ack
-			call sendDoneTimer.startOneShot(SENDDONE_WAITTIME);
+		// Proccess only Message sent, ignoring the sent ack.
+		dbg("UDP","UDP::udp_sent_cb():  lastSendAck=%s\n",_TFstr(lastSendAck));
+		if (lastSendAck == FALSE){
+			// sucesso no send sem ack
+			if(getMetadata(lastSendMessage)->ackID == 0)
+				call sendDoneTaskTimer.startOneShot(10);
+			else{ // inicio timeout do ack
+				sendDoneTimerCanceled = FALSE;
+				call sendDoneTimer.startOneShot(SENDDONE_WAITTIME);
+			}
+		} else {
+			lastSendAck = FALSE;
+			call receiveTaskTimer.startOneShot(10);
 		}
 	}
+
+	event void receiveTaskTimer.fired(){
+			// Now can signal the original received message
+	 		post receiveTask();
+	 		
+	}	event void sendDoneTaskTimer.fired(){
+			// Now can signal the original received message
+	 		post send_done();
+	}
+	
 
 	// Check IP connection was done
 	event void timerCheckConn.fired(){
@@ -151,14 +177,17 @@ implementation{
 			espconn_regist_recvcb(&espconnReceiver, user_udp_recv_cb);
 			espconn_create(&espconnReceiver);
 		
+			radioStarted=TRUE;
+
 			// Set global NODE_ID -- removed! NODE_ID comes from compilation time
 //			TOS_NODE_ID = (uint16_t)((ipconfig.ip.addr >> 16)*256 + (ipconfig.ip.addr >> 24)); //(ip4_addr3(ipconfig.ip.addr)*256 + ip4_addr4(ipconfig.ip.addr));
 			post start_done(); // signal a succesful start done 
+			dbgerror("UDP","UDP::Connection OK \n");
 		} else {
 			if ((wifi_station_get_connect_status() == STATION_WRONG_PASSWORD ||
 	                wifi_station_get_connect_status() == STATION_NO_AP_FOUND ||
 	                wifi_station_get_connect_status() == STATION_CONNECT_FAIL)) {
-				dbgerror("UDP","UDP::Conncetion fail - status=%d",wifi_station_get_connect_status());
+				dbgerror("UDP","UDP::Connection fail - status=%d\n",wifi_station_get_connect_status());
 				post start_done_fail();
 			} else {
 	           //re-arm timer to check ip
@@ -167,24 +196,26 @@ implementation{
 	    }
 	}
 
+	ackMessage_t ackMsg;
 	event void timerDelay.fired(){	
-		ackMessage_t ackMsg;
  		const char udp_remote_ip[4] = GROUP_BYTES;
  		uint8_t stat; 
+		const int port = PORT;
 	
+		lastSendAck = TRUE;
 		ackMsg.ackCode = ACK_CODE;
 		ackMsg.src = TOS_NODE_ID;
 		ackMsg.dest = getHeader(&lastReceiveMessage)->src;
 		ackMsg.ackID = getMetadata(&lastReceiveMessage)->ackID;
 	
+		dbg("UDP","Sendind an AckID=%d - time=%d us\n",ackMsg.ackID,system_get_time());	
 		// Send Ack message via ESP UDP
+ 		espconnSender.proto.udp->remote_port = port;  // ESP8266 udp remote port need to be set everytime we call espconn_sent
 		os_memcpy(espconnSender.proto.udp->remote_ip, udp_remote_ip, 4); // ESP8266 udp remote IP need to be set everytime we call espconn_sent
- 		espconnSender.proto.udp->remote_port = PORT;  // ESP8266 udp remote port need to be set everytime we call espconn_sent
 		stat=espconn_sendto(&espconnSender, (char*)&ackMsg, sizeof(ackMessage_t));
 		if (stat != 0) {
 			dbgerror("UDP","UDP ERROR:: Fail to send Ack! stat=%d\n",stat);
 		}
-
 	}
 	
 
@@ -194,6 +225,7 @@ implementation{
 		struct station_config stationConf;
 
 		int status;
+		radioStarted = FALSE;
 
 	    //Set station mode
 	    wifi_set_opmode(STATION_MODE);
@@ -205,33 +237,42 @@ implementation{
 		wifi_station_set_config(&stationConf);
 	
 		//set a timer to check whether got ip from router succeed or not.
-		call timerCheckConn.startOneShot(100);	
+		call timerCheckConn.startOneShot(300);	
 
 		return SUCCESS;
 	}
 	
 	event void sendDoneTimer.fired(){
-		getMetadata(lastSendMessage)->ackID = FALSE;
-		signal AMSend.sendDone[getHeader(lastSendMessage)->type](lastSendMessage, SUCCESS);
+		if (sendDoneTimerCanceled == FALSE) {
+			getMetadata(lastSendMessage)->ackID = FALSE;
+			dbg("UDP","UDP::AMSend - Ack time-out time=%d us\n",system_get_time());
+			signal AMSend.sendDone[getHeader(lastSendMessage)->type](lastSendMessage, SUCCESS);
+		} else {
+			dbg("UDP","UDP::AMSend - Ack time-out timer was canceled - time=%d us\n",system_get_time());
+			
+		}
 	}
 
 	command error_t AMSend.send[am_id_t id](am_addr_t am_addr, message_t *msg, uint8_t len){
-
-		message_header_t *header;
 		uint8_t stat;
  		const char udp_remote_ip[4] = GROUP_BYTES; 
 		const int port = PORT;
+
+		if (radioStarted==FALSE) {
+			dbg("UDP","UDP::AMSend.send(): UDP not yet connected!\n");
+			return FAIL;
+		}
 
 		call AMPacket.setSource(msg, TOS_NODE_ID);
 		call AMPacket.setDestination(msg, am_addr);
 		call AMPacket.setGroup(msg, TOS_AM_GROUP);
 		call AMPacket.setType(msg, id);
-		dbg("UDP","UDP::Sending to %d am_d=%d\n",am_addr,id);
 		// setar o counter se houver ack
 		if (getMetadata(msg)->ackID != 0){			
 			counter = (counter==0)?1:counter+1; // se for diferente de zero, mantém; caso contrário, soma
 			getMetadata(msg)->ackID = counter;
 		}
+		dbg("UDP","UDP::AMSend.send(): Sending to %d am_id=%d, ackID=%d - time= %d us\n",am_addr,id,getMetadata(msg)->ackID,system_get_time());
 		lastSendMessage = msg; // salva o endereço da ultima mensagem
 
 		// Send message via ESP UDP

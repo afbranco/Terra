@@ -8,16 +8,20 @@ DUMP_FILE = $(BUILDDIR)/wiring-check.xml
 GCC = xtensa-lx106-elf-gcc
 OBJDUMP = avr-objdump
 
+#Serial upload port
+SERIAL ?= /dev/ttyUSB0
+
 # Specif xtensa flags
-XCFLAGS = -DICACHE_FLASH -mlongcalls
+CFLAGS += -DICACHE_FLASH -mlongcalls
 LDLIBS = -nostdlib -Wl,--start-group -lmain -lnet80211 -lwpa -llwip -lc -lpp -lphy -Wl,--end-group -lgcc
 LDFLAGS = -Teagle.app.v6.ld
 
 OPT1=-fnesc-include=tos -topdir=$(APPDIR)
 OPT2=-fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask -o $(MAIN_EXE) -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -fnesc-cfile=$(MAIN_APPC) --param max-inline-insns-single=100000 -fnesc-dump=wiring   -fnesc-dumpfile=$(DUMP_FILE) -lm -fnesc-no-debug 
-OPT3 =  $(XCFLAGS) $(CFLAGS)
-OPT4=-DTERRA_NODE_ID=$(INSTALL)
-OPT5= $(LDLIBS) $(LDFLAGS)
+OPT3=$(XCFLAGS) $(CFLAGS)
+OPT4=$(LDFLAGS) $(LDLIBS) 
+
+#$(error $(OPT1) $(OPT2) $(OPT3) $(OPT4))
 
 
 esp: builddir bin bytes
@@ -25,7 +29,7 @@ esp: builddir bin bytes
 
 $(MAIN_APPC):
 	@echo "    compiling $(COMPONENT) to a $(PLATFORM) binary"
-	nescc -conly $(OPT1) $(OPT2) $(OPT3) $(OPT4) $(OPT5) -gcc=$(GCC) -E $(COMPONENT).nc
+	nescc -conly $(OPT1) $(OPT2) $(OPT3) $(OPT4) -gcc=$(GCC) -E $(COMPONENT).nc
 	#
 	@sed -i -e's/static[ ]*void/static void __attribute((section(".irom0.text"))) /g' build/esp/app.c
 	@sed -i -e's/static[ ]*bool/static bool __attribute((section(".irom0.text"))) /g' build/esp/app.c
@@ -91,15 +95,15 @@ bin: elf
 
 elf: $(MAIN_APPC)
 	$(info ---------------------------------  Compile done *************)
-	$(GCC) $(MAIN_APPC) $(OPT3) $(OPT5) -o$(MAIN_EXE)
+	$(GCC) $(MAIN_APPC) $(OPT3) $(OPT4) -o$(MAIN_EXE)
 
 install.%: $(MAIN_EXE)-0x00000.bin $(MAIN_EXE)-0x10000.bin 
 	$(info ---------------------------------  Start flashing to device *************)
-	esptool.py -b 115200 write_flash 0x00000 $(MAIN_EXE)-0x00000.bin 0x10000 $(MAIN_EXE)-0x10000.bin
+	esptool.py -b 115200 -p $(SERIAL) write_flash 0x00000 $(MAIN_EXE)-0x00000.bin 0x10000 $(MAIN_EXE)-0x10000.bin
 
 install: $(MAIN_EXE)-0x00000.bin $(MAIN_EXE)-0x10000.bin 
 	$(info ---------------------------------  Start flashing to device *************)
-	esptool.py -b 115200 write_flash 0x00000 $(MAIN_EXE)-0x00000.bin 0x10000 $(MAIN_EXE)-0x10000.bin
+	esptool.py -b 115200 -p $(SERIAL) write_flash 0x00000 $(MAIN_EXE)-0x00000.bin 0x10000 $(MAIN_EXE)-0x10000.bin
 
 
 builddir: 

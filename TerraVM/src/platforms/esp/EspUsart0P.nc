@@ -61,8 +61,22 @@ implementation
 
 	command error_t StdControl.start ()
 	{		
+		struct rst_info *rtc_info = system_get_rst_info(); 
 		// Config Baudrate for Uart0 and Uart1
 		uart_init(UART0_BAUD, BIT_RATE_115200);
+
+		// Print the reset reason and, if it accours, the fatal exception.
+		os_printf("reset reason: %x\n", rtc_info->reason); 
+		if (	rtc_info->reason == REASON_WDT_RST || 
+		  		rtc_info->reason == REASON_EXCEPTION_RST || 
+		   		rtc_info->reason == REASON_SOFT_WDT_RST) { 
+			if (rtc_info->reason == REASON_EXCEPTION_RST) { 
+		    	os_printf("Fatal exception (%d):\n", rtc_info->exccause); 
+		   	} 
+			os_printf("epc1=0x%08x, epc2=0x%08x, epc3=0x%08x,excvaddr=0x%08x, depc=0x%08x\n", 
+		    			rtc_info->epc1, rtc_info->epc2, rtc_info->epc3, rtc_info->excvaddr, rtc_info->depc);//The address of the last crash is printed, which is used to debug garbled output.
+		}
+
 		return SUCCESS;
 	}
 
@@ -86,7 +100,7 @@ implementation
 		}
 		uart0_tx_buffer(buf,len);
 		post stream_send_done();
-		os_printf("\nPassei no USART send. len=%d, 1st byte=%02x\n",len,*buf);
+//		os_printf("\nPassei no USART send. len=%d, 1st byte=%02x\n",len,*buf);
 		return SUCCESS;
 	}
 
@@ -155,16 +169,16 @@ void ICACHE_FLASH_ATTR uart_rx_task(os_event_t *events) {
 	uint8_t rx_len=0;
     char rx_char;
     uint8_t ii;
-os_printf(":");
+//os_printf(":");
     if (events->sig == 0) {
         // Sig 0 is a normal receive. Get how many bytes have been received.
         rx_len = (READ_PERI_REG(UART_STATUS(UART0)) >> UART_RXFIFO_CNT_S) & UART_RXFIFO_CNT;
-os_printf("%d\n",rx_len); 
+//os_printf("%d\n",rx_len); 
         for (ii=0; ii < rx_len; ii++) {
         	receiveBuffer[ii]=READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
-os_printf("%c.%02x|",receiveBuffer[ii],receiveBuffer[ii]); 
+//os_printf("%c.%02x|",receiveBuffer[ii],receiveBuffer[ii]); 
         }
-os_printf("\n");
+//os_printf("\n");
         // Clear the interrupt condition flags and re-enable the receive interrupt.
         WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_FULL_INT_CLR | UART_RXFIFO_TOUT_INT_CLR);
         uart_rx_intr_enable(UART0);

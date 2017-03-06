@@ -183,6 +183,8 @@ os_event_t	taskQueueMem[TASK_QUEUE_LEN];
 				  return;
 			  }
 		  }
+	  	  system_soft_wdt_feed();
+	  	  system_os_post(USER_TASK_PRIO_0,	SIG_TASKLOOP,	0);
 		  signal TaskBasic.runTask[nextTask]();
 	  }
   }

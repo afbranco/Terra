@@ -78,7 +78,7 @@ void  func_getNodeId(uint16_t id){
 	uint16_t stat;
 	// return NodeId
 	stat = TOS_NODE_ID;
-	dbg(APPNAME,"Custom::func_getNodeId(): id=%d, NodeId=%d\n",id,stat);
+	dbg(APPNAME,"Custom::func_getNodeId(): func id=%d, NodeId=%d\n",id,stat);
 	signal VM.push(stat);
 	}	
 void  func_random(uint16_t id){

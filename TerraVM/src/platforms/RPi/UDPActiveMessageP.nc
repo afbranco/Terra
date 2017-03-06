@@ -52,6 +52,7 @@ implementation{
 		/* Walk through linked list, maintaining head pointer so we
 		can free list later */
 
+		dbgerror("UDP","UDP::getID_fromIP() - looking for a good addr\n");
 		for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
 			if (ifa->ifa_addr == NULL)
 				continue;
@@ -61,12 +62,14 @@ implementation{
 			if (family == AF_INET){
 				s = getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
 				if (s != 0) {
-					dbgerror("UDP","UDP::getnameinfo() failed: %s\n", gai_strerror(s));
+					dbgerror("UDP","UDP::getID_fromIP():getnameinfo() failed: %s\n", gai_strerror(s));
 					exit(EXIT_FAILURE);
 				}
 	
 				sscanf(host, "%u.%u.%u.%u", &addrHost[0], &addrHost[1], &addrHost[2], &addrHost[3]);
-	
+				dbgerror("UDP","UDP::getID_fromIP() - test addr: %d.%d.%d.%d\n",
+							addrHost[0],addrHost[1],addrHost[2],addrHost[3]);
+					
 				if (addrHost[0] != 127) return (uint16_t) (addrHost[2]*256 + addrHost[3]);
 			}
 		}
@@ -95,16 +98,12 @@ implementation{
 		message_t *msg;
 		ackMessage_t receiveAckMsg;
 		int size;
-		//struct sockaddr *addrRcv;
-		//struct socklen_t *addRcvLen;
+
 		size = recvfrom(socket_receiver, dgram, MAX_LENGTH, 0, (struct sockaddr*)&addr, (socklen_t*)&fromlen);
-//printf("Received some data - len=%d\n",size);	
 		dbgerror("UDP","UDP::UDP_HandleReceiver() - Received some data - len=%d\n",size);
 
-		if (size < 0) dbgerror("UDP","UDP::Erro recvfrom\n"); // incluir o signal do receive()
-		else{
-				dgram[size]='\0';	
-		}
+		if (size < 0) { dbgerror("UDP","UDP::Ignoring message with size < 0\n"); return;}
+
 		if ((*(nx_uint16_t*)dgram) == ACK_CODE){
 			// verificando se eh pra mim
 			memcpy (&receiveAckMsg, (ackMessage_t*)dgram, sizeof(ackMessage_t));
@@ -113,7 +112,7 @@ implementation{
 //				printf("EH ACK! Dest: %d Src: %d AckID: %d\n", receiveAckMsg.dest, receiveAckMsg.src, receiveAckMsg.ackID);
 //				printf("Tos_node_id: %d, ackID: %d, dest: %d, Timer: %s\n", TOS_NODE_ID, getMetadatata(lastSendMessage)->ackID, getHeader(lastSendMessage)->dest, (call sendDoneTimer.isRunning())?"true":"false");
 	
-				dbg("UDP","UDP::received an ack: %d \n", (uint16_t)call sendDoneTimer.getNow());
+				dbg("UDP","UDP::received an ackID: %d from %d\n", receiveAckMsg.ackID, receiveAckMsg.src);
 				if (receiveAckMsg.src == getHeader(lastSendMessage)->dest
 							&& receiveAckMsg.ackID == getMetadata(lastSendMessage)->ackID
 						&& call sendDoneTimer.isRunning()){
@@ -121,6 +120,8 @@ implementation{
 					call sendDoneTimer.stop();
 					post send_doneAck();				
 				}	
+			} else {
+				dbg("UDP","UDP:: Ack is not for me!\n");
 			}	
 		}
 		else{ // eh o msg_t
@@ -130,12 +131,16 @@ implementation{
 				memcpy(&lastReceiveMessage, msg, sizeof(message_t));
 				dbg("UDP","UDP::Received from %d -- reqAck: %d\n", call AMPacket.source(msg), getMetadata(msg)->ackID);
 
-				// soh mando ack se for pra mim e se o remente requerir
+				// soh mando ack se for pra mim e se o remetente requerir
 				if (getMetadata(msg)->ackID != 0 && getHeader(msg)->dest == TOS_NODE_ID){
-					call timerDelay.startOneShot(1); // ack mto rápido
+					dbg("UDP","UDP:: Reply an Ack message\n");
+					call timerDelay.startOneShot(1); // ack muito rápido
+				} else {
+					post receiveTask();
 				}
-				post receiveTask();
-			}
+			} else {
+				dbg("UDP","UDP:: Message is not for me!\n");
+			}	
 		}
 	}	
 
@@ -146,8 +151,12 @@ implementation{
 		ackMsg.src = TOS_NODE_ID;
 		ackMsg.dest = getHeader(&lastReceiveMessage)->src;
 		ackMsg.ackID = getMetadata(&lastReceiveMessage)->ackID;
+		dbgerror("UDP","Sendind an AckID=%d\n",ackMsg.ackID);
 	
 		sendto(socket_sender, &ackMsg, sizeof(message_t), 0, (struct sockaddr *)&addrSender, sizeof(struct sockaddr_in));
+		
+		// Now can signal the original received message
+		post receiveTask();
 	
 	}
 	
@@ -173,7 +182,7 @@ implementation{
 		const unsigned int one = 1;
 		int status;
 	
-//		TOS_NODE_ID = getID_fromIP(); // NODE_ID comes from compilation time
+		//TOS_NODE_ID = getID_fromIP(); // NODE_ID comes from compile time
 		if(getID_fromIP() == 0){
 			dbgerror("UDP","UDP::Nenhuma interface ethernet AF_INET foi encontrada\n");
 			return FAIL;
@@ -279,24 +288,23 @@ implementation{
 	
 	event void sendDoneTimer.fired(){
 		getMetadata(lastSendMessage)->ackID = FALSE;
+		dbg("UDP","UDP::AMSend - Ack time-out\n");
 		signal AMSend.sendDone[getHeader(lastSendMessage)->type](lastSendMessage, SUCCESS);
 	}
 
 	command error_t AMSend.send[am_id_t id](am_addr_t am_addr, message_t *msg, uint8_t len){
-
-		//struct ip_mreq mcast_group;
-		//message_header_t *header;
 	
 		call AMPacket.setSource(msg, TOS_NODE_ID);
 		call AMPacket.setDestination(msg, am_addr);
 		call AMPacket.setGroup(msg, TOS_AM_GROUP);
 		call AMPacket.setType(msg, id);
-		dbg("UDP","UDP::Sending to %d am_d=%d\n",am_addr,id);
 		// setar o counter se houver ack
 		if (getMetadata(msg)->ackID != 0){			
 			counter = (counter==0)?1:counter+1; // se for diferente de zero, mantém; caso contrário, soma
 			getMetadata(msg)->ackID = counter;
 		}
+		dbg("UDP","UDP::AMSend.send(): Sending to %d am_id=%d, ackID=%d\n",am_addr,id,getMetadata(msg)->ackID);
+
 		lastSendMessage = msg; // salva o endereço da ultima mensagem
 		sendto(socket_sender, msg, sizeof(message_t), 0, (struct sockaddr *)&addrSender, sizeof(struct sockaddr_in));	
 	

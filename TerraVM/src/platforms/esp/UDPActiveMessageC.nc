@@ -17,6 +17,7 @@ implementation{
 	
 	components UDPActiveMessageP;
 	components new TimerMilliC() as SD_Timer, new TimerMilliC() as TimerDelay, new TimerMilliC() as TimerCheckConn;
+	components new TimerMilliC() as receiveTaskTimer, new TimerMilliC() as sendDoneTaskTimer;
 	
 	SplitControl = UDPActiveMessageP;
 	AMSend = UDPActiveMessageP;
@@ -31,5 +32,7 @@ implementation{
 	UDPActiveMessageP.sendDoneTimer->SD_Timer; // usando
 	UDPActiveMessageP.timerDelay->TimerDelay;
 	UDPActiveMessageP.timerCheckConn -> TimerCheckConn;
+	UDPActiveMessageP.receiveTaskTimer -> receiveTaskTimer;
+	UDPActiveMessageP.sendDoneTaskTimer -> sendDoneTaskTimer;
 }
 

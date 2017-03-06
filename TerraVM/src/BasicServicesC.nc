@@ -66,7 +66,7 @@ implementation{
 	components new vmBitVectorC(CURRENT_MAX_BLOCKS) as Bitmap;
 	BS.BM -> Bitmap;	
 	// Bit vector to control Others blocks
-	components new vmBitVectorC(CURRENT_MAX_BLOCKS) as Bitmap2;
+	components new vmBitVectorC(GENERAL_MAX_BLOCKS) as Bitmap2;
 	BS.BMaux -> Bitmap2;	
 	
 	// IN & OUT Queues

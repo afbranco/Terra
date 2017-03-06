@@ -1,5 +1,3 @@
-#ifndef NO_DEBUG
-#endif
 
 generic module dataQueueP(typedef dataType, uint8_t qLenth, uint8_t qId){
 	provides interface dataQueue;

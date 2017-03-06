@@ -5,11 +5,12 @@
  * abranco at inf.puc-rio.br
  * *********************************************/
 /*
- * Module: TerraVMC
+ * Module: TerraVMC	
  * Virtual Machine main control - module file
  * 
  */
 #include "TerraVM.h"
+//#include "printf.h"
 
 module TerraVMC @safe()
 {
@@ -26,7 +27,7 @@ implementation
 {
     uint32_t old;
 	// Mote Identifier
-	nx_uint16_t MoteID;					
+	nx_uint16_t MoteID;			
 	// VM scrip memory
 	nx_uint8_t CEU_data[BLOCK_SIZE * CURRENT_MAX_BLOCKS];   // Ceu data room for 'tracks', 'mem', 'Prog', and 'Stack'
 	// Program Counter (PC)
@@ -74,10 +75,8 @@ implementation
 	 * Initialization 
 	 */
 	event void BSBoot.booted(){
-#ifdef TERRA_NODE_ID // For non TinyOS platforms like Ino and RPI
-		TOS_NODE_ID = TERRA_NODE_ID;
-#endif 		
 		MoteID = TOS_NODE_ID;
+
 	}	
 
 
@@ -481,7 +480,6 @@ void ceu_track_clr (tceu_nlbl l1, tceu_nlbl l2) {
 
 void ceu_spawn (nx_uint16_t* lbl)
 {
-//printf("spw:%d\n",*(nx_uint16_t*)lbl);printfflush();
     if (*(nx_uint16_t*)lbl != Inactive) {
         ceu_track_ins(CEU->stack, CEU_TREE_MAX, 0, *lbl);
         *(nx_uint16_t*)lbl = Inactive;
@@ -537,7 +535,6 @@ void ceu_wclock_enable (int gte, s32 us, tceu_nlbl lbl) {
 	dt = (dt<0)?0:dt;
 
     dbg(APPNAME,"CEU::ceu_wclock_enable(): gate=%d, time=%d, lbl=%d, dt=%ld, wClock0=%d\n",gte,us,lbl,dt,wClock0);
-//printf("[%d/%d] (%ld - %d) = %ld",gte,lbl,us,CEU->wclk_late,dt);printfflush();
     tmr->togo = dt;
     *(nx_uint16_t*)&(tmr->lbl)  = lbl;
 
@@ -689,6 +686,7 @@ void execTrail(uint16_t lbl){
 		return;  // Label not found
 	}
 	getOpCode(&Opcode,&Param1);
+	
 	while (Opcode != op_end){
 	    if (haltedFlag) return;
 		Decoder(Opcode,Param1);
@@ -699,15 +697,16 @@ void execTrail(uint16_t lbl){
 
 int ceu_go (int* ret)
 {
-//fprintf(stderr, "===\n");
+	uint8_t nextTrk;
     tceu_trk trk;
     tceu_nlbl _lbl_;
 
     dbg(APPNAME,"CEU::ceu_go():\n");
-
 	procFlag = TRUE;
     CEU->stack = CEU_STACK_MIN;
-    while (ceu_track_rem(&trk, 1))
+
+	nextTrk = ceu_track_rem(&trk, 1);
+    while (nextTrk)
     {
         if (trk.stack != CEU->stack) {
             CEU->stack = trk.stack;
@@ -720,10 +719,10 @@ int ceu_go (int* ret)
         
         execTrail(_lbl_);
 
+		nextTrk = ceu_track_rem(&trk, 1);
     }
 	procFlag = FALSE;
 	post procEvent();
-
     return 0;
 }
 
@@ -1124,14 +1123,15 @@ void f_set_v(uint8_t Modifier){
 	Maddr1 = getPar16(p1_1len);
 	Maddr2 = getPar16(p2_1len);
 	
-	dbg(APPNAME,"VM::f_set_v(%02x): tp1=%d, tp2=%d, p1_1len=%d, p2_1len=%d, Maddr1=%d, Maddr2=%d\n",Modifier,tp1,tp2,p1_1len,p2_1len,Maddr1,Maddr2);
 
 	if (tp2 == F32){ 		// Source is a float
 		float buffer = getMValf(Maddr2);
 		setMVal(*(uint32_t*)&buffer,Maddr1,tp2,tp1);
+		dbg(APPNAME,"VM::f_set_v(%02x): tp1=%d, tp2=%d, p1_1len=%d, p2_1len=%d, Maddr1=%d, Maddr2=%d, value=%f\n",Modifier,tp1,tp2,p1_1len,p2_1len,Maddr1,Maddr2,buffer);
 	} else { 				// Source is an integer
 		uint32_t buffer = getMVal(Maddr2,tp2);
 		setMVal(buffer,Maddr1,tp2,tp1);
+		dbg(APPNAME,"VM::f_set_v(%02x): tp1=%d, tp2=%d, p1_1len=%d, p2_1len=%d, Maddr1=%d, Maddr2=%d, value=%d\n",Modifier,tp1,tp2,p1_1len,p2_1len,Maddr1,Maddr2,buffer);
 	}	
 }
 void f_setarr_vc(uint8_t Modifier){
@@ -1827,6 +1827,7 @@ void f_set_c(uint8_t Modifier){
 	event void BSUpload.start(bool resetFlag){
 		uint8_t i, size;
 		MoteID = TOS_NODE_ID;
+
 		dbg(APPNAME,"VM::BSUpload.start(%s)\n",(resetFlag)?"TRUE":"FALSE");
 		if (resetFlag==TRUE){ // Reset all stuff
 			//Clean up Event Queue
@@ -1865,7 +1866,7 @@ void f_set_c(uint8_t Modifier){
 	}
 	
 	event void VMCustom.evtError(uint8_t ecode){ 
-	evtError(ecode);
+		evtError(ecode);
 	}
 	
 	
