@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 //import java.util.List;
 import java.util.Properties;
 import java.util.Timer;
@@ -980,6 +981,7 @@ public class ControlForm {
 	private void fillComboPrefix(){
 		File fd = new File(textFolder.getText());
 		String[] Names = fd.list(new ControlFileFilter(vmSufix));
+		Arrays.sort(Names);
 		System.out.println("Folder: "+ fd.getPath() +" #prefix:"+Names.length);
 		comboPrefix.removeAllItems();
 		if (Names.length>0) {
@@ -1031,6 +1033,8 @@ public class ControlForm {
 		lblTCPStatus2.repaint();
 		//lblTCPStatus3.repaint(); // dataForm
 		lblTCPRetries.repaint();
+		btnApply.repaint();
+		controlPanel.repaint();
 		
 	}
 	
@@ -1106,7 +1110,7 @@ public class ControlForm {
 	
 	public void sendBSMsg(int Sender, int EvtId, int Seq, String Data){
 //		System.out.println("sendBSMsg");
-		String line = String.format("%s:sendBSMsg: Sender= %03d, EvtId=%02d, data=[%s]\n", DateFormat.format(System.currentTimeMillis()),Sender,EvtId,Data);	
+		String line = String.format("%s:sendBSMsg: Snd=%05d(%01d:%03d), eid=%02d, data=[%s]\n", DateFormat.format(System.currentTimeMillis()),Sender,Sender>>11,Sender & 0x07ff,EvtId,Data);	
 		DataMsgs.append(line);
 		DataMsgs.setCaretPosition(DataMsgs.getDocument().getLength());
 	}
