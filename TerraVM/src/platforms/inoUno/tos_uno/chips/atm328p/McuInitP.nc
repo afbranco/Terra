@@ -44,6 +44,10 @@ implementation
   command error_t Init.init ()
   {
     error_t res = SUCCESS;
+#ifdef INO_HALF_CLOCK
+  CLKPR = (1<<CLKPCE);
+  CLKPR = (0<<CLKPS3) | (0<<CLKPS2) | (0<<CLKPS1) | (1<<CLKPS0); 
+#endif
     res = ecombine (res, call PowerInit.init ());
     res = ecombine (res, call IoBusInit.init ());
     res = ecombine (res, call IoModuleInit.init ());
