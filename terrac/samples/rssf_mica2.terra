@@ -1,0 +1,183 @@
+#include "TerraNet.defs"
+
+//setRFPower(1);
+
+#define REQ_TOPO 3
+#define DATA 1
+#define NEW_TOPO 2
+
+#define ROOT 1
+#define PERIOD 150
+
+var ubyte count=0;
+var ubyte tcount=0;
+var ubyte stat;
+var ubyte seqTopo=0;
+var ubyte lastReqTopo=0;
+var ushort reqTopoNode=0;
+
+var ushort nodeid = getNodeId();
+#define NO_FATHER 88
+var ushort parentid=NO_FATHER;
+
+pktype usrMsg from radioMsg with
+	var ubyte[4] d8;
+	var ushort[4] d16;
+	var ulong[2] d32;
+end
+
+var usrMsg sdata;
+var usrMsg fdata;
+var usrMsg xdata;
+var usrMsg topo;
+var usrMsg rtopo;
+var usrMsg xtopo;
+var usrMsg msgRadio;
+
+sdata.type=DATA;
+sdata.target=NO_FATHER;
+sdata.source=nodeid;
+sdata.d8[1]=0;
+sdata.d8[2]=0;
+
+topo.type=NEW_TOPO;
+topo.target=BROADCAST;
+topo.source=nodeid;
+topo.d8[1]=0;
+topo.d8[2]=0;
+
+var ulong delay = (nodeid & 0x07ff) * 20;
+qClear();
+
+emit LEDS(0);
+//emit LED1(ON);
+par do
+	if nodeid == ROOT then
+		parentid = 0;
+		// Send topo
+		loop do
+			rtopo = await RECEIVE(REQ_TOPO);
+emit LED2(ON);
+			reqTopoNode=rtopo.d16[3];
+			parentid = 0;
+			emit REQ_CUSTOM_A(1);
+			await 3s;
+		end
+	else
+		loop do
+			rtopo=await RECEIVE(NEW_TOPO);
+			if parentid == NO_FATHER then
+				parentid = rtopo.source;
+			end
+			rtopo.source=nodeid;
+			stat = qPut(rtopo);
+			await 5s;
+		end
+	end
+with
+	await (delay)ms;
+	loop do
+		if parentid != NO_FATHER then
+			emit REQ_TEMP;
+			sdata.d16[0] = await TEMP;	
+			emit REQ_PHOTO;
+			sdata.d16[1] = await PHOTO;
+			emit REQ_VOLTS;
+			sdata.d16[2] = await VOLTS;
+			inc sdata.d8[0];
+			sdata.d8[2]=0; //Retries
+			sdata.target = parentid;
+			sdata.d8[0]=count;
+			sdata.d16[3]=nodeid;
+			stat = qPut(sdata);
+			await (PERIOD)s;
+		else
+			await 10s;
+			if nodeid != ROOT then
+				xtopo.type = REQ_TOPO;
+				xtopo.source =  nodeid;
+				inc lastReqTopo;
+				xtopo.d8[1] = lastReqTopo;
+				xtopo.d16[3] = nodeid;
+				xtopo.target=BROADCAST;
+				stat = qPut(xtopo);			
+emit LED0(TOGGLE);
+			end
+		end
+	end
+with
+	if nodeid == ROOT then
+		loop do
+			await CUSTOM_A(1);
+			inc tcount;
+			topo.d8[0]=tcount;
+			topo.d16[3] = reqTopoNode;
+			stat = qPut(topo);
+		end
+	else
+		loop do
+			xdata=await RECEIVE(REQ_TOPO);
+			if parentid != NO_FATHER then
+				lastReqTopo = xdata.d8[1];
+				xdata.target = parentid;
+				stat = qPut(xdata);
+			end
+		end
+	end
+with
+	loop do
+		fdata=await RECEIVE(DATA);
+//emit LED1(TOGGLE);
+		if fdata.source != parentid then
+			inc fdata.d8[1];
+			if nodeid == ROOT then
+				fdata.source = fdata.d16[3];
+			else
+				fdata.source = nodeid;
+			end
+			fdata.target = parentid;
+			stat = qPut(fdata);
+		end
+	end
+with
+/**********************************************************
+ * Dequeue and send to radio
+ **********************************************************/
+	var ubyte ack=TRUE;
+	var ubyte reply=0;
+	loop do
+		await Q_READY;
+		loop do
+			if qSize() > 0 then
+				reply=0;
+				stat = qGet(msgRadio);
+				if msgRadio.target == BROADCAST or msgRadio.target == 0 or (msgRadio.target>>11 != nodeid>>11) then
+					emit SEND(msgRadio);
+					await SEND_DONE(msgRadio.type);
+				else
+//					loop do
+						msgRadio.d8[2] = msgRadio.d8[2] + reply;
+						emit SEND_ACK(msgRadio);
+						ack = await SEND_DONE_ACK(msgRadio.type);
+/*
+						if ack==TRUE then
+							break;
+						end
+						inc reply;
+						if reply > 10 then
+							parentid = NO_FATHER;
+							reqTopoNode=0;
+							emit REQ_CUSTOM_A(1);
+							break;
+						end
+						await 200ms;
+*/
+//					end
+				end
+			else
+				break;
+			end
+		end
+	end
+end
+

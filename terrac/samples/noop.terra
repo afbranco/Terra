@@ -1,6 +1,18 @@
-#include "TerraIno.defs"
+#include "TerraNet.defs"
 
-		await 1s;
-		//emit LED0(TOGGLE);
-		await 1s;
+var ubyte a=10;
+emit LEDS(0);
+var ubyte i=0;
+loop do
+		await (((i%30)+1)*20)ms;
+		emit LEDS(1<<i%3);
+		inc i;
+
+//		emit LED0(ON);
+//		emit LED1(OFF);
+//		emit LED2(ON);
+end	
+		//emit LED1(ON);
+		//emit LED2(ON);
+		//await 1s;
 
