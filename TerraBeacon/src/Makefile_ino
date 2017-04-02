@@ -34,19 +34,27 @@ else ifeq ($(MOTE),mega)
   TOS_INO = tos_mega
   ISP_BAUDRATE = 115200
   AVRDUDEPROG = wiring
+else ifeq ($(MOTE),promini16)
+  AVRDUDE_MCU = m328p
+  MCU=atmega328p
+  MCUCLK = 16
+  F_CPU = 16000000ul
+  DEVTYPE = __AVR_ATmega328P__
+  TOS_INO = tos_uno
+  ISP_BAUDRATE = 57600
+  AVRDUDEPROG = arduino
+else ifeq ($(MOTE),promini8)
+  AVRDUDE_MCU = m328p
+  MCU=atmega328p
+  MCUCLK = 8
+  F_CPU = 8000000ul
+  DEVTYPE = __AVR_ATmega328P__
+  TOS_INO = tos_uno
+  ISP_BAUDRATE = 57600
+  AVRDUDEPROG = arduino
 endif
 
-#  Save makecmdgoals (a read only var) to goals so that we can modify it.
-GOALS += $(MAKECMDGOALS)
 
-#  Extract user options from goals of the form opt,arg, transform to opt=arg,
-#  and evaluate.  Then, reduce GOALS to have the args removed.
-OptRE := [,.]
-GoalOpts := $(shell perl -e 'print join " ", map {s{^(.*?)$(OptRE)}{\U$$1=};$$_} grep /$(OptRE)/, split /\s+/, "$(GOALS)";')
-GOALS := $(shell perl -e '$$_="$(GOALS)"; s{$(OptRE)\S*}{}g; print;')
-$(foreach opt,$(GoalOpts),$(eval $(opt)))
-
-INSTALL ?= 1
 USB ?= /dev/ttyACM0
 
 # Extract all "tos_uno"/"tos_mega" subdirectories as includes
@@ -55,7 +63,7 @@ INCDIRS := $(addprefix -I,$(shell find $(VMDIR)/$(TOS_INO)/ -type d -print))
 
 OPT_1 =  -fnesc-include=tos -topdir=$(APPDIR) -fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask  -o $(MAIN_EXE) -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -fnesc-cfile=$(MAIN_APPC) --param max-inline-insns-single=100000 -fnesc-dump=wiring   -fnesc-dumpfile=$(DUMP_FILE) -lm  -fnesc-target=avr -fnesc-no-debug
 
-OPT_2 =  -mmcu=$(MCU) -DMHZ=$(MCUCLK) -D$(DEVTYPE) -DF_CPU=$(F_CPU) -DTERRA_NODE_ID=$(INSTALL)
+OPT_2 =  -mmcu=$(MCU) -DMHZ=$(MCUCLK) -D$(DEVTYPE) -DF_CPU=$(F_CPU)
 
 OPT_3 =  $(INCDIRS) -I$(TERRA_APPDIR)/platforms/inoMega/tos_mega/chips/nRF24  $(CFLAGS)
 
@@ -64,6 +72,12 @@ mega: builddir exe bytes $(BUILD_EXTRA_DEPS)
 	$(info **********  Makefile Ino: Mega *************)
 
 uno: builddir exe bytes $(BUILD_EXTRA_DEPS)
+	$(info **********  Makefile Ino: Uno *************)
+
+promini16: builddir exe bytes $(BUILD_EXTRA_DEPS)
+	$(info **********  Makefile Ino: Uno *************)
+	
+promini8: builddir exe bytes $(BUILD_EXTRA_DEPS)
 	$(info **********  Makefile Ino: Uno *************)
 
 exe: 

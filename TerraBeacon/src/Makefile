@@ -13,23 +13,42 @@
 # INO_RADIO Connection: XBEE0 or XBEE1 or NRF24 or NO_RADIO| default NO_RADIO
 #    INO_RADIO=XBEE0
 #
+# INO_HALF_CLOCK Divide Arduino MCU Clock by 2. Apply when powering ProMini_16MHz(5v) with 3.3v 
+# INO_HALF_CLOCK=YES
+#
+# NET ID: 0..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee 
+# NET_ID=2
+#
 # Command line examples
-#  make uno INO_RADIO=NRF24 install.2 USB,/dev/ttyUSB0
+#  make promini16 INO_RADIO=NRF24 install.2 USB,/dev/ttyUSB0
 #
 #==================================================================================
 #==================================================================================
 
-ALL_TARGETS = micaz mica2 mica2dot telosb iris uno mega rpi
+ALL_TARGETS = micaz mica2 mica2dot telosb iris uno mega rpi promini16 promini8
 TOS_TARGETS = micaz mica2 mica2dot telosb iris
-INO_TARGETS = uno mega
+INO_TARGETS = uno mega promini16 promini8
+INO_UNO_TARGETS = uno promini16 promini8
+INO_MEGA_TARGETS = mega
 IX_TARGETS = rpi
+
+#  Save makecmdgoals (a read only var) to goals so that we can modify it.
+GOALS += $(MAKECMDGOALS)
+#  Extract user options from goals of the form opt,arg, transform to opt=arg,
+#  and evaluate.  Then, reduce GOALS to have the args removed.
+OptRE := [,.]
+GoalOpts := $(shell perl -e 'print join " ", map {s{^(.*?)$(OptRE)}{\U$$1=};$$_} grep /$(OptRE)/, split /\s+/, "$(GOALS)";')
+GOALS := $(shell perl -e '$$_="$(GOALS)"; s{$(OptRE)\S*}{}g; print;')
+$(foreach opt,$(GoalOpts),$(eval $(opt)))
+
+INSTALL ?= 1
 
 # Extract Target mote
 MOTE = $(word 1,$(MAKECMDGOALS))
 
 # Valid motes
 ifeq ($(filter $(MOTE),$(ALL_TARGETS)),)
-      $(error Target mote must be: micaz, mica2, mica2dot, telosb, uno, mega, or rpi)
+      $(error Target mote must be: micaz, mica2, mica2dot, telosb, uno, mega, promini16 promini8, or rpi)
 endif
 
 #
@@ -71,6 +90,12 @@ ifeq ($(VERB),YES)
 	CFLAGS += -v
 endif
 
+INO_HALF_CLOCK ?= NO
+ifneq ($(INO_HALF_CLOCK),YES)
+  ifneq ($(INO_HALF_CLOCK),NO)
+    $(error INO_HALF_CLOCK must be "YES" or "NO")
+  endif
+endif
 
 #----------------------------------------------------------------
 
@@ -88,12 +113,18 @@ ifneq ($(filter $(MOTE),$(TOS_TARGETS)),)
 	CFLAGS += -I. -I$(COMMONDIR) 
 endif
 
-ifeq ($(MOTE),uno)
+ifneq ($(filter $(MOTE),$(INO_UNO_TARGETS)),)
 	VMDIR = $(TERRA_APPDIR)/platforms/inoUno
 	CFLAGS += -I. -I$(VMDIR) 
 	CFLAGS += -D$(INO_RADIO)
+	ifeq ($(INO_HALF_CLOCK),YES)
+		CFLAGS += -DINO_HALF_CLOCK
+		ifneq ($(MOTE),promini8)
+          $(error FAIL: Setting INO_HALF_CLOCK was recommended only for "promini8 5v", but powered with 3v3!)
+		endif
+	endif
 endif
-ifeq ($(MOTE),mega)
+ifneq ($(filter $(MOTE),$(INO_MEGA_TARGETS)),)
 	VMDIR = $(TERRA_APPDIR)/platforms/inoMega
 	CFLAGS += -I. -I$(VMDIR) 
 	CFLAGS += -D$(INO_RADIO)
@@ -102,6 +133,45 @@ ifeq ($(MOTE),rpi)
 	VMDIR = $(TERRA_APPDIR)/platforms/RPi
 	CFLAGS += -I. -I$(VMDIR) 
 endif
+
+
+# default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee
+NETID_mica2 = 0
+NETID_mica2dot = 0
+NETID_micaz = 1
+NETID_telosb = 1
+NETID_iris = 1
+NETID_esp = 2
+NETID_rpi = 2
+NETID_megaNRF24 = 4
+NETID_megaXBEE0 = 5
+NETID_megaXBEE1 = 5
+NETID_megaNO_RADIO = 5
+NETID_unoNRF24 = 4
+NETID_unoXBEE0 = 5
+NETID_unoXBEE1 = 5
+NETID_unoNO_RADIO = 5
+
+NETID_promini8NRF24 = 4
+NETID_promini8XBEE0 = 5
+NETID_promini8XBEE1 = 5
+NETID_promini8NO_RADIO = 5
+
+NETID_promini16NRF24 = 4
+NETID_promini16XBEE0 = 5
+NETID_promini16XBEE1 = 5
+NETID_promini16NO_RADIO = 5
+
+NET_ID ?= $(NETID_$(MOTE)$(INO_RADIO))
+ifeq ($(shell echo "$(NET_ID)<0 || $(NET_ID)>30" | bc), 1)
+    $(error 'in NET_ID=xx , xx must be in 0..30')
+endif
+
+
+
+MOTE_ADDR = $(shell echo $(NET_ID)*2048 + $(INSTALL) | bc)
+CFLAGS += -DNET_ID=$(NET_ID)
+CFLAGS += -DTERRA_NODE_ID=$(MOTE_ADDR)
 
 
 CFLAGS += -I$(TERRA_APPDIR)/lib/serial
@@ -147,10 +217,10 @@ ifeq ($(MOTE),telosb)
   CFLAGS += -Os
 endif
 
-ifeq ($(MOTE),uno)
+ifneq ($(filter $(MOTE),$(INO_UNO_TARGETS)),)
   CFLAGS += -O1
 endif
-ifeq ($(MOTE),mega)
+ifneq ($(filter $(MOTE),$(INO_MEGA_TARGETS)),)
   CFLAGS += -O1
   CFLAGS += -DRFPOWER_IDX=$(RFPOWER)
 endif
@@ -193,16 +263,11 @@ $(info ***********************)
 $(info **** Configuration ****)
 $(info MOTE        = $(MOTE))
 $(info VM          = $(VM))
-$(info MODULES     = $(MODULES) -- [MSGQ])
-$(info ROOT_ID     = $(ROOT_ID))
+$(info NODE_ID     = $(INSTALL))
 $(info RFPOWER     = $(RFPOWER))
 $(info LPL         = $(LPL))
 $(info SENSORBOARD = $(SENSORBOARD))
 $(info TYPE        = $(TYPE))
-$(info SETDATA     = $(SETDATA))
-$(info QUEUE       = $(QUEUE))
-$(info VM_MEM_BLKS = $(MBLOCKS_F))
-$(info VM_MEM      = $(shell echo ${MBLOCKS_F}*24 | bc))
 $(info TOSVERSION  = $(TOSVERSION))
 $(info ***********************)
 $(info Make Cmds- $(MAKECMDGOALS))

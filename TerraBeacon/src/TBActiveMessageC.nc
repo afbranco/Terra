@@ -29,9 +29,9 @@ implementation{
 	AM.nRF24_IRQ -> ExtInt.Int0;
 	components HplAtm328pGeneralIOC as IO;
 	AM.CSNpin -> IO.PortB0;
-	AM.CEpin -> IO.PortB1;
+	AM.CEpin -> IO.PortD7;
 	AM.IRQpin -> IO.PortD2; // Int0
-	
+		
 	components new TimerMilliC() as TimerDelay;
 	AM.TimerDelay -> TimerDelay;
 	

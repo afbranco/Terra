@@ -2,11 +2,17 @@
 #define TERRA_BEACON_H
 
 enum {
-	DATA_MSG_ID=1,
+	// Terra msg type/id
+	BEACON_A_MSG_ID=128, // Temperature, SourceId,  Seq
+	BEACON_B_MSG_ID=129,
+	BEACON_C_MSG_ID=130,
+	BEACON_PARENT_MSG_ID = 150,
+	// System message AM ID
 	DATA_MSG_AMID=145,
 	AM_USRMSG = 145,	
 	
-	BEACON_PERIOD = 5*60*1000,
+//	BEACON_PERIOD = 5*60*1000,
+	BEACON_PERIOD = 20*1000,
 	RESEND_DELAY = 20L,
 	MAX_SEND_RETRIES = 3,
 	

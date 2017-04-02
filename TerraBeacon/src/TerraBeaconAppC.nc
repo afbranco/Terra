@@ -17,11 +17,16 @@ implementation{
 	TB.TimerBeacon -> TimerBeacon;
 	components new TimerMilliC() as sendTimer;
 	TB.sendTimer -> sendTimer;
+	components new TimerMilliC() as radioStop;
+	TB.radioStop -> radioStop;
 	components RandomC;
 	TB.Random -> RandomC;
 
 	components HplAtm328pGeneralIOC as IO;
-	TB.PC0 -> IO.PortC0;	
+	TB.PC0 -> IO.PortC0;
+	TB.PD3 -> IO.PortD3;
+	TB.LED -> IO.PortD6; // LED Aux
+	
 	components new Analog0C() as Ana0;
 	TB.Ana0 -> Ana0;
     	
