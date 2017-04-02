@@ -5,9 +5,6 @@
 #define F_CPU 16000000
 #endif
 
-#ifndef TERRA_NODE_ID
-#defined TERRA_NODE_ID 1
-#endif
 
 /*
  * nRF24 state machine
@@ -17,10 +14,12 @@
 enum {NONE,START,STOP,SEND, RECEIVE};
 
 // nRF24 address must have a fixed mask with only last byte varying.
-// Mask: 0x04nn
-// NODE_ID: 001.. 254 -- 1024 .. 1278 (0x0400 .. 0x04FE)
-// BROADCAST: 255 --  1279 (0x04FF)
-enum {nRF24_ADDR_MASK=0x0400, nRF24_BROADCAST_ADDR = 0x00FF, nRF24_NODE_ID = TERRA_NODE_ID};
+// Mask: 0xNNxx -> This number must follow the NET_ID definitions for Terra networks. (for NET_ID=4 for NRF24)
+// NODE_ID: NET_ID*2048 + <001.. 254>
+// BROADCAST: NET_ID*2048 + 255 
+uint16_t nRF24_ADDR_MASK=TERRA_NODE_ID & 0xff00;
+uint16_t nRF24_BROADCAST_ADDR = TERRA_NODE_ID | 0x00ff;
+uint16_t nRF24_NODE_ID = TERRA_NODE_ID;
 
 typedef struct lastSend{
 	nx_am_id_t id;

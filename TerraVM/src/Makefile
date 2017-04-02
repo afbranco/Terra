@@ -30,7 +30,10 @@
 #    RFPOWER=1
 #
 # INO_RADIO Connection: XBEE0 or XBEE1 or NRF24 or NO_RADIO| default NO_RADIO
-#    INO_RADIO=XBEE0
+#    INO_RADIO=NO_RADIO
+#
+# INO_HALF_CLOCK Divide Arduino MCU Clock by 2. Apply when powering ProMini_16MHz(5v) with 3.3v 
+# INO_HALF_CLOCK=YES
 #
 # Low Power Listening mode: YES or NO | default NO
 #    LPL=NO
@@ -47,7 +50,12 @@
 # NODE ID: 1..2047 | default 1
 # install.3 
 #
-# NET ID: 1..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee 
+# BS_BAUD: 115200, 57600, 19200 | default <platform specific or 19200>
+# BS_BAUD=57600
+# OBS: Platform specific = telosb, tmote, eyes, intelmote2 => 115200; micaz,mica2, iris => 57600; mica2dot=>19200
+# OBS2: Do not change baudrate for mica2dot.
+#
+# NET ID: 0..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee 
 # NET_ID=2
 #
 # Command line examples
@@ -197,6 +205,12 @@ else
   endif
 endif
 
+INO_HALF_CLOCK ?= NO
+ifneq ($(INO_HALF_CLOCK),YES)
+  ifneq ($(INO_HALF_CLOCK),NO)
+    $(error INO_HALF_CLOCK must be "YES" or "NO")
+  endif
+endif
 
 LPL ?= NO
 ifneq ($(LPL),YES)
@@ -316,6 +330,28 @@ MOTE_ADDR = $(shell echo $(NET_ID)*2048 + $(INSTALL) | bc)
 CFLAGS += -DNET_ID=$(NET_ID)
 CFLAGS += -DTERRA_NODE_ID=$(MOTE_ADDR)
 
+# Defaul values for serial baudrate
+BAUD_mica2 = 57600
+BAUD_micaz = 57600
+BAUD_mica2dot = 19200
+BAUD_telosb = 115200
+BAUD_iris = 57600
+BAUD_rpi = 57600
+BAUD_esp = 57600
+BAUD_mega = 57600
+BAUD_uno = 57600
+ALL_BAUDS = 19200 57600 115200
+
+BS_BAUD ?= $(BAUD_$(MOTE))
+ifneq ($(filter $(BS_BAUD),$(ALL_BAUDS)),)
+  ifneq ($(MOTE),mica2dot) # Do not change for mica2dot. Original mica2dot baudrate is 19200.
+    CFLAGS+= -DPLATFORM_BAUDRATE=$(BS_BAUD)ul
+  endif
+else
+    $(error BS_BAUD must be: $(ALL_BAUDS))
+endif
+
+
 CFLAGS += -I$(APPDIR)/interfaces
 CFLAGS += -I$(APPDIR)/system
 CFLAGS += -I$(APPDIR)/lib/serial
@@ -361,6 +397,10 @@ endif
 
 ifeq ($(MOTE),uno)
   CFLAGS += -O1
+  # INO_HALF_CLOCK config
+  ifeq ($(INO_HALF_CLOCK),YES)
+    CFLAGS += -DINO_HALF_CLOCK
+  endif
 endif
 ifeq ($(MOTE),mega)
   CFLAGS += -O1

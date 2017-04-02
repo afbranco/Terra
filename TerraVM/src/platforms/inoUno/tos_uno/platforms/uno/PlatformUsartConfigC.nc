@@ -45,7 +45,11 @@ implementation
     two_stop_bits:        FALSE,
     polarity_rising_edge: FALSE,
     double_speed:         TRUE,
-    baud:                 115200ul,
+#ifdef PLATFORM_BAUDRATE
+    baud:                 PLATFORM_BAUDRATE,
+#else
+    baud:                 57600ul,
+#endif
   };
 
   async command atm328p_usart_config_t *Atm328pUsartConfig.getConfig ()

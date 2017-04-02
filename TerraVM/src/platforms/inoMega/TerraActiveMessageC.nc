@@ -30,8 +30,7 @@ implementation{
 	components HplAtm2560GeneralIOC as IO;
 	AM.CSNpin -> IO.PortB4;
 	AM.CEpin -> IO.PortB5;
-	AM.IRQpin -> IO.PortE4; // Int4
-	
+	AM.IRQpin -> IO.PortE4; // Int4	
 	components new TimerMilliC() as TimerDelay;
 	AM.TimerDelay -> TimerDelay;
 	

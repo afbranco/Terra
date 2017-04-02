@@ -42,7 +42,7 @@ configuration PlatformSpiC
 }
 implementation
 {
-  components Atm328pSpiC as SpiC;
+  components Atm2560SpiC as SpiC;
 
   SpiByte     = SpiC;
   SpiPacket   = SpiC;

@@ -1,9 +1,9 @@
 
 extern UartDevice    UartDev;
 
-// Mica2Dot baudrate=19200
-#define UART0_BAUD 19200
-//#define UART0_BAUD BIT_RATE_115200
+#ifndef PLATFORM_BAUDRATE
+#define PLATFORM_BAUDRATE 57600
+#endif
 
 module EspUsart0P
 {
@@ -63,7 +63,7 @@ implementation
 	{		
 		struct rst_info *rtc_info = system_get_rst_info(); 
 		// Config Baudrate for Uart0 and Uart1
-		uart_init(UART0_BAUD, BIT_RATE_115200);
+		uart_init(PLATFORM_BAUDRATE, BIT_RATE_115200);
 
 		// Print the reset reason and, if it accours, the fatal exception.
 		os_printf("reset reason: %x\n", rtc_info->reason); 
@@ -478,7 +478,7 @@ void ICACHE_FLASH_ATTR uart_rx_task(os_event_t *events) {
 	void ICACHE_FLASH_ATTR
 	uart_reattach()
 	{
-		uart_init(UART0_BAUD, BIT_RATE_115200);
+		uart_init(PLATFORM_BAUDRATE, BIT_RATE_115200);
 	}
 
 	/******************************************************************************

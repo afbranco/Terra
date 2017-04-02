@@ -266,6 +266,10 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 	command void VM.reset(){
 		// Reset leds
 		gpio_output_set(LED0_GPIO_BIT, 0, LED0_GPIO_BIT, 0);
+#ifdef M_MSG_QUEUE
+		// Clear msgQ
+		call usrDataQ.clearAll();
+#endif
 	}
 
 	task void BCRadio_receive(){

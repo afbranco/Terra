@@ -11,7 +11,7 @@ implementation{
 
 	// Custom Queues
 #ifdef M_MSG_QUEUE
-	components new dataQueueC(qData_t,USRMSG_QSIZE,(char)unique("dataQueueC")) as usrDataQ;
+	components new dataQueueC(usrMsg_t,USRMSG_QSIZE,(char)unique("dataQueueC")) as usrDataQ;
 	custom.usrDataQ -> usrDataQ;
 #endif
 

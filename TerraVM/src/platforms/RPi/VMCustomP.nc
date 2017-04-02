@@ -176,7 +176,11 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 
 	command void VM.reset(){
 		// Reset leds
-	}
+		// ???
+#ifdef M_MSG_QUEUE
+		// Clear msgQ
+		call usrDataQ.clearAll();
+#endif}
 
 	task void BCRadio_receive(){
 		signal VM.queueEvt(I_RECEIVE_ID, ExtDataRadioReceived.type, &ExtDataRadioReceived);	

@@ -334,7 +334,7 @@ typedef nx_struct usrSendGR{
 	nx_uint16_t node; // To a specific target mote in group or the sender when received
 	// Msg Definition  
 	nx_uint8_t  evtId; // Event ID
-	nx_int8_t  Data[SEND_DATA_SIZE]; // Data buffer
+	nx_int8_t  Data[SENDGR_DATA_SIZE]; // Data buffer
 } usrSendGR_t;	
 
 typedef nx_struct sendGR{		
@@ -349,13 +349,13 @@ typedef nx_struct sendGR{
 	nx_uint16_t  TargetMote; // To a specific target mote in group
 	// Msg Definition  
 	nx_uint8_t  evtId; // Event ID
-	nx_int8_t  Data[SEND_DATA_SIZE]; // Data buffer
+	nx_int8_t  Data[SENDGR_DATA_SIZE]; // Data buffer
 } sendGR_t;	
 
 
 typedef nx_struct usrSendBS{	
 	nx_uint8_t  evtId; // Event ID
-	nx_int8_t  Data[SEND_DATA_SIZE]; // Data buffer
+	nx_int8_t  Data[SENDBS_DATA_SIZE]; // Data buffer
 } usrSendBS_t;	
 
 

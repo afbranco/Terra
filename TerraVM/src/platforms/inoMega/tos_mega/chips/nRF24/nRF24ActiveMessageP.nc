@@ -61,7 +61,7 @@ implementation{
 	void delay_us(uint16_t us) {_delay_loop_2(us * (F_CPU/4000000ul));}
 
 	task void startDone(){ signal SplitControl.startDone(SUCCESS);}	
-	task void stopDone(){ signal SplitControl.stopDone(SUCCESS);}	
+	task void stopDone() { signal SplitControl.stopDone(SUCCESS);}	
 
 	command error_t SplitControl.start(){
 		// Configure non SPI IO
@@ -130,7 +130,7 @@ implementation{
 			}
 		// save msg pointer to post process
 		lastSendMsg.msg = msg;
-		lastSendMsg.target = (addr==AM_BROADCAST_ADDR)? nRF24_BROADCAST_ADDR : addr;
+		lastSendMsg.target = (addr == AM_BROADCAST_ADDR )? nRF24_BROADCAST_ADDR : addr;
 		lastSendMsg.len = len;
 		lastSendMsg.id = id;
 		// start sending
@@ -372,7 +372,7 @@ void nRF_setPower(uint8_t nRFpower){
 
 /*
 Procedimento para inicialização do rádio 
-1. Esperar 5ms após o ligar a placa
+1. Esperar 5ms após ligar a placa
 2. Reset NRF_CONFIG and enable 16-bit CRC.: write_register( NRF_CONFIG, 0b00001100 ) ;
 3. Set retries. setRetries(5,15); ->  write_register(SETUP_RETR,(delay&0xf)<<ARD | (count&0xf)<<ARC);
 4. Set data rate 1MBPS.  RF_SETUP = RF_SETUP + Bits modificados
@@ -396,7 +396,7 @@ Procedimento para inicialização do rádio
  
 	void stmProcStart(){
 		switch (stmStep){
-			case 0: // Waits 5ms - Radio power on  
+			case 0: // Waits 5ms - Radio power on 
 				stmStep++; // point to next step
 				call TimerDelay.startOneShot(5);
 			case 1: // Request SPI bus
@@ -406,25 +406,18 @@ Procedimento para inicialização do rádio
 			case 2: // Configure radio registers
 				stmStep++; // point to next step
 				nRF_wrReg(CONFIG,RESET_CONFIG);// Reset the Config register
-//			nRF_wrReg(CONFIG,0b00001100);// Reset the Config register
-//				nRF_wrReg(SETUP_RETR, 0);	// Enable retransmissions up to 3 & delay of 1500us			
 				nRF_wrReg(SETUP_RETR, ((1500/250)-1)<<4 | 3);	// Enable retransmissions up to 3 & delay of 1500us			
-//			nRF_wrReg(SETUP_RETR, ((1500/250)-1)<<4 | 3);	// Enable retransmissions up to 3 & delay of 1500us			
 				nRF_wrReg(RF_SETUP,HAL_NRF_1MBPS<<3  | HAL_NRF_18DBM<<1);// Set bandwidth to 1Mps and RF Power
-//			nRF_wrReg(RF_SETUP,0x00);// Set bandwidth to 2Mps and RF Power
-			nRF_toggleFeature(); // Toggle feature
+				nRF_toggleFeature(); // Toggle feature
 				nRF_wrReg(FEATURE,0x01);	// Configue FEATURE register - enable TX_ACK, disable Dynamic Payload and ACK-payload
-//			nRF_wrReg(FEATURE,0);	// Configue FEATURE register - enable TX_ACK, disable Dynamic Payload and ACK-payload
 				nRF_wrReg(DYNPD,0);	// Disable  Dynamic payload for all pipes
-//			nRF_wrReg(DYNPD,0);	// Disable  Dynamic payload for all pipes
 
 				nRF_wrReg(RF_CH,0x4c);		// Set radio frequency - default 2402MHs
 				// Flush the buffers
 				nRF_flushRX();
 				nRF_flushTX();
-		CELow();
+				CELow();
 				nRF_wrReg(CONFIG,START_CONFIG);// Config register - Power up the radio to StandBy mode, etc.
-//		nRF_wrReg(CONFIG,0b00001110);// Config register - Power up the radio to StandBy mode, etc.
 				// Waits for POWER UP MODE
 				call TimerDelay.startOneShot(5);
 				break;
@@ -432,17 +425,17 @@ Procedimento para inicialização do rádio
 				stmStep++; // point to next step
 				nRF_wrReg(SETUP_AW,0x03);	// Setup 5bytes node Addrs
 				// Set null addr to Pipe Addr 0
-				nRF_wrAddr(RX_ADDR_P0,0);
+				nRF_wrAddr(RX_ADDR_P0,0); // Full address
 				// Set broadcast  addr to Pipe Addr 1 (0xnn00)
-				nRF_wrAddr(RX_ADDR_P1,nRF24_BROADCAST_ADDR);
+				nRF_wrAddr(RX_ADDR_P1,nRF24_BROADCAST_ADDR); // nRF_wrAddr
 				// Set node addr to Pipe Addr 2 (0x00nn)
-				nRF_wrAddr(RX_ADDR_P2,nRF24_NODE_ID);
+				nRF_wrAddr(RX_ADDR_P2,nRF24_NODE_ID); // 1byte address
 
 				nRF_wrReg(RX_PW_P0,0x20); // Set payload size for pipe 0 
 				nRF_wrReg(RX_PW_P1,0x20); // Set payload size for pipe 1 
 				nRF_wrReg(RX_PW_P2,0x20); // Set payload size for pipe 2 
 				nRF_wrReg(EN_AA,0x07);		// Enable Auto Ack, when requested by sent message	
-				nRF_wrReg(EN_RXADDR,0x7);	// Enable Addrs 0,1&2, disable ,3,4,5				
+				nRF_wrReg(EN_RXADDR,0x6);	// Enable Addrs 1&2, disable 0,3,4,5				
 				nRF_wrReg(CONFIG,REC_CONFIG);// Config register - RX mode
 				nRF_wrReg(STATUS,nRF_getStatus() | 1<<RX_DR | 1<<TX_DS | 1<<MAX_RT); // Reset Int flags
 				// Flush the buffers
@@ -464,10 +457,6 @@ Procedimento para inicialização do rádio
 		switch (stmStep){
 			case 0: // Request SPI bus
 				stmStep++; // point to next step
-//				stat = call SpiResource.request(); 
-//				break;
-//			case 1: 
-				stmStep++; // point to next step
 				call nRF24_IRQ.clear();
 				call nRF24_IRQ.disable(); // Disable IRQ
 				CELow(); // Guarantee CE is low on powerDown
@@ -482,9 +471,6 @@ Procedimento para inicialização do rádio
 		switch (stmStep){
 			case 0: // Request SPI bus			
 				stmStep++; // point to next step
-//				call SpiResource.request(); 
-//				break;
-//			case 1: 
 				stmStep++; // point to next step
 				CELow(); // Move to Standby mode
 				// Fill radio Msg
@@ -501,6 +487,7 @@ Procedimento para inicialização do rádio
 				// Target Addr
 				nRF_wrAddr(RX_ADDR_P0,	lastSendMsg.target);
 				nRF_wrAddr(TX_ADDR,		lastSendMsg.target);
+				nRF_wrReg(EN_RXADDR,0x1);	// Enable Addrs 0, disable 1,2,3,4,5				
 				// TX_PAYLOAD command
 				spi_buffer = (uint8_t*)&nRF24_msg;
 				ssOn();
@@ -532,17 +519,38 @@ Procedimento para inicialização do rádio
 				nRF_wrAddr(RX_ADDR_P0,0);
 				// Set broadcast  addr to Pipe Addr 1 (0xnn00)
 				nRF_wrAddr(RX_ADDR_P1,nRF24_BROADCAST_ADDR);
+				nRF_wrReg(EN_RXADDR,0x6);	// Enable Addrs 1&2, disable 0,3,4,5				
 				nRF_wrReg(CONFIG,REC_CONFIG);	// Reconfigure CONFIG Register to RX mode (is the same of START_CONFIG)
 				nRF_wrReg(STATUS,nRF_getStatus() | 1<<RX_DR | 1<<TX_DS | 1<<MAX_RT); // Reset Int flags
 				// Change to RX mode
 				nRF_flushRX();
-				CEHigh();
-				// Release SPI
-//				call SpiResource.release();
+// copy from stmOper=START; stmStep=3; without postStartDone()
+{
+				nRF_wrReg(SETUP_AW,0x03);	// Setup 5bytes node Addrs
+				// Set null addr to Pipe Addr 0
+				nRF_wrAddr(RX_ADDR_P0,0); // Full address
+				// Set broadcast  addr to Pipe Addr 1 (0xnn00)
+				nRF_wrAddr(RX_ADDR_P1,nRF24_BROADCAST_ADDR); // nRF_wrAddr
+				// Set node addr to Pipe Addr 2 (0x00nn)
+				nRF_wrAddr(RX_ADDR_P2,nRF24_NODE_ID); // 1byte address
+
+				nRF_wrReg(RX_PW_P0,0x20); // Set payload size for pipe 0 
+				nRF_wrReg(RX_PW_P1,0x20); // Set payload size for pipe 1 
+				nRF_wrReg(RX_PW_P2,0x20); // Set payload size for pipe 2 
+				nRF_wrReg(EN_AA,0x07);		// Enable Auto Ack, when requested by sent message	
+				nRF_wrReg(EN_RXADDR,0x6);	// Enable Addrs 1&2, disable 0,3,4,5				
+				nRF_wrReg(CONFIG,REC_CONFIG);// Config register - RX mode
+				nRF_wrReg(STATUS,nRF_getStatus() | 1<<RX_DR | 1<<TX_DS | 1<<MAX_RT); // Reset Int flags
+				// Flush the buffers
+				nRF_flushRX();
+				nRF_flushTX();
 				// Enable IRQ
 				call nRF24_IRQ.clear();
 				call nRF24_IRQ.enable();
-				stmOper = NONE;
+				// Change to RX mode
+				CEHigh();
+				stmOper = NONE;	
+}
 				break;
 		}
 	}
@@ -553,9 +561,6 @@ Procedimento para inicialização do rádio
 		switch (stmStep){
 			case 0: // Request SPI bus
 				stmStep++; // point to next step
-//				stat = call SpiResource.request(); 
-//				break;
-//			case 1: 
 				stmStep++; // point to next step
 				// Disable receive state
 				CELow();
@@ -636,8 +641,6 @@ Procedimento para inicialização do rádio
 					// Enable IRQ
 					call nRF24_IRQ.clear();
 					call nRF24_IRQ.enable();
-					// Release SPI
-					// call SpiResource.release();
 				}
 				break;
 		}
@@ -687,9 +690,6 @@ uint8_t irqStat;
 	}
 
 	async event void nRF24_IRQ.fired(){ 
-//PORTD |= 0x80;
-
-//PORTF = (PORTF  & 0xf0) | ((PORTF+2) & 0x0f);	
 		call nRF24_IRQ.clear();
 		call nRF24_IRQ.disable();
 		post IRQ_fired();

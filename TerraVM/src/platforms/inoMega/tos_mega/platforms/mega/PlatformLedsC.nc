@@ -45,23 +45,20 @@ implementation
   components HplAtm2560GeneralIOC as Gpio, new NoPinC();
 
   components new noInvertedIOC () as Inv0;
-//  Inv0.SubIO -> Gpio.PortB7;
-/*
+  Inv0.SubIO -> Gpio.PortE5;
   components new noInvertedIOC () as Inv1;
-  Inv1.SubIO -> Gpio.PortE4;
+  Inv1.SubIO -> Gpio.PortE6;
   components new noInvertedIOC () as Inv2;
-  Inv2.SubIO -> Gpio.PortE5;
-*/
+  Inv2.SubIO -> Gpio.PortE7;
 
-/*
   Led0 = Inv0;
   Led1 = Inv1;
   Led2 = Inv2;
-*/
 
-  Led0 = NoPinC;
-  Led1 = NoPinC;
-  Led2 = NoPinC;
+
+//  Led0 = NoPinC;
+//  Led1 = NoPinC;
+//  Led2 = NoPinC;
 
   components PlatformP;
   Init = PlatformP.PlatformInit;
