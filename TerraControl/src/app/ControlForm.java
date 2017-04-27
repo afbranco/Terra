@@ -54,6 +54,7 @@ import java.awt.event.ItemEvent;
 import messages.*;
 */
 import javax.swing.JCheckBox;
+import javax.swing.event.ChangeListener;
 
 public class ControlForm {
 
@@ -99,6 +100,7 @@ public class ControlForm {
 	JProgressBar barFSM2;
 	JComboBox<String> comboPrefix;
 	JComboBox<Integer> comboMoteType;
+	JCheckBox persistFlag;
 	JTextArea DataMsgs;
 	JTextArea ControlMsgs;
 
@@ -366,7 +368,12 @@ public class ControlForm {
 		for (int i=1;i<=20;i++) comboMoteType.addItem(i);
 		controlPanel.add(comboMoteType);
 		
-
+		persistFlag = new JCheckBox("Persist?");
+		persistFlag.setSelected(false);
+		persistFlag.setBounds(762-180, 41+60, 120, 24);
+		controlPanel.add(persistFlag);
+		
+		
 		JButton btnRefresh = new JButton("");
 		btnRefresh.setIcon(new ImageIcon(ControlForm.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeLeaf.gif")));
 		
@@ -379,7 +386,7 @@ public class ControlForm {
 		controlPanel.add(btnRefresh);
 
 		lbllastVersion = new JLabel("Last version: 00000");
-		lbllastVersion.setBounds(762-180, 10+80, 140, 15);
+		lbllastVersion.setBounds(762-180, 10+75, 140, 15);
 		controlPanel.add(lbllastVersion);
 		
 		
@@ -940,6 +947,15 @@ public class ControlForm {
 		}
 		
 		lastDir = AppDir;
+
+		// Confirm prog persistence
+		if (persistFlag.isSelected()) {
+			if (JOptionPane.showConfirmDialog(null, "Please, confirm if you wold like to persist program inside the devices?" 
+					, "Terra Control Tool", JOptionPane.OK_CANCEL_OPTION) != 0) {
+				return;
+			}
+		}
+
 		
 		// Load data
 		terracore.pauseConfig();
@@ -954,6 +970,7 @@ public class ControlForm {
 			appendControlMsg("****** "+error);
 			return;
 		}
+		progBin.setPersistFlag(persistFlag.isSelected());
 
 		// Start the new configuration
 		barFSM.setValue(0);

@@ -25,6 +25,7 @@ public class ProgBin {
 	private int inEvts;
 	private int async0;
 	private int appSize;
+	private boolean persistFlag;
 	
 	short[][] ProgData= new short[MAX_BLOCKS][BLOCK_SIZE];
 
@@ -57,6 +58,8 @@ public class ProgBin {
 	public int getInEvts() {return inEvts;}
 	public int getAsync0() {return async0;}
 	public int getAppSize() {return appSize;}
+	public boolean getPersistFlag() {return persistFlag;}
+	public void setPersistFlag(boolean flag) {persistFlag=flag;}
 
 	public String getLastError() {return lastError;}
 	
