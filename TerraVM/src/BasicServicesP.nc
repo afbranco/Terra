@@ -203,6 +203,7 @@ implementation{
 	/**
 	* Command to start the communication
 	*/ 
+
 	
 	event void TOSBoot.booted(){
 		uint32_t rnd=0;	
@@ -257,13 +258,13 @@ implementation{
 		// Only for first initialization (boot)
 		if (firstInic){
 			reqProgBlock_t Data;
-// EEPROM - incluir aqui a chamada para tentar carregar programa da EEPROM, atualizar version Id.
+
 			firstInic = FALSE;
 			// Request initial program version
 			ReqState=RO_NEW_VERSION;
 			Data.reqOper=RO_NEW_VERSION;
 			Data.moteType = TERRA_MOTE_TYPE;
-			Data.versionId = 0;
+			Data.versionId = ProgVersion;
 			Data.blockId = 0;
 		 	lastRequestBlock = 0;
 			ProgMoteSource = AM_BROADCAST_ADDR;
@@ -280,6 +281,12 @@ implementation{
 #endif		
 #endif
 		signal BSBoot.booted();
+			// EEPROM - incluir aqui a chamada para tentar carregar programa da EEPROM, atualizar version
+			ProgVersion = signal BSUpload.progRestore();
+			if (ProgVersion > 0) {
+				signal BSUpload.start(TRUE);
+			}
+
 	}
 	
 	event void RadioControl.stopDone(error_t error) {
@@ -447,6 +454,7 @@ implementation{
 	 */
 	void recNewProgVersionNet_receive(message_t *msg, void *payload, uint8_t len, uint8_t fromSerial){
 		newProgVersion_t *xmsg;
+
 		// Copy data to temporarily buffer
 		memcpy(tempInputInQ.Data,payload,sizeof(newProgVersion_t));
 		tempInputInQ.fromSerial = fromSerial;
@@ -473,7 +481,10 @@ dbg(APPNAME,"BS::recNewProgVersionNet_receive(): versionId=%04x:%d, blockLen=%04
 		xmsg->startProg,xmsg->startProg,xmsg->endProg,xmsg->endProg,xmsg->appSize);
 
 		// Discard duplicated message
-		if ((xmsg->versionId <= ProgVersion) || (xmsg->versionId == lastRecNewProgVersion)) { dbg(APPNAME, "BS::recNewProgVersionNet_receive(): Discarding duplicated message!\n"); return;}
+		if ((xmsg->versionId <= ProgVersion) || (xmsg->versionId == lastRecNewProgVersion)) { 
+			dbg(APPNAME, "BS::recNewProgVersionNet_receive(): Discarding duplicated message!\n"); 
+			return;
+		}
 		// Store the last received ProgVersion
 		lastRecNewProgVersion = xmsg->versionId; 
 		call BMaux.clearAll();
@@ -841,7 +852,7 @@ dbg(APPNAME,"BS::recNewProgVersionNet_receive(): versionId=%04x:%d, blockLen=%04
 		 dbg(APPNAME, "BS::procRecReqProgBlock(). Local version=%hhu, Req Version %hhu Oper=%hhu, BM.isAllBitSet=%s\n", ProgVersion, Data->versionId, Data->reqOper,_TFstr(call BM.isAllBitSet()));
 		switch (Data->reqOper){
 			case RO_NEW_VERSION: 
-				if ((ProgVersion > Data->versionId) && (ProgVersion > 0) && call BM.isAllBitSet()){
+				if ((ProgVersion > Data->versionId) && ( Data->moteType==TERRA_MOTE_TYPE) && (ProgVersion > 0) && call BM.isAllBitSet()){
 					xVersion.moteType = TERRA_MOTE_TYPE;
 					xVersion.versionId = ProgVersion;
 				 	xVersion.blockLen = ProgBlockLen;

@@ -26,4 +26,24 @@ enum{
 		
 };
 
+/***
+ * Env and Storage  structures
+ * 
+ */
+typedef struct progEnv {
+	// Ceu Environment vars
+	uint16_t Version;
+	uint16_t ProgStart;
+	uint16_t ProgEnd;
+	uint16_t nTracks;
+	uint16_t wClocks;
+	uint16_t asyncs;
+	uint16_t wClock0;	
+	uint16_t gate0;	
+	uint16_t inEvts;	
+	uint16_t async0;	
+	uint16_t appSize;
+	uint8_t  persistFlag;	
+} progEnv_t;
+
 #endif /* VMDATA_H */

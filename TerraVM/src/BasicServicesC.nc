@@ -18,6 +18,9 @@ configuration BasicServicesC{
 	provides interface BSTimer as BSTimerAsync;
 	provides interface BSUpload;
 	provides interface BSRadio;
+#ifdef MODE_INTFLASH
+	provides interface ProgStorage;
+#endif
 }
 implementation{
 	components MainC;
@@ -116,5 +119,14 @@ implementation{
 	components dataSensorC;
 	BS.MoteType -> dataSensorC.MoteType;
 #endif
+
+/*******************************************
+ * ProgStorage component
+ *******************************************/
+#ifdef MODE_INTFLASH
+	components ProgStorageC;
+	ProgStorage = ProgStorageC; 
+#endif
+
 
 }

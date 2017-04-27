@@ -7,12 +7,12 @@
 public class newProgVersionMsg extends net.tinyos.message.Message {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 27;
+    public static final int DEFAULT_MESSAGE_SIZE = 28;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 160;
 
-    /** Create a new newProgVersionMsg of size 27. */
+    /** Create a new newProgVersionMsg of size 28. */
     public newProgVersionMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -125,6 +125,9 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [appSize=0x"+Long.toHexString(get_appSize())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [persistFlag=0x"+Long.toHexString(get_persistFlag())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       return s;
     }
@@ -1011,6 +1014,69 @@ public class newProgVersionMsg extends net.tinyos.message.Message {
      */
     public static int sizeBits_appSize() {
         return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: persistFlag
+    //   Field type: short, unsigned
+    //   Offset (bits): 216
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'persistFlag' is signed (false).
+     */
+    public static boolean isSigned_persistFlag() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'persistFlag' is an array (false).
+     */
+    public static boolean isArray_persistFlag() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'persistFlag'
+     */
+    public static int offset_persistFlag() {
+        return (216 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'persistFlag'
+     */
+    public static int offsetBits_persistFlag() {
+        return 216;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'persistFlag'
+     */
+    public short get_persistFlag() {
+        return (short)getUIntBEElement(offsetBits_persistFlag(), 8);
+    }
+
+    /**
+     * Set the value of the field 'persistFlag'
+     */
+    public void set_persistFlag(short value) {
+        setUIntBEElement(offsetBits_persistFlag(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'persistFlag'
+     */
+    public static int size_persistFlag() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'persistFlag'
+     */
+    public static int sizeBits_persistFlag() {
+        return 8;
     }
 
 }

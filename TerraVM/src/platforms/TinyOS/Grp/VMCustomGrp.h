@@ -355,7 +355,7 @@ typedef nx_struct sendGR{
 
 typedef nx_struct usrSendBS{	
 	nx_uint8_t  evtId; // Event ID
-	nx_int8_t  Data[SENDBS_DATA_SIZE]; // Data buffer
+	nx_int8_t  Data[SEND_DATA_SIZE]; // Data buffer
 } usrSendBS_t;	
 
 

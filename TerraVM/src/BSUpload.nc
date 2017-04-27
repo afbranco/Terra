@@ -37,6 +37,10 @@ interface BSUpload{
 	// get program section
 	event uint8_t* getSection(uint16_t Addr);
 	
+	// Try to restore a program from flash
+	// return ProgVersion or 0
+	event uint16_t progRestore();
+	
 #if defined(INOS)
 #elif defined(INOX)
 	// Log data to USB0

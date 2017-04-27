@@ -105,6 +105,11 @@ enum{
 	
 };
 
+#ifndef RFPOWER_IDX
+#define RFPOWER_IDX 3
+#endif
+
+#define RFPower_IDs 8
 
 /**
  * Msg structures
@@ -125,6 +130,7 @@ typedef nx_struct newProgVersion{
 	nx_uint16_t inEvts;	 		// In Evts number
 	nx_uint16_t async0;	 		// Async0 addr
 	nx_uint16_t appSize;	 	// Application size in bytes. Used to check against VM memory size.
+	nx_uint8_t  persistFlag;	// If TRUE it will backup the script into internal persistent memory
 } newProgVersion_t;	
 	
 typedef nx_struct newProgBlock{	
@@ -185,9 +191,5 @@ typedef nx_struct ctpMsg {
 	nx_uint8_t  data[MSG_BUFF_SIZE];
 } ctpMsg_t;
 
-#ifndef RFPOWER_IDX
-#define RFPOWER_IDX 3
-#endif
 
-#define RFPower_IDs 8
 #endif /* BASIC_SERVICES_H */

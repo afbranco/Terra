@@ -18,6 +18,9 @@ module TerraVMC @safe()
 	uses interface Boot as BSBoot;
 	uses interface BSUpload;
 	uses interface VMCustom;
+#ifdef MODE_INTFLASH
+	uses interface ProgStorage;
+#endif	
 	// Support modules
 	uses interface Queue<evtData_t> as evtQ;
 	uses interface BSTimer as BSTimerVM;
@@ -37,9 +40,13 @@ implementation
 	// VM Processing Flag
 	bool procFlag=FALSE;
 	// last system error code
-	nx_uint8_t ExtDataSysError;				
+	nx_uint8_t ExtDataSysError;
+	// Current program was restored from internal flash
+	bool progRestored = FALSE;	
 
 	// Ceu Environment vars
+	progEnv_t envData;
+/*
 	uint16_t ProgStart;
 	uint16_t ProgEnd;
 	uint16_t nTracks;
@@ -49,8 +56,10 @@ implementation
 	uint16_t gate0;	
 	uint16_t inEvts;	
 	uint16_t async0;	
-	uint16_t appSize;	
-	nx_uint8_t* MEM;
+	uint16_t appSize;
+	uint8_t  persistFlag;	
+*/
+ 	nx_uint8_t* MEM;
 	
 	// Stack control
 	uint16_t currStack=(BLOCK_SIZE * CURRENT_MAX_BLOCKS)-1-4;
@@ -75,8 +84,9 @@ implementation
 	 * Initialization 
 	 */
 	event void BSBoot.booted(){
+//printf("a\n");printfflush();	
 		MoteID = TOS_NODE_ID;
-
+		
 	}	
 
 
@@ -192,8 +202,8 @@ uint32_t unit2val(uint32_t val, uint8_t unit){
 
 void push(uint32_t value){
 	currStack = currStack - 4 ;
-	dbg(APPNAME,"VM::push(): newStack=%d, value=%d (0x%04x), ProgEnd=%d\n",currStack,value,value,ProgEnd);
-	if ((currStack) > ProgEnd) 
+	dbg(APPNAME,"VM::push(): newStack=%d, value=%d (0x%04x), ProgEnd=%d\n",currStack,value,value,envData.ProgEnd);
+	if ((currStack) > envData.ProgEnd) 
 		*(nx_uint32_t*)(CEU_data+currStack)=value;
 	else {
 		evtError(E_STKOVF);
@@ -206,7 +216,7 @@ void push(uint32_t value){
 void pushf(float value){
 	currStack = currStack - 4 ;
 //	dbg(APPNAME,"VM::pushf(): newStack=%d, value=%f (0x%08x), ProgEnd=%d\n",currStack,value,*(uint32_t*)&value,ProgEnd);
-	if ((currStack) > ProgEnd) {
+	if ((currStack) > envData.ProgEnd) {
 		*(nx_float*)(CEU_data+currStack)=value;
 	} else {
 		evtError(E_STKOVF);
@@ -288,15 +298,15 @@ void setMVal(uint32_t buffer, uint16_t Maddr, uint8_t fromTp, uint8_t toTp){
 uint16_t getEvtCeuId(uint8_t EvtId){
 	uint8_t i=0;
 	uint8_t slotSize; // Normal slot has 2 bytes.  Slot with auxId has 3 bytes. 
-	uint16_t currSlot=gate0;
+	uint16_t currSlot=envData.gate0;
 	slotSize = ((*(nx_uint8_t*)(MEM+currSlot+1)) & 0x80)?3:2; // Test bit7 of nGates to find slotSize
-dbg(APPNAME,"VM::getEvtCeuId(): EvtId?=%d : currSlot=%d,  slotId=%d, slotSize=%d, i=%d, inEvts=%d\n", EvtId, currSlot,(*(nx_uint8_t*)(MEM+currSlot)),slotSize,i,inEvts );
+dbg(APPNAME,"VM::getEvtCeuId(): EvtId?=%d : currSlot=%d,  slotId=%d, slotSize=%d, i=%d, inEvts=%d\n", EvtId, currSlot,(*(nx_uint8_t*)(MEM+currSlot)),slotSize,i,envData.inEvts );
 //	while (EvtId > (*(nx_uint8_t*)(MEM+currSlot)) && i < inEvts) {
-	while (EvtId != (*(nx_uint8_t*)(MEM+currSlot)) && i < inEvts) {
+	while (EvtId != (*(nx_uint8_t*)(MEM+currSlot)) && i < envData.inEvts) {
 		i++;
 		currSlot = 	currSlot + 1 + (((*(nx_uint8_t*)(MEM+currSlot+1)) & 0x7f)*slotSize) + 1;
 		slotSize = ((*(nx_uint8_t*)(MEM+currSlot+1)) & 0x80)?3:2; // Test bit7 of nGates to find slotSize
-dbg(APPNAME,"VM::getEvtCeuId(): EvtId?=%d : currSlot=%d,  slotId=%d, slotSize=%d, i=%d, inEvts=%d\n", EvtId, currSlot,(*(nx_uint8_t*)(MEM+currSlot)),slotSize,i,inEvts );
+dbg(APPNAME,"VM::getEvtCeuId(): EvtId?=%d : currSlot=%d,  slotId=%d, slotSize=%d, i=%d, inEvts=%d\n", EvtId, currSlot,(*(nx_uint8_t*)(MEM+currSlot)),slotSize,i,envData.inEvts );
 	}
 	if (EvtId != (*(nx_uint8_t*)(MEM+currSlot))) { 
 		dbg(APPNAME,"WARNING: Not found slot for event %d!\n",EvtId);
@@ -529,12 +539,12 @@ int ceu_wclock_lt (tceu_wclock* tmr) {
 
 
 void ceu_wclock_enable (int gte, s32 us, tceu_nlbl lbl) {
-	tceu_wclock* tmr = (tceu_wclock*)(MEM+wClock0+(gte*sizeof(tceu_wclock)));
+	tceu_wclock* tmr = (tceu_wclock*)(MEM+envData.wClock0+(gte*sizeof(tceu_wclock)));
     s32 dt = us - CEU->wclk_late;
 //afb Prevent negative dt
 	dt = (dt<0)?0:dt;
 
-    dbg(APPNAME,"CEU::ceu_wclock_enable(): gate=%d, time=%d, lbl=%d, dt=%ld, wClock0=%d\n",gte,us,lbl,dt,wClock0);
+    dbg(APPNAME,"CEU::ceu_wclock_enable(): gate=%d, time=%d, lbl=%d, dt=%ld, wClock0=%d\n",gte,us,lbl,dt,envData.wClock0);
     tmr->togo = dt;
     *(nx_uint16_t*)&(tmr->lbl)  = lbl;
 
@@ -546,7 +556,7 @@ void ceu_wclock_enable (int gte, s32 us, tceu_nlbl lbl) {
 
 
 void ceu_async_enable (int gte, tceu_nlbl lbl) {
-    PTR(tceu_nlbl*,async0)[gte] = lbl;
+    PTR(tceu_nlbl*,envData.async0)[gte] = lbl;
 	if (!call BSTimerAsync.isRunning()) 
 		call BSTimerAsync.startOneShot(ASYNC_DELAY); // afb: moved to here to avoid timer cycles without active async 
 }
@@ -559,10 +569,11 @@ int ceu_go_init (int* ret)
    if (haltedFlag) return(0);
 
    CEU->p_tracks = (tceu_trk*)CEU_data+0;
-   CEU->p_mem = CEU_data+((nTracks+1)*sizeof(tceu_trk));
+   CEU->p_mem = CEU_data+((envData.nTracks+1)*sizeof(tceu_trk));
    MEM = CEU->p_mem;
 
-   ceu_track_ins(CEU_STACK_MIN, CEU_TREE_MAX, 0, ProgStart);
+//printf("init: %d ",envData.ProgStart);printfflush();
+   ceu_track_ins(CEU_STACK_MIN, CEU_TREE_MAX, 0, envData.ProgStart);
     return ceu_go(ret);
 }
 
@@ -585,17 +596,17 @@ int ceu_go_event (int* ret, int id, uint8_t auxId, void* data)
 int ceu_go_async(int* ret, int* pending)
 {
     int i,s=0;
-    tceu_nlbl* ASY0 = PTR(tceu_nlbl*,async0);
+    tceu_nlbl* ASY0 = PTR(tceu_nlbl*,envData.async0);
    dbg(APPNAME,"CEU::ceu_go_async(): ret=%d, pending=%d, async0=%d,asyncs=%d, async_cur=%d, ASY0[0]=%d\n",
-   				(ret==NULL?0:*ret),(pending==NULL?0:*pending),async0,asyncs,CEU->async_cur,ASY0[0]);
+   				(ret==NULL?0:*ret),(pending==NULL?0:*pending),envData.async0,envData.asyncs,CEU->async_cur,ASY0[0]);
 
-    for (i=0; i < asyncs; i++) {
-        int idx = (CEU->async_cur+i) % asyncs;
+    for (i=0; i < envData.asyncs; i++) {
+        int idx = (CEU->async_cur+i) % envData.asyncs;
         if (ASY0[idx] != Inactive) {
 
             ceu_track_ins(CEU_STACK_MIN, CEU_TREE_MAX, 0, ASY0[idx]);
             ASY0[idx] = Inactive;
-            CEU->async_cur = (idx+1) % asyncs;
+            CEU->async_cur = (idx+1) % envData.asyncs;
 
             CEU->wclk_late--;
             s = ceu_go(ret);
@@ -606,7 +617,7 @@ int ceu_go_async(int* ret, int* pending)
     if (pending != NULL)
     {
         *pending = 0;
-        for (i=0 ; i < asyncs ; i++) {
+        for (i=0 ; i < envData.asyncs ; i++) {
             if (ASY0[i] != Inactive) {
                 *pending = 1;
                 break;
@@ -622,7 +633,7 @@ int ceu_go_wclock (int* ret, s32 dt, s32* nxt)
 {
     int i;
     s32 min_togo = CEU_WCLOCK_NONE;
-    tceu_wclock* CLK0 = PTR(tceu_wclock*,wClock0);
+    tceu_wclock* CLK0 = PTR(tceu_wclock*,envData.wClock0);
 
     CEU->stack = CEU_STACK_MIN;
 
@@ -641,7 +652,7 @@ int ceu_go_wclock (int* ret, s32 dt, s32* nxt)
     // finds the next CEU->wclk_cur
     // decrements all togo
     CEU->wclk_cur = NULL;
-    for (i=0; i<wClocks; i++)
+    for (i=0; i<envData.wClocks; i++)
     {
         tceu_wclock* tmr = &CLK0[i];
         dbg(APPNAME,"CEU::ceu_go_wclock(): Loop1 nos wClocks: tmr->togo=%d, tmr->lbl=%d\n",(nx_uint32_t)(tmr->togo), tmr->lbl);
@@ -677,6 +688,7 @@ int ceu_go_wclock (int* ret, s32 dt, s32* nxt)
 
 void execTrail(uint16_t lbl){
 	uint8_t Opcode,Param1;
+//printf("Ex: h=%d\n",haltedFlag);printfflush();
 	dbg(APPNAME,"CEU::execTrail(%d), haltedFlag=%s\n",lbl,_TFstr(haltedFlag));
     if (haltedFlag) return;
 	// Get Label Addr
@@ -689,6 +701,7 @@ void execTrail(uint16_t lbl){
 	
 	while (Opcode != op_end){
 	    if (haltedFlag) return;
+//printf(":%d",PC-1);printfflush();
 		Decoder(Opcode,Param1);
 		getOpCode(&Opcode,&Param1);
 	}
@@ -1765,8 +1778,8 @@ void f_set_c(uint8_t Modifier){
     
 	bool hasAsync(){
 		uint8_t i;
-	    tceu_nlbl* ASY0 = PTR(tceu_nlbl*,async0);
-        for (i=0 ; i < asyncs ; i++) {
+	    tceu_nlbl* ASY0 = PTR(tceu_nlbl*,envData.async0);
+        for (i=0 ; i < envData.asyncs ; i++) {
             if (ASY0[i] != Inactive) {
                 return TRUE;
             }
@@ -1787,40 +1800,47 @@ void f_set_c(uint8_t Modifier){
 \* ********************************************************************************/
 
 	event void BSUpload.stop(){
+//printf("$5");printfflush();
 		dbg(APPNAME,"VM::BSUpload.stop()\n");
 		haltedFlag = TRUE;
 	}
 
 	event void BSUpload.setEnv(newProgVersion_t* data){
-		ProgStart = (uint16_t)data->startProg;
-		ProgEnd = (uint16_t)data->endProg;
-		nTracks = data->nTracks;
-		wClocks = data->wClocks;
-		asyncs = data->asyncs;
-		wClock0 = data->wClock0;
-		gate0 = data->gate0;
-		inEvts = data->inEvts;
-		async0 = data->async0;
-		appSize = data->appSize;
+//printf("$4");printfflush();
+		envData.Version = data->versionId;
+		envData.ProgStart = (uint16_t)data->startProg;
+		envData.ProgEnd = (uint16_t)data->endProg;
+		envData.nTracks = data->nTracks;
+		envData.wClocks = data->wClocks;
+		envData.asyncs = data->asyncs;
+		envData.wClock0 = data->wClock0;
+		envData.gate0 = data->gate0;
+		envData.inEvts = data->inEvts;
+		envData.async0 = data->async0;
+		envData.appSize = data->appSize;
+		envData.persistFlag = data->persistFlag;
+		progRestored = FALSE;
 
 		dbg(APPNAME,"VM::BSUpload.setEnv(): ProgStart=%d, ProgEnd=%d, nTracks=%d, wClocks=%d, asyncs=%d, wClock0=%d, gate0=%d, async0=%d\n",
-				ProgStart, ProgEnd, nTracks,wClocks,asyncs,wClock0,gate0,async0);
+				envData.ProgStart, envData.ProgEnd, envData.nTracks,envData.wClocks,envData.asyncs,envData.wClock0,envData.gate0,envData.async0);
 	} 
 	
 	event void BSUpload.getEnv(newProgVersion_t* data){
 		dbg(APPNAME,"VM::BSUpload.getEnv()\n");
-		data->startProg = ProgStart;
-		data->endProg = ProgEnd;
-		data->nTracks = nTracks;
-		data->wClocks = wClocks;
-		data->asyncs = asyncs;
-		data->wClock0 = wClock0;
-		data->gate0 = gate0;
-		data->inEvts = inEvts;
-		data->async0 = async0;
-		data->appSize = appSize;
+		data->versionId = envData.Version;
+		data->startProg = envData.ProgStart;
+		data->endProg = envData.ProgEnd;
+		data->nTracks = envData.nTracks;
+		data->wClocks = envData.wClocks;
+		data->asyncs = envData.asyncs;
+		data->wClock0 = envData.wClock0;
+		data->gate0 = envData.gate0;
+		data->inEvts = envData.inEvts;
+		data->async0 = envData.async0;
+		data->appSize = envData.appSize;
+		data->persistFlag = envData.persistFlag;
 		dbg(APPNAME,"VM::BSUpload.getEnv(): ProgStart=%d, ProgEnd=%d, nTracks=%d, wClocks=%d, asyncs=%d, wClock0=%d, gate0=%d, async0=%d\n",
-				ProgStart, ProgEnd,nTracks,wClocks,asyncs,wClock0,gate0,async0);
+				envData.ProgStart, envData.ProgEnd,envData.nTracks,envData.wClocks,envData.asyncs,envData.wClock0,envData.gate0,envData.async0);
 	}
 
 
@@ -1828,6 +1848,12 @@ void f_set_c(uint8_t Modifier){
 		uint8_t i, size;
 		MoteID = TOS_NODE_ID;
 
+#ifdef MODE_INTFLASH
+		if (envData.persistFlag && progRestored == FALSE) {
+			call ProgStorage.save(&envData, (uint8_t*)&CEU_data[envData.ProgStart], (envData.ProgEnd-envData.ProgStart)+1);
+			progRestored = TRUE;
+		}
+#endif		
 		dbg(APPNAME,"VM::BSUpload.start(%s)\n",(resetFlag)?"TRUE":"FALSE");
 		if (resetFlag==TRUE){ // Reset all stuff
 			//Clean up Event Queue
@@ -1850,6 +1876,7 @@ void f_set_c(uint8_t Modifier){
 	event void BSUpload.resetMemory(){
 		uint16_t i;
 		uint8_t size;
+//printf("$2");printfflush();
 		dbg(APPNAME,"VM::BSUpload.resetMemory()\n");
 		haltedFlag = TRUE;
 		// Reset CEU_data[]
@@ -1864,6 +1891,24 @@ void f_set_c(uint8_t Modifier){
 		memcpy(&CEU_data[Addr],Data,Size);		
 		dbg(APPNAME,"VM::BSUpload.loadSection(): blk=%d, Addr=%d, Size=%d 1stByte=%d\n",(uint8_t)(Addr/BLOCK_SIZE),Addr,Size,CEU_data[Addr]);
 	}
+	
+	event uint16_t BSUpload.progRestore(){
+#ifdef MODE_INTFLASH
+		error_t status=FAIL;
+		signal BSUpload.resetMemory();
+		status = call ProgStorage.getEnv(&envData);
+		if (status == SUCCESS){
+			status = call ProgStorage.restore((uint8_t*)&CEU_data[envData.ProgStart], (envData.ProgEnd-envData.ProgStart)+1);	
+			if (status == SUCCESS) {
+				progRestored = TRUE;
+				haltedFlag = FALSE;
+				return envData.Version;
+			}
+		}
+		progRestored = FALSE;
+#endif
+		return 0;
+		}
 	
 	event void VMCustom.evtError(uint8_t ecode){ 
 		evtError(ecode);

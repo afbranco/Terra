@@ -21,7 +21,9 @@ implementation
 	terra.BSUpload -> BS;
 	terra.BSTimerVM -> BS.BSTimerVM;
 	terra.BSTimerAsync -> BS.BSTimerAsync;
-
+#ifdef MODE_INTFLASH
+	terra.ProgStorage -> BS;
+#endif
     components VMCustomC as custom;
 	terra.VMCustom -> custom; 
 
