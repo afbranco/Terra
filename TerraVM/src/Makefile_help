@@ -1,0 +1,163 @@
+MAKEFLAGS += -s
+
+
+#----------------------------------------------------------
+# Main help
+#----------------------------------------------------------
+define help_HELP
+**********************************************************
+*****  Terra system building tool 
+**********************************************************
+  command line:
+      make <platform> <options> 
+  where:
+      <platform>: Target platform name
+          $(ALL_TARGETS)
+      <options>: OPT:VALUE or OPT.VALUE or mib520,<usb path>
+          $(ALL_OPTIONS)
+
+Shows a help message for specific platform: make help <platform>
+Obs: To compile for TOSSIM, the target platform must be 'micaz sim-sf'
+
+endef
+
+
+define options_HELP
+**********************************************************
+**** All OPTIONS description
+**********************************************************
+ VM:  Define the VM flavour: NET, GRP | default NET
+ MOD: Define additional modules: MSGQ | default ''
+ SENSOR: Configure sensorboard: MTS300CA or MTS300CB(wired) or MDA100 | default MDA100
+ QUEUE: Generate short or long queues | default SHORT
+ TYPE: Configure runtime type: NOBS or BOTH | default BOTH
+ MOTE_TYPE: Define mote type: 1..254 | Default 1
+ VERB: Verbose Compilation mode: Y or N | Default N
+ SETDATA: SetData functionality: Y or N | default N
+ RFPOWER: RF Power: 0 1 2 3 4 5 6 7 | default 7
+ INO_RADIO: Radio board for mega/uno: XBEE0 or XBEE1 or NRF24 or NO_RADIO| default NO_RADIO
+ INO_HALF_CLOCK: Divide Arduino MCU Clock by 2. Applies for powering ProMini_16MHz(5v) with 3.3v 
+ LPL: Low Power Listening mode: Y or N | default N
+ IFLASH: Internal Flash for prog storage: Y or N | default Y
+ DEBUG: Debug dbg() mode for Linux: Y or N | default N
+ WIFI_SSID: ESP WIFI SSID:  <input ssid> | default iot_terra
+ WIFI_PASSWD: ESP WIFI PASSWORD:  <input password> | default projeto_terra
+ NET_ID: Network identifier - 0..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee 
+ install.<nodeid> - Install command + unique node identifier inside its network - 1..2047 | default 1
+ BS_BAUD: BaseStation baudrate - 115200, 57600, 19200 | default <platform specific or 19200>
+   - OBS: Platform specific = telosb, tmote, eyes, intelmote2 => 115200; micaz,mica2, iris => 57600; mica2dot=>19200
+   - OBS2: Do not change baudrate for mica2dot.
+
+endef
+
+
+define tos_HELP
+**********************************************************
+**** TOS available options -- $(TOS_TARGETS)
+**********************************************************
+ VM:  Define the VM flavour: NET, GRP | default NET
+ MOD: Define additional modules: MSGQ | default ''
+ SENSOR: Configure sensorboard: MTS300CA or MTS300CB(wired) or MDA100 | default MDA100
+ QUEUE: Generate short or long queues | default SHORT
+ TYPE: Configure runtime type: NOBS or BOTH | default BOTH
+ MOTE_TYPE: Define mote type: 1..254 | Default 1
+ VERB: Verbose Compilation mode: Y or N | Default N
+ SETDATA: SetData functionality: Y or N | default N
+ RFPOWER: RF Power: 0 1 2 3 4 5 6 7 | default 7
+ LPL: Low Power Listening mode: Y or N | default N
+ IFLASH: Internal Flash for prog storage: Y or N | default Y
+ DEBUG: Debug dbg() mode for Linux: Y or N | default N
+ NET_ID: Network identifier - 0..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee 
+ install.<nodeid> - Install command + unique node identifier inside its network - 1..2047 | default 1
+ BS_BAUD: BaseStation baudrate - 115200, 57600, 19200 | default <platform specific or 19200>
+   - OBS: Platform specific = telosb, tmote, eyes, intelmote2 => 115200; micaz,mica2, iris => 57600; mica2dot=>19200
+   - OBS2: Do not change baudrate for mica2dot.
+
+endef
+
+
+define ino_HELP
+**********************************************************
+**** INO available options -- $(INO_TARGETS)
+**********************************************************
+ VM:  Define the VM flavour: NET, GRP | default NET
+ MOD: Define additional modules: MSGQ | default ''
+ QUEUE: Generate short or long queues | default SHORT
+ TYPE: Configure runtime type: NOBS or BOTH | default BOTH
+ MOTE_TYPE: Define mote type: 1..254 | Default 1
+ VERB: Verbose Compilation mode: Y or N | Default N
+ SETDATA: SetData functionality: Y or N | default N
+ RFPOWER: RF Power: 0 1 2 3 4 5 6 7 | default 7
+ INO_RADIO: Radio board for mega/uno: XBEE0 or XBEE1 or NRF24 or NO_RADIO| default NO_RADIO
+ INO_HALF_CLOCK: Divide Arduino MCU Clock by 2. Applies for powering ProMini_16MHz(5v) with 3.3v 
+ IFLASH: Internal Flash for prog storage: Y or N | default Y
+ DEBUG: Debug dbg() mode for Linux: Y or N | default N
+ NET_ID: Network identifier - 0..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee 
+ install.<nodeid> - Install command + unique node identifier inside its network - 1..2047 | default 1
+ BS_BAUD: BaseStation baudrate - 115200, 57600, 19200 | default <platform specific or 19200>
+   - OBS: Platform specific = telosb, tmote, eyes, intelmote2 => 115200; micaz,mica2, iris => 57600; mica2dot=>19200
+   - OBS2: Do not change baudrate for mica2dot.
+
+endef
+
+
+define ix_HELP
+**********************************************************
+**** RPi/IX available options -- $(IX_TARGETS)
+**********************************************************
+ VM:  Define the VM flavour: NET, GRP | default NET
+ MOD: Define additional modules: MSGQ | default ''
+ QUEUE: Generate short or long queues | default SHORT
+ MOTE_TYPE: Define mote type: 1..254 | Default 1
+ VERB: Verbose Compilation mode: Y or N | Default N
+ SETDATA: SetData functionality: Y or N | default N
+ IFLASH: Internal Flash for prog storage: Y or N | default Y
+ DEBUG: Debug dbg() mode for Linux: Y or N | default N
+ NET_ID: Network identifier - 0..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee 
+ install.<nodeid> - Install command + unique node identifier inside its network - 1..2047 | default 1
+ BS_BAUD: BaseStation baudrate - 115200, 57600, 19200 | default <platform specific or 19200>
+   - OBS: Platform specific = telosb, tmote, eyes, intelmote2 => 115200; micaz,mica2, iris => 57600; mica2dot=>19200
+   - OBS2: Do not change baudrate for mica2dot.
+
+endef
+
+
+define esp_HELP
+**********************************************************
+**** ESP available options -- $(ESP_TARGETS)
+**********************************************************
+ VM:  Define the VM flavour: NET, GRP | default NET
+ MOD: Define additional modules: MSGQ | default ''
+ QUEUE: Generate short or long queues | default SHORT
+ TYPE: Configure runtime type: NOBS or BOTH | default BOTH
+ MOTE_TYPE: Define mote type: 1..254 | Default 1
+ VERB: Verbose Compilation mode: Y or N | Default N
+ SETDATA: SetData functionality: Y or N | default N
+ RFPOWER: RF Power: 0 1 2 3 4 5 6 7 | default 7
+ IFLASH: Internal Flash for prog storage: Y or N | default Y
+ DEBUG: Debug dbg() mode for Linux: Y or N | default N
+ WIFI_SSID: ESP WIFI SSID:  <input ssid> | default iot_terra
+ WIFI_PASSWD: ESP WIFI PASSWORD:  <input password> | default projeto_terra
+ NET_ID: Network identifier - 0..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee 
+ install.<nodeid> - Install command + unique node identifier inside its network - 1..2047 | default 1
+ BS_BAUD: BaseStation baudrate - 115200, 57600, 19200 | default <platform specific or 19200>
+   - OBS: Platform specific = telosb, tmote, eyes, intelmote2 => 115200; micaz,mica2, iris => 57600; mica2dot=>19200
+   - OBS2: Do not change baudrate for mica2dot.
+
+endef
+
+#==============================================================
+
+%:
+	$(info $($@_HELP))
+
+default: help
+micaz: tos
+mica2: tos
+mica2dot: tos
+iris: tos
+telosb: tos
+uno: ino
+mega: ino
+rpi: ix
+#==============================================================

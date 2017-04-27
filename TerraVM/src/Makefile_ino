@@ -1,5 +1,5 @@
 # Initial paths/files
-BUILDDIR ?= build/$(MOTE)
+BUILDDIR ?= build/$(_MOTE)
 MAIN_APPC = $(BUILDDIR)/app.c
 MAIN_EXE = $(BUILDDIR)/main.exe
 MAIN_SREC = $(BUILDDIR)/main.srec
@@ -16,7 +16,7 @@ AVRDUDECONF = /home/branco/arduino-1.0.5/hardware/tools/avrdude.conf
 
 
 # MCU and CLOCK
-ifeq ($(MOTE),uno)
+ifeq ($(_MOTE),uno)
   AVRDUDE_MCU = m328p
   MCU=atmega328p
   MCUCLK = 16
@@ -25,7 +25,7 @@ ifeq ($(MOTE),uno)
   TOS_INO = tos_uno
   ISP_BAUDRATE = 115200
   AVRDUDEPROG = arduino
-else ifeq ($(MOTE),mega)
+else ifeq ($(_MOTE),mega)
   AVRDUDE_MCU = atmega2560
   MCU=atmega2560
   MCUCLK = 16
@@ -37,7 +37,7 @@ else ifeq ($(MOTE),mega)
 endif
 
 
-USB ?= /dev/ttyACM0
+__USB ?= /dev/ttyACM0
 
 # Extract all "tos_uno"/"tos_mega" subdirectories as includes
 INCDIRS := $(addprefix -I,$(shell find $(VMDIR)/$(TOS_INO)/ -type d -print))
@@ -65,10 +65,10 @@ exe:
 	@:
 
 install.%: 
-	@$(AVRDUDE) -C$(AVRDUDECONF)  -v -p$(AVRDUDE_MCU) -c$(AVRDUDEPROG) -P$(USB) -b$(ISP_BAUDRATE) -D -Uflash:w:$(MAIN_HEX):i
+	@$(AVRDUDE) -C$(AVRDUDECONF)  -v -p$(AVRDUDE_MCU) -c$(AVRDUDEPROG) -P$(__USB) -b$(ISP_BAUDRATE) -D -Uflash:w:$(MAIN_HEX):i
 
 install: 
-	@$(AVRDUDE) -C$(AVRDUDECONF)  -v -p$(AVRDUDE_MCU) -c$(AVRDUDEPROG) -P$(USB) -b$(ISP_BAUDRATE) -D -Uflash:w:$(MAIN_HEX):i
+	@$(AVRDUDE) -C$(AVRDUDECONF)  -v -p$(AVRDUDE_MCU) -c$(AVRDUDEPROG) -P$(__USB) -b$(ISP_BAUDRATE) -D -Uflash:w:$(MAIN_HEX):i
 
 
 builddir: 

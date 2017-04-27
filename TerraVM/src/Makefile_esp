@@ -1,5 +1,5 @@
 # Initial paths/files
-BUILDDIR = build/$(MOTE)
+BUILDDIR = build/$(_MOTE)
 MAIN_APPC = $(BUILDDIR)/app.c
 MAIN_EXE = $(BUILDDIR)/main.elf
 DUMP_FILE = $(BUILDDIR)/wiring-check.xml
@@ -9,7 +9,7 @@ GCC = xtensa-lx106-elf-gcc
 OBJDUMP = avr-objdump
 
 #Serial upload port
-SERIAL ?= /dev/ttyUSB0
+__SERIAL ?= /dev/ttyUSB0
 
 # Specif xtensa flags
 CFLAGS += -DICACHE_FLASH -mlongcalls
@@ -97,13 +97,16 @@ elf: $(MAIN_APPC)
 	$(info ---------------------------------  Compile done *************)
 	$(GCC) $(MAIN_APPC) $(OPT3) $(OPT4) -o$(MAIN_EXE)
 
+%:
+	@:
+
 install.%: $(MAIN_EXE)-0x00000.bin $(MAIN_EXE)-0x10000.bin 
 	$(info ---------------------------------  Start flashing to device *************)
-	esptool.py -b 115200 -p $(SERIAL) write_flash 0x00000 $(MAIN_EXE)-0x00000.bin 0x10000 $(MAIN_EXE)-0x10000.bin
+	esptool.py -b 115200 -p $(__SERIAL) write_flash 0x00000 $(MAIN_EXE)-0x00000.bin 0x10000 $(MAIN_EXE)-0x10000.bin
 
 install: $(MAIN_EXE)-0x00000.bin $(MAIN_EXE)-0x10000.bin 
 	$(info ---------------------------------  Start flashing to device *************)
-	esptool.py -b 115200 -p $(SERIAL) write_flash 0x00000 $(MAIN_EXE)-0x00000.bin 0x10000 $(MAIN_EXE)-0x10000.bin
+	esptool.py -b 115200 -p $(__SERIAL) write_flash 0x00000 $(MAIN_EXE)-0x00000.bin 0x10000 $(MAIN_EXE)-0x10000.bin
 
 
 builddir: 

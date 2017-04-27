@@ -1,5 +1,5 @@
 # Initial paths/files
-BUILDDIR = build/$(MOTE)
+BUILDDIR = build/$(_MOTE)
 MAIN_APPC = $(BUILDDIR)/app.c
 MAIN_EXE = $(BUILDDIR)/main.exe
 DUMP_FILE = $(BUILDDIR)/wiring-check.xml
@@ -27,12 +27,14 @@ exe: dbg.o setTimer.o
 	nescc $(OPT1) $(OPT2) $(OPT3) $(OPT4) -gcc=$(GCC) $(COMPONENT).nc
 	@echo "    compiled $(COMPONENT) to $(MAIN_EXE)"
 
+%:
+	@:
+
 install.%: 
-	@echo "    Done! NodeId=" $(INSTALL) # Deve ser compilado na propria máquina.
+	@echo "    Done! NodeId=" $(__INSTALL) # Deve ser compilado na propria máquina.
 
 install: 
-	@echo "    Warning: Default value for NodeId=" $(INSTALL) 
-
+	@echo "    Warning: Default value for NodeId=" $(__INSTALL) 
 
 builddir: 
 	@mkdir -p $(BUILDDIR)
