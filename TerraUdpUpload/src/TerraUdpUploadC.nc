@@ -78,6 +78,7 @@ void printMsg(uint8_t* msg, uint8_t len){
 		newProgVersion.inEvts = (nx_uint16_t) inEvts;
 		newProgVersion.async0 = (nx_uint16_t) async0;
 		newProgVersion.moteType = localMoteType;
+		newProgVersion.persistFlag = FALSE;
 	
 		while(fgets(line,LINE_SIZE,file) != NULL){
 			if (j>=0){ // ignores first line
