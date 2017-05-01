@@ -1,4 +1,5 @@
 #include<stdio.h>
+#include <fcntl.h>
 #include<stdlib.h>
 #include <errno.h>
 #include <time.h>
@@ -44,6 +45,7 @@ implementation{
 	uint8_t state = START;
 	uint16_t lastBlock = 0;
 	uint8_t retry=0;
+	bool persistFlag=FALSE;
 	
 void printMsg(uint8_t* msg, uint8_t len){
 	uint8_t i;
@@ -78,7 +80,7 @@ void printMsg(uint8_t* msg, uint8_t len){
 		newProgVersion.inEvts = (nx_uint16_t) inEvts;
 		newProgVersion.async0 = (nx_uint16_t) async0;
 		newProgVersion.moteType = localMoteType;
-		newProgVersion.persistFlag = FALSE;
+		newProgVersion.persistFlag = persistFlag;
 	
 		while(fgets(line,LINE_SIZE,file) != NULL){
 			if (j>=0){ // ignores first line
@@ -168,9 +170,46 @@ printf("Passo 6\n");
 	}
 
 	event void Boot.booted(){
-		char filename[200];
+		char inputLine[200];
+		char filename[200], persistChar;
+		char * pch;
+		int count=0;
+		int numRead;
+		
+		fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);
+		numRead = read(0,inputLine,200);
+		if (numRead < 3){
+			printf("Error: missing input arguments.\n");
+			printf("Syntax: echo \"/filepath/file.vmx flag\" | ./build/rpi/main.exe\n");
+			exit(1);
+		}
+		inputLine[numRead]=0;
+		//printf("len:%d,Input:|%s|\n",numRead,inputLine);
+
 		localVersionId = getVersionId();
-		gets(filename);
+
+		pch = strtok(inputLine," ");
+		if (pch == NULL) {
+			printf("Error: missing input arguments.\n");
+			printf("Syntax: echo \"/filepath/file.vmx flag\" | ./build/rpi/main.exe\n");
+			exit(1);
+		}
+		strcpy(filename,pch);
+		
+		pch = strtok(NULL," ");
+		if (pch == NULL) {
+			printf("Error: missing input arguments.\n");
+			printf("Syntax: echo \"/filepath/file.vmx flag\" | ./build/rpi/main.exe\n");
+			exit(1);
+		}
+		persistChar = (pch[0]>'a')?pch[0]-('a'-'A'):pch[0];
+		if (persistChar != 'Y' && persistChar != 'N') {
+			printf("Error: Persistence Flag must be Y or N.\n");
+			printf("Syntax: echo \"/filepath/file.vmx flag\" | ./build/rpi/main.exe\n");
+			exit(1);
+		}	
+		printf("Filename=|%s|, persistFlag=|%c|\n",filename,persistChar);
+		persistFlag = (persistChar == 'Y');
 		ReadVMXFile(filename);
 	
 		call UDPControl.start();
