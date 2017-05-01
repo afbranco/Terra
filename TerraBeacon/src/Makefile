@@ -135,7 +135,7 @@ ifeq ($(MOTE),rpi)
 endif
 
 
-# default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee
+# default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:nrf24, 4:xbee, 5:NoRadio
 NETID_mica2 = 0
 NETID_mica2dot = 0
 NETID_micaz = 1
@@ -143,24 +143,41 @@ NETID_telosb = 1
 NETID_iris = 1
 NETID_esp = 2
 NETID_rpi = 2
-NETID_megaNRF24 = 4
-NETID_megaXBEE0 = 5
-NETID_megaXBEE1 = 5
+NETID_megaNRF24 = 3
+NETID_megaXBEE0 = 4
+NETID_megaXBEE1 = 4
 NETID_megaNO_RADIO = 5
-NETID_unoNRF24 = 4
-NETID_unoXBEE0 = 5
-NETID_unoXBEE1 = 5
+NETID_unoNRF24 = 3
+NETID_unoXBEE0 = 4
+NETID_unoXBEE1 = 4
 NETID_unoNO_RADIO = 5
 
-NETID_promini8NRF24 = 4
-NETID_promini8XBEE0 = 5
-NETID_promini8XBEE1 = 5
+NETID_promini8NRF24 = 3
+NETID_promini8XBEE0 = 4
+NETID_promini8XBEE1 = 4
 NETID_promini8NO_RADIO = 5
 
-NETID_promini16NRF24 = 4
-NETID_promini16XBEE0 = 5
-NETID_promini16XBEE1 = 5
+NETID_promini16NRF24 = 3
+NETID_promini16XBEE0 = 4
+NETID_promini16XBEE1 = 4
 NETID_promini16NO_RADIO = 5
+
+NETNAME_0 = cc1000
+NETNAME_1 = cc2420
+NETNAME_2 = wifi-udp
+NETNAME_3 = nrf24
+NETNAME_4 = xbee
+NETNAME_5 = NoRadio
+
+ifeq ($(NET_ID),)
+  NET_ID = $(NETID_$(MOTE)$(INO_RADIO))
+  NET_NAME = $(NETNAME_$(NET_ID))
+else
+  ifeq ($(shell echo "$(NET_ID)<0 || $(NET_ID)>30" | bc), 1)
+    $(error 'in NET_ID:xx , xx must be in 0..30')
+  endif
+  NET_NAME = (?)
+endif
 
 NET_ID ?= $(NETID_$(MOTE)$(INO_RADIO))
 ifeq ($(shell echo "$(NET_ID)<0 || $(NET_ID)>30" | bc), 1)
@@ -263,7 +280,9 @@ $(info ***********************)
 $(info **** Configuration ****)
 $(info MOTE        = $(MOTE))
 $(info VM          = $(VM))
-$(info NODE_ID     = $(INSTALL))
+$(info NET_ID      = $(NET_ID) ($(NET_NAME)))
+$(info MOTE_ID     = $(INSTALL))
+$(info MOTE_ADDR   = $(MOTE_ADDR) ($(NET_ID):$(INSTALL)))
 $(info RFPOWER     = $(RFPOWER))
 $(info LPL         = $(LPL))
 $(info SENSORBOARD = $(SENSORBOARD))
