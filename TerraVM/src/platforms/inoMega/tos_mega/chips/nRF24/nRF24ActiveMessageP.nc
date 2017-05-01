@@ -343,7 +343,7 @@ uint16_t unpackAddr(uint8_t* nRF_addr){
 
 uint8_t nRF_getPower(){
 	uint8_t rf_setup;
-	// First get RF_SEUP value
+	// First get RF_SETUP value
 	ssOn();
 	call SpiByte.write(RF_SETUP);					
 	rf_setup = call SpiByte.write(0);
@@ -353,7 +353,7 @@ uint8_t nRF_getPower(){
 }
 void nRF_setPower(uint8_t nRFpower){
 	uint8_t rf_setup;
-	// First get RF_SEUP value
+	// First get RF_SETUP value
 	ssOn();
 	call SpiByte.write(RF_SETUP);					
 	rf_setup = call SpiByte.write(0);

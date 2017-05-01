@@ -40,16 +40,33 @@ MOD_VALUES = MSGQ
 
 #===================================================================================
 #  Save makecmdgoals (a read only var) to goals so that we can modify it.
-GOALS += $(shell echo $(MAKECMDGOALS) | tr a-z A-Z) 
+GOALS += $(MAKECMDGOALS) 
 
 #  Extract user options from goals of the form opt,arg, transform to opt=arg,
 #  and evaluate.  Then, reduce GOALS to have the args removed.
 OptRE := [.:]
-GoalOpts  := $(shell perl -e 'print join " ", map {s{^(.*?)$(OptRE)}{\U$$1=};$$_} grep /$(OptRE)/, split /\s+/, "$(GOALS)";')
-GoalOptsa := $(shell perl -e 'print join " ", map {s{^(.*?)$(OptRE)}{\U$$1=};$$1} grep /$(OptRE)/, split /\s+/, "$(GOALS)";')
+GoalOptsValues  := $(shell perl -e 'print join " ", map {s{^(.*?)$(OptRE)}{\U$$1=};$$_} grep /$(OptRE)/, split /\s+/, "$(GOALS)";')
+GoalOpts        := $(shell echo $(shell perl -e 'print join " ", map {s{^(.*?)$(OptRE)}{\U$$1=};$$1} grep /$(OptRE)/, split /\s+/, "$(GOALS)";') | tr a-z A-Z) 
 GOALS := $(shell perl -e '$$_="$(GOALS)"; s{$(OptRE)\S*}{}g; print;')
-$(foreach opt,$(GoalOpts),$(eval __$(opt)))
+$(foreach opt,$(GoalOptsValues),$(eval __$(shell echo $(opt) | tr a-z A-Z)))
 
+# If necessary, re-assignment USB without upper-case
+USB_DEV = $(filter USB%,$(GoalOptsValues))
+ifneq ($(USB_DEV),)
+  $(eval __$(USB_DEV))
+endif
+
+# If necessary, re-assignment WIFI_SSID without upper-case
+WIFI_SSID_ = $(filter WIFI_SSID%,$(GoalOptsValues))
+ifneq ($(WIFI_SSID_),)
+  $(eval __$(WIFI_SSID_))
+endif
+
+# If necessary, re-assignment WIFI_PASSWD without upper-case
+WIFI_PASSWD_ = $(filter WIFI_PASSWD%,$(GoalOptsValues))
+ifneq ($(WIFI_PASSWD_),)
+  $(eval __$(WIFI_PASSWD_))
+endif
 
 # Extract Target mote
 _MOTE = $(word 1,$(MAKECMDGOALS))
@@ -76,7 +93,7 @@ ifneq ($(words $(MAKEOVERRIDES)),0)
     $(info *****        You must use ":" or "." to separate an OPTION of its VALUE.)
     $(error )
 endif
-INVALID_OPTIONS = $(filter-out $($(MOTE_FAMILY)_OPTIONS),$(GoalOptsa))
+INVALID_OPTIONS = $(filter-out $($(MOTE_FAMILY)_OPTIONS),$(GoalOpts))
 ifneq ($(words $(INVALID_OPTIONS)),0)
   ifeq ($(words $(INVALID_OPTIONS)),1)
     $(info *****)
@@ -91,7 +108,8 @@ ifneq ($(words $(INVALID_OPTIONS)),0)
 endif
 
 
-REMAIN_OPTIONS = $(filter-out $(GoalOptsa),$(GOALS))
+REMAIN_OPTIONS = $(filter-out $(GoalOptsa),$(GOALSa))
+$(info $(REMAIN_OPTIONS)--$(GoalOptsa)--$(GOALSa))
 MALFORMED_OPTIONS = $(wordlist 2,100,$(REMAIN_OPTIONS))
 ifeq ($(firstword $(REMAIN_OPTIONS)),MICAZ)
   ifeq ($(firstword $(MALFORMED_OPTIONS)),SIM-SF)
@@ -367,6 +385,14 @@ _MOTE_ADDR = $(shell echo $(__NET_ID)*2048 + $(__INSTALL) | bc)
 CFLAGS += -DNET_ID=$(__NET_ID)
 CFLAGS += -DTERRA_NODE_ID=$(_MOTE_ADDR)
 
+# Redefine "install.xx" for TOS nodes
+ifneq ($(filter $(_MOTE),$(TOS_TARGETS)),)
+  ifneq ($(findstring install,$(MAKECMDGOALS)),)
+    MAKECMDGOALS += install.$(_MOTE_ADDR)  
+  endif
+endif
+
+
 # Defaul values for serial baudrate
 BAUD_mica2 = 57600
 BAUD_micaz = 57600
@@ -468,7 +494,6 @@ endif
 #
 # Validate SENSOR and define SENSORBOARD
 #
-SENSORBOARD = Not applicable
 ifeq ($(_MOTE),mica2dot)
   ifneq ($(__SENSOR),)
     $(error Invalid SENSOR value "$(SENSOR)" for "mica2dot". Currently Mica2Dot supports only internal temperature sensor.)
@@ -494,6 +519,8 @@ ifneq ($(filter $(_MOTE),micaz mica2 iris),)
     $(error Invalid SENSOR value "$(SENSOR)" for "$(MOTE)". Options are: MTS300CA, MTS300CB, MDA100)
   endif	
 endif
+# Force message for undefined sensor
+__SENSOR = Not applicable
 
 
 #
@@ -551,6 +578,7 @@ GENERAL_MAX__BLKS = 220
 M_SETDATA = 16
 M_MSGQ = 8
 M_INTFLASH = 0
+M_BSTATION = 5
 
 #
 # Configure BS and QUEUE defines
@@ -603,17 +631,23 @@ else
     DM_INTFLASH = 0
 endif
 
+ifeq ($(__TYPE) , BOTH)
+    DM_BSTATION = $(M_BSTATION)
+else
+    DM_BSTATION = 0
+endif
+
 
 # Calculate final MemBlocks
 BLOCK_SIZE = 22
-MBLOCKS_F = $(shell echo ${MBLOCKS}-${DM_MSGQ}-${DM_SETDATA}-${DM_INTFLASH} | bc)
+MBLOCKS_F = $(shell echo ${MBLOCKS}-${DM_MSGQ}-${DM_SETDATA}-${DM_INTFLASH}-${DM_BSTATION} | bc)
 # force short memory - test with printf
 # MBLOCKS=40
 CFLAGS += -DVM_MEM_BLKS=$(MBLOCKS_F)
 ifneq ($(filter $(_MOTE),$(TOS_TARGETS)),)
   CFLAGS += -DTOSVER=$(TOSVERSION)
 endif
-#$(info shell echo ${MBLOCKS}-${DM_MSGQ}-${DM_SETDATA}-${DM_INTFLASH})
+#$(info shell echo ${MBLOCKS}-${DM_MSGQ}-${DM_SETDATA}-${DM_INTFLASH}-${DM_BSTATION})
 
 
 $(info ***********************)
@@ -630,7 +664,7 @@ $(info MOTE_ADDR   = $(_MOTE_ADDR) ($(__NET_ID):$(__INSTALL)))
 $(info MOTE_TYPE   = $(__MOTE_TYPE))
 $(info RFPOWER     = $(__RFPOWER))
 $(info LPL         = $(__LPL))
-$(info SENSORBOARD = $(SENSORBOARD))
+$(info SENSORBOARD = $(__SENSOR))
 ifeq ($(__TYPE) , BOTH)
     $(info TYPE        = $(__TYPE) : SerialBaudrate=$(__BS_BAUD))
 else
