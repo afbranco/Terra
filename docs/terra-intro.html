@@ -1,6 +1,6 @@
-<h2>{{ site.data.menulist.docs_list_title }}</h2>
+<h2>{{ menulist.docs_list_title }}</h2>
 <ul>
-   {% for item in site.data.menulist.docs %}
+   {% for item in menulist.docs %}
       <li><a href="{{ item.url }}" alt="{{ item.title }}">{{ item.title }}</a></li>
    {% endfor %}
 </ul>
