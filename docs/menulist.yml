@@ -1,0 +1,11 @@
+docs_list_title: Terra Documentation
+docs:
+
+- title: Introduction
+  url: terra-intro.html
+
+- title: Language
+  url: terra-language.html
+
+- title: Customizations
+  url: terra-customizations.html

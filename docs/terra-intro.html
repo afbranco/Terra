@@ -1,0 +1,35 @@
+<h2>{{ site.data.samplelist.docs_list_title }}</h2>
+<ul>
+   {% for item in site.data.samplelist.docs %}
+      <li><a href="{{ item.url }}" alt="{{ item.title }}">{{ item.title }}</a></li>
+   {% endfor %}
+</ul>
+<p></p>
+<h3>Terra System Introduction</h3>
+<p>Terra's goal is to facilitate the creation of WSN applications, 
+specifically as refers to dealing with event-driven programming and 
+with network programming.
+The Terra model is based on a virtual machine and combines a reactive scripting language with a set of customized components.
+These components may be selected as needed, creating customized virtual machines with abstractions provided by the component interfaces.
+A scripting language enforces a programming model that glues components together to create powerful applications in a few lines of code.
+This makes them suitable for creating programs that benefit from the pre-defined and pre-installed
+set of components and that can be easily sent over the network.
+</p>
+<p>
+Terra uses Céu-T as its scripting language and provides a component-based virtual machine VM-T to be customized for different application domains.
+Céu-T implements a variation of the Céu programming language<cite><a href="http://dx.doi.org/10.1145/2517351.2517360" target="_blank">[SantAnna2013]</a></cite>.
+The Terra Virtual machine VM-T, with its customizations, runs on WSN nodes with limited resources.
+We built VM-T using the nesC programming language and the TinyOS<cite><a href="http://dx.doi.org/10.1007/3-540-27139-2_7" target="_blank">[Levis2004]</a></cite> operating system.
+Figure 1 presents the three basic elements of Terra.
+</p>
+
+<figure>
+<img style="border: 0px solid ; width: 480px; height: 250px;" alt="Terra system basic elements" src="images/fig_system.png" align="center" hspace="1" vspace="10">
+<figcaption>Fig1.: Terra system basic elements.</figcaption>
+</figure>
+<p></p>
+<p>
+Terra's guarantees for race freedom and against local starvation and invalid pointers contribute to safer code.
+These guarantees came, basically, from the static analysis of the Céu compiler and runtime checks of the VM-T execution.
+</p>
+

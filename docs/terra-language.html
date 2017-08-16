@@ -1,0 +1,213 @@
+<p></p>
+<h2>Céu-T Language</h2>
+<p>As an
+introductory example, the Céu-T program in the Listing 1 repeatedly
+reads the light (lines 4-5) and temperature (lines 7-9) sensors and
+tests (line 10) whether either reading has risen above a predefined
+limit. If this happens, the program turns on a led (line 11) to
+indicate the anomalous condition. Then the execution blocks waiting for
+1 minute (line 13) before repeating the loop again.
+</p>
+
+<figure>
+<img style="border: 0px solid ; width: 450px; height: 339px;" alt="Terra example" src="images/Terra3.gif" align="center" hspace="10" vspace="10"><br>
+<figcaption>Listing 1. - Céu-T introductory example.</figcaption>
+<figure>
+
+<h3>1 - Types and data structures</h3>
+<p>For Céu-T, we defined a basic type system that includes integer values with 8, 16, and
+32 bits and float values of 32 bits.
+Pointer types are not allowed for safety reasons. 
+The basic types supported by Céu-T are: <span class="code">byte</span>, <span class="code">short</span>, <span class="code">long</span>, <span class="code">ubyte</span>, <span class="code">ushort</span>, 
+and <span class="code">ulong</span> -- respectively 8, 16, and 32-bit signed and unsigned integers and float.
+
+<p>
+But we need more complex data structures to use in the interfaces between the user Céu-T script and the VM components.
+For that, we define three types of data structures --
+one-dimension arrays, registers and packets.
+
+<p>One-dimension arrays are defined as a basic type within a dimension.</p>
+<p>A <span class="code">regtype</span> declaration creates new register type.
+A register can only have fields that are values of basic types or arrays of basic types.</p>
+<p>We also defined a packet declarations for partial predefined structures.
+This kind of data structure is useful when a component interface needs to specify some fields and the user can define other fields as needed.  
+A typical example of packet use is in the radio message interface, where some fields are mandatory, such as message type and target node, and other fields depend on the application needs.
+The <span class="code">packet</span> command declares a new abstract register type which must contain, at least, a field of a special type called <span class="code">payload</span> and its length in bytes.
+Later on, during application writing, the <span class="code">pktype</span> declaration may be used to create a new register type based on the abstract register.
+In <span class="code">pktype</span> declaration the user must specify at least one basic type field or array field for the abstract packet register's payload.
+The only restriction is that the sum of bytes of all user-defined fields can not exceed the payload length defined by the <span class="code">packet</span> command.
+The <spanclass="code">packet</span> declarations can be used only in the configuration block as its use is intended to the developer of the customization.
+</p>
+</p><b>Obs:</b> All variables must start with a lowercase character.</p>
+
+<div class="container row">
+<div class="col-xs-6" >Examples of the Terra type system implementation
+<pre style="text-align:left">
+var ushort nodeId;          // Simple integer var
+var float average;          // Simple float point var
+var ushort[5] sensorReads;  // Array var
+
+regtype myData with 		// Register type
+	var ubyte sequence;
+	var ushort nodeID;
+	var ushort sensorValue;
+end
+
+var myData sensorData; 		// Register var
+
+// Abstract register type
+packet radioMsg with 
+	var ubyte msgId;
+	var ushort target;
+	var payload[20] data;	// 20 bytes
+end
+</pre>
+</div>
+<div class="col-xs-6" >&nbsp
+<pre style="text-align:left">
+// Register/packet type
+pktype userMsg of radioMsg with 
+	var ubyte seq;
+	var ushort sensorVal;
+end
+
+
+// Register/packet var
+var userMsg sendMsg;
+
+
+// Valid attribution examples
+nodeId = 5;
+average = nodeId/2.0;
+sensorData.sensorValue = sensorReads[0];
+sendMsg.target=1;
+sendMsg.sensorVal=sensorData.sensorValue;
+
+</pre>
+</div>
+</div>
+
+<h3>2 - Flow control</h3>
+
+<p>Céu-T inherits from Céu all flow control.
+Basically this has three control structures: parallel execution, loop execution, and conditional execution. </p>
+
+<h4>2.1 - The parallel execution</h4>
+<p> The Céu parallel execution allows three kind of operations.</p>
+<p>The <code>par/or</code> executes its blocks until the first block terminate, the execution  of the others blocks are canceled and the script continues after the <code>end</code>.
+The <code>par/and</code> executes its blocks until all blocks are completed and the script continues after the <code>end</code>.
+The <code>par</code> is used when all block are infinite loops.</p>
+<p><b>Obs.:</b> The system assumes the execution on a single thread and when a block suspends its execution the system executes the next pending block.</p>
+
+<div class="container row">
+<div class="col-xs-4" >Parallel: OR
+<pre style="text-align:left">
+par/or do
+    < block 1 >
+with
+    < block 2 >
+with
+    < block n >
+end
+</pre>
+</div>
+<div class="col-xs-4">Parallel: AND
+<pre style="text-align:left">
+par/and do
+    < block 1 >
+with
+    < block 2 >
+with
+    < block n >
+end
+</pre>
+</div>
+<div class="col-xs-4">Parallel: No termination
+<pre style="text-align:left">
+par do
+    < block 1 >
+with
+    < block 2 >
+with
+    < block n >
+end
+</pre>
+</div>
+</div>
+
+<h4>2.2 - The loop execution</h4>
+
+<p> Céu-T has a loop command limited by a counter and a loop that may be infinite. 
+Both loops may exit with the <code>break;</code> command.</p>
+
+<div class="container row">
+<div class="col-xs-4" >Loop: count
+<pre style="text-align:left">
+loop i,10 do
+    < block >
+end
+</pre>
+The loop increments <code>i</code> from zero up to 9, then exit.
+</div>
+<div class="col-xs-4">Loop: No count
+<pre style="text-align:left">
+loop do
+    < block >
+end
+</pre>
+This is an infinite loop.
+</div>
+</div>
+
+<h4>2.3 - The conditional execution</h4>
+
+<div class="container row">
+<div class="col-xs-4" >If-then
+<pre style="text-align:left">
+if i > 10 then
+    < block >
+end
+</pre>
+</div>
+<div class="col-xs-4" >If-then-else
+<pre style="text-align:left">
+if i > 10 then
+    < block 1 >
+else
+    < block 2 >
+end
+</pre>
+</div>
+<div class="col-xs-4" >If-then-else/if
+<pre style="text-align:left">
+if i > 10 then
+    < block 1 >
+else/if i == 5 then
+    < block 2 >
+else
+    < block 3 >
+end
+</pre>
+</div>
+</div>
+
+<h3> 3 - Event operations</h3>
+
+<p> Céu-T also inherits from Céu the basic event operations. An event may be an output event or an input event.
+The <code>emit</code> command generate an output event and the <code>await</code> command blocks waiting to receive a specific event.
+The <code>await</code> command may be used as timer command passing a time value instead an event name.
+Each Terra customization defines its own events. The Customizations section presents all events available for the TerraNet and TerraGrp customizations. </p>
+<p> Follows a script example using events.</p>
+<div class="col-xs-4" >
+<pre style="text-align:left">
+var ushort photo;
+loop do
+    await 30s;
+    emit REQ_PHOTO;
+    photo = await PHOTO;
+    emit LEDS(photo);
+end
+</pre>
+</div>
+
+
