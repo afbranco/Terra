@@ -4,7 +4,7 @@
 	{% if item.submenu == null %}
 		<p><a href="{{ item.url }}" alt="{{ item.menu }}">{{ item.menu }}</a></p>
 	{% else %}
-	    <h3>{{ item.title }}</h3>
+		<p>{{ item.menu }}</p>
 	      <ul>
 	        {% for entry in item.submenu %}
 		      <a href="{{ entry.url }}" alt="{{ entry.page }}">{{ entry.page }}</a>, 
