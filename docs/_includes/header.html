@@ -2,7 +2,7 @@
 <h2>{{ site.data.menulist.docs_list_title }}</h2>
 {% for item in site.data.menulist.docs %}
 	{% if item.submenu == null %}
-		<p><a href="{{ item.url }}" alt="{{ item.title }}">{{ item.title }}</a></p>
+		<p><a href="{{ item.url }}" alt="{{ item.menu }}">{{ item.menu }}</a></p>
 	{% else %}
 	    <h3>{{ item.title }}</h3>
 	      <ul>
