@@ -1,10 +1,7 @@
 ---
 ---
-<h2>{{ site.data.menulist.docs_list_title }}</h2>
-   {% for item in site.data.menulist.docs %}
-      <a href="{{ item.url }}" alt="{{ item.title }}">{{ item.title }}</a>, 
-   {% endfor %}
-<p></p>
+{% include header.html %}
+
 <h3>Terra System Introduction</h3>
 <p>Terra's goal is to facilitate the creation of WSN applications, 
 specifically as refers to dealing with event-driven programming and 
@@ -32,4 +29,6 @@ Figure 1 presents the three basic elements of Terra.
 Terra's guarantees for race freedom and against local starvation and invalid pointers contribute to safer code.
 These guarantees came, basically, from the static analysis of the Céu compiler and runtime checks of the VM-T execution.
 </p>
-
+---
+---
+{% include footer.html %}
