@@ -3,7 +3,7 @@ docs:
 - menu: Main
   url: terra-intro.html
   
-- menu: TerraDocumentation
+- menu: Documentation
   submenu:
   - page: Introduction
     url: terra-intro.html
