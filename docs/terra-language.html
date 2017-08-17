@@ -2,6 +2,21 @@
 ---
 {% include header.html %}
 
+<style type="text/css">
+.wrapper {
+    margin: 0 auto;
+    width: 960px;
+}
+
+.column {
+       float: left;
+       width: 33%;
+}
+}
+
+
+</style>
+
 <p></p>
 <h2>Céu-T Language</h2>
 <p>As an
@@ -44,9 +59,9 @@ The <spanclass="code">packet</span> declarations can be used only in the configu
 </p>
 </p><b>Obs:</b> All variables must start with a lowercase character.</p>
 
-<div style="float:left;">
+<div class="wrapper">
 Examples of the Terra type system implementation
-<div style="float:left;">
+<div class="column">
 {% highlight c %}
 var ushort nodeId;          // Simple integer var
 var float average;          // Simple float point var
@@ -68,7 +83,7 @@ packet radioMsg with
 end
 {% endhighlight %}
 </div>
-<div style="float:left;">
+<div class="column">
 {% highlight c %}
 // Register/packet type
 pktype userMsg of radioMsg with 
