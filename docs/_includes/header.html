@@ -3,7 +3,7 @@
 {% for item in site.data.menulist.docs %}
 
 {% if item.submenu == null %}
-	<a href="{{ entry.url }}" alt="{{ entry.title }}">{{ entry.title }}</a>, 
+	<a href="{{ entry.url }}" alt="{{ entry.title }}">{{ entry.title }}</a> 
 {% else %}
     <h3>{{ item.title }}</h3>
       <ul>
@@ -11,7 +11,6 @@
 	      <a href="{{ entry.url }}" alt="{{ entry.page }}">{{ entry.page }}</a>, 
         {% endfor %}
       </ul>
-  {% endfor %}
 {% endif %}
 
   
