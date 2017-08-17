@@ -21,13 +21,15 @@ The menu <a href="terra-intro.html">Documentation</a> presents detailed informat
   <p>Summary of current supported platforms and/or operational system.
 The menu <a href="terra-platf-intro.html">Platforms</a> presents detailed informations for each platform implementation.
   </p>
-  <p>In the table below, <b>minimal support</b> in the Dev.Status column
+  <p>All platform implements a minimal support that includes the virtual machine engine, radio communication, 
+  and access to a very simples hardware like LEDs or temperature sensors.
+   The Dev.Status column indicates some additional or special implementation for specific platform.
   </p>            
   <table class="table">
     <thead>
       <tr>
         <th>Platform Name</th>
-        <th>MCU</th>
+        <th>MCU/CPU</th>
         <th>Protocol/Radio</th>
         <th>Dev. Status</th>
       </tr>
@@ -37,25 +39,25 @@ The menu <a href="terra-platf-intro.html">Platforms</a> presents detailed inform
         <td>TinyOS</td>
         <td>8/16bits, 4/8MHz, 4/8/10KB RAM -- </td>
         <td>Device dependent - IEEE802.15.4 and 900MHz</td>
-        <td>Minimal Support and Group Communication library</td>
+        <td>LEDs and Temperature Sensor. Optionally a Group Communication library.</td>
       </tr>
       <tr>
         <td>Linux/RPi</td>
         <td>RPi or Any Linux box</td>
         <td>UDP/WIFI</td>
-        <td>Minimal Support</td>
+        <td></td>
       </tr>
       <tr>
         <td>Android</td>
         <td>Android devices (> 4.0)</td>
         <td>UDP/WIFI</td>
-        <td>Minimal Support</td>
+        <td>LED and Temperature Sensor</td>
       </tr>
       <tr>
         <td>ESP8266</td>
         <td>32bits, 80MHz, 96KB RAM </td>
         <td>UDP/WIFI</td>
-        <td>Minimal Support</td>
+        <td>LED and Temperature Sensor</td>
       </tr>
       <tr>
         <td>ArduinoMega</td>
