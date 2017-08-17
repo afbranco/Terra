@@ -1,7 +1,7 @@
 docs_list_title: Terra IoT
 docs:
-- menu: Main
-  url: terra-intro.html
+- menu: Home
+  url: terra-home.html
   
 - menu: Documentation
   submenu:
@@ -30,7 +30,23 @@ docs:
     url: terra-download.html
 
 - menu: Platforms
-  url: terra-intro.html
-  
+  submenu:
 
+  - page: Introduction
+    url: terra-platf-intro.html  
+
+  - page: TinyOS
+    url: terra-platf-tinyos.html  
+
+  - page: Linux/RPi
+    url: terra-platf-rpi.html  
+
+  - page: Android
+    url: terra-platf-droid.html  
+
+  - page: ESP8266
+    url: terra-platf-esp.html  
+
+  - page: Arduino Mega
+    url: terra-platf-inoMega.html  
   
