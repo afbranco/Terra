@@ -44,9 +44,9 @@ The <spanclass="code">packet</span> declarations can be used only in the configu
 </p>
 </p><b>Obs:</b> All variables must start with a lowercase character.</p>
 
-<div class="container row">
-<div class="col-xs-6" >Examples of the Terra type system implementation
-<pre style="text-align:left">
+<div >
+Examples of the Terra type system implementation
+<div style="float:left;">
 {% highlight c %}
 var ushort nodeId;          // Simple integer var
 var float average;          // Simple float point var
@@ -67,10 +67,9 @@ packet radioMsg with
 	var payload[20] data;	// 20 bytes
 end
 {% endhighlight %}
-</pre>
 </div>
-<div class="col-xs-6" >&nbsp
-<pre style="text-align:left">
+<div style="float:left;">
+{% highlight c %}
 // Register/packet type
 pktype userMsg of radioMsg with 
 	var ubyte seq;
@@ -89,7 +88,7 @@ sensorData.sensorValue = sensorReads[0];
 sendMsg.target=1;
 sendMsg.sensorVal=sensorData.sensorValue;
 
-</pre>
+{% endhighlight %}
 </div>
 </div>
 
