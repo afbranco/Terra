@@ -1,37 +1,36 @@
 docs_list_title: Terra Documentation
 docs:
-
 - menu: Main
-  url: xxxx.html
-  
-- menu: Terra
-  submenu:
-- page: Introduction
   url: terra-intro.html
+  
+- menu: TerraDocumentation
+  submenu:
+  - page: Introduction
+    url: terra-intro.html
+    
+  - page: Language
+    url: terra-language.html
 
-- page: Language
-  url: terra-language.html
-
-- page: Customizations
-  url: terra-customizations.html
+  - page: Customizations
+    url: terra-customizations.html
   
-- page: Tools
-  url: terra-tools.html
+  - page: Tools
+    url: terra-tools.html
   
-- page: Tutorial
-  url: terra-tutorial.html
+  - page: Tutorial
+    url: terra-tutorial.html
   
-- page: Code Example
-  url: terra-code-sample.html
+  - page: Code Example
+    url: terra-code-sample.html
   
-- page: Publications
-  url: terra-publications.html
+  - page: Publications
+    url: terra-publications.html
   
-- page: Download
-  url: terra-download.html
+  - page: Download
+    url: terra-download.html
 
 - menu: Platforms
-  url: xxxx.html
+  url: terra-intro.html
   
 
   
