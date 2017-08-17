@@ -1,6 +1,18 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 <h2>{{ site.data.menulist.docs_list_title }}</h2>
-   {% for item in site.data.menulist.docs %}
-      <a href="{{ item.url }}" alt="{{ item.title }}">{{ item.title }}</a>, 
-   {% endfor %}
-<p></p>
+{% for item in site.data.menulist.docs %}
+
+{% if item.submenu == null %}
+	<a href="{{ entry.url }}" alt="{{ entry.title }}">{{ entry.title }}</a>, 
+{% else %}
+    <h3>{{ item.title }}</h3>
+      <ul>
+        {% for entry in item.submenu %}
+	      <a href="{{ entry.url }}" alt="{{ entry.page }}">{{ entry.page }}</a>, 
+        {% endfor %}
+      </ul>
+  {% endfor %}
+{% endif %}
+
+  
+
