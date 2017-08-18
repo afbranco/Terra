@@ -49,4 +49,7 @@ docs:
 
   - page: Arduino Mega
     url: terra-platf-inoMega.html  
+    
+- menu: Classroom material
+  url: terra-classroom.html
   
