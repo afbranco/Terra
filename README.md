@@ -1,7 +1,10 @@
-Terra
+<img width=150 align="left" src="/docs/images/Terra_IoT_Globo.png">
+http://afbranco.github.io/Terra
+
+Terra IoT System
 =====
 
-__Terra System - A tiny virtual Machine for WSN that runs a reactive script language.__
+__Terra IoT System - A tiny virtual Machine for IoT/WSN that runs a reactive script language.__
 
 The system is composed by three modules:
 
