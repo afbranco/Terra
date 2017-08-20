@@ -1,4 +1,4 @@
-<img width=150 align="left" src="/docs/images/Terra_IoT_Globo.png">
+<img width=150 align="left" src="/docs/images/terra_logo_web_cut.png">
 http://afbranco.github.io/Terra
 
 Terra IoT System
