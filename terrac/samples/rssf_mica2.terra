@@ -11,13 +11,12 @@
 
 var ubyte count=0;
 var ubyte tcount=0;
+var ubyte failCount=0;
 var ubyte stat;
-var ubyte seqTopo=0;
 var ubyte lastReqTopo=0;
-var ushort reqTopoNode=0;
 
 var ushort nodeid = getNodeId();
-#define NO_FATHER 88
+#define NO_FATHER 200
 var ushort parentid=NO_FATHER;
 
 pktype usrMsg from radioMsg with
@@ -46,32 +45,48 @@ topo.source=nodeid;
 topo.d8[1]=0;
 topo.d8[2]=0;
 
-var ulong delay = (nodeid & 0x07ff) * 20;
+var ulong delay = ((nodeid & 0x07ff) * 20) + 1000 ;
 qClear();
 
 emit LEDS(0);
 //emit LED1(ON);
+// Controls the NewTopo proccess
 par do
 	if nodeid == ROOT then
 		parentid = 0;
-		// Send topo
+		// RootNode: Send topo at each received request. 
 		loop do
 			rtopo = await RECEIVE(REQ_TOPO);
-emit LED2(ON);
-			reqTopoNode=rtopo.d16[3];
-			parentid = 0;
-			emit REQ_CUSTOM_A(1);
-			await 3s;
+//emit LED2(ON);
+			topo.d16[3] = rtopo.d16[3];
+			inc tcount;
+			topo.d8[0]=tcount;
+			stat = qPut(topo);
+			await 3s; // Avoid successive requests.
 		end
 	else
-		loop do
-			rtopo=await RECEIVE(NEW_TOPO);
-			if parentid == NO_FATHER then
-				parentid = rtopo.source;
+		par do
+			// Non RootNodes: Receives a newTopo message and forward it.
+			// If necessary, update its parent id.
+			loop do
+				rtopo=await RECEIVE(NEW_TOPO);
+				if parentid == NO_FATHER then
+					parentid = rtopo.source;
+				end
+				rtopo.source=nodeid;
+				stat = qPut(rtopo);
+				await 5s; // Avoids simultaneous neighbors messages.
 			end
-			rtopo.source=nodeid;
-			stat = qPut(rtopo);
-			await 5s;
+		with
+			// Non RootNodes: Receives a reqTopo message and forward it.
+			loop do
+				xdata=await RECEIVE(REQ_TOPO);
+				if parentid != NO_FATHER then
+					lastReqTopo = xdata.d8[1];
+					xdata.target = parentid;
+					stat = qPut(xdata);
+				end
+			end
 		end
 	end
 with
@@ -92,7 +107,7 @@ with
 			stat = qPut(sdata);
 			await (PERIOD)s;
 		else
-			await 10s;
+			await 30s;
 			if nodeid != ROOT then
 				xtopo.type = REQ_TOPO;
 				xtopo.source =  nodeid;
@@ -101,28 +116,9 @@ with
 				xtopo.d16[3] = nodeid;
 				xtopo.target=BROADCAST;
 				stat = qPut(xtopo);			
-emit LED0(TOGGLE);
 			end
 		end
-	end
-with
-	if nodeid == ROOT then
-		loop do
-			await CUSTOM_A(1);
-			inc tcount;
-			topo.d8[0]=tcount;
-			topo.d16[3] = reqTopoNode;
-			stat = qPut(topo);
-		end
-	else
-		loop do
-			xdata=await RECEIVE(REQ_TOPO);
-			if parentid != NO_FATHER then
-				lastReqTopo = xdata.d8[1];
-				xdata.target = parentid;
-				stat = qPut(xdata);
-			end
-		end
+emit LED1(TOGGLE);
 	end
 with
 	loop do
@@ -155,29 +151,46 @@ with
 					emit SEND(msgRadio);
 					await SEND_DONE(msgRadio.type);
 				else
-//					loop do
-						msgRadio.d8[2] = msgRadio.d8[2] + reply;
-						emit SEND_ACK(msgRadio);
-						ack = await SEND_DONE_ACK(msgRadio.type);
-/*
-						if ack==TRUE then
-							break;
+					msgRadio.d8[2] = msgRadio.d8[2] + reply;
+					emit SEND_ACK(msgRadio);
+					ack = await SEND_DONE_ACK(msgRadio.type);
+					// Compute number of fails
+					// If fails, force to get new parent.
+					if ack==FALSE then 
+						if  msgRadio.type == DATA then
+							inc failCount;
+							if failCount > 2 and parentid != ROOT then 
+								parentid = NO_FATHER; 
+								failCount = 0;
+							end
 						end
-						inc reply;
-						if reply > 10 then
-							parentid = NO_FATHER;
-							reqTopoNode=0;
-							emit REQ_CUSTOM_A(1);
-							break;
-						end
-						await 200ms;
-*/
-//					end
+					else
+						failCount = 0;
+					end
 				end
+				await 100ms;
 			else
+emit LED2(TOGGLE);
 				break;
 			end
 		end
+	end
+with
+	var byte qCounter = 0;
+	loop do
+		loop i, qSize() do
+			emit LED0(ON);
+			await 100ms;			
+			emit LED0(OFF);
+			await 100ms;
+			inc qCounter;
+			if qCounter > 10 then qClear(); qCounter=0; end			
+		end
+		await 150ms;			
+		emit LED0(ON);
+		await 150ms;			
+		emit LED0(OFF);
+		await 700ms;
 	end
 end
 

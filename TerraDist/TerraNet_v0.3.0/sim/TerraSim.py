@@ -74,7 +74,7 @@ class Network:
         #self.tossim.addChannel("TreeRouting", outDBG)
         #self.tossim.addChannel("TreeRoutingCtl", outDBG)
 
-        self.tossim.addChannel("AM", outDBG)
+        #self.tossim.addChannel("AM", outDBG)
         ##self.tossim.addChannel("Acks", outDBG)
         ##self.tossim.addChannel("Packet", outDBG)
         ##self.tossim.addChannel("Serial", outDBG)
@@ -82,8 +82,8 @@ class Network:
         ##self.tossim.addChannel("HplAtm128Timer0AsyncP", outDBG)
         ##self.tossim.addChannel("Scheduler", outDBG)
         #--------------------------------------
-        self.tossim.addChannel("terra", outDBG)
-        self.tossim.addChannel("TVIEW", outDBG)
+        #self.tossim.addChannel("terra", outDBG)
+        #self.tossim.addChannel("TVIEW", outDBG)
         self.tossim.addChannel("TVIEW", outCMD)
         self.tossim.addChannel("VMDBG", outVM)
         self.ExecTime = 0

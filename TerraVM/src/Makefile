@@ -1,3 +1,22 @@
+#-------------
+#  	Terra IoT System - A small Virtual Machine and Reactive Language for IoT applications.
+#  	Copyright (C) 2014-2017  Adriano Branco
+#	
+#	This file is part of Terra IoT.
+#	
+#	Terra IoT is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Terra IoT is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with Terra IoT.  If not, see <http://www.gnu.org/licenses/>.  
+#-------------
 
 # Command line examples
 #  make micaz  VM:GRP TYPE:NOBS QUEUE:SHORT install.2 mib520,/dev/ttyUSB0
@@ -49,6 +68,7 @@ GoalOptsValues  := $(shell perl -e 'print join " ", map {s{^(.*?)$(OptRE)}{\U$$1
 GoalOpts        := $(shell echo $(shell perl -e 'print join " ", map {s{^(.*?)$(OptRE)}{\U$$1=};$$1} grep /$(OptRE)/, split /\s+/, "$(GOALS)";') | tr a-z A-Z) 
 GOALS := $(shell perl -e '$$_="$(GOALS)"; s{$(OptRE)\S*}{}g; print;')
 $(foreach opt,$(GoalOptsValues),$(eval __$(shell echo $(opt) | tr a-z A-Z)))
+$(error $(GOALS))
 
 # If necessary, re-assignment USB without upper-case
 USB_DEV = $(filter USB%,$(GoalOptsValues))

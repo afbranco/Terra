@@ -1,6 +1,7 @@
 #include "TerraNet.defs"
 
 var ubyte a=10;
+/*
 emit LEDS(0);
 var ubyte i=0;
 loop do
@@ -16,3 +17,4 @@ end
 		//emit LED2(ON);
 		//await 1s;
 
+*/
