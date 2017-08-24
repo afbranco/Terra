@@ -52,4 +52,7 @@ docs:
     
 - menu: Classroom
   url: terra-classroom.html
+
+- menu: License
+  url: terra-license.html
   
