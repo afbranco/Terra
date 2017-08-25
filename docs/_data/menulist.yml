@@ -3,32 +3,6 @@ docs:
 - menu: Home
   url: terra-home.html
   
-- menu: Documentation
-  submenu:
-  - page: Introduction
-    url: terra-intro.html
-    
-  - page: Language
-    url: terra-language.html
-
-  - page: Customizations
-    url: terra-customizations.html
-  
-  - page: Tools
-    url: terra-tools.html
-  
-  - page: Tutorial
-    url: terra-tutorial.html
-  
-  - page: Code Example
-    url: terra-code-sample.html
-  
-  - page: Publications
-    url: terra-publications.html
-  
-  - page: Download
-    url: terra-download.html
-
 - menu: Platforms
   submenu:
 
@@ -50,8 +24,10 @@ docs:
   - page: Arduino Mega
     url: terra-platf-inoMega.html  
     
-- menu: Classroom
-  url: terra-classroom.html
+- menu: Contributions
+  submenu:
+  - page: GSoC
+    url: terra-gsoc.html
 
 - menu: License
   url: terra-license.html
