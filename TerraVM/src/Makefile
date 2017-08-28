@@ -1,6 +1,6 @@
 #-------------
 #  	Terra IoT System - A small Virtual Machine and Reactive Language for IoT applications.
-#  	Copyright (C) 2014-2017  Adriano Branco
+#  	Copyright (C) 2014-2017  Adriano Branco, Mauricio Pedro Vieira
 #	
 #	This file is part of Terra IoT.
 #	
@@ -29,11 +29,12 @@
 #==================================================================================
 
 # Define targets
-ALL_TARGETS = micaz mica2 mica2dot telosb iris uno mega rpi esp
+ALL_TARGETS = micaz mica2 mica2dot telosb iris uno mega rpi esp droid
 TOS_TARGETS = micaz mica2 mica2dot telosb iris
 INO_TARGETS = uno mega
 IX_TARGETS = rpi
-ESP_TARGETS = esp
+ESP_TARGETS = espz
+DROID_TARGETS = droid
 
 # Define family
 micaz_FAMILY = TOS
@@ -44,6 +45,7 @@ iris_FAMILY = TOS
 uno_FAMILY = INO
 mega_FAMILY = INO
 rpi_FAMILY = IX
+droid_FAMILY = DROID
 esp_FAMILY = ESP
 
 # define options
@@ -52,6 +54,7 @@ TOS_OPTIONS = VM TYPE MOD INSTALL QUEUE DEBUG SENSOR MOTE_TYPE VERB SETDATA RFPO
 INO_OPTIONS = VM TYPE MOD INSTALL QUEUE DEBUG MOTE_TYPE VERB SETDATA RFPOWER INO_HALF_CLOCK INO_RADIO USB SERIAL IFLASH BS_BAUD NET_ID
 IX_OPTIONS  = VM MOD INSTALL QUEUE DEBUG MOTE_TYPE VERB SETDATA IFLASH NET_ID
 ESP_OPTIONS = VM TYPE MOD INSTALL QUEUE DEBUG WIFI_SSID WIFI_PASSWD MOTE_TYPE VERB SETDATA RFPOWER USB IFLASH BS_BAUD NET_ID
+DROID_OPTIONS  = VM MOD INSTALL CLEAN QUEUE DEBUG MOTE_TYPE VERB SETDATA IFLASH NET_ID
 
 
 # define MOD available values
@@ -68,7 +71,6 @@ GoalOptsValues  := $(shell perl -e 'print join " ", map {s{^(.*?)$(OptRE)}{\U$$1
 GoalOpts        := $(shell echo $(shell perl -e 'print join " ", map {s{^(.*?)$(OptRE)}{\U$$1=};$$1} grep /$(OptRE)/, split /\s+/, "$(GOALS)";') | tr a-z A-Z) 
 GOALS := $(shell perl -e '$$_="$(GOALS)"; s{$(OptRE)\S*}{}g; print;')
 $(foreach opt,$(GoalOptsValues),$(eval __$(shell echo $(opt) | tr a-z A-Z)))
-$(error $(GOALS))
 
 # If necessary, re-assignment USB without upper-case
 USB_DEV = $(filter USB%,$(GoalOptsValues))
@@ -205,7 +207,7 @@ ifneq ($(__SETDATA),Y)
   endif
 endif
 
-__TYPE ?= BOTH
+__TYPE ?= NOBS
 ifneq ($(__TYPE),BOTH)
   ifneq ($(__TYPE),NOBS)
     ifneq ($(__TYPE),BOTH2)
@@ -365,6 +367,10 @@ ifeq ($(_MOTE),esp)
 	VMDIR = $(APPDIR)/platforms/esp
 	CFLAGS += -I. -I$(VMDIR) -DESP
 endif
+ifeq ($(_MOTE),droid)
+	VMDIR = $(APPDIR)/platforms/droid
+	CFLAGS += -I. -I$(VMDIR) -I/home/mauricio/Android/Sdk/ndk-bundle/sources/android/native_app_glue/ -DLINUX -DANDROID
+endif
 
 # default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:nrf24, 4:xbee, 5:NoRadio
 NETID_mica2 = 0
@@ -374,6 +380,7 @@ NETID_telosb = 1
 NETID_iris = 1
 NETID_esp = 2
 NETID_rpi = 2
+NETID_droid = 2
 NETID_megaNRF24 = 3
 NETID_megaXBEE0 = 4
 NETID_megaXBEE1 = 4
@@ -420,6 +427,7 @@ BAUD_mica2dot = 19200
 BAUD_telosb = 115200
 BAUD_iris = 57600
 BAUD_rpi = 57600
+BAUD_droid = 57600
 BAUD_esp = 57600
 BAUD_mega = 57600
 BAUD_uno = 57600
@@ -441,6 +449,7 @@ INTFLASH_mica2dot = 4096
 INTFLASH_telosb = 126
 INTFLASH_iris = 4096
 INTFLASH_rpi = 4096
+INTFLASH_droid = 4096
 INTFLASH_esp = 4096
 INTFLASH_mega = 4096
 INTFLASH_uno = 1024
@@ -587,6 +596,8 @@ else ifneq ($(filter $(_MOTE),mega),) # 8KB RAM
         MBLOCKS = 220
 else ifneq ($(filter $(_MOTE),rpi),) # xxxKB RAM
         MBLOCKS = 220  
+else ifneq ($(filter $(_MOTE),droid),) # xxxKB RAM
+        MBLOCKS = 220
 else ifneq ($(filter $(_MOTE),esp),) # xxxKB RAM
         MBLOCKS = 100  
 endif
@@ -736,6 +747,8 @@ else ifneq ($(filter $(_MOTE),$(IX_TARGETS)),)
   include Makefile_ix
 else ifneq ($(filter $(_MOTE),$(ESP_TARGETS)),)
   include Makefile_esp
+else ifneq ($(filter $(_MOTE),$(DROID_TARGETS)),)
+  include Makefile_droid
 endif
 ############################################
 # End for non help comand
