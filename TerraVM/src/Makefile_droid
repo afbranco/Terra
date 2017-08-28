@@ -1,0 +1,68 @@
+#-------------
+#  	Terra IoT System - A small Virtual Machine and Reactive Language for IoT applications.
+#  	Copyright (C) 2014-2017  Mauricio Pedro Vieira
+#	
+#	This file is part of Terra IoT.
+#	
+#	Terra IoT is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Terra IoT is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with Terra IoT.  If not, see <http://www.gnu.org/licenses/>.  
+#-------------
+
+# Initial paths/files
+BUILDDIR = build/$(_MOTE)
+MAIN_APPC = $(BUILDDIR)/app.c
+MAIN_EXE = $(BUILDDIR)/main.exe
+DUMP_FILE = $(BUILDDIR)/wiring-check.xml
+
+# programs and config "path/names"
+GCC = gcc
+
+CFLAGS += -I/home/mauricio/Android/Sdk/ndk-bundle/platforms/android-9/arch-arm/usr/include/
+CFLAGS += -I/home/mauricio/Android/Sdk/ndk-bundle/platforms/android-24/arch-arm/usr/include/
+
+OPT1=-fnesc-include=tos -topdir=$(APPDIR)
+OPT2=-fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask -conly -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -fnesc-cfile=$(MAIN_APPC) --param max-inline-insns-single=100000 -fnesc-dump=wiring   -fnesc-dumpfile=$(DUMP_FILE) -fnesc-no-debug 
+OPT3 = $(CFLAGS)
+
+droid: builddir cfile cmake
+	$(info **********  Makefile Droid: *************)
+
+cfile:
+	nescc -c $(OPT1) $(OPT2) $(OPT3) $(COMPONENT).nc
+	
+cmake: builddir cfile
+	@cd build/droid; cmake ../../platforms/droid/;
+	@cd build/droid; $(MAKE) -s build;
+
+%:
+	@:
+
+install.%: 
+	@echo "    Done! NodeId=" $(__INSTALL) # Deve ser compilado na propria máquina.
+
+install: cfile
+	@cd build/droid; $(MAKE) -s deploy
+
+clean:
+	@cd build/droid; $(MAKE) -s clean
+	
+deploy:	
+	@cd build/droid; $(MAKE) -s deploy
+
+uninstall:
+	@cd build/droid; $(MAKE) -s uninstall
+
+builddir: 
+	@mkdir -p $(BUILDDIR)
+
+

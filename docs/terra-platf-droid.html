@@ -2,6 +2,106 @@
 ---
 {% include header.html %}
 
-	TBD
+<h2>Terra Android Documentation</h2>
+<p><i>This was a project from Google Summer of Code 2017 implemented by Mauricio Pedro Vieira, you can find the pull request here</i></p>
+
+<h3>Pre-Requisites</h3>
+	<p>In order to successfully compile and run Terra in your Android device you need to have installed in your computer:</p>
+
+	<table class="table">
+		<tbody>
+			<tr>
+				<td>Android SDK Tools</td>
+				<td>This one can be downloaded <a href="https://developer.android.com/studio/index.html">here</a>. You get the SDK tools by either downloading the android studio or just the command line SDK tools in the bottom of the page</td>
+			</tr>
+			<tr>
+				<td>Android NDK Tools</td>
+				<td>Once you have downloaded the SDK Tools you can open the SDK manager that comes with it and install the NDK through there.</td>
+			</tr>
+			<tr>
+				<td>Java</td>
+			</tr>
+		<tbody>
+	</table>
+
+<h3>Pre-Installation</h3>
+	<p>In order for the compilation and deploy to work properly some changes are necessary in the CMakeLists.txt file under src/platforms/droid.</p>
+	<p>First, for the compilation to workout, it is needed to generate a standalone toolchain. It is important that this toolchain matches the architecture and target android version of the device you are aiming to. Inside the Android NDK folder installation, under build/tools there is a python script “make_standalone_toolchain.py”. You need to execute this script passing as parameter the architecture you are building to, the API you will be using and the folder in which you want to place the generated standalone toolchain. This is an example to build a toolchain for the ARM architecture with the 24 API and outputted in the standalone_toolchain_ARM folder under the Android NDK installation folder.</p>
+	
+	<p>ou can find more details about how to customize your standalone toolchain <a href="https://developer.android.com/ndk/guides/standalone_toolchain.html#creating_the_toolchain">here</a></p>
+	<p>Also, in this file, you need to update the directories on the top of it to be the ones in your machine.</p>
+	
+	<table>
+		<tbody>
+			<tr>
+				<td>ANDROID_HOME</td>
+				<td>SDK Tools installation folder</td>
+			</tr>
+			<tr>
+				<td>BUILD_TOOLS</td>
+				<td>Build Tools installation folder</td>
+			</tr>
+			<tr>
+				<td>ANDROID_NDK</td>
+				<td>NDK installation folder</td>
+			</tr>
+			<tr>
+				<td>TOOLCHAIN</td>
+				<td>Directory where your generated standalone toolchain was created</td>
+			</tr>
+			<tr>
+				<td>JAVA_HOME</td>
+				<td>Java installation folder</td>
+			</tr>
+		</tbody>
+	</table>
+	
+	<p>It is also needed to adapt some commands to the specific architecture and API chosen. In the creation of the c++ shared libraries and the libnative_app_glue the option -march= should be adapted to have the architecture you are using.
+</p>
+	<p>In the generation of R.class, R.java and NativeActivity.unsigned.apk, android-24 need to be replaced by your target Android version.</p>
+	
+<h3>Commands</h3>
+	<p>To build terra application you can just go to the src directory and run <b>make droid</b></p>
+	<p>To build and deploy terra application you go to the same directory and type <b>make droid install</b></p>
+	<p>If you go inside the src/build directory you have access to the uninstall command by typing <b>make uninstall</b></P>
+	
+<h3>Important Files</h3>
+	<table>
+		<tbody>
+			<tr>
+				<td>Makefile</td>
+				<td>General makefile to build terra</td>
+			</tr>
+			<tr>
+				<td>Makefile_droid</td>
+				<td>Specific makefile to generate the main.c</td>
+			</tr>
+			<tr>
+				<td>RealMainP</td>
+				<td>Contains the android_main function</td>
+			</tr>
+			<tr>
+				<td>VMCustom</td>
+				<td>Customization module</td>
+			</tr>
+			<tr>
+				<td>androidEvents</td>
+				<td>Main loop to check events from the Android platform</td>
+			</tr>
+			<tr>
+				<td>androidGraphics</td>
+				<td>Android Graphics manipulation</td>
+			</tr>
+			<tr>
+				<td>AndroidManifest</td>
+				<td>Regular Android Manifest from any app, mostly useful to grant permission for Terra to use the device hardware</td>
+			</tr>
+			<tr>
+				<td>CMakeLists.txt</td>
+				<td>Compile the C code generated and standalone into an Android Native App</td>
+			</tr>
+		</tbody>
+	</table>
+
 
 {% include footer.html %}

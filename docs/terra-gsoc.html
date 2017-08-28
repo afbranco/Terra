@@ -2,6 +2,17 @@
 ---
 {% include header.html %}
 
-TBD
+<h2>Porting Terra to Android Devices</h2>
+<h3>Introduction</h3>
+	<p>This document describes a project from Google Summer of Code 2017 implemented by Mauricio Pedro Vieira for LabLua entitled “Porting Terra, a tiny IoT Virtual Machine, to Android Devices”. You can find more details about the project <a href="http://www.lua.inf.puc-rio.br/gsoc/ideas2017.html#terradroid">here</a> and the code <a href="">here</a></p>
+	
+<h3>Implementation</h3>
+	<p>The main goal of the project was to port Terra to Android. Terra is built entirely with C and nesC code, the decision was to make Terra run with the Android NDK support. The first step was to create a dummy app to be sure how to install a C written app on an Android device with the support on Android Studio.</p>
+	<p>The adaptations needed in order to make the nesC code from Terra run with the NDK compiling through the Android Studio would be very difficult, so instead of this approach it was decided to compile and deploy the application through the command line.</p>
+	<p>The next main effort was to create the script to generate a C code that would be equivalent to the nesC code from Terra and then compiles it into a Native App using the ndk. After that the script would also deploy the app containing the Terra Virtual Machine into the Android Device.</p>
+	<p>Once Terra was already running inside the device, it was necessary to create standard input and output events to prove the viability of the Android integration. Besides the debug functionality, it was implemented a listener for the Android Events and an output event that changed the screen color when triggered.</p>
+	
+<h3>Documentation</h3>
+<p>Towards the end of the project some time was dedicated to create the guide to use Terra on Android devices which you can find in this site into Platforms -> Droid.</p>
 
 {% include footer.html %}

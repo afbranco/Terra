@@ -53,6 +53,11 @@
  * @date   January 17 2005
  */
 
+#ifdef ANDROID
+	#include <android_native_app_glue.h>
+	#include <androidEvents.h>
+#endif
+
 module RealMainP @safe() {
   provides interface Boot;
   uses interface Scheduler;
@@ -60,7 +65,12 @@ module RealMainP @safe() {
   uses interface Init as SoftwareInit;
 }
 implementation {
+#ifdef ANDROID
+  void android_main(struct android_app* state) @C() @spontaneous() {
+	androidInitEvent(state);
+#else
   int main() @C() @spontaneous() {
+#endif
     atomic
       {
 	/* First, initialize the Scheduler so components can post
@@ -98,7 +108,11 @@ implementation {
     /* We should never reach this point, but some versions of
      * gcc don't realize that and issue a warning if we return
      * void from a non-void function. So include this. */
+#ifdef ANDROID
+	return;
+#else
     return -1;
+#endif
   }
 
   default command error_t PlatformInit.init() { return SUCCESS; }
