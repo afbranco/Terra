@@ -352,12 +352,12 @@ endif
 ifeq ($(_MOTE),uno)
 	VMDIR = $(APPDIR)/platforms/inoUno
 	CFLAGS += -I. -I$(VMDIR) 
-	CFLAGS += -D$(__INO_RADIO)
+	CFLAGS += -D$(__INO_RADIO) -DUNO
 endif
 ifeq ($(_MOTE),mega)
 	VMDIR = $(APPDIR)/platforms/inoMega
 	CFLAGS += -I. -I$(VMDIR) 
-	CFLAGS += -D$(__INO_RADIO)
+	CFLAGS += -D$(__INO_RADIO) -DMEGA
 endif
 ifeq ($(_MOTE),rpi)
 	VMDIR = $(APPDIR)/platforms/RPi
