@@ -1448,10 +1448,15 @@ void f_getextdt_v(uint8_t Modifier){
 	}
 	
 void f_inc(uint8_t Modifier){
-	uint8_t v1_len,tp1;
+#ifndef MEGA
+	uint8_t v1_len;
+#endif
+	uint8_t tp1;
 	uint16_t Maddr;
 	tp1 = getBits(Modifier,0,1);
+#ifndef MEGA
 	v1_len = 1<<tp1;
+#endif
 	Maddr = (uint16_t)pop();
 	dbg(APPNAME,"VM::f_inc(%02x): v1_len=%d, Maddr=%d, value+1=%d, \n",Modifier,v1_len,Maddr,getMVal(Maddr,tp1)+1);
 	setMVal((getMVal(Maddr,tp1)+1),Maddr,tp1,tp1);	
