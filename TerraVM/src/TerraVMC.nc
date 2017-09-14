@@ -1280,7 +1280,10 @@ void f_poparr_v(uint8_t Modifier){
 }
 
 void f_pusharr_v(uint8_t Modifier){
-	uint8_t v1_len,p1_1len,v2_len,p2_1len,p3_1len,Aux,tp1,tp2;
+#ifndef MEGA
+	uint8_t v2_len;
+#endif
+	uint8_t v1_len,p1_1len,p2_1len,p3_1len,Aux,tp1,tp2;
 	uint16_t Maddr,Vidx,Max;
 
 	p3_1len = getBitsPow(Modifier,0,0);
@@ -1291,8 +1294,9 @@ void f_pusharr_v(uint8_t Modifier){
 	tp2 = getBits(Aux,0,2);
 
 	v1_len = (tp1==F32)? 4 : 1<<(tp1&0x3);
+#ifndef MEGA
 	v2_len = (tp2==F32)? 4 : 1<<(tp2&0x3);
-
+#endif
 	Maddr = getPar16(p1_1len);
  	Vidx  = getPar16(p2_1len);
 	Max   = getPar16(p3_1len);
@@ -1453,20 +1457,30 @@ void f_inc(uint8_t Modifier){
 	setMVal((getMVal(Maddr,tp1)+1),Maddr,tp1,tp1);	
 }
 void f_dec(uint8_t Modifier){
-	uint8_t v1_len,tp1;
+#ifndef MEGA
+	uint8_t v1_len;
+#endif
+	uint8_t tp1;
 	uint16_t Maddr;
 	tp1 = getBits(Modifier,0,1);
+#ifndef MEGA
 	v1_len = 1<<tp1;
+#endif
 	Maddr = (uint16_t)pop();
 	dbg(APPNAME,"VM::f_dec(%02x): v1_len=%d, Maddr=%d, value-1=%d, \n",Modifier,v1_len,Maddr,getMVal(Maddr,tp1)-1);
 	setMVal((getMVal(Maddr,tp1)-1),Maddr,tp1,tp1);	
 }
 
 void f_set_e(uint8_t Modifier){
-	uint8_t v1_len,tp1;
+#ifndef MEGA
+	uint8_t v1_len;
+#endif
+	uint8_t tp1;
 	uint16_t Maddr1;
 	tp1 = getBits(Modifier,0,2);
+#ifndef MEGA
 	v1_len = (tp1==F32)? 4 : 1<<(tp1&0x3);
+#endif
 	Maddr1 = (uint16_t)pop();
 	if (tp1 == F32){
 		float Value = popf();
@@ -1588,11 +1602,16 @@ void f_outevt_v(uint8_t Modifier){
 }
 
 void f_set_c(uint8_t Modifier){
-	uint8_t v1_len,p1_1len,p2_len, tp1;
+#ifndef MEGA
+	uint8_t v1_len;
+#endif
+	uint8_t p1_1len,p2_len, tp1;
 	uint16_t Maddr;
 	uint32_t Const;
 	tp1 = getBits(Modifier,0,2);
+#ifndef MEGA
 	v1_len = (tp1==F32)? 4 : 1<<(tp1&0x3);	
+#endif
 	p1_1len = getBitsPow(Modifier,3,3);
 	p2_len = (uint8_t)(getBits(Modifier,4,5)+1);
 	Maddr = getPar16(p1_1len);
