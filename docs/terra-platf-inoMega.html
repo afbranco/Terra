@@ -2,6 +2,157 @@
 ---
 {% include header.html %}
 
-	TBD
+	<p>The main Arduino customization is for the Mega2560 platform using the NRF24L01+ radio board.
+	</p>
+	
+	
+<h2>Installing Terra Ino in a Linux Box</h2> 
+
+<h3>Pre-requisites</h3>
+<ul>
+<li>Linux machine. This procedure was tested with Ubuntu 16.04.</li>
+<li>Internet access.</li>
+</ul>
+
+<h3>Installation Steps</h3>
+
+<h4>Install, if necessary, missing packages</h4>
+<p>Open a command terminal and execute the following commands.</p>
+<code>
+sudo apt-get update
+sudo apt-get install git lua5.1 lua-lpeg nescc gcc-avr avr-libc avrdude 
+</code>
+
+<h4>Adjust USB access permission</h4>
+<pre><code>sudo usermod -a -G dialout terra</code></pre>
+<p>Obs: You must logout and login again to validate this new permission.</p>
+
+<h4>Get Terra source code from the repository</h4>
+<p>Clone Terra repository into home directory.</p>
+<p>Open a command terminal, change to home directory, and download Terra repository.</p>
+<pre><code>
+cd ~
+git clone https://github.com/afbranco/Terra</code></pre>
+<p>The next time use the command <code>git pull</code> from the new <var>Terra</var> dir to get last update</p>
+
+<h4>Adjust makefile paths</h4>
+<p>If necessary, adjust the paths inside <code>Makefile_ino</code> file.</p>
+<p>Open a command terminal and change to src directory</p>
+<pre><code>cd ~/Terra/TerraVM/src</code></pre>
+<p>Open the file <code>Makefile_ino</code> in the editor.</p>
+<pre><code>gedit Makefile_ino</code></pre>
+<pre><code>
+<p>Modify following definition to:</p>
+<pre><code>
+GCC = avr-gcc
+OBJCOPY = avr-objcopy
+OBJDUMP = avr-objdump
+GCC = avr-gcc
+AVRDUDE = avrdude
+AVRDUDECONF = /etc/avrdude.conf
+</code></pre>
+
+<h4>Create environment definitions</h4>
+<p>Open a command terminal and change to HOME directory</p>
+<pre><code>cd ~</code></pre>
+<p>Open the file <code>.bashrc</code> in the editor.</p>
+<pre><code>gedit .bashrc</code></pre>
+<pre><code>
+<p>Insert following lines at the end of the file.</p>
+<pre><code>
+export TERRADIR=$HOME/Terra
+export CLASSPATH=$TERRADIR/TerraControl/tinyos.jar:.$CLASSPATH
+alias terrac='$TERRADIR/terrac/terrac -I$TERRADIR/terrac/samples'
+alias ttool='java -jar $TERRADIR/TerraControl/TControl.jar'
+alias sf='java net.tinyos.sf.SerialForwarder'
+
+</code></pre>
+<p>Open a new command terminal to get the new environment.</p>
+
+
+<h2>Compiling and flashing</h2>
+<p>After a successful installation, you can generate a compiled file and 
+flash it into an Arduino Mega board.</p> 
+<p>Terra developent environment uses a Make system to build and install the firmware.
+You must change to the <code>src</code> directory and execute <code>make mega</code> 
+command with additional parameters.
+</p>
+<p>The follow command is an example of Terra compilation for Arduino Mega board:</p>
+<pre><code>
+make mega TYPE=BOTH VM=NET MOD=MSGQ USB:/dev/ttyACM0 BS_BAUD:19200 install.4
+</code></pre>
+
+<h3>Attention points</h3>
+<p>We must pay attention for some details when compiling and installing Terra for Arduino Mega.</p>
+
+<p> The <b>TYPE:<i>type</i></b> parameter indicates if your node will communicate 
+via USB interface (<i>BOTH</i>) or not (<i>NOBS</i>).
+Usually one node, acting as BaseStation or sink node, is connected to a computer via USB interface when
+the all nodes communicate via radio.
+Hybrid networks may create a bridge connecting two node with different radios via serial/USB interface.
+</p>
+
+<p> the <b>BS_BAUD:<i>value</i></b> configures the USB baudrate for Terra operation.
+(This do not change the firmware flashing baudrate that is configured internally in the system.)
+</p> 
+
+<p>the <b>INSTAL.<i>n</i></b> parameter indicates to flash the compiled file. 
+The <i>n</i> is the unique node identifier for its network.</p>
+
+<p>The <b>real node address</b> is the combination of the Network ID and the unique node identifier. 
+For example, the default Network Id for the NRF24 network is the number 4.
+The node address, considering the unique ID 1, will be <code>(4*2048)+1</code>.</p>
+
+<p>The <b>USB:<i>path</i></b> identify the USB connected to flash the Mega Board.
+This value is usually <code>/dev/ttyACM0</code> or <code>/dev/ttyUSB0</code>, 
+this depend of the FDDI chip used in the board. 
+But its number may change if the previous connection is already allocated.
+Use the command <code>ls /dev/ttyA*</code> or <code>ls /dev/ttyU*</code> to find the correct port.   
+</p>
+
+<p>The <b>INO_RADIO:<i>radio</i></b> defines the radio board used in the node.
+Only the <i>NRF24</i> value was fully tested in the last Terra version.
+Use the option <i>NO_RADIO</i> in the case you are not using a radio board, 
+i.e. your Arduino Mega communicates only by the USB interface.
+</p>
+
+<h3>Terra compilation parameters</h3>
+<p>These are the allowed parameters when compiling for Arduino Mega board.
+The command <code>make help mega</code> will show a updated definition.</p>
+<ul>
+<li> VM:  Define the VM flavour: NET, GRP | default NET</li>
+<li> MOD: Define additional modules: MSGQ | default ''
+<li> QUEUE: Generate short or long queues | default SHORT
+<li> TYPE: Configure runtime type: NOBS or BOTH | default BOTH
+<li> MOTE_TYPE: Define mote type: 1..254 | Default 1
+<li> VERB: Verbose Compilation mode: Y or N | Default N
+<li> SETDATA: SetData functionality: Y or N | default N
+<li> RFPOWER: RF Power: 0 1 2 3 4 5 6 7 | default 7
+<li> INO_RADIO: Radio board for mega/uno: XBEE0 or XBEE1 or NRF24 or NO_RADIO| default NO_RADIO
+<li> INO_HALF_CLOCK: Divide Arduino MCU Clock by 2. Applies for powering ProMini_16MHz(5v) with 3.3v 
+<li> IFLASH: Internal Flash for prog storage: Y or N | default Y
+<li> DEBUG: Debug dbg() mode for Linux: Y or N | default N
+<li> NET_ID: Network identifier - 0..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee 
+<li> install.<nodeid> - Install command + unique node identifier inside its network - 1..2047 | default 1
+<li> BS_BAUD: BaseStation baudrate - 115200, 57600, 19200 | default 115200
+
+<li>
+</ul>
+
+
+<h2>Loading a Terra Script into the network</h2>
+<p>Considering that you already have a script compiled with <code>terrac</code> compiler,
+you need to load the script bytecode into the Terra network nodes.
+Two programms must be started to that. The TinyOS <i>SerilForwarder</i> application and the <i>Terra Control</i> tool.
+</p>
+<p>The use of the Terra Control tool was explained in the Terra tutorial.
+The tool can be started by <code>ttool</code> command. 
+After started, the tool waits for the SerialForwarder to connect to the USB.
+</p>
+<p>The SerialForwarder is started by <code>sf -comm serial@<i>path</i>:<i>baud</i> </code> command, 
+where <i>path</i> is the path to the USB interface 
+and <i>baud</i> is the baudrate indicated in the BS_BAUD parameter.
+</p>
+
 
 {% include footer.html %}
