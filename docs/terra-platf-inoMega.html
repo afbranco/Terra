@@ -2,8 +2,23 @@
 ---
 {% include header.html %}
 
-	<p>The main Arduino customization is for the Mega2560 platform using the NRF24L01+ radio board.
+<h2>Introduction</h2> 
+	<p>
+	In this page we explain:
+	<ul>
+	<li> how to install Terra development environment,</li>
+	<li> how to compile the Arduino Mega version of TerraVM and flash it into a device,</li>
+	<li> how to load a Terra Script in the network, and</li>
+	<li> how connect the NRF24 radio board to Mega board.</li>
+	</ul>
 	</p>
+<p>	The main Arduino customization is for the Mega2560 platform using the NRF24L01+ radio board.
+Currently we tested Terra in two boards:
+	<ul>
+	<li>Original <a target="_blank" href="https://store.arduino.cc/usa/arduino-mega-2560-rev3">Arduino Mega 2560</a>.</li>
+	<li>An alternative <a target="_blank" href="http://www.inhaos.com/product_info.php?products_id=118">Atmega2560 board from INHAOS</a></li>
+	</ul>
+</p>	
 	
 	
 <h2>Installing Terra Ino in a Linux Box</h2> 
@@ -143,6 +158,68 @@ After started, the tool waits for the SerialForwarder to connect to the USB.
 where <i>path</i> is the path to the USB interface 
 and <i>baud</i> is the baudrate indicated in the BS_BAUD parameter.
 </p>
+
+<h2>Connecting NRF24L01+ to Mega Board</h2>
+
+<p> The next figure shows the NRF24L01+ pin-out and the table shows the connections for Arduino Mega and MegaCore.
+</p>
+<img style='float:left;margin-right:10px;' 
+	src="images/nrf24l01p.png" alt="NRF24L01+ image">
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>NRF24</th>
+        <th>Arduino Mega</th>
+        <th>MegaCore</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1 - GND</td>
+        <td>GND</td>
+        <td>GND</td>
+      </tr>
+      <tr>
+        <td>2 - VCC 3.3v</td>
+        <td>3.3v</td>
+        <td>3.3v (external)</td>
+      </tr>
+      <tr>
+        <td>3 - CE</td>
+        <td>11</td>
+        <td>PB5</td>
+      </tr>
+      <tr>
+        <td>4 - CS</td>
+        <td>10</td>
+        <td>PB4</td>
+      </tr>
+      <tr>
+        <td>5 - SCK</td>
+        <td>52</td>
+        <td>PB1</td>
+      </tr>
+      <tr>
+        <td>6 - MOSI</td>
+        <td>51</td>
+        <td>PB2</td>
+      </tr>
+      <tr>
+        <td>7 - MISO</td>
+        <td>50</td>
+        <td>PB3</td>
+      </tr>
+      <tr>
+        <td>8 - IRQ</td>
+        <td>2</td>
+        <td>PE4</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+
 
 
 {% include footer.html %}
