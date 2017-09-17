@@ -16,16 +16,15 @@
 
 <h3>Installation Steps</h3>
 
-<h4>Install, if necessary, missing packages</h4>
+<h4>Install, if necessary, the following packages.</h4>
 <p>Open a command terminal and execute the following commands.</p>
-<pre><code>
-sudo apt-get update
+<pre><code>sudo apt-get update
 sudo apt-get install git lua5.1 lua-lpeg nescc gcc-avr avr-libc avrdude 
 </code></pre>
 
-<h4>Adjust USB access permission</h4>
-<pre><code>sudo usermod -a -G dialout terra</code></pre>
-<p>Obs: You must logout and login again to validate this new permission.</p>
+<h4>Adjust USB access permission for your user:</h4>
+<pre><code>sudo usermod -a -G dialout $USER</code></pre>
+<p><b>Obs:</b> You must logout and login again to validate this new permission.</p>
 
 <h4>Get Terra source code from the repository</h4>
 <p>Clone Terra repository into home directory.</p>
@@ -40,7 +39,7 @@ git clone https://github.com/afbranco/Terra</code></pre>
 <pre><code>cd ~/Terra/TerraVM/src</code></pre>
 <p>Open the file <code>Makefile_ino</code> in the editor.</p>
 <pre><code>gedit Makefile_ino</code></pre>
-<p>Modify following definition to:</p>
+<p>Modify the following definitions to:</p>
 <pre><code>GCC = avr-gcc
 OBJCOPY = avr-objcopy
 OBJDUMP = avr-objdump
@@ -52,9 +51,10 @@ AVRDUDECONF = /etc/avrdude.conf
 <h4>Create environment definitions</h4>
 <p>Open a command terminal and change to HOME directory</p>
 <pre><code>cd ~</code></pre>
+
 <p>Open the file <code>.bashrc</code> in the editor.</p>
 <pre><code>gedit .bashrc</code></pre>
-<pre><code>
+
 <p>Insert following lines at the end of the file.</p>
 <pre><code>export TERRADIR=$HOME/Terra
 export CLASSPATH=$TERRADIR/TerraControl/tinyos.jar:.$CLASSPATH
