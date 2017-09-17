@@ -18,10 +18,10 @@
 
 <h4>Install, if necessary, missing packages</h4>
 <p>Open a command terminal and execute the following commands.</p>
-<code>
+<pre><code>
 sudo apt-get update
 sudo apt-get install git lua5.1 lua-lpeg nescc gcc-avr avr-libc avrdude 
-</code>
+</code></pre>
 
 <h4>Adjust USB access permission</h4>
 <pre><code>sudo usermod -a -G dialout terra</code></pre>
@@ -30,8 +30,7 @@ sudo apt-get install git lua5.1 lua-lpeg nescc gcc-avr avr-libc avrdude
 <h4>Get Terra source code from the repository</h4>
 <p>Clone Terra repository into home directory.</p>
 <p>Open a command terminal, change to home directory, and download Terra repository.</p>
-<pre><code>
-cd ~
+<pre><code>cd ~
 git clone https://github.com/afbranco/Terra</code></pre>
 <p>The next time use the command <code>git pull</code> from the new <var>Terra</var> dir to get last update</p>
 
@@ -41,10 +40,8 @@ git clone https://github.com/afbranco/Terra</code></pre>
 <pre><code>cd ~/Terra/TerraVM/src</code></pre>
 <p>Open the file <code>Makefile_ino</code> in the editor.</p>
 <pre><code>gedit Makefile_ino</code></pre>
-<pre><code>
 <p>Modify following definition to:</p>
-<pre><code>
-GCC = avr-gcc
+<pre><code>GCC = avr-gcc
 OBJCOPY = avr-objcopy
 OBJDUMP = avr-objdump
 GCC = avr-gcc
@@ -59,13 +56,11 @@ AVRDUDECONF = /etc/avrdude.conf
 <pre><code>gedit .bashrc</code></pre>
 <pre><code>
 <p>Insert following lines at the end of the file.</p>
-<pre><code>
-export TERRADIR=$HOME/Terra
+<pre><code>export TERRADIR=$HOME/Terra
 export CLASSPATH=$TERRADIR/TerraControl/tinyos.jar:.$CLASSPATH
 alias terrac='$TERRADIR/terrac/terrac -I$TERRADIR/terrac/samples'
 alias ttool='java -jar $TERRADIR/TerraControl/TControl.jar'
 alias sf='java net.tinyos.sf.SerialForwarder'
-
 </code></pre>
 <p>Open a new command terminal to get the new environment.</p>
 
@@ -78,8 +73,7 @@ You must change to the <code>src</code> directory and execute <code>make mega</c
 command with additional parameters.
 </p>
 <p>The follow command is an example of Terra compilation for Arduino Mega board:</p>
-<pre><code>
-make mega TYPE=BOTH VM=NET MOD=MSGQ USB:/dev/ttyACM0 BS_BAUD:19200 install.4
+<pre><code>make mega TYPE=BOTH VM=NET MOD=MSGQ USB:/dev/ttyACM0 BS_BAUD:19200 install.4
 </code></pre>
 
 <h3>Attention points</h3>
@@ -121,22 +115,20 @@ i.e. your Arduino Mega communicates only by the USB interface.
 The command <code>make help mega</code> will show a updated definition.</p>
 <ul>
 <li> VM:  Define the VM flavour: NET, GRP | default NET</li>
-<li> MOD: Define additional modules: MSGQ | default ''
-<li> QUEUE: Generate short or long queues | default SHORT
-<li> TYPE: Configure runtime type: NOBS or BOTH | default BOTH
-<li> MOTE_TYPE: Define mote type: 1..254 | Default 1
-<li> VERB: Verbose Compilation mode: Y or N | Default N
-<li> SETDATA: SetData functionality: Y or N | default N
-<li> RFPOWER: RF Power: 0 1 2 3 4 5 6 7 | default 7
-<li> INO_RADIO: Radio board for mega/uno: XBEE0 or XBEE1 or NRF24 or NO_RADIO| default NO_RADIO
-<li> INO_HALF_CLOCK: Divide Arduino MCU Clock by 2. Applies for powering ProMini_16MHz(5v) with 3.3v 
-<li> IFLASH: Internal Flash for prog storage: Y or N | default Y
-<li> DEBUG: Debug dbg() mode for Linux: Y or N | default N
-<li> NET_ID: Network identifier - 0..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee 
-<li> install.<nodeid> - Install command + unique node identifier inside its network - 1..2047 | default 1
-<li> BS_BAUD: BaseStation baudrate - 115200, 57600, 19200 | default 115200
-
-<li>
+<li> MOD: Define additional modules: MSGQ | default ''</li>
+<li> QUEUE: Generate short or long queues | default SHORT</li>
+<li> TYPE: Configure runtime type: NOBS or BOTH | default BOTH</li>
+<li> MOTE_TYPE: Define mote type: 1..254 | Default 1</li>
+<li> VERB: Verbose Compilation mode: Y or N | Default N</li>
+<li> SETDATA: SetData functionality: Y or N | default N</li>
+<li> RFPOWER: RF Power: 0 1 2 3 4 5 6 7 | default 7</li>
+<li> INO_RADIO: Radio board for mega/uno: XBEE0 or XBEE1 or NRF24 or NO_RADIO| default NO_RADIO</li>
+<li> INO_HALF_CLOCK: Divide Arduino MCU Clock by 2. Applies for powering ProMini_16MHz(5v) with 3.3v</li> 
+<li> IFLASH: Internal Flash for prog storage: Y or N | default Y</li>
+<li> DEBUG: Debug dbg() mode for Linux: Y or N | default N</li>
+<li> NET_ID: Network identifier - 0..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee</li> 
+<li> install.<nodeid> - Install command + unique node identifier inside its network - 1..2047 | default 1</li>
+<li> BS_BAUD: BaseStation baudrate - 115200, 57600, 19200 | default 115200</li>
 </ul>
 
 
