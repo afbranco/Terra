@@ -12,7 +12,7 @@
 	<li> how connect the NRF24 radio board to Mega board.</li>
 	</ul>
 	</p>
-<p>	The main Arduino customization is for the Mega2560 platform using the NRF24L01+ radio board.
+<p>	The main Arduino customization is based on Terra NET flavor for the Mega2560 platform using the NRF24L01+ radio board.
 Currently we tested Terra in two boards:
 	<ul>
 	<li>Original <a target="_blank" href="https://store.arduino.cc/usa/arduino-mega-2560-rev3">Arduino Mega 2560</a>.</li>
@@ -83,7 +83,7 @@ alias sf='java net.tinyos.sf.SerialForwarder'
 <h2>Compiling and flashing</h2>
 <p>After a successful installation, you can generate a compiled file and 
 flash it into an Arduino Mega board.</p> 
-<p>Terra developent environment uses a Make system to build and install the firmware.
+<p>Terra development environment uses a Make system to build and install the firmware.
 You must change to the <code>src</code> directory and execute <code>make mega</code> 
 command with additional parameters.
 </p>
@@ -109,8 +109,8 @@ Hybrid networks may create a bridge connecting two node with different radios vi
 The <i>n</i> is the unique node identifier for its network.</p>
 
 <p>The <b>real node address</b> is the combination of the Network ID and the unique node identifier. 
-For example, the default Network Id for the NRF24 network is the number 4.
-The node address, considering the unique ID 1, will be <code>(4*2048)+1</code>.</p>
+For example, the default Network Id for the NRF24 network is the number 3.
+The node address, considering the unique ID 1, will be <code>(3*2048)+1 = 6145</code>.</p>
 
 <p>The <b>USB:<i>path</i></b> identify the USB connected to flash the Mega Board.
 This value is usually <code>/dev/ttyACM0</code> or <code>/dev/ttyUSB0</code>, 
@@ -129,26 +129,23 @@ i.e. your Arduino Mega communicates only by the USB interface.
 <p>These are the allowed parameters when compiling for Arduino Mega board.
 The command <code>make help mega</code> will show an updated definition.</p>
 <ul>
-<li> VM:  Define the VM flavour: NET, GRP | default NET</li>
 <li> MOD: Define additional modules: MSGQ | default ''</li>
 <li> QUEUE: Generate short or long queues | default SHORT</li>
 <li> TYPE: Configure runtime type: NOBS or BOTH | default BOTH</li>
 <li> MOTE_TYPE: Define mote type: 1..254 | Default 1</li>
 <li> VERB: Verbose Compilation mode: Y or N | Default N</li>
-<li> SETDATA: SetData functionality: Y or N | default N</li>
 <li> RFPOWER: RF Power: 0 1 2 3 4 5 6 7 | default 7</li>
-<li> INO_RADIO: Radio board for mega/uno: XBEE0 or XBEE1 or NRF24 or NO_RADIO| default NO_RADIO</li>
+<li> INO_RADIO: Radio board for mega: NRF24 or NO_RADIO| default NO_RADIO</li>
 <li> IFLASH: Internal Flash for prog storage: Y or N | default Y</li>
 <li> NET_ID: Network identifier - 0..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee</li> 
 <li> install.<nodeid> - Install command + unique node identifier inside its network - 1..2047 | default 1</li>
 <li> BS_BAUD: BaseStation baudrate - 115200, 57600, 19200 | default 115200</li>
 </ul>
 
-
 <h2>Loading a Terra Script into the network</h2>
 <p>Considering that you already have a script compiled with <code>terrac</code> compiler,
 you need to load the script bytecode into the Terra network nodes.
-Two programms must be started to that. The TinyOS <i>SerialForwarder</i> application and the <i>Terra Control</i> tool.
+Two tools must be started to that. The TinyOS <i>SerialForwarder</i> application and the <i>Terra Control</i> tool.
 </p>
 <p>The use of the Terra Control tool was explained in the Terra tutorial.
 The tool can be started by <code>ttool</code> command. 
@@ -187,32 +184,32 @@ and <i>baud</i> is the baudrate indicated in the BS_BAUD parameter.
       </tr>
       <tr>
         <td>3 - CE</td>
-        <td>11</td>
+        <td>Digital pin 11</td>
         <td>PB5</td>
       </tr>
       <tr>
         <td>4 - CS</td>
-        <td>10</td>
+        <td>Digital pin 10</td>
         <td>PB4</td>
       </tr>
       <tr>
         <td>5 - SCK</td>
-        <td>52</td>
+        <td>Digital pin 52</td>
         <td>PB1</td>
       </tr>
       <tr>
         <td>6 - MOSI</td>
-        <td>51</td>
+        <td>Digital pin 51</td>
         <td>PB2</td>
       </tr>
       <tr>
         <td>7 - MISO</td>
-        <td>50</td>
+        <td>Digital pin 50</td>
         <td>PB3</td>
       </tr>
       <tr>
         <td>8 - IRQ</td>
-        <td>2</td>
+        <td>Digital pin 2</td>
         <td>PE4</td>
       </tr>
     </tbody>
