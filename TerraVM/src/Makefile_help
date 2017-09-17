@@ -59,7 +59,7 @@ define options_HELP
  INO_HALF_CLOCK: Divide Arduino MCU Clock by 2. Applies for powering ProMini_16MHz(5v) with 3.3v 
  LPL: Low Power Listening mode: Y or N | default N
  IFLASH: Internal Flash for prog storage: Y or N | default Y
- DEBUG: Debug dbg() mode for Linux: Y or N | default N
+ DEBUG: Debug dbg() mode for Linux/ESP: Y or N | default N
  WIFI_SSID: ESP WIFI SSID:  <input ssid> | default iot_terra
  WIFI_PASSWD: ESP WIFI PASSWORD:  <input password> | default projeto_terra
  NET_ID: Network identifier - 0..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee 
@@ -86,7 +86,6 @@ define tos_HELP
  RFPOWER: RF Power: 0 1 2 3 4 5 6 7 | default 7
  LPL: Low Power Listening mode: Y or N | default N
  IFLASH: Internal Flash for prog storage: Y or N | default Y
- DEBUG: Debug dbg() mode for Linux: Y or N | default N
  NET_ID: Network identifier - 0..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee 
  install.<nodeid> - Install command + unique node identifier inside its network - 1..2047 | default 1
  BS_BAUD: BaseStation baudrate - 115200, 57600, 19200 | default <platform specific or 19200>
@@ -111,12 +110,9 @@ define ino_HELP
  INO_RADIO: Radio board for mega/uno: XBEE0 or XBEE1 or NRF24 or NO_RADIO| default NO_RADIO
  INO_HALF_CLOCK: Divide Arduino MCU Clock by 2. Applies for powering ProMini_16MHz(5v) with 3.3v 
  IFLASH: Internal Flash for prog storage: Y or N | default Y
- DEBUG: Debug dbg() mode for Linux: Y or N | default N
  NET_ID: Network identifier - 0..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee 
  install.<nodeid> - Install command + unique node identifier inside its network - 1..2047 | default 1
- BS_BAUD: BaseStation baudrate - 115200, 57600, 19200 | default <platform specific or 19200>
-   - OBS: Platform specific = telosb, tmote, eyes, intelmote2 => 115200; micaz,mica2, iris => 57600; mica2dot=>19200
-   - OBS2: Do not change baudrate for mica2dot.
+ BS_BAUD: BaseStation baudrate - 115200, 57600, 19200 | default mega 115200
 
 endef
 
@@ -132,12 +128,9 @@ define ix_HELP
  VERB: Verbose Compilation mode: Y or N | Default N
  SETDATA: SetData functionality: Y or N | default N
  IFLASH: Internal Flash for prog storage: Y or N | default Y
- DEBUG: Debug dbg() mode for Linux: Y or N | default N
+ DEBUG: Debug dbg() mode: Y or N | default N
  NET_ID: Network identifier - 0..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee 
  install.<nodeid> - Install command + unique node identifier inside its network - 1..2047 | default 1
- BS_BAUD: BaseStation baudrate - 115200, 57600, 19200 | default <platform specific or 19200>
-   - OBS: Platform specific = telosb, tmote, eyes, intelmote2 => 115200; micaz,mica2, iris => 57600; mica2dot=>19200
-   - OBS2: Do not change baudrate for mica2dot.
 
 endef
 
@@ -155,7 +148,7 @@ define esp_HELP
  SETDATA: SetData functionality: Y or N | default N
  RFPOWER: RF Power: 0 1 2 3 4 5 6 7 | default 7
  IFLASH: Internal Flash for prog storage: Y or N | default Y
- DEBUG: Debug dbg() mode for Linux: Y or N | default N
+ DEBUG: Debug dbg() mode: Y or N | default N
  WIFI_SSID: ESP WIFI SSID:  <input ssid> | default iot_terra
  WIFI_PASSWD: ESP WIFI PASSWORD:  <input password> | default projeto_terra
  NET_ID: Network identifier - 0..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:nrf24, 4:xbee, 5:NoRadio 
