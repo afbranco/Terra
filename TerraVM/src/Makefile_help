@@ -99,7 +99,6 @@ define ino_HELP
 **********************************************************
 **** INO available options -- $(INO_TARGETS)
 **********************************************************
- VM:  Define the VM flavour: NET, GRP | default NET
  MOD: Define additional modules: MSGQ | default ''
  QUEUE: Generate short or long queues | default SHORT
  TYPE: Configure runtime type: NOBS or BOTH | default BOTH
@@ -107,7 +106,7 @@ define ino_HELP
  VERB: Verbose Compilation mode: Y or N | Default N
  SETDATA: SetData functionality: Y or N | default N
  RFPOWER: RF Power: 0 1 2 3 4 5 6 7 | default 7
- INO_RADIO: Radio board for mega/uno: XBEE0 or XBEE1 or NRF24 or NO_RADIO| default NO_RADIO
+ INO_RADIO: Radio board for mega: NRF24 or NO_RADIO| default NO_RADIO
  INO_HALF_CLOCK: Divide Arduino MCU Clock by 2. Applies for powering ProMini_16MHz(5v) with 3.3v 
  IFLASH: Internal Flash for prog storage: Y or N | default Y
  NET_ID: Network identifier - 0..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee 
