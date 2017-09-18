@@ -39,7 +39,7 @@ sudo apt-get install git lua5.1 lua-lpeg nescc gcc-avr avr-libc avrdude
 
 <h4>Adjust USB access permission for your user:</h4>
 <pre><code>sudo usermod -a -G dialout $USER</code></pre>
-<p><b>Obs:</b> You must logout and login again to validate this new permission.</p>
+<p><b>Note:</b> You must logout and login again to validate this new permission.</p>
 
 <h4>Get Terra source code from the repository</h4>
 <p>Clone Terra repository into home directory.</p>
@@ -101,8 +101,8 @@ the all nodes communicate via radio.
 Hybrid networks may create a bridge connecting two node with different radios via serial/USB interface.
 </p>
 
-<p> the <b>BS_BAUD:<i>value</i></b> configures the USB baudrate for Terra operation.
-(This do not change the firmware flashing baudrate that is configured internally in the system.)
+<p> the <b>BS_BAUD:<i>value</i></b> configures the USB baud rate for Terra operation.
+(This does not change the firmware flashing baud rate that is configured internally in the system.)
 </p> 
 
 <p>the <b>INSTAL.<i>n</i></b> parameter indicates to flash the compiled file. 
@@ -112,9 +112,9 @@ The <i>n</i> is the unique node identifier for its network.</p>
 For example, the default Network Id for the NRF24 network is the number 3.
 The node address, considering the unique ID 1, will be <code>(3*2048)+1 = 6145</code>.</p>
 
-<p>The <b>USB:<i>path</i></b> identify the USB connected to flash the Mega Board.
+<p>The <b>USB:<i>path</i></b> identifies the USB connected to flash the Mega Board.
 This value is usually <code>/dev/ttyACM0</code> or <code>/dev/ttyUSB0</code>, 
-this depend of the FDDI chip used in the board. 
+this depend on the FDDI chip used in the board. 
 But its number may change if the previous connection is already allocated.
 Use the command <code>ls /dev/ttyA*</code> or <code>ls /dev/ttyU*</code> to find the correct port.   
 </p>
@@ -139,7 +139,7 @@ The command <code>make help mega</code> will show an updated definition.</p>
 <li> IFLASH: Internal Flash for prog storage: Y or N | default Y</li>
 <li> NET_ID: Network identifier - 0..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee</li> 
 <li> install.<nodeid> - Install command + unique node identifier inside its network - 1..2047 | default 1</li>
-<li> BS_BAUD: BaseStation baudrate - 115200, 57600, 19200 | default 115200</li>
+<li> BS_BAUD: BaseStation baud rate - 115200, 57600, 19200 | default 115200</li>
 <li> ANA0_REF: Reference voltage for Analog 0 read - DEFAULT,INTERNAL1V1,INTERNAL2V56,EXTERNAL | default INTERNAL1V1</li>
 <li> ANA1_REF: Reference voltage for Analog 1 read - DEFAULT,INTERNAL1V1,INTERNAL2V56,EXTERNAL | default INTERNAL1V1</li>
 <li> ANA2_REF: Reference voltage for Analog 2 read - DEFAULT,INTERNAL1V1,INTERNAL2V56,EXTERNAL | default INTERNAL1V1</li>
@@ -157,7 +157,7 @@ After started, the tool waits for the SerialForwarder to connect to the USB.
 </p>
 <p>The SerialForwarder is started by <code>sf -comm serial@<i>path</i>:<i>baud</i> </code> command, 
 where <i>path</i> is the path to the USB interface 
-and <i>baud</i> is the baudrate indicated in the BS_BAUD parameter.
+and <i>baud</i> is the baud rate indicated in the BS_BAUD parameter.
 </p>
 
 <h2>Connecting NRF24L01+ to Mega Board</h2>
