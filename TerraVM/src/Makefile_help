@@ -67,6 +67,10 @@ define options_HELP
  BS_BAUD: BaseStation baudrate - 115200, 57600, 19200 | default <platform specific or 19200>
    - OBS: Platform specific = telosb, tmote, eyes, intelmote2 => 115200; micaz,mica2, iris => 57600; mica2dot=>19200
    - OBS2: Do not change baudrate for mica2dot.
+ ANA0_REF: Reference voltage for Analog 0 read - DEFAULT,INTERNAL1V1,INTERNAL2V56,EXTERNAL | default INTERNAL1V1
+ ANA1_REF: Reference voltage for Analog 1 read - DEFAULT,INTERNAL1V1,INTERNAL2V56,EXTERNAL | default INTERNAL1V1
+ ANA2_REF: Reference voltage for Analog 2 read - DEFAULT,INTERNAL1V1,INTERNAL2V56,EXTERNAL | default INTERNAL1V1
+ ANA3_REF: Reference voltage for Analog 3 read - DEFAULT,INTERNAL1V1,INTERNAL2V56,EXTERNAL | default INTERNAL1V1
 
 endef
 
@@ -112,7 +116,10 @@ define ino_HELP
  NET_ID: Network identifier - 0..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee 
  install.<nodeid> - Install command + unique node identifier inside its network - 1..2047 | default 1
  BS_BAUD: BaseStation baudrate - 115200, 57600, 19200 | default mega 115200
-
+ ANA0_REF: Reference voltage for Analog 0 read - DEFAULT,INTERNAL1V1,INTERNAL2V56,EXTERNAL | default INTERNAL1V1
+ ANA1_REF: Reference voltage for Analog 1 read - DEFAULT,INTERNAL1V1,INTERNAL2V56,EXTERNAL | default INTERNAL1V1
+ ANA2_REF: Reference voltage for Analog 2 read - DEFAULT,INTERNAL1V1,INTERNAL2V56,EXTERNAL | default INTERNAL1V1
+ ANA3_REF: Reference voltage for Analog 3 read - DEFAULT,INTERNAL1V1,INTERNAL2V56,EXTERNAL | default INTERNAL1V1
 endef
 
 

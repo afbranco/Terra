@@ -31,8 +31,18 @@ module VMCustomP{
 	uses interface dataQueue as usrDataQ;
 #endif
 
-	uses interface GeneralIO as D22;
+	// Analog 0
+	uses interface GeneralIO as PA_0;
 	uses interface Read<uint16_t> as Ana0;
+	// Analog 1
+	uses interface GeneralIO as PA_1;
+	uses interface Read<uint16_t> as Ana1;
+	// Analog 2
+	uses interface GeneralIO as PA_2;
+	uses interface Read<uint16_t> as Ana2;
+	// Analog 3
+	uses interface GeneralIO as PA_3;
+	uses interface Read<uint16_t> as Ana3;
 
 }
 implementation{
@@ -115,17 +125,47 @@ void  proc_req_custom(uint16_t id, uint32_t value){
 	signal VM.queueEvt(I_CUSTOM   ,    0, &ExtDataCustomA);
 	}
 
-
+// A/Ds
 void  proc_req_ana0_read(uint16_t id, uint32_t value){
 	dbg(APPNAME,"Custom::proc_req_ana0_read(): id=%d\n",id);
 	// Request a Analog 0 read
-	if (call D22.isOutput()) call D22.makeInput();
+	if (call PA_0.isOutput()) call PA_0.makeInput();
 	call Ana0.read();
 	}
 event void Ana0.readDone(error_t result, uint16_t val){
 	ExtDataAnalog = val;
 	signal VM.queueEvt(I_ANA0_READ_DONE   ,    0, &ExtDataAnalog);
 	signal VM.queueEvt(I_TEMP   ,    0, &ExtDataAnalog);
+	}
+void  proc_req_ana1_read(uint16_t id, uint32_t value){
+	dbg(APPNAME,"Custom::proc_req_ana1_read(): id=%d\n",id);
+	// Request a Analog 1 read
+	if (call PA_1.isOutput()) call PA_1.makeInput();
+	call Ana1.read();
+	}
+event void Ana1.readDone(error_t result, uint16_t val){
+	ExtDataAnalog = val;
+	signal VM.queueEvt(I_ANA1_READ_DONE   ,    0, &ExtDataAnalog);
+	}
+void  proc_req_ana2_read(uint16_t id, uint32_t value){
+	dbg(APPNAME,"Custom::proc_req_ana2_read(): id=%d\n",id);
+	// Request a Analog 2 read
+	if (call PA_2.isOutput()) call PA_2.makeInput();
+	call Ana2.read();
+	}
+event void Ana2.readDone(error_t result, uint16_t val){
+	ExtDataAnalog = val;
+	signal VM.queueEvt(I_ANA2_READ_DONE   ,    0, &ExtDataAnalog);
+	}
+void  proc_req_ana3_read(uint16_t id, uint32_t value){
+	dbg(APPNAME,"Custom::proc_req_ana3_read(): id=%d\n",id);
+	// Request a Analog 3 read
+	if (call PA_3.isOutput()) call PA_3.makeInput();
+	call Ana3.read();
+	}
+event void Ana3.readDone(error_t result, uint16_t val){
+	ExtDataAnalog = val;
+	signal VM.queueEvt(I_ANA3_READ_DONE   ,    0, &ExtDataAnalog);
 	}
 
 	
@@ -226,6 +266,9 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		case O_CUSTOM 		: proc_req_custom(id,value); break;
 
 		case O_ANA0_READ 	: proc_req_ana0_read(id,value); break;
+		case O_ANA1_READ 	: proc_req_ana1_read(id,value); break;
+		case O_ANA2_READ 	: proc_req_ana2_read(id,value); break;
+		case O_ANA3_READ 	: proc_req_ana3_read(id,value); break;
 	}
 }
 

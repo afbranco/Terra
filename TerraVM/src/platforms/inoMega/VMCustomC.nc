@@ -32,10 +32,22 @@ implementation{
 	custom.LEDS -> LedsC;
 
 	components HplAtm2560GeneralIOC as IO;
-	custom.D22 -> IO.PortA0;
-	
+	// Ana0
+	custom.PA_0 -> IO.PortA0;
 	components new Analog0C() as Ana0;
 	custom.Ana0 -> Ana0;
+	// Ana1
+	custom.PA_1 -> IO.PortA1;
+	components new Analog1C() as Ana1;
+	custom.Ana1 -> Ana1;
+	// Ana2
+	custom.PA_2 -> IO.PortA2;
+	components new Analog2C() as Ana2;
+	custom.Ana2 -> Ana2;
+	// Ana3
+	custom.PA_3 -> IO.PortA3;
+	components new Analog3C() as Ana3;
+	custom.Ana3 -> Ana3;
 	
 	// Custom Queues
 #ifdef M_MSG_QUEUE

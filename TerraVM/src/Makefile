@@ -49,9 +49,9 @@ droid_FAMILY = DROID
 esp_FAMILY = ESP
 
 # define options
-ALL_OPTIONS = VM TYPE MOD INSTALL QUEUE DEBUG WIFI_SSID WIFI_PASSWD SENSOR MOTE_TYPE VERB SETDATA RFPOWER INO_HALF_CLOCK INO_RADIO USB SERIAL LPL IFLASH BS_BAUD NET_ID
+ALL_OPTIONS = VM TYPE MOD INSTALL QUEUE DEBUG WIFI_SSID WIFI_PASSWD SENSOR MOTE_TYPE VERB SETDATA RFPOWER INO_HALF_CLOCK INO_RADIO USB SERIAL LPL IFLASH BS_BAUD NET_ID ANA0_REF ANA1_REF ANA2_REF ANA3_REF
 TOS_OPTIONS = VM TYPE MOD INSTALL QUEUE DEBUG SENSOR MOTE_TYPE VERB SETDATA RFPOWER USB LPL IFLASH BS_BAUD NET_ID
-INO_OPTIONS = VM TYPE MOD INSTALL QUEUE DEBUG MOTE_TYPE VERB SETDATA RFPOWER INO_HALF_CLOCK INO_RADIO USB SERIAL IFLASH BS_BAUD NET_ID
+INO_OPTIONS = VM TYPE MOD INSTALL QUEUE DEBUG MOTE_TYPE VERB SETDATA RFPOWER INO_HALF_CLOCK INO_RADIO USB SERIAL IFLASH BS_BAUD NET_ID ANA0_REF ANA1_REF ANA2_REF ANA3_REF
 IX_OPTIONS  = VM MOD INSTALL QUEUE DEBUG MOTE_TYPE VERB SETDATA IFLASH NET_ID
 ESP_OPTIONS = VM TYPE MOD INSTALL QUEUE DEBUG WIFI_SSID WIFI_PASSWD MOTE_TYPE VERB SETDATA RFPOWER USB IFLASH BS_BAUD NET_ID
 DROID_OPTIONS  = VM MOD INSTALL CLEAN QUEUE DEBUG MOTE_TYPE VERB SETDATA IFLASH NET_ID
@@ -297,6 +297,84 @@ ifeq ($(__DEBUG),N)
 	CFLAGS += -DNO_DEBUG
 endif
 
+# Analog ref IDs
+AN_DEFAULT = 0
+AN_INTERNAL1V1 = 1
+AN_INTERNAL2V56 = 2
+AN_EXTERNAL = 3
+
+# ANA0_REF
+ifneq ($(filter $(_MOTE),$(INO_TARGETS)),)
+  __ANA0_REF ?= INTERNAL1V1
+  ifneq ($(__ANA0_REF),DEFAULT)
+    ifneq ($(__ANA0_REF),INTERNAL1V1)
+  	  ifneq ($(__ANA0_REF),INTERNAL2V56)
+        ifneq ($(__ANA0_REF),EXTERNAL)
+          $(error ANA0_REF must be "DEFAULT", "INTERNAL1V1", "INTERNAL2V56", or "EXTERNAL")
+        endif
+      endif
+    endif
+  endif
+else
+  ifneq ($(__ANA0_REF),)
+    $(error ANA0_REF must be set only for motes: $(INO_TARGETS))
+  endif
+endif
+
+# ANA1_REF
+ifneq ($(filter $(_MOTE),$(INO_TARGETS)),)
+  __ANA1_REF ?= INTERNAL1V1
+  ifneq ($(__ANA1_REF),DEFAULT)
+    ifneq ($(__ANA1_REF),INTERNAL1V1)
+  	  ifneq ($(__ANA1_REF),INTERNAL2V56)
+        ifneq ($(__ANA1_REF),EXTERNAL)
+          $(error ANA1_REF must be "DEFAULT", "INTERNAL1V1", "INTERNAL2V56", or "EXTERNAL")
+        endif
+      endif
+    endif
+  endif
+else
+  ifneq ($(__ANA1_REF),)
+    $(error ANA1_REF must be set only for motes: $(INO_TARGETS))
+  endif
+endif
+
+# ANA2_REF
+ifneq ($(filter $(_MOTE),$(INO_TARGETS)),)
+  __ANA2_REF ?= INTERNAL1V1
+  ifneq ($(__ANA2_REF),DEFAULT)
+    ifneq ($(__ANA2_REF),INTERNAL1V1)
+  	  ifneq ($(__ANA2_REF),INTERNAL2V56)
+        ifneq ($(__ANA2_REF),EXTERNAL)
+          $(error ANA2_REF must be "DEFAULT", "INTERNAL1V1", "INTERNAL2V56", or "EXTERNAL")
+        endif
+      endif
+    endif
+  endif
+else
+  ifneq ($(__ANA2_REF),)
+    $(error ANA2_REF must be set only for motes: $(INO_TARGETS))
+  endif
+endif
+
+# ANA3_REF
+ifneq ($(filter $(_MOTE),$(INO_TARGETS)),)
+  __ANA3_REF ?= INTERNAL1V1
+  ifneq ($(__ANA3_REF),DEFAULT)
+    ifneq ($(__ANA3_REF),INTERNAL1V1)
+  	  ifneq ($(__ANA3_REF),INTERNAL2V56)
+        ifneq ($(__ANA3_REF),EXTERNAL)
+          $(error ANA3_REF must be "DEFAULT", "INTERNAL1V1", "INTERNAL2V56", or "EXTERNAL")
+        endif
+      endif
+    endif
+  endif
+else
+  ifneq ($(__ANA3_REF),)
+    $(error ANA3_REF must be set only for motes: $(INO_TARGETS))
+  endif
+endif
+
 
 #----------------------------------------------------------------
 
@@ -504,12 +582,13 @@ ifeq ($(_MOTE),uno)
   CFLAGS += -O1
   # INO_HALF_CLOCK config
   ifeq ($(__INO_HALF_CLOCK),Y)
-    CFLAGS += -DINO_HALF_CLOCK
+    CFLAGS += -DINO_HALF_CLOCK 
   endif
 endif
 ifeq ($(_MOTE),mega)
   CFLAGS += -O1
   CFLAGS += -DRFPOWER_IDX=$(__RFPOWER)
+  CFLAGS += -DANA0_REF=$(AN_$(__ANA0_REF)) -DANA1_REF=$(AN_$(__ANA1_REF)) -DANA2_REF=$(AN_$(__ANA2_REF)) -DANA3_REF=$(AN_$(__ANA3_REF))
 endif
 ifeq ($(_MOTE),rpi)
   CFLAGS += -Os

@@ -29,6 +29,20 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include "VMCustom.h"
+#ifdef ANA0_REF
+#if ANA0_REF == AN_DEFAULT
+#define ADC0_REF ATM2560_ADC_REF_AVCC
+#elif ANA0_REF==AN_INTERNAL1V1
+#define ADC0_REF ATM2560_ADC_REF_INTERNAL_1_1
+#elif ANA0_REF==AN_INTERNAL3V56
+#define ADC0_REF ATM2560_ADC_REF_INTERNAL_2_56
+#elif ANA0_REF==AN_EXTERNAL
+#define ADC0_REF ATM2560_ADC_REF_AREF
+#endif
+#else
+#define ADC0_REF ATM2560_ADC_REF_INTERNAL_1_1
+#endif
 
 module Analog0ConfigP
 {
@@ -37,7 +51,7 @@ module Analog0ConfigP
 implementation
 {
   Atm2560AdcConfig_t cfg = {
-    .reference = ATM2560_ADC_REF_INTERNAL_1_1,
+    .reference = ADC0_REF,
     .prescale  = ATM2560_ADC_PRESCALE_128,
     .channel   = ATM2560_ADC_CHANNEL_0,
     .digital_input = FALSE,

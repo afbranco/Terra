@@ -30,6 +30,12 @@
 #include "VMData.h" //"../../VMData.h"
 #include "VMError.h" //"../../VMError.h"
 
+// Analog Ref IDs
+#define AN_DEFAULT 0
+#define AN_INTERNAL1V1 1
+#define AN_INTERNAL2V56 2
+#define AN_EXTERNAL 3
+
 enum{
 	
 	// TerraIno local Output events
@@ -43,6 +49,9 @@ enum{
 	O_CUSTOM		=23,
 	
 	O_ANA0_READ		=30,
+	O_ANA1_READ		=31,
+	O_ANA2_READ		=32,
+	O_ANA3_READ		=33,
 	// TerraNet Custom Output events
 	O_SEND			=40,
 	O_SEND_ACK		=41,
@@ -67,6 +76,9 @@ enum{
 	I_PULSE_LEN 		= 25,
 	
 	I_ANA0_READ_DONE	= 30,
+	I_ANA1_READ_DONE	= 31,
+	I_ANA2_READ_DONE	= 32,
+	I_ANA3_READ_DONE	= 33,
 	
 	// TerraNet Custom Input events
 	I_SEND_DONE_ID		=40,
