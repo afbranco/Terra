@@ -183,6 +183,9 @@ do
 	output void 	SEND_ACK		radioMsg 41;
 
 	output void 	ANA0_READ		void 30;
+	output void 	ANA1_READ		void 31;
+	output void 	ANA2_READ		void 32;
+	output void 	ANA3_READ		void 33;
 
 	// TerraNet Local Input events
 	input ubyte 	ERROR 		 	ubyte 	0;
@@ -200,6 +203,9 @@ do
 	input ulong	INT_PULSE_LEN		void	25;
 
 	input ushort	ANA0_READ_DONE	void	30;
+	input ushort	ANA1_READ_DONE	void	31;
+	input ushort	ANA2_READ_DONE	void	32;
+	input ushort	ANA3_READ_DONE	void	33;
 
 
 	// TerraNet Custom Input events
