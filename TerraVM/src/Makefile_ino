@@ -28,12 +28,12 @@ MAIN_HEX = $(BUILDDIR)/main.hex
 DUMP_FILE = $(BUILDDIR)/wiring-check.xml
 
 # programs and config "path/names"
-OBJCOPY = /home/branco/arduino-1.0.5/hardware/tools/avr/bin/avr-objcopy
+AVR_TOOLS_PATH = /home/branco/arduino-1.0.5/hardware/tools
+OBJCOPY = $(AVR_TOOLS_PATH)/avr/bin/avr-objcopy
 OBJDUMP = avr-objdump
-GCC = /home/branco/arduino-1.0.5/hardware/tools/avr/bin/avr-gcc
-AVRDUDE = /home/branco/arduino-1.0.5/hardware/tools/avrdude
-AVRDUDECONF = /home/branco/arduino-1.0.5/hardware/tools/avrdude.conf
-
+GCC = $(AVR_TOOLS_PATH)/avr/bin/avr-gcc
+AVRDUDE = $(AVR_TOOLS_PATH)/avrdude
+AVRDUDECONF = $(AVR_TOOLS_PATH)/avrdude.conf
 
 # MCU and CLOCK
 ifeq ($(_MOTE),uno)
