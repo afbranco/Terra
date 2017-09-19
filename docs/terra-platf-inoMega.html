@@ -54,14 +54,26 @@ git clone https://github.com/afbranco/Terra</code></pre>
 <pre><code>cd ~/Terra/TerraVM/src</code></pre>
 <p>Open the file <code>Makefile_ino</code> in the editor.</p>
 <pre><code>gedit Makefile_ino</code></pre>
-<p>Modify the following definitions to:</p>
-<pre><code>GCC = avr-gcc
-OBJCOPY = avr-objcopy
+<p>Modify the following definitions according to your installation options.</p>
+<p>If your environment already has an Arduino installation, 
+please find the correct Arduino path and modify following definitions.
+(tip: the command: <code>locate tools/avr/bin/avr-gcc</code> will help you to find the correct path.)
+<pre><code>
+AVR_TOOLS_PATH = <i>found_tools_path</i>/
+OBJCOPY = $(AVR_TOOLS_PATH)/avr/bin/avr-objcopy
+OBJDUMP = avr-objdump
+GCC = $(AVR_TOOLS_PATH)/avr/bin/avr-gcc
+AVRDUDE = $(AVR_TOOLS_PATH)/avrdude
+AVRDUDECONF = $(AVR_TOOLS_PATH)/avrdude.conf
+</code></pre>
+<p>If you do not have Arduino installed, you must edit the definitions to:</p> 
+<pre><code>OBJCOPY = avr-objcopy
 OBJDUMP = avr-objdump
 GCC = avr-gcc
 AVRDUDE = avrdude
 AVRDUDECONF = /etc/avrdude.conf
 </code></pre>
+
 
 <h4>Create environment definitions</h4>
 <p>Open a command terminal and change to HOME directory</p>
