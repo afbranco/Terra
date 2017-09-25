@@ -7,8 +7,9 @@
 	In this page we explain:
 	<ul>
 	<li> how to install Terra development environment,</li>
-	<li> how to compile the Arduino Mega version of TerraVM and flash it into a device,</li>
-	<li> how to load a Terra Script in the network, and</li>
+	<li> how to compile the firmware of the Arduino Mega version of TerraVM and flash it into a device,</li>
+	<li> how to compile your Terra Script,</li>
+	<li> how to load a Terra Script bytecode in the network, and</li>
 	<li> how connect the NRF24 radio board to Mega board.</li>
 	</ul>
 	</p>
@@ -156,6 +157,18 @@ The command <code>make help mega</code> will show an updated definition.</p>
 <li> ANA2_REF: Reference voltage for Analog 2 read - DEFAULT,INTERNAL1V1,INTERNAL2V56,EXTERNAL | default INTERNAL1V1</li>
 <li> ANA3_REF: Reference voltage for Analog 3 read - DEFAULT,INTERNAL1V1,INTERNAL2V56,EXTERNAL | default INTERNAL1V1</li>
 </ul>
+
+<h2>Compiling a Terra script</h2>
+<p>Terra scripts rely on a definition file targeting a specific customization. 
+In the case of Arduino, the TerraIno.defs file is the the basic customization. 
+This file must be referenced in the begining of your script code as <code>#include "TerraIno.defs"</code>.
+</p>
+
+<p>Use the command <code>terrac</code> to compile your script. 
+Assuming that the name of your script file is myScript.terra, type the following command:</p>
+<pre><code>terrac myScript.terra</code></pre>
+<p>This command will generate a bytecode file named myScript.vmx</p>
+
 
 <h2>Loading a Terra Script into the network</h2>
 <p>Considering that you already have a script compiled with <code>terrac</code> compiler,
