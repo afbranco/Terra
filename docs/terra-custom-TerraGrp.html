@@ -1,0 +1,390 @@
+---
+---
+{% include header.html %}
+
+<h2>Terra customizations</h2>
+<p>
+The components included in a specific virtual machine define the
+interface between the application script and the environment, and thus
+determine the abstraction level at which the script programmer will work. 
+Terra offers a basic library of components that can be included (or not) in
+a specific virtual machine.
+As far as possible, these components are parameterized for genericity.
+New components can also be included by programmer-savvy users to
+create abstractions for new programming patterns, but
+the goal of this basic library is to offer a set of components that 
+is sufficient for a range of common applications.
+This is feasible because most applications for sensor networks are 
+variations of a basic monitoring and control pattern.
+Because processing resources are limited, these variations typically
+involve only basic operations for accessing sensors and actuators and
+coordination among motes.
+</p>
+<p>
+In the next subsections we present a customization, called TerraGrp, that uses the basic library of components, which includes the high-level abstractions for group management.
+</p>
+
+
+<h3>TerraGrp - Group Operations</h3>
+<p>
+The Terra customization, apart local sensors readings, provides an way to define by parameters multiple group of nodes. The "send" and "receive" events applies to a predefined group of nodes. Also includes some value aggregations for group of nodes.
+Table 4 presents the current TerraGrp events interface and Table 5 presents the functions interface.
+</p>
+<p>
+The local operations comprises operations to
+read sensors and residual energy battery,
+define led's configuration
+and access input and output devices of the microcontroller.
+Terra encapsulates all these operations in a component called <i>Local
+Operations</i> providing them as output events.
+Timers, on the other hand, are handled directly by the Céu-T language
+with the <span class="code">await time</span> command.
+</p>
+
+<p>The <span class="code">SEND()</span> command is a basic send command that reach all nodes in a group definition.
+If the field <span class="code">target</span> is set to <span class="code">BROADCAST</span>  value, all nodes in the group will receive the message.
+On the other hand, if this field is set to a specific node identifier, only this node will receive the message (if the node is in the group definition). 
+A <span class="code">SEND_DONE()</span> event indicates that the send request was processed by the radio. 
+The <span class="code">RECEIVE</span> event returns a received message.
+Additionally, TerraGrp implements the <span class="code">SEND_BS()</span> command that router a message to the root node.
+</p>
+<p>The user must define the radio message data structure using <span class="code">pktype</span> command and then create a message variable.</p>
+
+<br>
+<div class="table-responsive">
+<table class="table table-bordered table-hover table-events">
+    <caption>Table 3 - TerraGrp Events interface</caption>
+    <tr>
+        <th rowspan="2" style="text-align:center;">Description</th>
+        <th colspan="2" style="text-align:center;">Output event (emit)</th>
+        <th colspan="3" style="text-align:center;" bgcolor="#66CCFF">Input event (await)</th>
+    </tr>
+    <tr>
+        <th>Event identifier</th>
+        <th>Argument type</th>
+        <th>Returned type</th>
+        <th>Event identifier</th>
+        <th>Argument type</th>
+    </tr>
+    <tr>
+        <td>Set all three leds - The less three significative bits of the argument will set the leds.</td>
+        <td>LEDS</td>
+        <td>ubyte</td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Set LED0 - Argument can be ON, OFF, or TOGGLE.</td>
+        <td>LED0</td>
+        <td>ubyte</td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Set LED1 - Argument can be ON, OFF, or TOGGLE.</td>
+        <td>LED1</td>
+        <td>ubyte</td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Set LED2 - Argument can be ON, OFF, or TOGGLE.</td>
+        <td>LED2</td>
+        <td>ubyte</td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Temperature Sensor - Requests and receives the sensor value. The received value is a 10bit reading from A/D converter. This is not the physical unit.</td>
+        <td>REQ_TEMP</td>
+        <td>void</td>
+        <td>ushort</td>
+        <td>TEMP</td>
+        <td>void</td>
+    </tr>
+    <tr>
+        <td>Luminosity Sensor - Similar to the others sensors.</td>
+        <td>REQ_PHOTO</td>
+        <td>void</td>
+        <td>ushort</td>
+        <td>PHOTO</td>
+        <td>void</td>
+    </tr>
+    <tr>
+        <td>Voltage Sensor - Similar to the others sensors.</td>
+        <td>REQ_VOLTS</td>
+        <td>void</td>
+        <td>ushort</td>
+        <td>VOLTS</td>
+        <td>void</td>
+    </tr>
+    <tr>
+        <td>Custom event - This is a internal loopback event that allows to pass a integer value. The await command may define or not which value to wait.
+        </td>
+        <td>REQ_CUSTOM_A</td>
+        <td>ubyte</td>
+        <td>ubyte</td>
+        <td>CUSTOM_A</td>
+        <td>void or ubyte</td>
+    </tr>
+    <tr>
+        <td>Send radio message to the BaseStation node. The argument in the await event may be used to wait only a specific  message type identifier.</td>
+        <td>SEND_BS</td>
+        <td>msgBS_t</td>
+        <td>ubyte</td>
+        <td>SENDBS_DONE</td>
+        <td>void or ubyte</td>
+    </tr>
+    <tr>
+        <td>Send radio message to the group nodes. The argument in the await event may be used to wait only a specific  message type identifier.</td>
+        <td>SEND_GR</td>
+        <td>msgGR_t</td>
+        <td>ubyte</td>
+        <td>SENDGR_DONE</td>
+        <td>void or ubyte</td>
+    </tr>
+    <tr>
+        <td>Execute an aggregation value for a group nodes. The argument in the await event may be used to wait only a specific  message type identifier./td>
+        <td>AGGREG</td>
+        <td>aggreg_t</td>
+        <td>aggDone_t</td>
+        <td>AGGREG_DONE</td>
+        <td>void or ubyte</td>
+    </tr>
+    <tr>
+        <td>Receive radio message from a group node- returns a radioMsg variable received by the radio. The argument in the await event may be used to wait only a specific  message type identifier.</td>
+        <td></td>
+        <td></td>
+        <td>msgGR_t</td>
+        <td>REC_GR</td>
+        <td>void or ubyte</td>
+    </tr>
+    <tr>
+    <tr>
+        <td>Error trap - Indicates a internal errors like E_DIVZERO and E_IDXOVF, respectively division by zero and array index overflow.</td>
+        <td></td>
+        <td></td>
+        <td>ubyte</td>
+        <td>ERROR</td>
+        <td>void or ubyte</td>
+    </tr>
+</table>
+</div>
+<br>
+
+
+<br>
+<div class="table-responsive" >
+<table class="table table-bordered table-hover table-functions">
+    <caption>Table 4 - TerraGrp functions interface</caption>
+    <tr>
+        <th>Description</th>
+        <th>Returned type</th>
+        <th>Function name</th>
+        <th>arguments</th>
+    </tr>
+    <tr>
+        <td>Return the node identifier</td>
+        <td>ushort</td>
+        <td>getNodeId</td>
+        <td>void</td>
+    </tr>
+    <tr>
+        <td>Return a 16bit random number</td>
+        <td>ushort</td>
+        <td>random</td>
+        <td>void</td>
+    </tr>
+    <tr>
+        <td>Return the internal timer counter</td>
+        <td>ulong</td>
+        <td>getTime</td>
+        <td>void</td>
+    </tr>
+    <tr>
+        <td>Initialize a Group data structure. Always returns SUCCESS.</td>
+        <td>ubyte</td>
+        <td>groupInit</td>
+        <td>group_t grVar, ubyte ID1, ubyte ID2, ubyte nHops,  ubyte status,  ubyte elFlag, ushort leader</td>
+    </tr>
+    <tr>
+        <td>Initialize an Aggregation data structure. Always returns SUCCESS.</td>
+        <td>ubyte</td>
+        <td>aggregInit</td>
+        <td>aggreg_t agVar, group_t grVar,    ubyte sensorId,  ubyte agOper,  ubyte agComp,  ulong refVal</td>
+    </tr>
+    <tr>
+        <td>Return the current parent node in the CTP routing tree</td>
+        <td>ushort</td>
+        <td>getParent</td>
+        <td>void</td>
+    </tr>
+    <tr>
+        <td>Set the radio transmit power level. Always returns SUCCESS.</td>
+        <td>ubyte</td>
+        <td>setRFPower</td>
+        <td>ubyte level</td>
+    </tr>
+</table>
+</div>
+
+
+<br>
+<div class="table-responsive" >
+<table class="table table-bordered table-hover">
+    <caption>Table 6 - TerraGrp Constant definitions</caption>
+    <tr>
+        <th>Constant</th>
+        <th>Value</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>SUCCESS</td>
+        <td>0</td>
+        <td>Indicates a Success operation</td>
+    </tr>
+    <tr>
+        <td>TRUE</td>
+        <td>1</td>
+        <td>A true value</td>
+    </tr>
+    <tr>
+        <td>FALSE</td>
+        <td>0</td>
+        <td>A false value</td>
+    </tr>
+    <tr>
+        <td>ON</td>
+        <td>1</td>
+        <td>Set LED ON</td>
+    </tr>
+    <tr>
+        <td>OFF</td>
+        <td>0</td>
+        <td>Set LED OFF</td>
+    </tr>
+    <tr>
+        <td>TOGGLE</td>
+        <td>2</td>
+        <td>Set LED with oposite value</td>
+    </tr>
+    <tr>
+        <td>BROADCAST</td>
+        <td>0xffff</td>
+        <td>Define a broadcast message</td>
+    </tr>
+    <tr>
+        <td>E_DIVZERO</td>
+        <td>10</td>
+        <td>Error event - Division by zero</td>
+    </tr>
+    <tr>
+        <td>E_IDXOVF</td>
+        <td>11</td>
+        <td>Error event - Array index overflow</td>
+    </tr>
+    <tr>
+        <td>E_STKOVF</td>
+        <td>20</td>
+        <td>Error event - Stack overflow -- fatal</td>
+    </tr>
+
+    <tr>
+        <td>opLT</td>
+        <td>1</td>
+        <td>LT - "<" operation</td>
+    </tr>
+    <tr>
+        <td>opLTE</td>
+        <td>2</td>
+        <td>LTE - "<=" operation</td>
+    </tr>
+    <tr>
+        <td>opGT</td>
+        <td>3</td>
+        <td>GT - ">" operation</td>
+    </tr>
+    <tr>
+        <td>opGTE</td>
+        <td>4</td>
+        <td>GTE - "<=" operation</td>
+    </tr>
+    <tr>
+        <td>opEQ</td>
+        <td>5</td>
+        <td>EQ - "==" operation</td>
+    </tr>
+    <tr>
+        <td>opNEQ</td>
+        <td>6</td>
+        <td>NEQ - "!=" operation</td>
+    </tr>
+    <tr>
+        <td>fAVG</td>
+        <td>0</td>
+        <td>Aggreg Functions - Average</td>
+    </tr>
+    <tr>
+        <td>fSUM</td>
+        <td>1</td>
+        <td>Aggreg Functions - Summation</td>
+    </tr>
+    <tr>
+        <td>fAVG</td>
+        <td>0</td>
+        <td>Aggreg Functions - Average</td>
+    </tr>
+    <tr>
+        <td>fMAX</td>
+        <td>2</td>
+        <td>Aggreg Functions - Maximum value</td>
+    </tr>
+    <tr>
+        <td>fMIN</td>
+        <td>3</td>
+        <td>Aggreg Functions - Minimum value</td>
+    </tr>
+    <tr>
+        <td>SID_TEMP</td>
+        <td>1</td>
+        <td>Sensor IDs - Temperature</td>
+    </tr>
+    <tr>
+        <td>SID_PHOTO</td>
+        <td>2</td>
+        <td>Sensor IDs - Luminosity</td>
+    </tr>
+    <tr>
+        <td>SID_LEDS</td>
+        <td>3</td>
+        <td>Sensor IDs - Leds</td>
+    </tr>
+    <tr>
+        <td>SID_VOLT</td>
+        <td>1</td>
+        <td>Sensor IDs - Voltage</td>
+    </tr>
+    <tr>
+        <td>eACTIVE</td>
+        <td>1</td>
+        <td>Group Election Status - Node participate activitely.</td>
+    </tr>
+    <tr>
+        <td>ePASSIVE</td>
+        <td>3</td>
+        <td>Group Election Status - Node participate, but not vote to be a leader.</td>
+    </tr>
+    <tr>
+        <td>eOFF</td>
+        <td>3</td>
+        <td>Group Election Status - Node is disabled on the election procedure</td>
+    </tr>
+
+</table>
+</div>
+
+{% include footer.html %}

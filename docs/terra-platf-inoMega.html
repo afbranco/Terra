@@ -85,7 +85,7 @@ AVRDUDECONF = /etc/avrdude.conf
 <p>Insert following lines at the end of the file.</p>
 <pre><code>export TERRADIR=$HOME/Terra
 export CLASSPATH=$TERRADIR/TerraControl/tinyos.jar:.$CLASSPATH
-alias terrac='$TERRADIR/terrac/terrac -I$TERRADIR/terrac/samples'
+alias terrac='$TERRADIR/terrac/terrac -I$TERRADIR/TerraVM/src/TerraDefs'
 alias ttool='java -jar $TERRADIR/TerraControl/TControl.jar'
 alias sf='java net.tinyos.sf.SerialForwarder'
 </code></pre>
@@ -170,7 +170,7 @@ Assuming that the name of your script file is myScript.terra, type the following
 <p>This command will generate a bytecode file named myScript.vmx</p>
 
 
-<h2>Loading a Terra Script into the network</h2>
+<h2>Loading a Terra Script into network</h2>
 <p>Considering that you already have a script compiled with <code>terrac</code> compiler,
 you need to load the script bytecode into the Terra network nodes.
 Two tools must be started to that. The TinyOS <i>SerialForwarder</i> application and the <i>Terra Control</i> tool.

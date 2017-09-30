@@ -23,6 +23,19 @@ docs:
 
   - page: Arduino Mega
     url: terra-platf-inoMega.html  
+
+- menu: Flavors
+  submenu:
+
+  - page: TinyOS - Net
+    url: terra-custom-TerraNet.html  
+
+  - page: TinyOS - Grp
+    url: terra-custom-TerraGrp.html  
+
+  - page: ArduinoMega - Basic
+    url: terra-custom-TerraIno.html  
+
     
 - menu: Contributions
   submenu:
