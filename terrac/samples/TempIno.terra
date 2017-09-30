@@ -57,6 +57,9 @@ else
 	        await SEND_DONE_ACK;
 			emit LED0(TOGGLE);
 	    end 	
+	with
+		await 1s;
+		emit LED1(TOGGLE);
 	end 
 end
 
