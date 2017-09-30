@@ -148,7 +148,7 @@ Additionally, TerraNet implements a simple message queue to support message buff
     <tr>
         <td>DTH Sensor - Requests and receives the sensor value. The received value is a 8bit reading. 
         	The request argument defines which interrupt pin the sensor data pin is connected to. Can range from 0 for Int0/D21 to 3 for Int3/D18.
-			The received event return a <code>dhtData_t</code> data structure. </td>
+			The received event return a <code>dhtData_t</code> data structure with <code>stat, hum, temp</code> fields. </td>
         <td>REQ_DHT</td>
         <td>ubyte</td>
         <td>dhtData_t</td>
@@ -158,7 +158,7 @@ Additionally, TerraNet implements a simple message queue to support message buff
     <tr>
         <td>Analog Input - Requests and receives the analog input value. 
         	The received value is a 10bit reading from Analog to Digital converter.
-        	 Four input are available in AN0 to AN3.</td>
+        	 Four input are available in ANA0 to ANA3.</td>
         <td>ANA0_READ</td>
         <td>void</td>
         <td>ushort</td>
@@ -532,7 +532,7 @@ Additionally, TerraNet implements a simple message queue to support message buff
 <tr> <td>D39	</td> <td>6,2		</td> <td> PG2 (ALE)</td> </tr>
 <tr> <td>D4	</td> <td>6,5		</td> <td> PG5 (PWM/OC0B)</td> </tr>
 <tr> <td>D17	</td> <td>7,0		</td> <td> PH0 (RXD2)</td> </tr>
-<tr> <td>D16	7</td> <td>,1		</td> <td> PH1 (TXD2)</td> </tr>
+<tr> <td>D16	</td> <td>7,1		</td> <td> PH1 (TXD2)</td> </tr>
 <tr> <td>D6	</td> <td>7,3		</td> <td> PH3 (PWM/OC4A)</td> </tr>
 <tr> <td>D7	</td> <td>7,4		</td> <td> PH4 (PWM/OC4B)</td> </tr>
 <tr> <td>D8	</td> <td>7,5		</td> <td> PH5 (PWM/OC4C)</td> </tr> 
