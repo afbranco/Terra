@@ -572,8 +572,8 @@ Additionally, TerraIno implements a simple message queue to support message buff
 <pre><code>#inlcude "TerraIno.defs"
 pinMode(PORTB,7,OUTPUT);  // also may use: pinMode(D13,OUTPUT);
 loop do
-	await 500ms;
-	pinToggle(D13);
+    await 500ms;          // Waits 0,5 seconds
+    pinToggle(D13);       // Toggle LED value
 end
 </code>
 </pre>
@@ -581,39 +581,39 @@ end
 <h4>DHT11 Sensor - Counting temperature value</h4>
 <p>Connect the DHT data pin to D21/PortD0/Int0.</p>
 <pre><code>#inlcude "TerraIno.defs"
-pinMode(PORTB,7,OUTPUT);  // also may use: pinMode(D13,OUTPUT);
-var dhtData_t data;
-var ubyte count;
+pinMode(PORTB,7,OUTPUT);    // also may use: pinMode(D13,OUTPUT);
+var dhtData_t data;         // Data variable to store result
+var ubyte count;            // Blink LED counter
 loop do
-	emit REQ_DHT(INT0);  
-	data = await DHT();
-	count=data.temp;
-	if data.stat != 0 then count=data.stat; end
-	loop i, count do
-		pinWrite(D13,HIGH);
-		await 150ms;
-		pinWrite(D13,LOW);
-		await 150ms;
-	end
-	await 500ms;
+    emit REQ_DHT(INT0);     // Request a DHT11 read
+    data = await DHT();     // Waits the data
+    count=data.temp;        // Count the Temperature or the Error code
+    if data.stat != 0 then count=data.stat; end
+    loop i, count do        // Loop to blink the LED
+        pinWrite(D13,HIGH);
+        await 150ms;
+        pinWrite(D13,LOW);
+        await 150ms;
+    end
+    await 500ms;
 end
 </code>
 </pre>
 
 <h4>Interrupt Pin - Trigger a pin interruption</h4>
 <p>Connect a push button to GND and D20.
-The LED will toggle when you press the button. Do nothing when releasing it.</p>
+The LED will toggle once when you press the button. Do nothing when releasing it.</p>
 <pre><code>#inlcude "TerraIno.defs"
-pinMode(PORTB,7,OUTPUT);  // also may use: pinMode(D13,OUTPUT);
-pinMode(D20,INPUT_PULLUP); // Int1 pin as input
-intConfig(INT1,INT_FALLING);
-intEnable(INT1);
-intClear(INT1);
+pinMode(PORTB,7,OUTPUT);    // also may use: pinMode(D13,OUTPUT);
+pinMode(D20,INPUT_PULLUP);  // Int1 pin as input
+intConfig(INT1,INT_FALLING);// Interrupt from 1 to 0.
+intEnable(INT1);            // Enable the interrupt
+intClear(INT1);             // Clear, if necessary, the interrupt flag.
 loop do
-	await INT_FIRED(INT1);
-	intClear(INT1);
-	pinToggle(D13);
-	await 30ms;  // debouncing
+    await INT_FIRED(INT1);  // Waits for an interrupt Int1
+    intClear(INT1);         // Clear the IntFlag
+    pinToggle(D13);         // Toggle the LED status
+    await 30ms;  			// Debouncing: Waits some time before next Int1.
 end
 </code>
 </pre>
