@@ -28,8 +28,6 @@ implementation{
 	custom.BSRadio -> BS;
 	components RandomC;
 	custom.Random -> RandomC;
-	components LedsC;
-	custom.LEDS -> LedsC;
 
 	components HplAtm2560GeneralIOC as IO;
 	// Ana0
@@ -48,6 +46,21 @@ implementation{
 	custom.PA_3 -> IO.PortA3;
 	components new Analog3C() as Ana3;
 	custom.Ana3 -> Ana3;
+
+	// Interruptions
+	components HplAtm2560ExtInterruptC as ExtInt;
+	custom.Int0 -> ExtInt.Int0;
+	custom.Int1 -> ExtInt.Int1;
+	custom.Int2 -> ExtInt.Int2;
+	custom.Int3 -> ExtInt.Int3;
+	
+	// DHT
+	components dhtC as DHT;
+	custom.dht -> DHT;
+
+	// RTC
+	components rtcC as rtc;
+	custom.rtc -> rtc;
 	
 	// Custom Queues
 #ifdef M_MSG_QUEUE

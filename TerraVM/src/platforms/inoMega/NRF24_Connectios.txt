@@ -1,0 +1,37 @@
+
+
+====================================
+NRF24L01+ pinout
+
+Connector - Bottom view
+
+ VCC : 2 ---o  o---1 : GND
+  CS : 4 ---o  o---3 : CE
+MOSI : 6 ---o  o---5 : SCK
+ IRQ : 8 ---o  o---7 : MISO
+
+* VCC=3.3v
+
+
+====================================
+Connections - Arduimo Mega2560 Board 
+
+3.3v : 2 ---o  o---1 : GND
+  10 : 4 ---o  o---3 : 11
+  51 : 6 ---o  o---5 : 52
+   2 : 8 ---o  o---7 : 50
+
+
+
+====================================
+Connections - INHAOS MegaCore Board
+
+3.3v : 2 ---o  o---1 : GND
+ PB4 : 4 ---o  o---3 : PB5
+ PB2 : 6 ---o  o---5 : PB1
+ PE4 : 8 ---o  o---7 : PB3
+
+
+
+
+ 

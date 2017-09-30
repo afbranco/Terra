@@ -1,0 +1,318 @@
+/*{-{*/
+#ifndef _TERRAINO_
+#define _TERRAINO_
+config 
+	name : TerraIno_MsgQ ,
+	code:00.02.00 , 
+	{
+		inoMega: 1000,
+	} 
+do
+/*
+ * ATENTION: DO NOT use comments with '/**', always use only one star!
+ * Actual compiler has a bug to identifier this type of comments. 
+ */
+
+/*
+ * Define constants
+ */
+
+
+// error_t
+#define SUCCESS 0 
+     // FAIL > 0
+// Boolean
+#define TRUE 1
+#define FALSE 0
+// Leds Constants
+#define ON 1
+#define OFF 0
+#define TOGGLE 2
+// Hi/Lo
+#define LOW  0
+#define HIGH 1
+
+
+
+/*
+ * Arduino Original Digital/Analog Pins
+ */
+
+//---------+-------+----------------------------+
+//	Arduino| Terra |  ATmega2560             	|
+//      Pin| args  | pin function            	|
+//---------+-------+----------------------------+
+//         |       |                      		|
+#define D22  0,0	// PA0 (AD0)				|
+#define D23  0,1	// PA1 (AD1)				|
+#define D24  0,2	// PA2 (AD2)				|
+#define D25  0,3	// PA3 (AD3)				|
+#define D26  0,4	// PA4 (AD4)				|
+#define D27  0,5	// PA5 (AD5)				|
+#define D28  0,6	// PA6 (AD6)				|
+#define D29  0,7	// PA7 (AD7)				|
+//---------+-------+----------------------------+
+#define D53 1,0		// PB0 (SS)					|
+#define D52 1,1		// PB1 (SCK)				|
+#define D51 1,2		// PB2 (MOSI)				|
+#define D50 1,3		// PB3 (MISO)				|
+#define D10 1,4		// PB4 (PWM/OC2A)			|
+#define D11 1,5		// PB5 (PWM/OC1A)			|
+#define D12 1,6		// PB6 (PWM/OC1B)			|
+#define D13 1,7		// PB7 (PWM/OC0A/OC1C)		|
+//---------+-------+----------------------------+
+#define D37 2,0 	// PC0 (A8)					|
+#define D36 2,1 	// PC1 (A9)					|
+#define D35 2,2 	// PC2 (A10)				|
+#define D34 2,3 	// PC3 (A11)				|
+#define D33 2,4 	// PC4 (A12)				|
+#define D32 2,5 	// PC5 (A13)				|
+#define D31 2,6 	// PC6 (A14)				|
+#define D30 2,7 	// PC7 (A15)				|
+//---------+-------+----------------------------+
+#define D21 3,0 	// PD0 (SCL/INT0)			|
+#define D20 3,1 	// PD1 (SDA/INT1)			|
+#define D19 3,2 	// PD2 (RX1/INT2)			|
+#define D18 3,3 	// PD3 (TX1/INT3)			|
+//		Dxx  3,4 	// PD4 (ICP1)				|
+//		Dxx  3,5 	// PD5 (XCK1)				|
+//		Dxx  3,6 	// PD6 (T1)					|
+#define D38 3,7 	// PD7 (T0)					|
+//---------+-------+----------------------------+
+#define D0 4,0 		// PE0 (RXD0/PCINT8)		|
+#define D1 4,1 		// PE1 (TXD0)				|
+// 		Dx 4,2 		// PE2 (XCK0/AIN0)			|
+#define D5 4,3 		// PE3 (PWM/OC3A/AIN1)		|
+#define D2 4,4 		// PE4 (PWM/OC3B) [INT4]	|
+#define D3 4,5 		// PE5 (PWM/OC3C) [INT5]	|
+//		Dx 4,6 		// PE6 (T3/INT6)			|
+//		Dx 4,7 		// PE7 (CLKO/ICP3/INT7)		|
+//---------+-------+----------------------------+
+#define D41	6,0		// PG0 (WR)					|
+#define D40	6,1		// PG1 (RD)					|
+#define D39	6,2		// PG2 (ALE)				|
+// 		Dx	6,3		// PG3 (TOSC2)				|
+//		Dx	6,4		// PG4 (TOSC1)				|
+#define D4	6,5		// PG5 (PWM/OC0B)			|
+//		Dx	6,6		// PG6						|
+//		Dx	6,7		// PG7						|
+//---------+-------+----------------------------+
+#define D17	7,0		// PH0 (RXD2)				|
+#define D16	7,1		// PH1 (TXD2)				|
+// 		Dx	7,2		// PH2 (XCK2)				|
+#define D6	7,3		// PH3 (PWM/OC4A)			|
+#define D7	7,4		// PH4 (PWM/OC4B)			|
+#define D8	7,5		// PH5 (PWM/OC4C)			| 
+#define D9	7,6		// PH6 (PWM/OC2B)			|
+// 		Dx	7,7		// PH7 (T4)					|
+//---------+-------+----------------------------+
+#define D15	8,0		// PJ0 (RX3/PCINT9)			|
+#define D14	8,1		// PJ1 (TX3/PCINT10)		|
+//		Dx	8,2		// PJ2 (XCK3/PCINT11)		|
+//		Dx	8,3		// PJ3 (PCINT12)			|
+//		Dx	8,4		// PJ4 (PCINT13)			|
+//		Dx	8,5		// PJ5 (PCINT14) 			|
+//		Dx	8,6		// PJ6 (PCINT 15)			|
+//		Dx	8,7		// PJ7						|
+//---------+-------+----------------------------+
+#define D49	10,0	// PL0 (ICP4)				|
+#define D48	10,1	// PL1 (ICP5)				|
+#define D47	10,2	// PL2 (T5)					|
+#define D46	10,3	// PL3 (PWM/OC5A)			|
+#define D45	10,4	// PL4 (PWM/OC5B)			|
+#define D44	10,5	// PL5 (PWM/OC5C) 			|
+#define D43	10,6	// PL6						|
+#define D42	10,7	// PL7						|
+//---------+-------+----------------------------+
+#define A0   5,0 	// PF0 (ADC0)  				|
+#define A1   5,1 	// PF1 (ADC1)  				|
+#define A2   5,2 	// PF2 (ADC2)  				|
+#define A3   5,3 	// PF3 (ADC3)  				|
+#define A4   5,4 	// PF4 (ADC4/TMK)  			|
+#define A5   5,5 	// PF5 (ADC5/TMS)  			|
+#define A6   5,6 	// PF6 (ADC6)  				|
+#define A7   5,7 	// PF7 (ADC7)  				|	
+//---------+-------+----------------------------+
+#define A8   9,0 	// PK0 (ADC8/PCINT16)		| 
+#define A9   9,1 	// PK1 (ADC9/PCINT17)		|
+#define A10  9,2 	// PK2 (ADC10/PCINT18)		|
+#define A11  9,3 	// PK3 (ADC11/PCINT19)		|  
+#define A12  9,4 	// PK4 (ADC12/PCINT20)		|  
+#define A13  9,5 	// PK5 (ADC13/PCINT21)		|  
+#define A14  9,6 	// PK6 (ADC14/PCINT22)		|  
+#define A15  9,7 	// PK7 (ADC15/PCINT23)		| 
+//         |       |                      		|
+//---------+-------+----------------------------+
+
+
+	/*
+	 * Analog Reference voltage
+	 */
+
+#define DEFAULT 	0 
+#define INTERNAL 	1 
+#define INTERNAL1V1 2 
+#define INTERNAL2V56 3 
+#define EXTERNAL 	4
+
+
+// End Ino Constants
+
+/* -------------------------------------------------------------------------------*/
+// Revisão começa aqui!!!!
+/* -------------------------------------------------------------------------------*/
+
+/*
+ * PORTs, PINs, and modes
+ */
+#define PORTA 0
+#define PORTB 1
+#define PORTC 2
+#define PORTD 3
+#define PORTE 4
+#define PORTF 5
+#define PORTG 6
+#define PORTH 7
+#define PORTJ 8
+#define PORTK 9
+#define PORTL 10
+
+#define PIN0 0
+#define PIN1 1
+#define PIN2 2
+#define PIN3 3
+#define PIN4 4
+#define PIN5 5
+#define PIN6 6
+#define PIN7 7
+
+#define INPUT  0
+#define OUTPUT  1
+#define INPUT_PULLUP 2
+
+/*
+ * Interruptions and modes
+ */
+#define INT0 0  // PD0
+#define INT1 1  // PD1 
+#define INT2 2  // PD2 
+#define INT3 3  // PD3 
+
+#define INT_LEVEL 0
+#define INT_TOGGLE 1
+#define INT_FALLING 2
+#define INT_RISING 3
+
+
+// Message
+#define BROADCAST 0xffff
+#define SEND_DATA_SIZE 16
+// VM Error codes
+#define E_DIVZERO 10 // Division by zero
+#define E_IDXOVF  11 // Array index overflow
+#define E_STKOVF  20 // Stack overflow -- fatal
+
+
+/*
+ * Define custom registers
+ */
+
+	// radioMsg - Radio/Queue Data Message Register
+	packet radioMsg with
+		var ubyte type;
+		var ushort source;
+		var ushort target;
+		var payload[20] data;
+	end
+	
+	regtype dhtData_t with
+		var ubyte stat;
+		var ubyte hum;
+		var ubyte temp;
+	end
+
+	// Terra local Output events
+//	output void		INIT			ubyte 0;
+	output void		LEDS			ubyte 5;
+	output void		LED0			ubyte 6;
+	output void		LED1			ubyte 7;
+	output void		LED2			ubyte 8;
+	output void		REQ_TEMP		void  9;
+	output void		REQ_DHT			ubyte 10;
+	
+	output void 	REQ_CUSTOM_A	ubyte 20;
+	// TerraNet Custom Output events
+	output void 	SEND			radioMsg 40;
+	output void 	SEND_ACK		radioMsg 41;
+
+	output void 	ANA0_READ		void 30;
+	output void 	ANA1_READ		void 31;
+	output void 	ANA2_READ		void 32;
+	output void 	ANA3_READ		void 33;
+
+	// TerraNet Local Input events
+	input ubyte 	ERROR 		 	ubyte 	0;
+	input ubyte 	ERROR 			void	1;
+	input ushort 	TEMP 			void 	5;
+	input dhtData_t DHT 			void 	6;
+	
+	input ubyte 	CUSTOM_A		ubyte 	10;
+	input ubyte 	CUSTOM_A 		void 	11;
+
+	// Ino EVents
+	input ushort	ANA_READ_DONE_ID	ubyte	20;
+	input ushort	ANA_READ_DONE		void	21;
+	input ubyte		INT_FIRED			ubyte	22;
+	input ubyte		PCINT_FIRED			ubyte	23;
+
+	input ushort	ANA0_READ_DONE	void	30;
+	input ushort	ANA1_READ_DONE	void	31;
+	input ushort	ANA2_READ_DONE	void	32;
+	input ushort	ANA3_READ_DONE	void	33;
+
+
+	// TerraNet Custom Input events
+	input ubyte 	SEND_DONE 		ubyte	40;
+	input ushort 	SEND_DONE 		void 	41;
+	input ubyte 	SEND_DONE_ACK	ubyte	42;
+	input ubyte 	SEND_DONE_ACK	void	43;
+	input radioMsg	RECEIVE 		ubyte 	44;
+	input radioMsg	RECEIVE 		void 	45;
+	input ubyte 	Q_READY 		void 	46;
+
+	// Terra basic functions
+	function pure ushort getNodeId()		0;
+	function pure ushort random()			1;
+	function pure ulong getClockMicro()		2;
+	// TerraNet custom functions
+	function nohold ubyte qPut(radioMsg) 	10;
+	function nohold ubyte qGet(radioMsg) 	11;
+	function pure ubyte qSize()				12;
+	function pure ubyte qClear()			13;
+	function ubyte setRFPower(ubyte)		17;
+
+	// TerraIno Specific custom functions
+	function ubyte pinMode(ubyte,ubyte,ubyte) 	20;
+	function ubyte pinWrite(ubyte,ubyte,ubyte) 	21;
+	function ubyte pinRead(ubyte,ubyte) 		22;
+	function ubyte pinToggle(ubyte,ubyte) 		23;
+	function ubyte portDDR(ubyte,ubyte) 		24;
+	function ubyte portWrite(ubyte,ubyte) 		25;
+	function ubyte portRead(ubyte) 				26;
+
+	function ubyte intEnable(ubyte)				30;
+	function ubyte intDisable(ubyte)			31;
+	function ubyte intClear(ubyte)				32;
+	function ubyte intConfig(ubyte,ubyte)		33;
+	function ubyte pcintEnable(ubyte)			34;
+	function ubyte pcintDisable(ubyte)			35;
+	function ubyte pcintClear(ubyte)			36;
+	function ubyte pcintMask(ubyte,ubyte)		37;
+
+// Deterministic
+// ???
+					
+
+end
+#endif
+/*}-}*/

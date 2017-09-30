@@ -45,6 +45,7 @@ enum{
 	O_LED1			=7,
 	O_LED2			=8,
 	O_TEMP			=9,
+	O_DHT			=10,
 	O_CUSTOM_A		=20,
 	O_CUSTOM		=23,
 	
@@ -63,6 +64,7 @@ enum{
 //	I_ERROR_id		=0,  // Defined in VMError.h
 //	I_ERROR			=1,  // Defined in VMError.h
 	I_TEMP			=5,
+	I_DHT			=6,
 	
 	I_CUSTOM_A_ID	=12,
 	I_CUSTOM_A		=13,
@@ -70,10 +72,8 @@ enum{
 	// Ino EVents
 	I_ANA_READ_DONE_ID 	= 20,
 	I_ANA_READ_DONE 	= 21,
-	I_INT_FIRED_ID		= 22,
-	I_INT_FIRED			= 23,
-	I_PULSE_LEN_ID 		= 24,
-	I_PULSE_LEN 		= 25,
+	I_INT_FIRED			= 22,
+	I_PCINT_FIRED		= 23,
 	
 	I_ANA0_READ_DONE	= 30,
 	I_ANA1_READ_DONE	= 31,
@@ -103,15 +103,21 @@ enum{
 	F_SETRFPOWER	= 17,
 	// TerraIno Specific custom functions
 	F_PIN_MODE 			= 20,
-	F_DIGITAL_WRITE 	= 21,
-	F_DIGITAL_READ 		= 22,
-	F_DIGITAL_TOGGLE 	= 23,
-	F_ANALOG_REFERENCE 	= 24,
-	F_ANALOG_READ 		= 25,
-	F_INT_RISING_EDGE 	= 26,
-	F_INT_FALLING_EDGE	= 27,
-	F_INT_DISABLE 		= 28,
-	F_PULSE_IN 			= 29,
+	F_PIN_WRITE 		= 21,
+	F_PIN_READ 			= 22,
+	F_PIN_TOGGLE 		= 23,
+	F_PORT_DDR			= 24,
+	F_PORT_WRITE		= 25,
+	F_PORT_READ			= 26,
+
+	F_INT_ENABLE 		= 30,
+	F_INT_DISABLE 		= 31,
+	F_INT_CLEAR 		= 32,
+	F_INT_CONFIG 		= 33,
+	F_PCINT_ENABLE 		= 34,
+	F_PCINT_DISABLE 	= 35,
+	F_PCINT_CLEAR 		= 36,
+	F_PCINT_MASK 		= 37,
 
 	// Event Type ID - 3 msb bits of EvtId
 	TID_SENSOR_DONE = 0 << 5,
@@ -121,6 +127,19 @@ enum{
 
 	// Sensor IDs (max 31)
 	SENSOR_COUNT = 0,	
+	
+	// PORTs and PINs
+	_portA	= 0,
+	_portB	= 1,
+	_portC	= 2,
+	_portD	= 3,
+	_portE	= 4,
+	_portF	= 5,
+	_portG	= 6,
+	_portH	= 7,
+	_portJ	= 8,
+	_portK	= 9,
+	_portL	= 10,
 	
 };
 
