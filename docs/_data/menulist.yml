@@ -24,8 +24,11 @@ docs:
   - page: Arduino Mega
     url: terra-platf-inoMega.html  
 
-- menu: Flavors
+- menu: Custom Flavors
   submenu:
+
+  - page: Intro
+    url: terra-custom-Intro.html  
 
   - page: TinyOS - Net
     url: terra-custom-TerraNet.html  
