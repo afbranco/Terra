@@ -6,7 +6,7 @@ docs:
 - menu: Platforms
   submenu:
 
-  - page: Introduction
+  - page: Introduction <i class="fa fa-ban" aria-hidden="true"></i>
     url: terra-platf-intro.html  
 
   - page: TinyOS
