@@ -33,7 +33,7 @@ ALL_TARGETS = micaz mica2 mica2dot telosb iris uno mega rpi esp droid
 TOS_TARGETS = micaz mica2 mica2dot telosb iris
 INO_TARGETS = uno mega
 IX_TARGETS = rpi
-ESP_TARGETS = espz
+ESP_TARGETS = esp
 DROID_TARGETS = droid
 
 # Define family
