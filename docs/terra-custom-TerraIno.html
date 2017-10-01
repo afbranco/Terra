@@ -569,7 +569,7 @@ Additionally, TerraIno implements a simple message queue to support message buff
 <h3>Code samples</h3>
 
 <h4>Digital Pin - Blinking the board Led - D13/PortB.7</h4>
-<pre><code>#inlcude "TerraIno.defs"
+<pre><code>#include "TerraIno.defs"
 pinMode(PORTB,7,OUTPUT);  // also may use: pinMode(D13,OUTPUT);
 loop do
     await 500ms;          // Waits 0,5 seconds
@@ -580,7 +580,7 @@ end
 
 <h4>DHT11 Sensor - Counting temperature value</h4>
 <p>Connect the DHT data pin to D21/PortD0/Int0.</p>
-<pre><code>#inlcude "TerraIno.defs"
+<pre><code>#include "TerraIno.defs"
 pinMode(PORTB,7,OUTPUT);    // also may use: pinMode(D13,OUTPUT);
 var dhtData_t data;         // Data variable to store result
 var ubyte count;            // Blink LED counter
@@ -603,7 +603,7 @@ end
 <h4>Interrupt Pin - Trigger a pin interruption</h4>
 <p>Connect a push button to GND and D20.
 The LED will toggle once when you press the button. Do nothing when releasing it.</p>
-<pre><code>#inlcude "TerraIno.defs"
+<pre><code>#include "TerraIno.defs"
 pinMode(PORTB,7,OUTPUT);    // also may use: pinMode(D13,OUTPUT);
 pinMode(D20,INPUT_PULLUP);  // Int1 pin as input
 intConfig(INT1,INT_FALLING);// Interrupt from 1 to 0.
@@ -617,7 +617,6 @@ loop do
 end
 </code>
 </pre>
-
 
 
 
