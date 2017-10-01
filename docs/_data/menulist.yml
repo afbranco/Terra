@@ -9,16 +9,16 @@ docs:
   - page: Introduction x
     url: terra-platf-intro.html  
 
-  - page: TinyOS
+  - page: TinyOS x
     url: terra-platf-tinyos.html  
 
-  - page: Linux/RPi
+  - page: Linux/RPi x
     url: terra-platf-rpi.html  
 
   - page: Android
     url: terra-platf-droid.html  
 
-  - page: ESP8266
+  - page: ESP8266 x
     url: terra-platf-esp.html  
 
   - page: Arduino Mega
