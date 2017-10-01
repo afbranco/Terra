@@ -521,7 +521,7 @@ F = {
         local e1, e2 = unpack(me)
         ASR(e1.var.isEvt, me, 'event "'..e1.var.id..'" is not declared')
         if (e2) then
-print("env::EmitInt:",e1.var.tp,e2.tp)
+--print("env::EmitInt:",e1.var.tp,e2.tp)
           err, cast,_,_, len1, len2 = _TP.tpCompat(e1.var.tp,e2.tp)
           ASR(not err,me,'type/size incompatibility: '.. e1.var.tp..'/'..len1 ..' <--> '.. e2.tp..'/'..len2..'')
           WRN(not cast,me, 'Automatic casting from `'.. e2.tp ..'´ to `' .. e1.var.tp ..'´. ')
@@ -679,7 +679,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
     end,
 
     Exp = function (me)
---print("env::Exp:",me.tag,me[1].auxtag,me[1].tag,me[1][1])
+--print("env::Exp:",me.tag,me[1].auxtag,me[1].tag,me[1][1],me[1].lval)
 --print(print_r(me,"env::Exp: me"))
 --        ASR(not(me[1].tag=='Var' and (me[1].arr)),me,'missing array index for "'..me[1][1]..'".')
         me.lval = me[1].lval
@@ -831,6 +831,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
 
     ['Op2_.'] = function (me)
         local op, e1, id = unpack(me)
+--print("env::Op_.:", op, id, e1[1], e1.tag,me.tag)
         ASR(_ENV.c[_TP.deref(e1.tp) or e1.tp].fields, me,'var "'.. e1[1]..'" is not a register. ')
         local field = _ENV.c[_TP.deref(e1.tp) or e1.tp].fields[id]
         ASR(field, me, 'invalid field name')

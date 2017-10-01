@@ -330,9 +330,10 @@ end
 -- Copyright 2009: hans@hpelbers.org
 -- This is freeware
  
-function print_r (t, name, indent)
+function print_r (t, name, indent, maxLevel)
   local tableList = {}
-  function table_r (t, name, indent, full)
+  maxLevel = maxLevel or 1000
+  function table_r (t, name, indent, full, maxLevel)
     local id = not full and name
         or type(name)~="number" and tostring(name) or '['..name..']'
     local tag = indent .. id .. ' = '
@@ -343,8 +344,11 @@ function print_r (t, name, indent)
         tableList[t]= full and (full .. '.' .. id) or id
         if next(t) then -- Table not empty
           table.insert(out, tag .. '{')
+          maxLevel = maxLevel - 1
           for key,value in pairs(t) do
-            table.insert(out,table_r(value,key,indent .. '|  ',tableList[t]))
+            if maxLevel > 0 then
+              table.insert(out,table_r(value,key,indent .. '|  ',tableList[t],maxLevel))
+            end
           end
           table.insert(out,indent .. '}')
         else table.insert(out,tag .. '{}') end
@@ -355,6 +359,6 @@ function print_r (t, name, indent)
     end
     return table.concat(out, '\n')
   end
-  return table_r(t,name or 'Value',indent or '')
+  return table_r(t,name or 'Value',indent or '', nil,maxLevel)
 end
 --- =========================================
