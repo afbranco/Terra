@@ -6,19 +6,19 @@ docs:
 - menu: Platforms
   submenu:
 
-  - page: Introduction x
+  - page: Introduction (TBD)
     url: terra-platf-intro.html  
 
-  - page: TinyOS x
+  - page: TinyOS (TBD)
     url: terra-platf-tinyos.html  
 
-  - page: Linux/RPi x
+  - page: Linux/RPi (TBD)
     url: terra-platf-rpi.html  
 
   - page: Android
     url: terra-platf-droid.html  
 
-  - page: ESP8266 x
+  - page: ESP8266 (TBD)
     url: terra-platf-esp.html  
 
   - page: Arduino Mega
