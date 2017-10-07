@@ -22,6 +22,9 @@
 #include "usrMsg.h"
 #include "BasicServices.h"
 
+/**
+ * TerraEsp
+ */
 
 module VMCustomP{
 	provides interface VMCustom as VM;
@@ -41,19 +44,10 @@ usrMsg_t ExtDataRadioReceived;	// last radio received msg
 nx_uint8_t ExtDataSendDoneError;
 nx_uint8_t ExtDataWasAcked;
 nx_uint8_t ExtDataQReady;			// last queue ready - queue size 
-nx_uint32_t ExtDataTimeStamp;		// last SLPL_FIRED - timestamp 
-nx_uint8_t ExtDataGModelRdDone;		// last GModelReadDone Status 
-nx_uint16_t ExtDataBufferRdDone;	// last StreamReadDone [error=0 | Count>0]
-nx_int32_t* UsrStreamBuffer;		// Pointer to user data stream buffer
-
-uint8_t MIC_flag;					// Indicate if Mic Sensor was setup
-nx_uint16_t* MIC_buf;				// Mic Sensor read buffer
-uint16_t MIC_count;				// Mic Sensor read count
-uint32_t MIC_usPeriod;			// Mic Sensor read period
-uint8_t MIC_gain;				// Mic Sensor gain adjust
 nx_uint16_t ExtDataAdcValue1;
-nx_uint16_t ExtDataAdcValue2;
+nx_uint8_t ExtDataGPIOInt;			// last GPIO  interruption data 
 
+bool gpioIntrAttached_flag = FALSE; // Indicate gpio_intr function is already attached.
 
 /*
  * Output Events implementation
@@ -92,48 +86,15 @@ void  proc_led0(uint16_t id, uint32_t value){
 			break;
 	}
 }
-void  proc_led1(uint16_t id, uint32_t value){
-	dbg(APPNAME,"Custom::proc_led1(): id=%d, value=%d *** DUMMY ***\n",id,(uint8_t)value);
-}
-void  proc_led2(uint16_t id, uint32_t value){
-	dbg(APPNAME,"Custom::proc_led2(): id=%d, value=%d  *** DUMMY ***\n",id,(uint8_t)value);
-}
-task void readTemp(){
-	// Power up PHOTO Dig PIN
-	gpio_output_set(BIT14, 0, BIT14, 0);
+task void readAna0(){
 	// Read ADC
-	os_delay_us(1000);  // Wait ADC stabilization
 	ExtDataAdcValue1 = system_adc_read();	
-	// Power down PHOTO Dig PIN
-	gpio_output_set(0, BIT14, BIT14, 0);
-	signal VM.queueEvt(I_TEMP, 0, &ExtDataAdcValue1);	
+	signal VM.queueEvt(I_ANA0, 0, &ExtDataAdcValue1);	
 }
-void  proc_req_temp(uint16_t id, uint32_t value){
-	dbg(APPNAME,"Custom::proc_req_temp(): id=%d\n",id);
-	post readTemp();
+void  proc_ana0(uint16_t id, uint32_t value){
+	dbg(APPNAME,"Custom::proc_ana0(): id=%d\n",id);
+	post readAna0();
 }
-task void readPhoto(){
-	// Power up PHOTO Dig PIN
-	gpio_output_set(BIT12, 0, BIT12, 0);
-	// Read ADC
-	os_delay_us(100);  // Wait ADC stabilization
-	ExtDataAdcValue2 = system_adc_read();	
-	// Power down PHOTO Dig PIN
-	gpio_output_set(0, BIT12, BIT12, 0);
-	signal VM.queueEvt(I_PHOTO, 0, &ExtDataAdcValue2);	
-}
-void  proc_req_photo(uint16_t id, uint32_t value){
-	dbg(APPNAME,"Custom::proc_req_photo(): id=%d\n",id);
-	post readPhoto();
-	}
-task void readVolts(){
-	// Dummy operation
-	signal VM.queueEvt(I_TEMP, 0, 0);	
-}
-void  proc_req_volts(uint16_t id, uint32_t value){
-	dbg(APPNAME,"Custom::proc_req_volts(): id=%d\n",id);
-	post readVolts();
-	}
 
 
 void  proc_send_x(uint16_t id,uint16_t addr,uint8_t ack){
@@ -240,6 +201,100 @@ void  func_qClear(uint16_t id){
 #endif //M_MSG_QUEUE
 
 /**
+ * GPIO and Pin Interrupt
+ */
+void func_pinMode(uint16_t id){
+	uint8_t stat=0;
+	uint8_t pin,mode;
+	dbg(APPNAME,"Custom::func_pinMode():");
+	mode = (uint8_t)signal VM.pop(); // 0-IN 1-OUT 2-OUT_HIGH
+	pin  = (uint8_t)signal VM.pop();
+	if ((pin <= 31) && (mode <= 3)){
+		switch (mode){
+			case 0 : GPIO_DIS_OUTPUT(pin); break;
+			case 1 : GPIO_OUTPUT_SET(pin, 0); break;
+			case 2 : GPIO_OUTPUT_SET(pin, 1); break;
+			default: stat=1;
+		}
+	}else{
+		stat = 1;
+	}
+	signal VM.push(stat);
+}
+void func_pinWrite(uint16_t id){
+	uint8_t stat=0;
+	uint8_t pin,value;
+	value = (uint8_t)signal VM.pop();
+	pin  = (uint8_t)signal VM.pop();
+	if (pin <= 31){
+		GPIO_OUTPUT_SET(pin, (value & 0xf1));
+	}else{
+		stat = 1;
+	}
+	signal VM.push(stat);	
+}
+void func_pinRead(uint16_t id){
+	uint8_t stat=0;
+	uint8_t pin,value;
+	pin  = (uint8_t)signal VM.pop();
+	if (pin <= 31){
+		value = GPIO_INPUT_GET(pin);
+	}else{
+		stat = 1;
+		value= 0;
+	}
+	signal VM.push(value);	
+}
+void func_pinToggle(uint16_t id){
+	uint8_t stat=0;
+	uint8_t pin,value;
+	pin  = (uint8_t)signal VM.pop();
+	if (pin <= 31){
+		value = GPIO_INPUT_GET(pin);
+		dbg(APPNAME,"Custom::func_pinToggle(): pin=%d, val=%d\n",pin,value);
+		GPIO_OUTPUT_SET(pin, (value == 0)?1:0);
+	}else{
+		stat = 1;
+	}
+	signal VM.push(stat);	
+}
+
+
+void gpio_intHandler(){
+	uint32 gpio_status; 
+	gpio_status = GPIO_REG_READ(GPIO_STATUS_ADDRESS); 
+	//clear interrupt status 
+	GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, gpio_status);
+	ExtDataGPIOInt=0;
+	signal VM.queueEvt(I_GPIO_INT   ,    0, &ExtDataGPIOInt);
+
+	dbg(APPNAME,"Custom::gpio_intHandler:\n");
+}
+
+void func_intEnable(uint16_t id){
+	if (!gpioIntrAttached_flag){
+		ETS_GPIO_INTR_ATTACH(gpio_intHandler, 0);
+		gpioIntrAttached_flag=TRUE;
+	}
+	ETS_GPIO_INTR_ENABLE();	
+}
+void func_intDisable(uint16_t id){
+	ETS_GPIO_INTR_DISABLE();
+}
+
+void func_intPinConfig(uint16_t id){
+	uint8_t stat=0;
+	uint8_t pin,type;
+	type  = (uint8_t)signal VM.pop();
+	pin  = (uint8_t)signal VM.pop();
+	if (pin <= 31){
+		gpio_pin_intr_state_set(pin,type);
+	}
+	signal VM.push(stat);	
+}
+
+
+/**
  *	procOutEvt(uint8_t id)
  *  	procOutEvt - process the out events (emit)
  * 
@@ -251,11 +306,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 //		case O_INIT 		: proc_init(id,value); break;
 		case O_LEDS 		: proc_leds(id,value); break;
 		case O_LED0 		: proc_led0(id,value); break;
-		case O_LED1 		: proc_led1(id,value); break;
-		case O_LED2 		: proc_led2(id,value); break;
-		case O_TEMP 		: proc_req_temp(id,value); break;
-		case O_PHOTO 		: proc_req_photo(id,value); break;
-		case O_VOLTS 		: proc_req_volts(id,value); break;
+		case O_ANA0 		: proc_ana0(id,value); break;
 		case O_SEND 		: proc_send(id,value); break;
 		case O_SEND_ACK 	: proc_send_ack(id,value); break;
 		case O_CUSTOM_A 	: proc_req_custom_a(id,value); break;
@@ -278,6 +329,14 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 			case F_QSIZE 	: func_qSize(id); break;
 			case F_QCLEAR 	: func_qClear(id); break;		
 #endif
+			case F_PIN_MODE		: func_pinMode(id); break;
+			case F_PIN_WRITE	: func_pinWrite(id); break;
+			case F_PIN_READ		: func_pinRead(id); break;
+			case F_PIN_TOGGLE	: func_pinToggle(id); break;
+
+			case F_INT_ENABLE	: func_intEnable(id); break;
+			case F_INT_DISABLE	: func_intDisable(id); break;
+			case F_INT_PINCONFIG: func_intPinConfig(id); break;
 
 		}
 
@@ -330,7 +389,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 
 
 /**
- * Custom usrDataueue
+ * Custom usrDataQueue
  */
 #ifdef M_MSG_QUEUE
 	event void usrDataQ.dataReady(){

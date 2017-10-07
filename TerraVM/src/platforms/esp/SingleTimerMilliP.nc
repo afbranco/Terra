@@ -26,12 +26,10 @@ module SingleTimerMilliP{
 implementation{
 
 	bool isRunning;
-	uint32_t now;
+	uint32_t now=0;
 	static os_timer_t localTimer;
-	
-	// inicializo com zero
-	uint32_t t_initial=0;
-	uint32_t t_current=0;		
+	uint32_t last_system_get_time=0;
+	uint32_t sys_time=0;
 	
 	task void tarefaTimer(){ signal TimerFrom.fired();}
 	void timer_handler()
@@ -40,6 +38,7 @@ implementation{
 //		printf("TimerCalllBack received - isRunning=%d\n",isRunning);
 		currentTime = call TimerFrom.getNow();
 //		if (currentTime>0) printf("Resultado Timer.getNow: %d\n", currentTime);
+//os_printf("ñ"); 
 		if (isRunning) post tarefaTimer();
 //		os_printf("4\n");
 	}
@@ -67,17 +66,15 @@ implementation{
 		os_timer_disarm(&localTimer);
 		os_timer_setfn(&localTimer, (os_timer_func_t*)timer_handler, NULL);
 		os_timer_arm(&localTimer,t1,0);
+//os_printf("ĩ"); 
 	}
+
 	
 	command uint32_t TimerFrom.getNow(){ 
-		uint32_t result;
-	
-		t_current = system_get_time()/1000; 
-		result = (t_current>t_initial)?(t_current - t_initial):(t_current + (0xffffffff - t_initial));
-		now+=result;
-		//printf("Resultado: %d Corrente Sec: %ld Inicial Sec: %ld\n", result, t_current, t_initial);
-		//printf("Now: %d\n", now);
-		t_initial = t_current;	
+		uint32_t curr_system_get_time = system_get_time();
+		uint32_t delta = (curr_system_get_time >= last_system_get_time)?curr_system_get_time-last_system_get_time:last_system_get_time +(0xffffffff-last_system_get_time);
+		last_system_get_time = curr_system_get_time;
+		now += (delta/1000);
 //		 dbg(APPNAME,"TimerP::TimerFrom.getNow(): now=%d\n",now);
 		return now;
 	}
@@ -90,8 +87,7 @@ implementation{
 	command uint32_t TimerFrom.getdt() {return 0;}
 
 	command error_t SoftwareInit.init(){
-		t_initial = system_get_time()/1000;	
-		now = 0;
+		now = call TimerFrom.getNow();
 		isRunning = FALSE;		
 		return SUCCESS;
 	}

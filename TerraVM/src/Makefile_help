@@ -46,11 +46,11 @@ define options_HELP
 **********************************************************
 **** All OPTIONS description
 **********************************************************
- VM:  Define the VM flavour: NET, GRP | default NET
+ VM:  Define the VM flavor: NET, GRP | default NET
  MOD: Define additional modules: MSGQ | default ''
  SENSOR: Configure sensorboard: MTS300CA or MTS300CB(wired) or MDA100 | default MDA100
- QUEUE: Generate short or long queues | default SHORT
- TYPE: Configure runtime type: NOBS or BOTH | default BOTH
+ QUEUE: Generate short or long internal queues: SHORT or LONG | default SHORT
+ TYPE: Configure runtime type: NOBS or BOTH | default NOBS
  MOTE_TYPE: Define mote type: 1..254 | Default 1
  VERB: Verbose Compilation mode: Y or N | Default N
  SETDATA: SetData functionality: Y or N | default N
@@ -79,11 +79,11 @@ define tos_HELP
 **********************************************************
 **** TOS available options -- $(TOS_TARGETS)
 **********************************************************
- VM:  Define the VM flavour: NET, GRP | default NET
+ VM:  Define the VM flavor: NET, GRP | default NET
  MOD: Define additional modules: MSGQ | default ''
  SENSOR: Configure sensorboard: MTS300CA or MTS300CB(wired) or MDA100 | default MDA100
- QUEUE: Generate short or long queues | default SHORT
- TYPE: Configure runtime type: NOBS or BOTH | default BOTH
+ QUEUE: Generate short or long internal queues: SHORT or LONG | default SHORT
+ TYPE: Configure runtime type: NOBS or BOTH | default NOBS
  MOTE_TYPE: Define mote type: 1..254 | Default 1
  VERB: Verbose Compilation mode: Y or N | Default N
  SETDATA: SetData functionality: Y or N | default N
@@ -104,8 +104,8 @@ define ino_HELP
 **** INO available options -- $(INO_TARGETS)
 **********************************************************
  MOD: Define additional modules: MSGQ | default ''
- QUEUE: Generate short or long queues | default SHORT
- TYPE: Configure runtime type: NOBS or BOTH | default BOTH
+ QUEUE: Generate short or long internal queues: SHORT or LONG | default SHORT
+ TYPE: Configure runtime type: NOBS or BOTH | default NOBS
  MOTE_TYPE: Define mote type: 1..254 | Default 1
  VERB: Verbose Compilation mode: Y or N | Default N
  SETDATA: SetData functionality: Y or N | default N
@@ -127,9 +127,9 @@ define ix_HELP
 **********************************************************
 **** RPi/IX available options -- $(IX_TARGETS)
 **********************************************************
- VM:  Define the VM flavour: NET, GRP | default NET
+ VM:  Define the VM flavor: NET, GRP | default NET
  MOD: Define additional modules: MSGQ | default ''
- QUEUE: Generate short or long queues | default SHORT
+ QUEUE: Generate short or long internal queues: SHORT or LONG | default SHORT
  MOTE_TYPE: Define mote type: 1..254 | Default 1
  VERB: Verbose Compilation mode: Y or N | Default N
  SETDATA: SetData functionality: Y or N | default N
@@ -145,13 +145,12 @@ define esp_HELP
 **********************************************************
 **** ESP available options -- $(ESP_TARGETS)
 **********************************************************
- VM:  Define the VM flavour: NET, GRP | default NET
+ VM:  Define the VM flavor: NET | default NET
  MOD: Define additional modules: MSGQ | default ''
- QUEUE: Generate short or long queues | default SHORT
- TYPE: Configure runtime type: NOBS or BOTH | default BOTH
+ QUEUE: Generate short or long internal queues: SHORT or LONG | default SHORT
+ TYPE: Configure runtime type: NOBS or BOTH | default NOBS
  MOTE_TYPE: Define mote type: 1..254 | Default 1
  VERB: Verbose Compilation mode: Y or N | Default N
- SETDATA: SetData functionality: Y or N | default N
  RFPOWER: RF Power: 0 1 2 3 4 5 6 7 | default 7
  IFLASH: Internal Flash for prog storage: Y or N | default Y
  DEBUG: Debug dbg() mode: Y or N | default N
@@ -159,9 +158,7 @@ define esp_HELP
  WIFI_PASSWD: ESP WIFI PASSWORD:  <input password> | default projeto_terra
  NET_ID: Network identifier - 0..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:nrf24, 4:xbee, 5:NoRadio 
  install.<nodeid> - Install command + unique node identifier inside its network - 1..2047 | default 1
- BS_BAUD: BaseStation baudrate - 115200, 57600, 19200 | default <platform specific or 19200>
-   - OBS: Platform specific = telosb, tmote, eyes, intelmote2 => 115200; micaz,mica2, iris => 57600; mica2dot=>19200
-   - OBS2: Do not change baudrate for mica2dot.
+ BS_BAUD: BaseStation baudrate - 115200, 57600, 19200 | default 57600
 
 endef
 

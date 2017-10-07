@@ -108,6 +108,10 @@ $(MAIN_APPC):
 	@sed -i -e's/%hhu/%d/g' build/esp/app.c
 	@sed -i -e's/ memcpy/ ets_memcpy/g' build/esp/app.c
 	#
+	@sed -i -e's/__attribute((section(".irom0.text")))  EspUsart0P__uart0_rx_intr_handler/EspUsart0P__uart0_rx_intr_handler/g' build/esp/app.c
+	@sed -i -e's/__attribute((section(".irom0.text")))  SingleTimerMilliP__timer_handler/SingleTimerMilliP__timer_handler/g' build/esp/app.c
+	@sed -i -e's/__attribute((section(".irom0.text")))  VMCustomP__gpio_intHandler/VMCustomP__gpio_intHandler/g' build/esp/app.c
+	#
 	@echo "    compiled $(COMPONENT) to $(MAIN_EXE)"
 
 bin: elf
@@ -120,15 +124,19 @@ elf: $(MAIN_APPC)
 %:
 	@:
 
-install.%: $(MAIN_EXE)-0x00000.bin $(MAIN_EXE)-0x10000.bin 
+install.%: $(MAIN_EXE)-0x00000.bin $(MAIN_EXE)-0x10000.bin blankFile
 	$(info ---------------------------------  Start flashing to device *************)
-	esptool.py -b 115200 -p $(__SERIAL) write_flash 0x00000 $(MAIN_EXE)-0x00000.bin 0x10000 $(MAIN_EXE)-0x10000.bin
+	esptool.py -b 115200 -p $(__SERIAL) write_flash 0x00000 $(MAIN_EXE)-0x00000.bin 0x66000 $(BUILDDIR)/blank_12k-0x66000.bin 0x10000 $(MAIN_EXE)-0x10000.bin
 
-install: $(MAIN_EXE)-0x00000.bin $(MAIN_EXE)-0x10000.bin 
+install: $(MAIN_EXE)-0x00000.bin $(MAIN_EXE)-0x10000.bin blankFile
 	$(info ---------------------------------  Start flashing to device *************)
-	esptool.py -b 115200 -p $(__SERIAL) write_flash 0x00000 $(MAIN_EXE)-0x00000.bin 0x10000 $(MAIN_EXE)-0x10000.bin
+	esptool.py -b 115200 -p $(__SERIAL) write_flash 0x00000 $(MAIN_EXE)-0x00000.bin 0x66000 $(BUILDDIR)/blank_12k-0x66000.bin 0x10000 $(MAIN_EXE)-0x10000.bin
+	@mkdir -p $(BUILDDIR)
+	@rm -f $(MAIN_APPC)
 
-
+blankFile: $(BUILDDIR)/blank_12k-0x66000.bin
+	@dd if=/dev/zero of=$(BUILDDIR)/blank_12k-0x66000.bin bs=12288 count=1
+	
 builddir: 
 	@mkdir -p $(BUILDDIR)
 	@rm -f $(MAIN_APPC)

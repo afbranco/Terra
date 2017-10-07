@@ -24,22 +24,24 @@ module ProgStorageP{
 }
 implementation{
 
-#define PROGDATA_START_SEC 0x3D
-#define BLOCK_SIZE 4096
+#define PROGDATA_START_SEC 0x66
+#define BLOCK_SIZE INTFLASH_SIZE
 
 typedef struct progStorage {
+	uint32_t reserv1;
 	progEnv_t env;
-	uint8_t bytecode[BLOCK_SIZE - sizeof(progEnv_t)];
+	uint8_t bytecode[BLOCK_SIZE - sizeof(progEnv_t) - 8];
+	uint32_t reserv2;
 } progStorage_t;
 
 	progStorage_t data;
 	
 	command error_t ProgStorage.save(progEnv_t *env, uint8_t *bytecode, uint16_t len){
 		error_t status;
-		if ((len + sizeof(progEnv_t)) > INTFLASH_SIZE) return FAIL;
+		if ((len + sizeof(progEnv_t) + 8) > BLOCK_SIZE) return FAIL;
 		memcpy(&data.env,env,sizeof(progEnv_t));
 		memcpy(&data.bytecode,bytecode,len);
-		status = call InternalFlash.write((void*)PROGDATA_START_SEC,&data, BLOCK_SIZE);
+		status = call InternalFlash.write((void*)PROGDATA_START_SEC,&data, len + sizeof(progEnv_t)+8);
 		return status;	
 	}
 

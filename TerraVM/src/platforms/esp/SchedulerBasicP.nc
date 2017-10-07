@@ -64,6 +64,7 @@ implementation
     NO_TASK = 255,
   };
 
+  uint8_t lixo[100];
   uint8_t m_head;
   uint8_t m_tail;
   uint8_t m_next[NUM_TASKS];
@@ -98,6 +99,7 @@ implementation
   
   bool isWaiting( uint8_t id )
   {
+//os_printf(" w%d(%d):%d;%d\n",id,m_next[id],m_head,m_tail); 
     return (m_next[id] != NO_TASK) || (m_tail == id);
   }
 
@@ -105,15 +107,15 @@ implementation
   {
     if( !isWaiting(id) )
     {
-      if( m_head == NO_TASK )
+      if( m_head == NO_TASK || m_tail == NO_TASK )
       {
-	m_head = id;
-	m_tail = id;
+		m_head = id;
+		m_tail = id;
       }
       else
       {
-	m_next[m_tail] = id;
-	m_tail = id;
+		m_next[m_tail] = id;
+		m_tail = id;
       }
       return TRUE;
     }
@@ -124,13 +126,14 @@ implementation
   }
 
 #define	SIG_TASKLOOP 	0
-#define	TASK_QUEUE_LEN	4
+#define	TASK_QUEUE_LEN	1
 os_event_t	*taskQueue;
 os_event_t	taskQueueMem[TASK_QUEUE_LEN];
 
  
  void taskLoop(os_event_t	*e)
  { 
+ //os_printf(" tl:%d-%d;%d\n\n",e->sig,m_head,m_tail);
  	call Scheduler.taskLoop();
  }
  
@@ -154,9 +157,11 @@ os_event_t	taskQueueMem[TASK_QUEUE_LEN];
       nextTask = popTask();
       if( nextTask == NO_TASK )
       {
+ //os_printf(" x%d\n",nextTask);
 	return FALSE;
       }
     }
+ //os_printf(" f%d:%d;%d\n",nextTask,m_head,m_tail);
     signal TaskBasic.runTask[nextTask]();
     return TRUE;
   }
@@ -164,30 +169,14 @@ os_event_t	taskQueueMem[TASK_QUEUE_LEN];
 
   command void Scheduler.taskLoop()
   {
-//os_printf("*");
-//if (count++ > 60){ os_printf("\n"); count=0;}
-	  for (;;)
-	  {
-		  uint8_t nextTask;
-
-		  atomic
-		  {
-			  while ((nextTask = popTask()) == NO_TASK)
-			  {
-			  	  // Re-post taskLoop() as an esp/nonos task.
-			  	  // Allowing ESP NONOS work a while 
-			  	  //call McuSleep.sleep();
-			  	  system_soft_wdt_feed();
-			  	  system_os_post(USER_TASK_PRIO_0,	SIG_TASKLOOP,	0);
-				  // Transfer control to ESP
-				  return;
-			  }
-		  }
-	  	  system_soft_wdt_feed();
-	  	  system_os_post(USER_TASK_PRIO_0,	SIG_TASKLOOP,	0);
-		  signal TaskBasic.runTask[nextTask]();
-	  }
-  }
+	uint8_t nextTask;
+	atomic {nextTask = popTask();}
+  	if ((nextTask) != NO_TASK){
+ 		  signal TaskBasic.runTask[nextTask]();
+  	}
+	system_soft_wdt_feed();
+	system_os_post(USER_TASK_PRIO_0,	SIG_TASKLOOP,	0);
+ }
 
   /**
    * Return SUCCESS if the post succeeded, EBUSY if it was already posted.
@@ -200,6 +189,7 @@ os_event_t	taskQueueMem[TASK_QUEUE_LEN];
 */
   async command error_t TaskBasic.postTask[uint8_t id]()
   {
+//atomic{os_printf(" p%d:%d;%d\n",id,m_head,m_tail);}
     atomic { return pushTask(id) ? SUCCESS : EBUSY; }
   }
 

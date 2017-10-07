@@ -84,7 +84,7 @@ implementation
 		// Config Baudrate for Uart0 and Uart1
 		uart_init(PLATFORM_BAUDRATE, BIT_RATE_115200);
 
-		// Print the reset reason and, if it accours, the fatal exception.
+		// Print the reset reason and, if it occurs, the fatal exception.
 		os_printf("reset reason: %x\n", rtc_info->reason); 
 		if (	rtc_info->reason == REASON_WDT_RST || 
 		  		rtc_info->reason == REASON_EXCEPTION_RST || 
@@ -380,8 +380,7 @@ void ICACHE_FLASH_ATTR uart_rx_task(os_event_t *events) {
 	 * Parameters   : void *para - point to ETS_UART_INTR_ATTACH's arg
 	 * Returns      : NONE
 	 *******************************************************************************/
-	LOCAL void
-	uart0_rx_intr_handler(void *para)
+	LOCAL void uart0_rx_intr_handler(void *para)
 	{
 		/* uart0 and uart1 intr combine togther, when interrupt occur, see reg 0x3ff20020, bit2, bit0 represents
 		 * uart1 and uart0 respectively

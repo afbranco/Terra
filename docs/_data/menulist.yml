@@ -18,7 +18,7 @@ docs:
   - page: Android
     url: terra-platf-droid.html  
 
-  - page: ESP8266 (TBD)
+  - page: ESP8266
     url: terra-platf-esp.html  
 
   - page: Arduino Mega
@@ -35,6 +35,9 @@ docs:
 
   - page: TinyOS - Grp
     url: terra-custom-TerraGrp.html  
+
+  - page: ESP8266 - Basic
+    url: terra-custom-TerraEsp.html  
 
   - page: ArduinoMega - Basic
     url: terra-custom-TerraIno.html  

@@ -7,15 +7,7 @@ config
 	name : TerraEsp ,
 	code:00.02.00 , 
 	{
-		tossim: 1728,
-		telosb_full: 4224,
-		iris_full: 4224,
-		telosb_hyb: 1920,
-		iris_hyb: 1920,
-		micaz : 1920,
-		mica2 : 1920,
-		mica2dot : 1920,
-		rpi : 1920,
+		esp : 1920,
 	} 
 do
 /*
@@ -38,13 +30,6 @@ do
 #define ON 1
 #define OFF 0
 #define TOGGLE 2
-// Interrupt config
-#define RISING 1
-#define FALLING 0
-#define DISABLE 2
-// Port Cfg
-#define pIN 0
-#define pOUT 1
 // Message
 #define BROADCAST 0xffff
 #define SEND_DATA_SIZE 16
@@ -52,6 +37,42 @@ do
 #define E_DIVZERO 10 // Division by zero
 #define E_IDXOVF  11 // Array index overflow
 #define E_STKOVF  20 // Stack overflow -- fatal
+
+// Pin mode
+#define INPUT  0
+#define OUTPUT  1
+#define OUTPUT_HIGH  2
+
+// GPIO_INT_TYPE
+#define INT_DISABLE 0 
+#define INT_POSEDGE 1 
+#define INT_NEGEDGE 2 
+#define INT_ANYEDGE 3 
+//#define INT_LOLEVEL 4 // Very bad!!! Generates high frequency interrupts.
+//#define INT_HILEVEL 5 // Very bad!!! Generates high frequency interrupts.
+
+
+/**
+ * GPIO Pin number - gpio_no
+ *
+ * NodeMCU DevKit: 	0, 1, 2, 3, 4, 5, 12, 13, 14, 15, 16 .. 9, 10, 
+ * D1 Mini: 		0, 1, 2, 3, 4, 5, 12, 13, 14, 15 ,16
+ * Esp-12E:			0, 1, 2, 3, 4, 5, 12, 13, 14, 15, 16 .. SPI-Flash[6, 7, 8, 9, 10, 11]
+ */
+#define GPIO0  0 
+#define GPIO1  1
+#define GPIO2  2
+#define GPIO3  3
+#define GPIO4  4
+#define GPIO5  5
+
+#define GPIO12 12
+#define GPIO13 13
+#define GPIO14 14
+#define GPIO15 15
+#define GPIO16 16
+
+
 
 /*
  * Define custom registers
@@ -65,26 +86,46 @@ do
 		var payload[20] data;
 	end
 	
-	// TerraIx local Output events
-//	output void		INIT			ubyte 0;
+	// TerraEsp local Output events
+	output void 	REQ_ANA0		ubyte 7;
 	output void 	REQ_CUSTOM_A	ubyte 20;
 	output void 	REQ_CUSTOM		void 23;
-	// TerraIx Custom Output events
+	// TerraEsp Custom Output events
 
-	// TerraIx Local Input events
+
+	// TerraEsp Local Input events
 	input ubyte 	ERROR 		 	ubyte 	0;
 	input ubyte 	ERROR 			void	1;
+	input ubyte 	ANA0 			void	5;
+	input ubyte 	GPIO_INT 		void	6;
 	input ubyte 	CUSTOM_A		ubyte 	12;
 	input ubyte 	CUSTOM_A 		void 	13;
 	input ubyte 	CUSTOM 			void 	15;
-	// TerraIx Custom Input events
+
+	// TerraEsp Custom Input events
 
 	// Terra basic functions
 	function pure ushort getNodeId()		0;
 	function pure ushort random()			1;
 	function pure ubyte getMem(ushort)		2;
 	function pure ulong getTime()			3;
-	// TerraIx custom functions
+
+	// TerraNet custom functions
+	function nohold ubyte qPut(radioMsg) 	10;
+	function nohold ubyte qGet(radioMsg) 	11;
+	function pure ubyte qSize()				12;
+	function pure ubyte qClear()			13;
+
+	// TerraEsp custom functions
+	function ubyte pinMode(ubyte,ubyte) 	20; //--> GPIO_OUTPUT_SET(gpio_no, bit_value),GPIO_DIS_OUTPUT(gpio_no)
+	function ubyte pinWrite(ubyte,ubyte) 	21; //--> GPIO_OUTPUT_SET(gpio_no, bit_value)
+	function ubyte pinRead(ubyte) 			22; //--> GPIO_INPUT_GET(gpio_no)                 gpio_no: 0..31
+	function ubyte pinToggle(ubyte) 		23;
+	
+	function ubyte intEnable()				30; // --> ETS_GPIO_INTR_ATTACH(func, arg)???? + ETS_GPIO_INTR_ENABLE()
+	function ubyte intDisable()				31; // --> ETS_GPIO_INTR_DISABLE()
+	function ubyte intPinConfig(ubyte,ubyte)	32; // --> gpio_pin_intr_state_set(GPIO_ID_PIN(no),INT_TYPE);
+	
 
 // Determinist
 

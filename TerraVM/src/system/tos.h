@@ -74,14 +74,15 @@ struct @exactlyonce { };
 #if defined(TOSSIM)
 
 #elif defined(ESP)
+void dummy(){}
 #ifndef NO_DEBUG
 #define dbg(s,...) os_printf(__VA_ARGS__) 
 #define dbg_clear(s,...) os_printf(__VA_ARGS__) 
 #define dbgerror(s,...) os_printf(__VA_ARGS__) 
 #define dbgerror_clear(s,...) os_printf(__VA_ARGS__) 
 #else
-#define dbg(s, ...) 
-#define dbg_clear(s, ...) 
+#define dbg(s,...) dummy() 
+#define dbg_clear(s,...) dummy() 
 #define dbgerror(s,...) os_printf(__VA_ARGS__) 
 #define dbgerror_clear(s,...) os_printf(__VA_ARGS__) 
 #endif

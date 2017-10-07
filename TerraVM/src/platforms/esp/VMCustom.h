@@ -23,34 +23,31 @@
 #include "VMData.h" //"../../VMData.h"
 #include "VMError.h" //"../../VMError.h"
 
-
+/**
+ * TerraEsp Custom
+ */
 enum{
 	
-	// TerraIx local Output events
+	// TerraEsp local Output events
 //	O_INIT			=0,
 	O_LEDS			=5,
 	O_LED0			=6,
-	O_LED1			=7,
-	O_LED2			=8,
-	O_TEMP			=9,
-	O_PHOTO			=10,
-	O_VOLTS			=11,
+	O_ANA0			=7,
 	O_CUSTOM_A		=20,
 	O_CUSTOM		=23,
-	// TerraIx Custom Output events
+	// TerraEsp Custom Output events
 	O_SEND			=40,
 	O_SEND_ACK		=41,
 
-	// TerraIx Local Input events
+	// TerraEsp Local Input events
 //	I_ERROR_id		=0,  // Defined in VMError.h
 //	I_ERROR			=1,  // Defined in VMError.h
-	I_TEMP			=5, 
-	I_PHOTO			=6,
-	I_VOLTS			=7,
+	I_ANA0			=5,
+	I_GPIO_INT		=6,
 	I_CUSTOM_A_ID	=12,
 	I_CUSTOM_A		=13,
 	I_CUSTOM		=15,
-	// TerraIx Custom Input events
+	// TerraEsp Custom Input events
 	I_SEND_DONE_ID		=40,
 	I_SEND_DONE			=41,
 	I_SEND_DONE_ACK_ID	=42,
@@ -59,16 +56,25 @@ enum{
 	I_RECEIVE			=45,
 	I_Q_READY 			=46,
 	
-	// TerraIx basic functions
+	// TerraNet basic functions
 	F_GETNODEID 	= 0,
 	F_RANDOM		= 1,
 	F_GETMEM		= 2,
 	F_GETTIME		= 3,
-	// TerraIx custom functions
+	// TerraNet custom functions
 	F_QPUT 			= 10,
 	F_QGET 			= 11,
 	F_QSIZE 		= 12,
 	F_QCLEAR 		= 13,
+	// TerraEsp custom functions
+	F_PIN_MODE 			= 20,
+	F_PIN_WRITE 		= 21,
+	F_PIN_READ 			= 22,
+	F_PIN_TOGGLE 		= 23,
+
+	F_INT_ENABLE 		= 30,
+	F_INT_DISABLE 		= 31,
+	F_INT_PINCONFIG 	= 32,
 
 	
 	// Event Type ID - 3 msb bits of EvtId

@@ -174,8 +174,8 @@ endif
 
 
 ifneq ($(filter $(_MOTE),$(ESP_TARGETS)),)
-	__WIFI_SSID ?= iot_terra
-	__WIFI_PASSWD ?= projeto_terra
+	__WIFI_SSID ?= terra_iot
+	__WIFI_PASSWD ?= projeto_iot
 else
   ifneq ($(__WIFI_SSID),)
       $(error WIFI_SSID must be used only for: $(ESP_TARGETS))

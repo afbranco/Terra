@@ -710,6 +710,11 @@ void execTrail(uint16_t lbl){
 	uint8_t Opcode,Param1;
 //printf("Ex: h=%d\n",haltedFlag);printfflush();
 	dbg(APPNAME,"CEU::execTrail(%d), haltedFlag=%s\n",lbl,_TFstr(haltedFlag));
+#ifdef ESP
+	// Avoid WDT reset on ESP
+	system_soft_wdt_feed();
+#endif
+	
     if (haltedFlag) return;
 	// Get Label Addr
 	PC = getLblAddr(lbl);
