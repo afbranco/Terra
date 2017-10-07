@@ -343,7 +343,7 @@ Additionally, TerraEsp implements a simple message queue to support message buff
     <tr>
         <td>GPIO0 .. GPIO5 , GPIO12 .. GPIO16</td>
         <td>0 .. 5, 12 .. 16</td>
-        <td>GPIO number - gpio_no. <b>Note:</b> Only a few GPIO pins are available in the board.</td>
+        <td>GPIO number - gpio_no. <b>Note:</b> Only few GPIO pins are available in the board.</td>
     </tr>
 </table>
 </div>
@@ -353,7 +353,7 @@ Additionally, TerraEsp implements a simple message queue to support message buff
 
 <h4>Digital Pin - Blinking the Led connected in the GPIO12</h4>
 <pre><code>#include "TerraEsp.defs"
-pinMode(GPIO12,OUTPUT);
+pinMode(GPIO12,OUTPUT);   // GPIO12 pin as output
 loop do
     await 500ms;          // Waits 0,5 seconds
     pinToggle(GPIO12);    // Toggle LED value
@@ -366,14 +366,14 @@ end
 <p>Connect a push button to GND and GPIO5. Connect a 10Kohms resistor to 3.3v and GPIO5.
 The LED at GPIO12 will toggle once when you press the button. Do nothing when releasing it.</p>
 <pre><code>#include "TerraEsp.defs"
-pinMode(GPIO12,OUTPUT);
-pinMode(GPIO5,INPUT);  		// GPIO5 pin as input
-intPinConfig(GPIO5,INT_NEGEDGE);// Interrupt from 1 to 0.
-intEnable();            	// Enable all GPIO the interruptions.
+pinMode(GPIO12,OUTPUT);          // GPIO12 pin as output
+pinMode(GPIO5,INPUT);            // GPIO5  pin as input
+intPinConfig(GPIO5,INT_NEGEDGE); // GPIO5 Interrupts from 1 to 0.
+intEnable();                     // Enable all GPIO interruptions.
 loop do
-    await GPIO_INT();  		// Waits for any configured GPIO interrupt.
+    await GPIO_INT();       // Waits for any configured GPIO interrupt.
     pinToggle(GPIO12);      // Toggle the LED status
-    await 30ms;  			// Debouncing: Waits some time before next Interruption.
+    await 30ms;             // Debouncing: Waits some time before next Interruption.
 end
 </code>
 </pre>
