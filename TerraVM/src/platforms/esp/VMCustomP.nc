@@ -209,7 +209,7 @@ void func_pinMode(uint16_t id){
 	dbg(APPNAME,"Custom::func_pinMode():");
 	mode = (uint8_t)signal VM.pop(); // 0-IN 1-OUT 2-OUT_HIGH
 	pin  = (uint8_t)signal VM.pop();
-	if ((pin <= 31) && (mode <= 3)){
+	if ((pin <= 15) && (mode <= 3)){
 		switch (mode){
 			case 0 : GPIO_DIS_OUTPUT(pin); break;
 			case 1 : GPIO_OUTPUT_SET(pin, 0); break;
@@ -226,7 +226,7 @@ void func_pinWrite(uint16_t id){
 	uint8_t pin,value;
 	value = (uint8_t)signal VM.pop();
 	pin  = (uint8_t)signal VM.pop();
-	if (pin <= 31){
+	if (pin <= 15){
 		GPIO_OUTPUT_SET(pin, (value & 0xf1));
 	}else{
 		stat = 1;
@@ -237,7 +237,7 @@ void func_pinRead(uint16_t id){
 	uint8_t stat=0;
 	uint8_t pin,value;
 	pin  = (uint8_t)signal VM.pop();
-	if (pin <= 31){
+	if (pin <= 15){
 		value = GPIO_INPUT_GET(pin);
 	}else{
 		stat = 1;
@@ -249,7 +249,7 @@ void func_pinToggle(uint16_t id){
 	uint8_t stat=0;
 	uint8_t pin,value;
 	pin  = (uint8_t)signal VM.pop();
-	if (pin <= 31){
+	if (pin <= 15){
 		value = GPIO_INPUT_GET(pin);
 		dbg(APPNAME,"Custom::func_pinToggle(): pin=%d, val=%d\n",pin,value);
 		GPIO_OUTPUT_SET(pin, (value == 0)?1:0);
@@ -287,7 +287,7 @@ void func_intPinConfig(uint16_t id){
 	uint8_t pin,type;
 	type  = (uint8_t)signal VM.pop();
 	pin  = (uint8_t)signal VM.pop();
-	if (pin <= 31){
+	if (pin <= 15){
 		gpio_pin_intr_state_set(pin,type);
 	}
 	signal VM.push(stat);	
