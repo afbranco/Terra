@@ -21,6 +21,9 @@
 #include "usrMsg.h"
 #include "BasicServices.h"
 
+/**
+ * TerraIno
+ */
 module VMCustomP{
 	provides interface VMCustom as VM;
 	uses interface BSRadio;
