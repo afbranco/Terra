@@ -36,8 +36,7 @@ Currently we tested Terra in two boards:
 <h4>Install, if necessary, the following packages.</h4>
 <p>Open a command terminal and execute the following commands.</p>
 <pre><code>sudo apt-get update
-sudo apt-get install git lua5.1 lua-lpeg nescc gcc-avr avr-libc avrdude 
-</code></pre>
+sudo apt-get install git lua5.1 lua-lpeg nescc gcc-avr avr-libc avrdude </code></pre>
 
 <h4>Adjust USB access permission for your user:</h4>
 <pre><code>sudo usermod -a -G dialout $USER</code></pre>
@@ -65,15 +64,14 @@ OBJCOPY = $(AVR_TOOLS_PATH)/avr/bin/avr-objcopy
 OBJDUMP = avr-objdump
 GCC = $(AVR_TOOLS_PATH)/avr/bin/avr-gcc
 AVRDUDE = $(AVR_TOOLS_PATH)/avrdude
-AVRDUDECONF = $(AVR_TOOLS_PATH)/avrdude.conf
-</code></pre>
+AVRDUDECONF = $(AVR_TOOLS_PATH)/avrdude.conf</code></pre>
+
 <p>If you do not have Arduino installed, you must edit the definitions to:</p> 
 <pre><code>OBJCOPY = avr-objcopy
 OBJDUMP = avr-objdump
 GCC = avr-gcc
 AVRDUDE = avrdude
-AVRDUDECONF = /etc/avrdude.conf
-</code></pre>
+AVRDUDECONF = /etc/avrdude.conf</code></pre>
 
 
 <h4>Create environment definitions</h4>
@@ -84,12 +82,14 @@ AVRDUDECONF = /etc/avrdude.conf
 <pre><code>gedit .bashrc</code></pre>
 
 <p>Insert following lines at the end of the file.</p>
-<pre><code>export TERRADIR=$HOME/Terra
+<pre><code># Export Terra paths
+export TERRADIR=$HOME/Terra
 export CLASSPATH=$TERRADIR/TerraControl/tinyos.jar:.$CLASSPATH
+
+# Tools alias
 alias terrac='$TERRADIR/terrac/terrac -I$TERRADIR/TerraVM/src/TerraDefs'
 alias ttool='java -jar $TERRADIR/TerraControl/TControl.jar'
-alias sf='java net.tinyos.sf.SerialForwarder'
-</code></pre>
+alias sf='java net.tinyos.sf.SerialForwarder'</code></pre>
 <p>Open a new command terminal to get the new environment.</p>
 
 
@@ -101,24 +101,23 @@ You must change to the <code>$HOME/Terra/TerraVM/src</code> directory and execut
 command with additional parameters.
 </p>
 <p>The follow command is an example of Terra compilation for Arduino Mega board:</p>
-<pre><code>make mega TYPE:BOTH VM:NET MOD:MSGQ USB:/dev/ttyACM0 BS_BAUD:19200 install.4
-</code></pre>
+<pre><code>make mega TYPE:BOTH VM:NET MOD:MSGQ USB:/dev/ttyACM0 BS_BAUD:19200 install.4</code></pre>
 
 <h3>Attention points</h3>
 <p>We must pay attention for some details when compiling and installing Terra for Arduino Mega.</p>
 
-<p> The <b>TYPE:<i>type</i></b> parameter indicates if your node will communicate 
+<p>The <b>TYPE:<i>type</i></b> parameter indicates if your node will communicate 
 via USB interface (<i>BOTH</i>) or not (<i>NOBS</i>).
 Usually one node, acting as BaseStation or sink node, is connected to a computer via USB interface when
 the all nodes communicate via radio.
 Hybrid networks may create a bridge connecting two node with different radios via serial/USB interface.
 </p>
 
-<p> the <b>BS_BAUD:<i>value</i></b> configures the USB baud rate for Terra operation.
+<p>The <b>BS_BAUD:<i>value</i></b> configures the USB baud rate for Terra operation.
 (This does not change the firmware flashing baud rate that is configured internally in the system.)
 </p> 
 
-<p>the <b>INSTAL.<i>n</i></b> parameter indicates to flash the compiled file. 
+<p>The <b>INSTAL.<i>n</i></b> parameter indicates to flash the compiled file. 
 The <i>n</i> is the unique node identifier for its network.</p>
 
 <p>The <b>real node address</b> is the combination of the Network ID and the unique node identifier. 
