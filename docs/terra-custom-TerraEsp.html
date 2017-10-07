@@ -126,7 +126,7 @@ Additionally, TerraEsp implements a simple message queue to support message buff
 <br>
 <div class="table-responsive" >
 <table class="table table-bordered table-hover table-functions">
-    <caption>Table 2 - TerraIno functions interface</caption>
+    <caption>Table 2 - TerraEsp functions interface</caption>
     <tr>
         <th>Description</th>
         <th>Returned type</th>
@@ -190,7 +190,8 @@ Additionally, TerraEsp implements a simple message queue to support message buff
     </tr>
     <tr>
         <td>Writes LOW or HIGH to a pin. Always returns SUCCESS. 
-        	The two arguments are:  gpio_no, value. See constants definitions for more details.</td>
+        	The two arguments are:  gpio_no, value. See constants definitions for more details.
+        	<b>Note:</b> Writing to a pin configured as INPUT, will change the pin configuration to OUTPUT.</td>
         <td>ubyte</td>
         <td>pinWrite</td>
         <td>ubyte,ubyte</td>
@@ -238,7 +239,7 @@ Additionally, TerraEsp implements a simple message queue to support message buff
 <br>
 <div class="table-responsive" >
 <table class="table table-bordered table-hover">
-    <caption>Table 3 - TerraIno Constant definitions</caption>
+    <caption>Table 3 - TerraEsp Constant definitions</caption>
     <tr>
         <th>Constant</th>
         <th>Value</th>
@@ -262,17 +263,17 @@ Additionally, TerraEsp implements a simple message queue to support message buff
     <tr>
         <td>ON</td>
         <td>1</td>
-        <td>Set LED ON</td>
+        <td>Set GPIO HIGH</td>
     </tr>
     <tr>
         <td>OFF</td>
         <td>0</td>
-        <td>Set LED OFF</td>
+        <td>Set GPIO LOW</td>
     </tr>
     <tr>
         <td>TOGGLE</td>
         <td>2</td>
-        <td>Set LED with oposite value</td>
+        <td>Set GPIO with opposite value</td>
     </tr>
     <tr>
         <td>BROADCAST</td>
@@ -347,140 +348,32 @@ Additionally, TerraEsp implements a simple message queue to support message buff
 </table>
 </div>
 
-<br>
-<div class="table-responsive" >
-<table class="table table-bordered table-hover">
-    <caption>Table 4 - Arduino pin enumeration to Port,Pin. 
-    	May be used to substitute the arguments <code>port_id, pin_id</code>  in the Pin Functions</caption>
-    <tr>
-        <th>Arduino Pin#</th>
-        <th>Terra portId,pinId</th>
-        <th>ATMega2560 functions</th>
-    </tr>
-    <tr> <td></td> <td></td> <td></td> </tr>
-
-<tr> <td>D22</td> <td>0,0</td> <td>PA0 (AD0)</td> </tr>
-<tr> <td>D23</td> <td>0,1</td> <td>PA1 (AD1)</td> </tr>
-<tr> <td>D24</td> <td>0,2</td> <td>PA2 (AD2)</td> </tr>
-<tr> <td>D25</td> <td>0,3</td> <td>PA3 (AD3)</td> </tr>
-<tr> <td>D26</td> <td>0,4</td> <td>PA4 (AD4)</td> </tr>
-<tr> <td>D27</td> <td>0,5</td> <td>PA5 (AD5)</td> </tr>
-<tr> <td>D28</td> <td>0,6	</td> <td> PA6 (AD6)</td> </tr>
-<tr> <td>D29</td> <td> 0,7	</td> <td> PA7 (AD7)</td> </tr>
-<tr> <td>D53 </td> <td>1,0		</td> <td> PB0 (SS)	</td> </tr>
-<tr> <td>D52 </td> <td>1,1		</td> <td> PB1 (SCK)</td> </tr>
-<tr> <td>D51 </td> <td>1,2		</td> <td> PB2 (MOSI)</td> </tr>
-<tr> <td>D50 </td> <td>1,3		</td> <td> PB3 (MISO)</td> </tr>
-<tr> <td>D10 </td> <td>1,4		</td> <td> PB4 (PWM/OC2A)</td> </tr>
-<tr> <td>D11 </td> <td>1,5		</td> <td> PB5 (PWM/OC1A)</td> </tr>
-<tr> <td>D12 </td> <td>1,6		</td> <td> PB6 (PWM/OC1B)</td> </tr>
-<tr> <td>D13 </td> <td>1,7		</td> <td> PB7 (PWM/OC0A/OC1C)</td> </tr>
-<tr> <td>D37 </td> <td>2,0 	</td> <td> PC0 (A8)	</td> </tr>
-<tr> <td>D36 </td> <td>2,1 	</td> <td> PC1 (A9)	</td> </tr>
-<tr> <td>D35 </td> <td>2,2 	</td> <td> PC2 (A10)</td> </tr>
-<tr> <td>D34 </td> <td>2,3 	</td> <td> PC3 (A11)</td> </tr>
-<tr> <td>D33 </td> <td>2,4 	</td> <td> PC4 (A12)</td> </tr>
-<tr> <td>D32 </td> <td>2,5 	</td> <td> PC5 (A13)</td> </tr>
-<tr> <td>D31 </td> <td>2,6 	</td> <td> PC6 (A14)</td> </tr>
-<tr> <td>D30 </td> <td>2,7 	</td> <td> PC7 (A15)</td> </tr>
-<tr> <td>D21 </td> <td>3,0 	</td> <td> PD0 (SCL/INT0)</td> </tr>
-<tr> <td>D20 </td> <td>3,1 	</td> <td> PD1 (SDA/INT1)</td> </tr>
-<tr> <td>D19 </td> <td>3,2 	</td> <td> PD2 (RX1/INT2)</td> </tr>
-<tr> <td>D18 </td> <td>3,3 	</td> <td> PD3 (TX1/INT3)</td> </tr>
-<tr> <td>D38 </td> <td>3,7 	</td> <td> PD7 (T0)	</td> </tr>
-<tr> <td>D0 </td> <td>4,0 		</td> <td> PE0 (RXD0/PCINT8)</td> </tr>
-<tr> <td>D1 </td> <td>4,1 		</td> <td> PE1 (TXD0)</td> </tr>
-<tr> <td>D5 </td> <td>4,3 		</td> <td> PE3 (PWM/OC3A/AIN1)</td> </tr>
-<tr> <td>D2 </td> <td>4,4 		</td> <td> PE4 (PWM/OC3B) [INT4]</td> </tr>
-<tr> <td>D3 </td> <td>4,5 		</td> <td> PE5 (PWM/OC3C) [INT5]</td> </tr>
-<tr> <td>D41	</td> <td>6,0		</td> <td> PG0 (WR)	</td> </tr>
-<tr> <td>D40	</td> <td>6,1		</td> <td> PG1 (RD)	</td> </tr>
-<tr> <td>D39	</td> <td>6,2		</td> <td> PG2 (ALE)</td> </tr>
-<tr> <td>D4	</td> <td>6,5		</td> <td> PG5 (PWM/OC0B)</td> </tr>
-<tr> <td>D17	</td> <td>7,0		</td> <td> PH0 (RXD2)</td> </tr>
-<tr> <td>D16	</td> <td>7,1		</td> <td> PH1 (TXD2)</td> </tr>
-<tr> <td>D6	</td> <td>7,3		</td> <td> PH3 (PWM/OC4A)</td> </tr>
-<tr> <td>D7	</td> <td>7,4		</td> <td> PH4 (PWM/OC4B)</td> </tr>
-<tr> <td>D8	</td> <td>7,5		</td> <td> PH5 (PWM/OC4C)</td> </tr> 
-<tr> <td>D9	</td> <td>7,6		</td> <td> PH6 (PWM/OC2B)</td> </tr>
-<tr> <td>D15	</td> <td>8,0		</td> <td> PJ0 (RX3/PCINT9)</td> </tr>
-<tr> <td>D14	</td> <td>8,1		</td> <td> PJ1 (TX3/PCINT10)</td> </tr>
-<tr> <td>D49	</td> <td>10,0	</td> <td> PL0 (ICP4)</td> </tr>
-<tr> <td>D48	</td> <td>10,1	</td> <td> PL1 (ICP5)</td> </tr>
-<tr> <td>D47	</td> <td>10,2	</td> <td> PL2 (T5)	</td> </tr>
-<tr> <td>D46	</td> <td>10,3	</td> <td> PL3 (PWM/OC5A)</td> </tr>
-<tr> <td>D45	</td> <td>10,4	</td> <td> PL4 (PWM/OC5B)</td> </tr>
-<tr> <td>D44	</td> <td>10,5	</td> <td> PL5 (PWM/OC5C) </td> </tr>
-<tr> <td>D43	</td> <td>10,6	</td> <td> PL6	</td> </tr>
-<tr> <td>D42	</td> <td>10,7	</td> <td> PL7	</td> </tr>
-<tr> <td>A0   </td> <td>5,0 	</td> <td> PF0 (ADC0)  </td> </tr>
-<tr> <td>A1   </td> <td>5,1 	</td> <td> PF1 (ADC1)  </td> </tr>
-<tr> <td>A2   </td> <td>5,2 	</td> <td> PF2 (ADC2)  </td> </tr>
-<tr> <td>A3   </td> <td>5,3 	</td> <td> PF3 (ADC3)  	</td> </tr>
-<tr> <td>A4   </td> <td>5,4 	</td> <td> PF4 (ADC4/TMK)  </td> </tr>
-<tr> <td>A5   </td> <td>5,5 	</td> <td> PF5 (ADC5/TMS)  	</td> </tr>
-<tr> <td>A6   </td> <td>5,6 	</td> <td> PF6 (ADC6)  </td> </tr>
-<tr> <td>A7   </td> <td>5,7 	</td> <td> PF7 (ADC7)  </td> </tr>	
-<tr> <td>A8   </td> <td>9,0 	</td> <td> PK0 (ADC8/PCINT16)</td> </tr> 
-<tr> <td>A9   </td> <td>9,1 	</td> <td> PK1 (ADC9/PCINT17)</td> </tr>
-<tr> <td>A10  </td> <td>9,2 	</td> <td> PK2 (ADC10/PCINT18)</td> </tr>
-<tr> <td>A11  </td> <td>9,3 	</td> <td> PK3 (ADC11/PCINT19)</td> </tr>
-<tr> <td>A12  </td> <td>9,4 	</td> <td> PK4 (ADC12/PCINT20)</td> </tr>
-<tr> <td>A13  </td> <td>9,5 	</td> <td> PK5 (ADC13/PCINT21)</td> </tr>
-<tr> <td>A14  </td> <td>9,6 	</td> <td> PK6 (ADC14/PCINT22)</td> </tr> 
-<tr> <td>A15  </td> <td>9,7 	</td> <td> PK7 (ADC15/PCINT23)</td> </tr>
-
-</table>
-</div>
 
 <h3>Code samples</h3>
 
-<h4>Digital Pin - Blinking the board Led - D13/PortB.7</h4>
-<pre><code>#include "TerraIno.defs"
-pinMode(PORTB,7,OUTPUT);  // also may use: pinMode(D13,OUTPUT);
+<h4>Digital Pin - Blinking the Led connected in the GPIO12</h4>
+<pre><code>#include "TerraEsp.defs"
+pinMode(GPIO12,OUTPUT);
 loop do
     await 500ms;          // Waits 0,5 seconds
-    pinToggle(D13);       // Toggle LED value
+    pinToggle(GPIO12);    // Toggle LED value
 end
 </code>
 </pre>
 
-<h4>DHT11 Sensor - Counting temperature value</h4>
-<p>Connect the DHT data pin to D21/PortD0/Int0.</p>
-<pre><code>#include "TerraIno.defs"
-pinMode(PORTB,7,OUTPUT);    // also may use: pinMode(D13,OUTPUT);
-var dhtData_t data;         // Data variable to store result
-var ubyte count;            // Blink LED counter
-loop do
-    emit REQ_DHT(INT0);     // Request a DHT11 read
-    data = await DHT();     // Waits the data
-    count=data.temp;        // Count the Temperature or the Error code
-    if data.stat != 0 then count=data.stat; end
-    loop i, count do        // Loop to blink the LED
-        pinWrite(D13,HIGH);
-        await 150ms;
-        pinWrite(D13,LOW);
-        await 150ms;
-    end
-    await 500ms;
-end
-</code>
-</pre>
 
-<h4>Interrupt Pin - Trigger a pin interruption</h4>
-<p>Connect a push button to GND and D20.
-The LED will toggle once when you press the button. Do nothing when releasing it.</p>
-<pre><code>#include "TerraIno.defs"
-pinMode(PORTB,7,OUTPUT);    // also may use: pinMode(D13,OUTPUT);
-pinMode(D20,INPUT_PULLUP);  // Int1 pin as input
-intConfig(INT1,INT_FALLING);// Interrupt from 1 to 0.
-intEnable(INT1);            // Enable the interrupt
-intClear(INT1);             // Clear, if necessary, the interrupt flag.
+<h4>Interrupt Pin - Trigger a GPIO interruption</h4>
+<p>Connect a push button to GND and GPIO5. Connect a 10Kohms resistor to 3.3v and GPIO5.
+The LED at GPIO12 will toggle once when you press the button. Do nothing when releasing it.</p>
+<pre><code>#include "TerraEsp.defs"
+pinMode(GPIO12,OUTPUT);
+pinMode(GPIO5,INPUT);  		// GPIO5 pin as input
+intPinConfig(GPIO5,INT_NEGEDGE);// Interrupt from 1 to 0.
+intEnable();            	// Enable all GPIO the interruptions.
 loop do
-    await INT_FIRED(INT1);  // Waits for an interrupt Int1
-    intClear(INT1);         // Clear the IntFlag
-    pinToggle(D13);         // Toggle the LED status
-    await 30ms;  			// Debouncing: Waits some time before next Int1.
+    await GPIO_INT();  		// Waits for any configured GPIO interrupt.
+    pinToggle(GPIO12);      // Toggle the LED status
+    await 30ms;  			// Debouncing: Waits some time before next Interruption.
 end
 </code>
 </pre>
