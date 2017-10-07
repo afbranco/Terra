@@ -235,14 +235,14 @@ Additionally, TerraIno implements a simple message queue to support message buff
     </tr>
     <tr>
         <td>Set the pin mode INPUT, OUTPUT, INPUT_PULLUP. Always returns SUCCESS. 
-        	The trhee arguments are: port_id, pin_id, mode. See constants definitions for more details.</td>
+        	The three arguments are: port_id, pin_id, mode. See constants definitions for more details.</td>
         <td>ubyte</td>
         <td>pinMode</td>
         <td>ubyte,ubyte,ubyte</td>
     </tr>
     <tr>
         <td>Writes LOW or HIGH to a pin. Always returns SUCCESS. 
-        	The trhee arguments are: port_id, pin_id, value. See constants definitions for more details.</td>
+        	The three arguments are: port_id, pin_id, value. See constants definitions for more details.</td>
         <td>ubyte</td>
         <td>pinWrite</td>
         <td>ubyte,ubyte,ubyte</td>
@@ -460,12 +460,12 @@ Additionally, TerraIno implements a simple message queue to support message buff
     <tr>
         <td>INT_FALLING</td>
         <td>2</td>
-        <td>Interrupt mode: Interrupts at falling edge</td>
+        <td>Interrupt mode: Interrupts at falling edge - 1->0</td>
     </tr>
     <tr>
         <td>INT_RISING</td>
         <td>3</td>
-        <td>Interrupt mode: Interrupts at rising edge</td>
+        <td>Interrupt mode: Interrupts at rising edge - 0->1</td>
     </tr>
     <tr>
         <td>PORTA .. PORTL</td>
