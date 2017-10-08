@@ -145,13 +145,13 @@ implementation
 
   void startTimer(uint8_t num, uint32_t t0, uint32_t dt, bool isoneshot)
   {
-  	uint8_t stat;
+//  	uint8_t stat;
     Timer_t* timer = &m_timers[num];
     timer->t0 = t0;
     timer->dt = dt;
     timer->isoneshot = isoneshot;
     timer->isrunning = TRUE;
-    stat=post updateFromTimer();
+    post updateFromTimer();
 //os_printf("s%d",stat);
   }
 
