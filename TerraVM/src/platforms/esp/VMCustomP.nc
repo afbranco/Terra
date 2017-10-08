@@ -266,12 +266,14 @@ task void gpioIntHandler_task(){
 }
 
 void gpio_intHandler(){
-	uint32 gpio_status; 
+	uint32 gpio_status;
+	ETS_GPIO_INTR_DISABLE();
 	gpio_status = GPIO_REG_READ(GPIO_STATUS_ADDRESS); 
 	//clear interrupt status 
 	GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, gpio_status);
 	ExtDataGPIOInt=0;
 	post gpioIntHandler_task();
+	ETS_GPIO_INTR_ENABLE();
 }
 
 
