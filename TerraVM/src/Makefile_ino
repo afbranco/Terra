@@ -27,13 +27,43 @@ MAIN_IHEX = $(BUILDDIR)/main.ihex
 MAIN_HEX = $(BUILDDIR)/main.hex
 DUMP_FILE = $(BUILDDIR)/wiring-check.xml
 
-# programs and config "path/names"
-AVR_TOOLS_PATH = /home/branco/arduino-1.0.5/hardware/tools
-OBJCOPY = $(AVR_TOOLS_PATH)/avr/bin/avr-objcopy
-OBJDUMP = avr-objdump
-GCC = $(AVR_TOOLS_PATH)/avr/bin/avr-gcc
-AVRDUDE = $(AVR_TOOLS_PATH)/avrdude
-AVRDUDECONF = $(AVR_TOOLS_PATH)/avrdude.conf
+ifeq ($(__INO_TOOLS_PATH),)
+  AVR_TOOLS_PATH=
+else
+  ifeq ($(__INO_TOOLS_PATH),A)
+    AVR_TOOLS_PATH = $(strip $(subst /avr/bin/avr-gcc,, $(shell locate tools/avr/bin/avr-gcc --limit=1)))
+  else
+   AVR_TOOLS_PATH = $(__INO_TOOLS_PATH)
+  endif
+endif
+
+ifneq ($(AVR_TOOLS_PATH),)
+  # programs and config "path/names"
+  OBJCOPY = $(AVR_TOOLS_PATH)/avr/bin/avr-objcopy
+  OBJDUMP = avr-objdump
+  GCC = $(AVR_TOOLS_PATH)/avr/bin/avr-gcc
+  AVRDUDE = $(AVR_TOOLS_PATH)/avrdude
+  AVRDUDECONF = $(AVR_TOOLS_PATH)/avrdude.conf
+  $(info INFO:: Using Arduino AVR-GCC compiler located in: $(GCC))
+else
+  OBJCOPY = avr-objcopy
+  OBJDUMP = avr-objdump
+  GCC = avr-gcc
+  AVRDUDE = avrdude
+  AVRDUDECONF = /etc/avrdude.conf
+  $(info INFO:: Using original AVR-GCC compiler)
+endif
+
+EXEC_AVR = $(shell command -v $(GCC) 2> /dev/null)
+ifeq ($(EXEC_AVR),)
+  $(info ******************************************************************)
+  $(info *** FAILED )
+  $(info *** Command avr-ggc not found in: $(GCC) )
+  $(info ***  - Check the avr-gcc installation or the INO_TOOLS_PATH: option.)
+  $(info ******************************************************************)
+  $(error )
+endif
+
 
 # MCU and CLOCK
 ifeq ($(_MOTE),uno)

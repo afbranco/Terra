@@ -72,7 +72,7 @@ define options_HELP
  ANA1_REF: Reference voltage for Analog 1 read - DEFAULT,INTERNAL1V1,INTERNAL2V56,EXTERNAL | default INTERNAL1V1
  ANA2_REF: Reference voltage for Analog 2 read - DEFAULT,INTERNAL1V1,INTERNAL2V56,EXTERNAL | default INTERNAL1V1
  ANA3_REF: Reference voltage for Analog 3 read - DEFAULT,INTERNAL1V1,INTERNAL2V56,EXTERNAL | default INTERNAL1V1
-
+ INO_TOOLS_PATH: Path to Arduino installation: A or path | Default ''
 endef
 
 
@@ -123,6 +123,7 @@ define ino_HELP
  ANA1_REF: Reference voltage for Analog 1 read - DEFAULT,INTERNAL1V1,INTERNAL2V56,EXTERNAL | default INTERNAL1V1
  ANA2_REF: Reference voltage for Analog 2 read - DEFAULT,INTERNAL1V1,INTERNAL2V56,EXTERNAL | default INTERNAL1V1
  ANA3_REF: Reference voltage for Analog 3 read - DEFAULT,INTERNAL1V1,INTERNAL2V56,EXTERNAL | default INTERNAL1V1
+ INO_TOOLS_PATH: Path to Arduino installation: A or path | Default ''
 endef
 
 
