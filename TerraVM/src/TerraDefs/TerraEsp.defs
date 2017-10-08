@@ -52,7 +52,7 @@ do
 //#define INT_HILEVEL 5 // Very bad!!! Generates high frequency interrupts.
 
 
-/**
+/*
  * GPIO Pin number - gpio_no
  *
  * NodeMCU DevKit: 	0, 1, 2, 3, 4, 5, 12, 13, 14, 15, 16 .. 9, 10, 
