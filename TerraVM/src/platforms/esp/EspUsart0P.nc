@@ -398,23 +398,23 @@ void ICACHE_FLASH_ATTR uart_rx_task(os_event_t *events) {
 		/*IF NOT , POST AN EVENT AND PROCESS IN SYSTEM TASK */
 		if(UART_FRM_ERR_INT_ST == (READ_PERI_REG(UART_INT_ST(uart_no)) & UART_FRM_ERR_INT_ST)){
 			// There has been an error interrupt.
-			DBG1("FRM_ERR\r\n");
+//			DBG1("FRM_ERR\r\n");
 			WRITE_PERI_REG(UART_INT_CLR(uart_no), UART_FRM_ERR_INT_CLR);
 		}else if(UART_RXFIFO_FULL_INT_ST == (READ_PERI_REG(UART_INT_ST(uart_no)) & UART_RXFIFO_FULL_INT_ST)){
 			// There has been a FIFO full interrupt.
-			DBG("f");
+//			DBG("f");
 			uart_rx_intr_disable(UART0);
 			WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_FULL_INT_CLR);
 			system_os_post(uart_recvTaskPrio, 0, 0);
 		}else if(UART_RXFIFO_TOUT_INT_ST == (READ_PERI_REG(UART_INT_ST(uart_no)) & UART_RXFIFO_TOUT_INT_ST)){
 			// There has been a time out interrupt.
-			DBG("t");
+//			DBG("t");
 			uart_rx_intr_disable(UART0);
 			WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_TOUT_INT_CLR);
 			system_os_post(uart_recvTaskPrio, 0, 0);
 		}else if(UART_TXFIFO_EMPTY_INT_ST == (READ_PERI_REG(UART_INT_ST(uart_no)) & UART_TXFIFO_EMPTY_INT_ST)){
 			// There has been a TX empty interrupt.
-			DBG("e");
+//			DBG("e");
 			/* to output uart data from uart buffer directly in empty interrupt handler*/
 			/*instead of processing in system event, in order not to wait for current task/function to quit */
 			/*ATTENTION:*/
@@ -429,7 +429,7 @@ void ICACHE_FLASH_ATTR uart_rx_task(os_event_t *events) {
  
 		}else if(UART_RXFIFO_OVF_INT_ST  == (READ_PERI_REG(UART_INT_ST(uart_no)) & UART_RXFIFO_OVF_INT_ST)){
 			WRITE_PERI_REG(UART_INT_CLR(uart_no), UART_RXFIFO_OVF_INT_CLR);
-			DBG1("RX OVF!!\r\n");
+//			DBG1("RX OVF!!\r\n");
 		}
 
 	}

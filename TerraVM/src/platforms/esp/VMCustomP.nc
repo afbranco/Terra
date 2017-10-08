@@ -260,16 +260,21 @@ void func_pinToggle(uint16_t id){
 }
 
 
+task void gpioIntHandler_task(){
+	signal VM.queueEvt(I_GPIO_INT   ,    0, &ExtDataGPIOInt);
+	dbg(APPNAME,"Custom::gpio_intHandler:\n");	
+}
+
 void gpio_intHandler(){
 	uint32 gpio_status; 
 	gpio_status = GPIO_REG_READ(GPIO_STATUS_ADDRESS); 
 	//clear interrupt status 
 	GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, gpio_status);
 	ExtDataGPIOInt=0;
-	signal VM.queueEvt(I_GPIO_INT   ,    0, &ExtDataGPIOInt);
-
-	dbg(APPNAME,"Custom::gpio_intHandler:\n");
+	post gpioIntHandler_task();
 }
+
+
 
 void func_intEnable(uint16_t id){
 	if (!gpioIntrAttached_flag){

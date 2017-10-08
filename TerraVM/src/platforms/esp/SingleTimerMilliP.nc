@@ -34,13 +34,9 @@ implementation{
 	task void tarefaTimer(){ signal TimerFrom.fired();}
 	void timer_handler()
 	{
-		uint32_t currentTime;
-//		printf("TimerCalllBack received - isRunning=%d\n",isRunning);
-		currentTime = call TimerFrom.getNow();
-//		if (currentTime>0) printf("Resultado Timer.getNow: %d\n", currentTime);
-//os_printf("ñ"); 
+		//uint32_t currentTime;
+		//currentTime = call TimerFrom.getNow();
 		if (isRunning) post tarefaTimer();
-//		os_printf("4\n");
 	}
 	
 	command void TimerFrom.startOneShot( uint32_t dt )
