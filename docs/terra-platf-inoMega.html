@@ -49,31 +49,6 @@ sudo apt-get install git lua5.1 lua-lpeg nescc gcc-avr avr-libc avrdude </code><
 git clone https://github.com/afbranco/Terra</code></pre>
 <p>The next time use the command <code>git pull</code> from the new <var>Terra</var> dir to get last update</p>
 
-<h4>Adjust makefile paths</h4>
-<p>If necessary, adjust the paths inside <code>Makefile_ino</code> file.</p>
-<p>Open a command terminal and change to src directory</p>
-<pre><code>cd ~/Terra/TerraVM/src</code></pre>
-<p>Open the file <code>Makefile_ino</code> in the editor.</p>
-<pre><code>gedit Makefile_ino</code></pre>
-<p>Modify the following definitions according to your installation options.</p>
-<p>If your environment already has an Arduino installation, 
-please find the correct Arduino path and modify the following definitions.
-(tip: the command: <code>locate tools/avr/bin/avr-gcc</code> will help you to find the correct path.)
-<pre><code>AVR_TOOLS_PATH = <i>found_tools_path</i>
-OBJCOPY = $(AVR_TOOLS_PATH)/avr/bin/avr-objcopy
-OBJDUMP = avr-objdump
-GCC = $(AVR_TOOLS_PATH)/avr/bin/avr-gcc
-AVRDUDE = $(AVR_TOOLS_PATH)/avrdude
-AVRDUDECONF = $(AVR_TOOLS_PATH)/avrdude.conf</code></pre>
-
-<p>If you do not have Arduino installed, you must edit the definitions to:</p> 
-<pre><code>OBJCOPY = avr-objcopy
-OBJDUMP = avr-objdump
-GCC = avr-gcc
-AVRDUDE = avrdude
-AVRDUDECONF = /etc/avrdude.conf</code></pre>
-
-
 <h4>Create environment definitions</h4>
 <p>Open a command terminal and change to HOME directory</p>
 <pre><code>cd ~</code></pre>
@@ -137,6 +112,17 @@ Use the option <i>NO_RADIO</i> in the case you are not using a radio board,
 i.e. your Arduino Mega communicates only by the USB interface.
 </p>
 
+<p> The <b>INO_TOOLS_PATH:</b> defines which avr-gcc installation will be used.
+In general you don't need to use this option, the default value points to the GNU/AVR installation.
+If you desires or needs to use the Arduino installation compiler, you have two options:
+<ul>
+<li> Using the option INO_TOOLS_PATH:<b>A</b>,the system will try to locate in the local disk an Arduino installation to be used.</li>
+<li> You may use INO_TOOLS_PATH:<i>path</i>, where <i>path</i> is the place of the Arduino installation tools directory.
+For example: <code>$HOME/arduino-1.0.5/hardware/tools</code>
+</li>
+</ul> 
+</p>
+
 <h3>Terra compilation parameters</h3>
 <p>These are the allowed parameters when compiling for Arduino Mega board.
 The command <code>make help mega</code> will show an updated definition.</p>
@@ -157,6 +143,7 @@ The command <code>make help mega</code> will show an updated definition.</p>
 <li> ANA1_REF: Reference voltage for Analog 1 read - DEFAULT,INTERNAL1V1,INTERNAL2V56,EXTERNAL | default INTERNAL1V1</li>
 <li> ANA2_REF: Reference voltage for Analog 2 read - DEFAULT,INTERNAL1V1,INTERNAL2V56,EXTERNAL | default INTERNAL1V1</li>
 <li> ANA3_REF: Reference voltage for Analog 3 read - DEFAULT,INTERNAL1V1,INTERNAL2V56,EXTERNAL | default INTERNAL1V1</li>
+<li> INO_TOOLS_PATH: Path to Arduino installation: A or path | Default ''</li>
 </ul>
 
 <h2>Compiling a Terra script</h2>
