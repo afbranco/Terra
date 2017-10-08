@@ -84,12 +84,24 @@ exe:
 %:
 	@:
 
-install.%: 
+install.%: exe $(__USB)
 	@$(AVRDUDE) -C$(AVRDUDECONF)  -v -p$(AVRDUDE_MCU) -c$(AVRDUDEPROG) -P$(__USB) -b$(ISP_BAUDRATE) -D -Uflash:w:$(MAIN_HEX):i
 
-install: 
+install: exe $(__USB)
 	@$(AVRDUDE) -C$(AVRDUDECONF)  -v -p$(AVRDUDE_MCU) -c$(AVRDUDEPROG) -P$(__USB) -b$(ISP_BAUDRATE) -D -Uflash:w:$(MAIN_HEX):i
 
+
+$(__USB):
+	$(info )
+	$(info ******************************************************************)
+	$(info ***  FAILED  )
+	$(info ***  Could not find: $(__USB) to install the TerraVM firmware.)
+	$(info ***    1 - Check if the device is connected.  )
+	$(info ***    2 - Confirm the correct USB path.  )
+	$(info ***    3 - Check the USB: option in the make command.  )
+	$(info ******************************************************************)
+	$(info )
+	$(error )
 
 builddir: 
 	@mkdir -p $(BUILDDIR)

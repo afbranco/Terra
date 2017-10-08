@@ -29,7 +29,7 @@ GCC = xtensa-lx106-elf-gcc
 OBJDUMP = avr-objdump
 
 #Serial upload port
-__SERIAL ?= /dev/ttyUSB0
+__USB ?= /dev/ttyUSB0
 
 # Specif xtensa flags
 CFLAGS += -DICACHE_FLASH -mlongcalls
@@ -97,6 +97,7 @@ $(MAIN_APPC):
 	@sed -i -e's/static inline[ ]*serial_header_t/static serial_header_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
 	@sed -i -e's/static inline[ ]*TerraVMC__evtQ__t/static TerraVMC__evtQ__t __attribute((section(".irom0.text"))) /g' build/esp/app.c
 	@sed -i -e's/static inline[ ]*\/\*TerraVMAppC.evtQ\*\/QueueC__0__queue_t/static QueueC__0__queue_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
+	@sed -i -e's/static inline[ ]*serial_metadata_t/static serial_metadata_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
 	#
 	@sed -i -e's/static[ ]*\/\*TerraVMAppC.evtQ\*\/QueueC__0__queue_t/static QueueC__0__queue_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
 	#
@@ -104,9 +105,12 @@ $(MAIN_APPC):
 	@sed -i -e's/inline static[ ]*message_t/static message_t __attribute((section(".irom0.text"))) /g' build/esp/app.c
 	#
 	@sed -i -e's/sint8 espconn/sint8 __attribute((section(".irom0.text"))) espconn/g' build/esp/app.c
+	@sed -i -e's/sint16 espconn/sint16 __attribute((section(".irom0.text"))) espconn/g' build/esp/app.c
+	@sed -i -e's/uint32 espconn/uint32 __attribute((section(".irom0.text"))) espconn/g' build/esp/app.c
 	#
 	@sed -i -e's/%hhu/%d/g' build/esp/app.c
 	@sed -i -e's/ memcpy/ ets_memcpy/g' build/esp/app.c
+	@sed -i -e's/ memset/ ets_memset/g' build/esp/app.c
 	#
 	@sed -i -e's/__attribute((section(".irom0.text")))  EspUsart0P__uart0_rx_intr_handler/EspUsart0P__uart0_rx_intr_handler/g' build/esp/app.c
 	@sed -i -e's/__attribute((section(".irom0.text")))  SingleTimerMilliP__timer_handler/SingleTimerMilliP__timer_handler/g' build/esp/app.c
@@ -124,16 +128,28 @@ elf: $(MAIN_APPC)
 %:
 	@:
 
-install.%: $(MAIN_EXE)-0x00000.bin $(MAIN_EXE)-0x10000.bin blankFile
+install.%: $(MAIN_EXE)-0x00000.bin $(MAIN_EXE)-0x10000.bin blankFile $(__USB)
 	$(info ---------------------------------  Start flashing to device *************)
-	esptool.py -b 115200 -p $(__SERIAL) write_flash 0x00000 $(MAIN_EXE)-0x00000.bin 0x66000 $(BUILDDIR)/blank_12k-0x66000.bin 0x10000 $(MAIN_EXE)-0x10000.bin
+	esptool.py -b 115200 -p $(__USB) write_flash 0x00000 $(MAIN_EXE)-0x00000.bin 0x66000 $(BUILDDIR)/blank_12k-0x66000.bin 0x10000 $(MAIN_EXE)-0x10000.bin
 
-install: $(MAIN_EXE)-0x00000.bin $(MAIN_EXE)-0x10000.bin blankFile
+install: $(MAIN_EXE)-0x00000.bin $(MAIN_EXE)-0x10000.bin blankFile $(__USB)
 	$(info ---------------------------------  Start flashing to device *************)
-	esptool.py -b 115200 -p $(__SERIAL) write_flash 0x00000 $(MAIN_EXE)-0x00000.bin 0x66000 $(BUILDDIR)/blank_12k-0x66000.bin 0x10000 $(MAIN_EXE)-0x10000.bin
+	esptool.py -b 115200 -p $(__USB) write_flash 0x00000 $(MAIN_EXE)-0x00000.bin 0x66000 $(BUILDDIR)/blank_12k-0x66000.bin 0x10000 $(MAIN_EXE)-0x10000.bin
 	@mkdir -p $(BUILDDIR)
 	@rm -f $(MAIN_APPC)
 
+$(__USB):
+	$(info )
+	$(info ******************************************************************)
+	$(info ***  FAILED  )
+	$(info ***  Could not find: $(__USB) to install the TerraVM firmware.)
+	$(info ***    1 - Check if the device is connected.  )
+	$(info ***    2 - Confirm the correct USB path.  )
+	$(info ***    3 - Check the USB: option in the make command.  )
+	$(info ******************************************************************)
+	$(info )
+	$(error )
+	
 blankFile: $(BUILDDIR)/blank_12k-0x66000.bin
 	@dd if=/dev/zero of=$(BUILDDIR)/blank_12k-0x66000.bin bs=12288 count=1
 	
