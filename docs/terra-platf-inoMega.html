@@ -163,13 +163,17 @@ Assuming that the name of your script file is myScript.terra, type the following
 you need to load the script bytecode into the Terra network nodes.
 Two tools must be started to that: The TinyOS <i>SerialForwarder</i> application and the <i>Terra Control</i> tool.
 </p>
-<p>The use of the Terra Control tool was explained in the Terra tutorial.
+<p>The use of the Terra Control tool was explained in the Terra tutorial  
+at <a target="_blank" href="http://www.inf.puc-rio.br/~abranco/index.html#tab2-5">Terra Site</a>.
 The tool can be started by the <code>ttool</code> command. 
 After started, the tool waits for the SerialForwarder to connect to the USB.
 </p>
 <p>The SerialForwarder is started by <code>sf -comm serial@<i>path</i>:<i>baud</i> </code> command, 
 where <i>path</i> is the path to the USB interface 
 and <i>baud</i> is the baud rate indicated in the BS_BAUD parameter.
+
+
+<pre><code>sf -comm serial@/dev/ttyACM0:19200</code></pre>
 </p>
 
 <h2>Connecting NRF24L01+ to Mega Board</h2>
