@@ -22,7 +22,7 @@ Currently we tested Terra in the following ESP8266-12E 4MB boards:
 </p>
 	
 
-<p>You will find in <a target="_blank" href="terra-custom-TerraEsp.html">this page</a> detailed informations about TerraEsp specific events and functions.</p>	
+<p>You will find in <a target="_blank" href="terra-custom-TerraEsp.html">this page</a> detailed information about TerraEsp specific events and functions.</p>	
 	
 <h2>Installing TerraEsp in a Linux Box</h2> 
 
@@ -49,7 +49,7 @@ sudo apt-get install git lua5.1 lua-lpeg nescc</code></pre>
     sed git unzip bash help2man wget bzip2 libtool-bin</code></pre>
 
 <h4> ESP SDK Toolchain installation. </h4>
-<p><b>Note:</b>Be patient! This step needs some time!</p>
+<p><b>Note:</b> Be patient! This step needs some time!</p>
 <pre><code>cd ~
 git clone --recursive https://github.com/pfalcon/esp-open-sdk.git
 cd ~/esp-open-sdk/
@@ -123,7 +123,7 @@ The node address, considering the unique ID 1, will be <code>(2*2048)+1 = 4097</
 
 <p>The <b>USB:<i>path</i></b> identifies the USB connected to flash the ESP Board.
 This value is usually <code>/dev/ttyUSB0</code>, 
-this depend on the FDDI chip used in the board. 
+this depends on the FDDI chip used in the board. 
 But its number may change if the previous connection is already allocated.
 Use the command <code>ls /dev/ttyU*</code> to find the correct port.   
 </p>
@@ -150,9 +150,9 @@ The command <code>make help esp</code> will show an updated definition.</p>
 </ul>
 
 <h3>Warning about some Pre installed firmwares</h3>
-<p>Terra firmware may not work depending on the original firmware loadded into the board.
+<p>Terra firmware may not work depending on the original firmware loaded into the board.
 Loading a specific firmware based on the same libraries used by Terra will solve this problem.
-The following commands will load the AT-Command firmware into your boad.
+The following commands will load the AT-Command firmware into your board.
 You need to do this only once. 
 </p>
 <pre><code>cd ~/esp-open-sdk/sdk/bin
@@ -162,7 +162,7 @@ esptool.py write_flash 0 boot_v1.2.bin 0x01000 at/1024+1024/user1.2048.new.5.bin
 <h2>Compiling a Terra script</h2>
 <p>Terra scripts rely on a definition file targeting a specific customization. 
 In the case of ESP, the TerraEsp.defs file is the the basic customization. 
-This file must be referenced in the begining of your script code as <code>#include "TerraEsp.defs"</code>.
+This file must be referenced in the beginning of your script code as <code>#include "TerraEsp.defs"</code>.
 </p>
 
 <p>Use the command <code>terrac</code> to compile your script. 
@@ -174,7 +174,7 @@ Assuming that the name of your script file is myScript.terra, type the following
 <h2>Loading a Terra Script into network</h2>
 <p>Considering that you already have a script compiled with <code>terrac</code> compiler,
 you need to load the script bytecode into the Terra network nodes.
-Two tools must be started to that. The TinyOS <i>SerialForwarder</i> application and the <i>Terra Control</i> tool.
+Two tools must be started to that: The TinyOS <i>SerialForwarder</i> application and the <i>Terra Control</i> tool.
 </p>
 <p>The use of the Terra Control tool was explained in the Terra tutorial.
 The tool can be started by <code>ttool</code> command. 

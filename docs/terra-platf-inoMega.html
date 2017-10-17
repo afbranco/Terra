@@ -21,7 +21,7 @@ Currently we tested Terra in two boards:
 	</ul>
 </p>	
 
-<p>You will find in <a target="_blank" href="terra-custom-TerraIno.html">this page</a> detailed informations about TerraIno specific events and functions.</p>	
+<p>You will find in <a target="_blank" href="terra-custom-TerraIno.html">this page</a> detailed information about TerraIno specific events and functions.</p>	
 	
 <h2>Installing Terra Ino in a Linux Box</h2> 
 
@@ -101,7 +101,7 @@ The node address, considering the unique ID 1, will be <code>(3*2048)+1 = 6145</
 
 <p>The <b>USB:<i>path</i></b> identifies the USB connected to flash the Mega Board.
 This value is usually <code>/dev/ttyACM0</code> or <code>/dev/ttyUSB0</code>, 
-this depend on the FDDI chip used in the board. 
+this depends on the FDDI chip used in the board. 
 But its number may change if the previous connection is already allocated.
 Use the command <code>ls /dev/ttyA*</code> or <code>ls /dev/ttyU*</code> to find the correct port.   
 </p>
@@ -149,7 +149,7 @@ The command <code>make help mega</code> will show an updated definition.</p>
 <h2>Compiling a Terra script</h2>
 <p>Terra scripts rely on a definition file targeting a specific customization. 
 In the case of Arduino, the TerraIno.defs file is the the basic customization. 
-This file must be referenced in the begining of your script code as <code>#include "TerraIno.defs"</code>.
+This file must be referenced in the beginning of your script code as <code>#include "TerraIno.defs"</code>.
 </p>
 
 <p>Use the command <code>terrac</code> to compile your script. 
@@ -161,7 +161,7 @@ Assuming that the name of your script file is myScript.terra, type the following
 <h2>Loading a Terra Script into network</h2>
 <p>Considering that you already have a script compiled with <code>terrac</code> compiler,
 you need to load the script bytecode into the Terra network nodes.
-Two tools must be started to that. The TinyOS <i>SerialForwarder</i> application and the <i>Terra Control</i> tool.
+Two tools must be started to that: The TinyOS <i>SerialForwarder</i> application and the <i>Terra Control</i> tool.
 </p>
 <p>The use of the Terra Control tool was explained in the Terra tutorial.
 The tool can be started by <code>ttool</code> command. 
