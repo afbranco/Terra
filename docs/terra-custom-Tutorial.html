@@ -62,7 +62,7 @@ Next we explain the developer activities to customize a basic Terra implementati
 
 
 <h4>Customization flow (Dev) <i>vs</i> Usage flow (User)</h4>
-<img 
+<img style='float:left;margin-right:10px;' 
 	src="images/CustomizationDiagram.png" alt="Customization Process Diagram">
 
 <h4>The developer activities</h4>
@@ -108,10 +108,10 @@ Some examples are:</p>
 <p>Output events are defined by:</p>
 <pre><code><b>output void</b> <i>EventName</i> <i>ArgumentType</i> <i>NumericID</i>;</code></pre>
 <p>Where:</p>
-<<ul>
+<ul>
   <li> <i>EventName</i> is the event name used in the Terra Script.</li>
   <li> <i>ArgumentType</i> is the type of the argument. Must be any basic Terra type, void or any custom data structure. </li>
-  <li> <i>NumericID</i> is a integer number that identify internally the event. This number must be unique in all output events.</li>
+  <li> <i>NumericID</i> is an integer number that identifies internally the event. This number must be unique in all output events.</li>
 </ul>
 <p>A an example of output event definition is:</p>
 <pre><code>output void REQ_DHT ubyte 10;</code></pre>
@@ -121,26 +121,26 @@ Some examples are:</p>
 <p>Input events are defined by:</p>
 <pre><code><b>input</b> <i>ReturnType</i> <i>EventName</i> <i>ArgumentType</i> <i>NumericID</i>;</code></pre>
 <p>Where:</p>
-<<ul>
+<ul>
   <li> <i>ReturnType</i> is the type of the <i>await</i> value. Must be any basic Terra type, void or any custom data structure. </li>
   <li> <i>EventName</i> is the event name used in the Terra Script.</li>
   <li> <i>ArgumentType</i> is the type of the argument. Must be an ubyte type or void. This argument, in general, identifies a <i>sub-event</i> type.</li>
-  <li> <i>NumericID</i> is a integer number that identify internally the event. This number must be unique in all input events.</li>
+  <li> <i>NumericID</i> is an integer number that identifies internally the event. This number must be unique in all input events.</li>
 </ul>
 <p>A an example of input event definition is:</p>
 <pre><code>input ubyte SEND_DONE void 41;</code></pre>
 
 <h5>Functions</h5>
 <p>Functions events are defined by:</p>
-<pre><code><b>function</b> <i>ReturnType</i> <i>FunctionName</i> (<i>ListOfArgumentsType</i>) <i>NumericID</i>;</code></pre>
+<pre><code><b>function</b> <i>ReturnType</i> <i>FunctionName</i>(<i>ListOfArgumentsType</i>) <i>NumericID</i>;</code></pre>
 <p>Where:</p>
-<<ul>
-  <li> <i>ReturnType</i> is the type of the function return value. Accept only basic Terra types. Cannot be void. </li>
+<ul>
+  <li> <i>ReturnType</i> is the type of the function return value. Accept only basic Terra types. Leave it empty in the case of void. </li>
   <li> <i>FunctionName</i> is the function name used in the Terra Script.</li>
   <li> <i>ListOfArgumentsType</i> May be empty or a list of types. The types must be any basic Terra type or any custom data structure. Cannot be void. </li>
-  <li> <i>NumericID</i> is a integer number that identify internally the event. This number must be unique in all input events.</li>
+  <li> <i>NumericID</i> is an integer number that identifies internally the function. This number must be unique in all functions.</li>
 </ul>
-<p>Examples of input event definition are:</p>
+<p>Examples of function definition are:</p>
 <pre><code>function ushort getNodeId() 0;
 function ubyte  pinWrite(ubyte,ubyte,ubyte) 21;</code></pre>
 
@@ -152,19 +152,19 @@ Each numeric ID must be equal to the equivalent one in the <code>.defs</code> fi
 These IDs are defined as a list of enumeration values as:
 </p>
 <pre><code>enum{
-  <i>OutEvent1</i>           =<i>NumericId1</i>,
-  <i>OutEvent2</i>           =<i>NumericId2</i>,
-  <i>InEvent1</i>           =<i>NumericId1</i>,
-  <i>InEvent2</i>           =<i>NumericId2</i>,
-  <i>Function1</i>           =<i>NumericId1</i>,
-  <i>Function2</i>           =<i>NumericId2</i>,
+  <i>OutEvent1</i> =<i>NumericId1</i>,
+  <i>OutEvent2</i> =<i>NumericId2</i>,
+  <i>InEvent1</i>  =<i>NumericId1</i>,
+  <i>InEvent2</i>  =<i>NumericId2</i>,
+  <i>Function1</i> =<i>NumericId1</i>,
+  <i>Function2</i> =<i>NumericId2</i>,
 }
 </code></pre>
 <p><b>Note</b> that the Numeric ID must be different only for each group of OutEvent, InEvent, and Function.
 </p>
 
 <h4>TVMCustomP.nc file</h4>
-<p></p>
+<p>TBD</p>
 
 <h3>Simplified Example</h3>
 
