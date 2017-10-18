@@ -40,7 +40,10 @@ docs:
     url: terra-custom-TerraEsp.html  
 
   - page: ArduinoMega - Basic
-    url: terra-custom-TerraIno.html  
+    url: terra-custom-TerraIno.html
+
+  - page: Tutorial New Custom
+    url: terra-custom-Tutorial.html
 
     
 - menu: Contributions

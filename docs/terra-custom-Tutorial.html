@@ -1,0 +1,278 @@
+---
+---
+{% include header.html %}
+
+<style>
+xb {font-weight:bold; color: blue;}
+xr {font-weight:bold; color: red;}
+xg {font-weight:bold; color: green;}
+xz {font-weight:bold; color: gray;}
+</style>
+
+<h2>Tutorial for new customizations</h2>
+<p>
+Basic concepts
+
+User script - Semantic and syntax for events and functions
+ubyte stat = emit EVENT(arg);
+ubyte ret = await EVENT(ubyte);
+type ret = FUNCTION(arg1,..., argn);
+
+".defs" file
+	Constant definitions
+	Custom data structures
+	output event ID, arg1, return1
+	input event ID, arg1, return1
+	functions ID, args, return1
+
+"TerraCustom.h"
+	Constant definitions
+	Custom data structures
+	output event ID
+	input event ID
+	functions ID
+
+"TerraCustomP.nc"
+	switch/case - output events
+	switch/case - functions
+	
+	Custom events/functions implementation
+		Resources - push and pop the stack - number of arguments must comply with .defs file.
+		Insert a input event - Data structure pointer or basic type value must comply with .defs file.
+
+
+IDs ..
+
+
+
+</p>
+
+
+<h3>Customization Process</h3>
+
+<p> The next figure presents the customization and usage flows.
+The developer activities related to customization are indicated in <xb>blue</xb> and 
+the user activities related to application script are indicated in <xr>red</xr>.
+</p>
+<p> The user activities are presented in more details in
+the <a target="_blank" href="http://www.inf.puc-rio.br/~abranco/index.html#tab2-5">Terra tutorial page</a> 
+and at the end of each Terra Platform page.
+Next we explain the developer activities to customize a basic Terra implementation.
+</p>
+
+
+<h4>Customization flow (Dev) <i>vs</i> Usage flow (User)</h4>
+<img style='float:left;margin-right:10px;' 
+	src="images/CustomizationDiagram.png" alt="Customization Process Diagram">
+
+<h4>The developer activities</h4>
+<p style="text-indent: 50px;"><b>Note:</b> <i>This procedure assumes that you already have Terra  
+ported to the desired platform with a very basic customization.
+In general this very basic customization is based on TerraNet customization.</i>  
+</p>
+
+<p>At least three files must be edited to add new functionalities to a specific customization.</p>
+<ul>
+<li>The Terra<i>XXX</i>.defs file located in <code>~/Terra/TerraVM/src/TerraDefs</code> directory, where <i>XXX</i> is the base customization for target platform.</li>
+<li>The VMCustom.h file located in <code>~/Terra/TerraVM/src/platform/<i>XXX</i></code> directory.</li>
+<li>The VMCustomP.nc file also located in <code>~/Terra/TerraVM/src/platform/<i>XXX</i></code> directory.</li>
+</ul>
+<p>The definitions between these three files must be compatibles.
+In the case of events, the numeric IDs must be equal to equivalent operations.
+In the case of data structures, the type and position of the each fields must be equivalent. 
+Same events and functions may have different names between the files.
+</p>
+<p>The syntax of each type of operations are described in the sequence.
+At the end you will find some real code examples.
+</p> 
+
+<h4>Terra<i>XXX</i>.defs file</h4>
+<p>
+This file is used during <i>terrac</i> compilation to validate the event and function names. 
+Any customized data structure used by events or functions are also defined in this file.
+Additionally, the developer may define constant values to be used in the new functionalities. 
+</p>
+<h5>Contants</h5>
+<p>A constant definition use the <code>#define</code> command as used in the C language.
+Some examples are:</p>
+<pre><code>#define HIGH 1
+#define LOW 0
+#define ON 1
+#define OFF 0
+</code></pre>
+
+<h5>Data structures</h5>
+<p>TBD</p>
+
+<h5>Output events</h5>
+<p>Output events are defined by:</p>
+<pre><code><b>output void</b> <i>EventName</i> <i>ArgumentType</i> <i>NumericID</i>;</code></pre>
+<p>Where:</p>
+<<ul>
+  <li> <i>EventName</i> is the event name used in the Terra Script.</li>
+  <li> <i>ArgumentType</i> is the type of the argument. Must be any basic Terra type, void or any custom data structure. </li>
+  <li> <i>NumericID</i> is a integer number that identify internally the event. This number must be unique in all output events.</li>
+</ul>
+<p>A an example of output event definition is:</p>
+<pre><code>output void REQ_DHT ubyte 10;</code></pre>
+<p><b>Note</b> that all output events must return void.</p>
+
+<h5>Input events</h5>
+<p>Input events are defined by:</p>
+<pre><code><b>input</b> <i>ReturnType</i> <i>EventName</i> <i>ArgumentType</i> <i>NumericID</i>;</code></pre>
+<p>Where:</p>
+<<ul>
+  <li> <i>ReturnType</i> is the type of the <i>await</i> value. Must be any basic Terra type, void or any custom data structure. </li>
+  <li> <i>EventName</i> is the event name used in the Terra Script.</li>
+  <li> <i>ArgumentType</i> is the type of the argument. Must be an ubyte type or void. This argument, in general, identifies a <i>sub-event</i> type.</li>
+  <li> <i>NumericID</i> is a integer number that identify internally the event. This number must be unique in all input events.</li>
+</ul>
+<p>A an example of input event definition is:</p>
+<pre><code>input ubyte SEND_DONE void 41;</code></pre>
+
+<h5>Functions</h5>
+<p>Functions events are defined by:</p>
+<pre><code><b>function</b> <i>ReturnType</i> <i>FunctionName</i> (<i>ListOfArgumentsType</i>) <i>NumericID</i>;</code></pre>
+<p>Where:</p>
+<<ul>
+  <li> <i>ReturnType</i> is the type of the function return value. Accept only basic Terra types. Cannot be void. </li>
+  <li> <i>FunctionName</i> is the function name used in the Terra Script.</li>
+  <li> <i>ListOfArgumentsType</i> May be empty or a list of types. The types must be any basic Terra type or any custom data structure. Cannot be void. </li>
+  <li> <i>NumericID</i> is a integer number that identify internally the event. This number must be unique in all input events.</li>
+</ul>
+<p>Examples of input event definition are:</p>
+<pre><code>function ushort getNodeId() 0;
+function ubyte  pinWrite(ubyte,ubyte,ubyte) 21;</code></pre>
+
+
+<h4>VMCustom.h file</h4>
+<p>
+This file defines the events and function numeric identifiers to be used during the building of TerraVM firmware.
+Each numeric ID must be equal to the equivalent one in the <code>.defs</code> file.
+These IDs are defined as a list of enumeration values as:
+</p>
+<pre><code>enum{
+  <i>OutEvent1</i>           =<i>NumericId1</i>,
+  <i>OutEvent2</i>           =<i>NumericId2</i>,
+  <i>InEvent1</i>           =<i>NumericId1</i>,
+  <i>InEvent2</i>           =<i>NumericId2</i>,
+  <i>Function1</i>           =<i>NumericId1</i>,
+  <i>Function2</i>           =<i>NumericId2</i>,
+}
+</code></pre>
+<p><b>Note</b> that the Numeric ID must be different only for each group of OutEvent, InEvent, and Function.
+</p>
+
+<h4>TVMCustomP.nc file</h4>
+<p></p>
+
+<h3>Simplified Example</h3>
+
+<p>Example file for <code>TerraXXX.defs</code></p>
+<pre><code>// Interruption used for DHT sensor
+#define INT0 0  // PD0
+#define INT1 1  // PD1 
+#define INT2 2  // PD2 
+#define INT3 3  // PD3 
+
+// DHT11 data structure
+regtype <i>dhtData_t</i> with
+	var ubyte stat;
+	var ubyte hum;
+	var ubyte temp;
+end
+
+// radioMsg - Radio/Queue Data Message Register
+packet <i>radioMsg</i> with
+	var ubyte type;
+	var ushort source;
+	var ushort target;
+	var payload[20] data;
+end
+
+output void   REQ_DHT   ubyte    <xb>10</xb>;
+output void   SEND      <i>radioMsg</i> <xb>40</xb>;
+
+input  <i>dhtData_t</i> DHT    void      <xr>6</xr>;
+input  ubyte     SEND_DONE ubyte <xr>40</xr>;
+input  ubyte     SEND_DONE void  <xr>41</xr>;
+
+function ushort getNodeId()                      <xg>0</xg>;
+function ubyte  pinWrite(ubyte,ubyte,ubyte) 	<xg>21</xg>;
+</code></pre>
+
+<p>Example file for <code>VMCustom.h</code></p>
+<pre><code>enum{
+  O_DHT           =<xb>10</xb>,
+  O_SEND          =<xb>40</xb>,
+
+  I_DHT           = <xr>6</xr>,
+  I_SEND_DONE_ID  =<xr>40</xr>,
+  I_SEND_DONE     =<xr>41</xr>,
+  
+  F_GETNODEID     =  <xg>0</xg>,
+  F_PIN_WRITE     = <xg>21</xg>,
+}
+</code></pre>
+
+<p>Example file for <code>VMCustomP.nc</code></p>
+<pre><code>void <b>proc_req_dht_read(uint16_t id, uint32_t value)</b>{
+	call dht.read((uint8_t)value);
+}
+
+void  <b>proc_send(uint16_t id, uint32_t addr)</b>{
+  usrMsg_t* usrMsg;
+  usrMsg = (usrMsg_t*)signal VM.getRealAddr(addr);
+  // .....
+}
+
+void  <b>func_getNodeId(uint16_t id)</b>{
+  uint16_t stat;
+  stat = TOS_NODE_ID;
+  signal VM.push(stat);<xz>// Returns a value</xz>
+}	
+
+void <b>func_pinWrite(uint16_t id)</b>{
+  uint8_t stat=0;
+  uint8_t port, pin, val;
+  val  = (uint8_t)signal VM.pop(); <xz>// pop 3⁰ arg from stack</xz>
+  pin  = (uint8_t)signal VM.pop(); <xz>// pop 2⁰ arg from stack</xz>
+  port = (uint8_t)signal VM.pop(); <xz>// pop 1⁰ arg from stack</xz>
+  stat = pinWrite(port,pin,val);   <xz>// execute local function</xz>
+  signal VM.push(stat);            <xz>// Returns a value</xz>
+}
+
+dhtData_t ExtDHTData;
+event void dht.readDone(dhtData_t* data){
+  memcpy(&ExtDHTData,data,sizeof(dhtData_t));  <xz>// copy data to event buffer</xz>
+  signal VM.queueEvt(<xr>I_DHT</xr>, 0, &ExtDHTData); <xz>// Generates a Terra event</xz>
+}
+
+nx_uint8_t ExtDataSendDoneError;
+event void BSRadio.sendDone(uint8_t am_id,message_t* msg,void* dataMsg, error_t error){
+  if (am_id == AM_USRMSG){
+    ExtDataSendDoneError = (uint8_t)error;
+    signal VM.queueEvt(<xr>I_SEND_DONE_ID</xr>, ((usrMsg_t*)dataMsg)->type, &ExtDataSendDoneError);
+    signal VM.queueEvt(<xr>I_SEND_DONE</xr>   ,                          0, &ExtDataSendDoneError);
+  }
+}
+
+command void VM.procOutEvt(uint8_t id,uint32_t value){
+  switch (id){
+    case <xb>O_DHT</xb>  : <b>proc_req_dht_read(id,value)</b>; break;
+    case <xb>O_SEND</xb> : <b>proc_send(id,value)</b>; break;
+  }
+}
+
+command void VM.callFunction(uint8_t id){
+  switch (id){
+    case <xg>F_GETNODEID</xg> : <b>func_getNodeId(id)</b>; break;
+    case <xg>F_PIN_WRITE</xg> : <b>func_pinWrite(id)</b>; break;
+  }
+}
+</code></pre>
+
+
+<p>
+
+{% include footer.html %}
