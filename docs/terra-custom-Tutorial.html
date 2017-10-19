@@ -136,7 +136,45 @@ Some examples are:</p>
 </code></pre>
 
 <h5>Data structures definitions</h5>
-<p>TBD</p>
+<p><i><b>Note</b>  that you need to be familiar with Terra data structures.
+The page 
+<a target="_blank" href="http://www.inf.puc-rio.br/~abranco/#tab2-2">Céu-T Language</a>
+presents details about the <em>Types and data structures</em> of Terra scripting language.</i>
+</p>
+
+<p><bold>Registers</bold> - Some new functionalities may need exchange values that a single basic type 
+cannot support.
+In these cases we need to create a specific data structure that includes all needed values.
+In Céu-T language, a <code>regtype</code> declaration creates a new register type. 
+A register can only have fields that are values of basic Terra types or arrays of basic types.
+</p>
+<pre><code><xz>// regtype example</xz>
+regtype dhtData_t with
+	var ubyte stat;
+	var ubyte hum;
+	var ubyte temp;
+end
+</code></pre>
+
+<p><bold>Packets</bold> - In special cases the new functionality may leave some fields to be defined by the user.
+This is the case of Radio messages where one part of the message (header) is predefined by the Terra message protocol
+ and second part (payload) is application dependent.
+ The <code>pktype</code> declaration creates a new abstract type with predefined fields and a payload section.
+ The predefined fields depend on the new functionality needs and the payload section is left to the user application needs.
+</p>
+<pre><code><xz>// pktype example</xz>
+packet radioMsg with
+	var ubyte type;
+	var ushort source;
+	var ushort target;
+	var payload[20] data;
+end
+</code></pre>
+
+<p>When using register in events or functions, Terra system always pass the data address instead of data values.
+Then, you must use the TerraVM internal support to copy memory data when building your customized function.
+See below the "VMCustomP.nc file" section to find some examples.
+</p>
 
 <h5>Output event  definition</h5>
 <p>Output events are defined by:</p>
