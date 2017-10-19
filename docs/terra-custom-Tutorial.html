@@ -69,8 +69,7 @@ IDs ..
 <p> The next figure presents the customization and usage flows.
 The developer activities related to customization are indicated in <xb>blue</xb> and 
 the user activities related to application script are indicated in <xr>red</xr>.
-</p>
-<p> The user activities are presented in more details in
+The user activities are presented in more details in
 the <a target="_blank" href="http://www.inf.puc-rio.br/~abranco/index.html#tab2-5">Terra tutorial page</a> 
 and at the end of each Terra Platform page.
 Next section presents the developer activities to customize a basic Terra implementation.
@@ -86,7 +85,7 @@ Next section presents the developer activities to customize a basic Terra implem
 <br>
 <figure>
 <figcaption >Figure: Customization flow (<xb>Dev</xb>) <i>vs</i> Usage flow (<xr>User</xr>)</figcaption>
-<img style='clear:both;margin-right:10px; margin-top:10px; width:798px; height:607px;' 
+<img style='clear:both;margin-right:10px; margin-top:10px; width:auto; height:auto;' 
 	src="images/CustomizationDiagram.png" alt="Customization Process Diagram">
 </figure>
 
@@ -107,10 +106,11 @@ In general this very basic customization is based on TerraNet customization.</i>
 <p>The definitions between these three files must be compatibles.
 In the case of events, the numeric IDs must be equal to equivalent operations.
 In the case of data structures, the type and position of the each fields must be equivalent. 
-Same events and functions may have different names between the files.
+Same events and functions may have different names between the files, 
+considering that the numeric IDs are the same.
 </p>
 <p>The syntax of each type of operations are described in the sequence.
-Last section presents some real code examples.
+The last section presents some real code examples.
 </p> 
 
 <p>In general, small functionalities are written inside <i>VMCustomP.nc</i> file.
@@ -142,7 +142,7 @@ The page
 presents details about the <em>Types and data structures</em> of Terra scripting language.</i>
 </p>
 
-<p><bold>Registers</bold> - Some new functionalities may need exchange values that a single basic type 
+<p><b>Registers</b> - Some new functionalities may need exchange values that a single basic type 
 cannot support.
 In these cases we need to create a specific data structure that includes all needed values.
 In Céu-T language, a <code>regtype</code> declaration creates a new register type. 
@@ -156,7 +156,7 @@ regtype dhtData_t with
 end
 </code></pre>
 
-<p><bold>Packets</bold> - In special cases the new functionality may leave some fields to be defined by the user.
+<p><b>Packets</b> - In special cases the new functionality may leave some fields to be defined by the user.
 This is the case of Radio messages where one part of the message (header) is predefined by the Terra message protocol
  and second part (payload) is application dependent.
  The <code>pktype</code> declaration creates a new abstract type with predefined fields and a payload section.
