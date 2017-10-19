@@ -131,9 +131,9 @@ Additionally, the developer may define constant values to be used in the new fun
 <p>A constant definition use the <code>#define</code> command as used in the C language.
 Some examples are:</p>
 <pre><code>#define HIGH 1
-#define LOW 0
-#define ON 1
-#define OFF 0
+<b>#define</b> LOW 0
+<b>#define</b> ON 1
+<b>#define</b> OFF 0
 </code></pre>
 
 <h5>Data structures definitions</h5>
@@ -152,11 +152,11 @@ A register can only have fields that are values of basic Terra types or arrays o
 In Céu-T, all variables must start with a lowercase character.
 </p>
 <pre><code><xz>// regtype example</xz>
-regtype dhtData_t with
-	var ubyte stat;
-	var ubyte hum;
-	var ubyte temp;
-end
+<b>regtype</b> dhtData_t <b>with</b>
+	<b>var ubyte</b> stat;
+	<b>var ubyte</b> hum;
+	<b>var ubyte</b> temp;
+<b>end</b>
 </code></pre>
 
 <p><b>Packets</b> - In special cases the new functionality may leave some fields to be defined by the user.
@@ -166,12 +166,12 @@ This is the case of Radio messages where one part of the message (header) is pre
  The predefined fields depend on the new functionality needs and the payload section is left to the user application needs.
 </p>
 <pre><code><xz>// pktype example</xz>
-packet radioMsg with
-	var ubyte type;
-	var ushort source;
-	var ushort target;
-	var payload[20] data;
-end
+<b>packet</b> radioMsg <b>with</b>
+	<b>var ubyte</b> type;
+	<b>var ushort</b> source;
+	<b>var ushort</b> target;
+	<b>var payload</b>[20] data;
+<b>end</b>
 </code></pre>
 
 <p>When using register in events or functions, Terra system always pass the data address instead of data values.
@@ -241,7 +241,7 @@ These IDs are defined as a list of enumeration values as:
   <strong>Note:</strong> the Numeric ID must be different only for each group of OutEvent, InEvent, and Function.
 </div>
 
-<h4>TVMCustomP.nc file</h4>
+<h4>VMCustomP.nc file</h4>
 <p>TBD</p>
 
 <h3>Simple Example</h3>
