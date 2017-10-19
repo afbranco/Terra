@@ -149,6 +149,7 @@ cannot support.
 In these cases we need to create a specific data structure that includes all needed values.
 In Céu-T language, a <code>regtype</code> declaration creates a new register type. 
 A register can only have fields that are values of basic Terra types or arrays of basic types.
+In Céu-T, all variables must start with a lowercase character.
 </p>
 <pre><code><xz>// regtype example</xz>
 regtype dhtData_t with
@@ -183,7 +184,7 @@ See below the "VMCustomP.nc file" section to find some examples.
 <pre><code><b>output void</b> <i>EventName</i> <i>ArgumentType</i> <i>NumericID</i>;</code></pre>
 <p>Where:</p>
 <ul>
-  <li> <i>EventName</i> is the event name used in the Terra Script.</li>
+  <li> <i>EventName</i> is the event name used in the Terra Script. Must be uppercase.</li>
   <li> <i>ArgumentType</i> is the type of the argument. Must be any basic Terra type, void or any custom data structure. </li>
   <li> <i>NumericID</i> is an integer number that identifies internally the event. This number must be unique in all output events.</li>
 </ul>
@@ -199,7 +200,7 @@ See below the "VMCustomP.nc file" section to find some examples.
 <p>Where:</p>
 <ul>
   <li> <i>ReturnType</i> is the type of the <i>await</i> value. Must be any basic Terra type, void or any custom data structure. </li>
-  <li> <i>EventName</i> is the event name used in the Terra Script.</li>
+  <li> <i>EventName</i> is the event name used in the Terra Script.  Must be uppercase.</li>
   <li> <i>ArgumentType</i> is the type of the argument. Must be an ubyte type or void. This argument, in general, identifies a <i>sub-event</i> type.</li>
   <li> <i>NumericID</i> is an integer number that identifies internally the event. This number must be unique in all input events.</li>
 </ul>
@@ -211,9 +212,9 @@ See below the "VMCustomP.nc file" section to find some examples.
 <pre><code><b>function</b> <i>ReturnType</i> <i>FunctionName</i>(<i>ListOfArgumentsType</i>) <i>NumericID</i>;</code></pre>
 <p>Where:</p>
 <ul>
-  <li> <i>ReturnType</i> is the type of the function return value. Accept only basic Terra types. Leave it empty in the case of void. </li>
-  <li> <i>FunctionName</i> is the function name used in the Terra Script.</li>
-  <li> <i>ListOfArgumentsType</i> May be empty or a list of types. The types must be any basic Terra type or any custom data structure. Cannot be void. </li>
+  <li> <i>ReturnType</i> is the type of the function return value. Accept only basic Terra types. </li>
+  <li> <i>FunctionName</i> is the function name used in the Terra Script. Must start with small letters.</li>
+  <li> <i>ListOfArgumentsType</i> May be empty or a list of types. The types must be any basic Terra type or any custom data structure.  Leave it empty in the case of void. </li>
   <li> <i>NumericID</i> is an integer number that identifies internally the function. This number must be unique in all functions.</li>
 </ul>
 <p>Examples of function definition are:</p>
