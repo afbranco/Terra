@@ -75,23 +75,23 @@ the <a target="_blank" href="http://www.inf.puc-rio.br/~abranco/index.html#tab2-
 and at the end of each Terra Platform page.
 Next section presents the developer activities to customize a basic Terra implementation.
 </p>
-<p> The developer activities comprise:
+<p> The main developer activities are:
 </p>
 <ul>
-<li><xb>(1)</xb> modifications in TerraVM source code.</li>
-<li><xb>(2)</xb> creation of a new TerraXXX.defs file or modification on an existing one.</li>
+<li><xb>(1)</xb> modifications in TerraVM source code. Optionally may create new components and/or libs.</li>
+<li><xb>(2)</xb> creation of a new <code>.defs</code> file or modification on an existing one.</li>
 <li><xb>(3)</xb> build and flash of TerraVM.</li>
 </ul>
 
 <figure>
 <img style='clear:both;margin-right:10px; width:798px; height:607px' 
 	src="images/CustomizationDiagram.png" alt="Customization Process Diagram">
-<figcaption>Customization flow (Dev) <i>vs</i> Usage flow (User)</figcaption>
+<figcaption style="text-align: center;">Figure: Customization flow (Dev) <i>vs</i> Usage flow (User)</figcaption>
 </figure>
 
 
 <h3>The developer activities</h4>
-<p style="text-indent: 50px;"><b>Note:</b> <i>This procedure assumes that you already have Terra  
+<p><i><b>Note:</b> This procedure assumes that you already have Terra  
 ported to the desired platform with a very basic customization.
 In general this very basic customization is based on TerraNet customization.</i>  
 </p>
@@ -102,13 +102,20 @@ In general this very basic customization is based on TerraNet customization.</i>
 <li>The VMCustom.h file located in <code>~/Terra/TerraVM/src/platform/<i>XXX</i></code> directory.</li>
 <li>The VMCustomP.nc file also located in <code>~/Terra/TerraVM/src/platform/<i>XXX</i></code> directory.</li>
 </ul>
+<p>In general, small functionalities are written inside <i>VMCustomP.nc</i> file.
+If a new functionality requires additional files, a nesC component and/or a library of external functions may be created.
+In this case the developer may need to modify the <i>VMCustom<b>C</b>.nc</i> file and 
+must modify the Make system to be able to compile the new functionalities.
+These modifications are out of scope of this tutorial.
+</p>
+
 <p>The definitions between these three files must be compatibles.
 In the case of events, the numeric IDs must be equal to equivalent operations.
 In the case of data structures, the type and position of the each fields must be equivalent. 
 Same events and functions may have different names between the files.
 </p>
 <p>The syntax of each type of operations are described in the sequence.
-At the end you will find some real code examples.
+At the last section you will find some real code examples.
 </p> 
 
 <h4>Terra<i>XXX</i>.defs file</h4>
