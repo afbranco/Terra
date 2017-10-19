@@ -97,11 +97,6 @@ ported to the desired platform with a very basic customization.
 In general this very basic customization is based on TerraNet customization.
 </div>
 
-<p><i><b>Note:</b> This procedure assumes that you already have Terra  
-ported to the desired platform with a very basic customization.
-In general this very basic customization is based on TerraNet customization.</i>  
-</p>
-
 <p>At least three files must be edited to add new functionalities to a specific customization.</p>
 <ul>
 <li>The Terra<i>XXX</i>.defs file located in <code>~/Terra/TerraVM/src/TerraDefs</code> directory, where <i>XXX</i> is the base customization for target platform.</li>
@@ -142,11 +137,12 @@ Some examples are:</p>
 </code></pre>
 
 <h5>Data structures definitions</h5>
-<p><i><b>Note</b>  that you need to be familiar with Terra data structures.
-The page 
-<a target="_blank" href="http://www.inf.puc-rio.br/~abranco/#tab2-2">Céu-T Language</a>
-presents details about the <em>Types and data structures</em> of Terra scripting language.</i>
-</p>
+
+<div class="alert alert-info">
+  <strong>Note:</strong> you need to be familiar with Terra data structures.
+The page <a target="_blank" href="http://www.inf.puc-rio.br/~abranco/#tab2-2">Céu-T Language</a>
+presents details about the <em>Types and data structures</em> of Terra scripting language.
+</div>
 
 <p><b>Registers</b> - Some new functionalities may need exchange values that a single basic type 
 cannot support.
@@ -193,7 +189,9 @@ See below the "VMCustomP.nc file" section to find some examples.
 </ul>
 <p>A an example of output event definition is:</p>
 <pre><code>output void REQ_DHT ubyte 10;</code></pre>
-<p><b>Note</b> that all output events must return void.</p>
+<div class="alert alert-info">
+  <strong>Note:</strong> all output events must return void.
+</div>
 
 <h5>Input event  definition</h5>
 <p>Input events are defined by:</p>
@@ -238,8 +236,9 @@ These IDs are defined as a list of enumeration values as:
   <i>Function2</i> =<i>NumericId2</i>,
 }
 </code></pre>
-<p><b>Note</b> that the Numeric ID must be different only for each group of OutEvent, InEvent, and Function.
-</p>
+<div class="alert alert-info">
+  <strong>Note:</strong> the Numeric ID must be different only for each group of OutEvent, InEvent, and Function.
+</div>
 
 <h4>TVMCustomP.nc file</h4>
 <p>TBD</p>
