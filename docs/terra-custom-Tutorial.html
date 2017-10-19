@@ -8,29 +8,20 @@ xr {font-weight:bold; color: red;}
 xg {font-weight:bold; color: green;}
 xz {font-weight:bold; color: gray;}
 
-    body {
-        counter-reset: h3counter;
-    }
-    h1 {
-        counter-reset: h3counter;
-    }
-    h2 {
-        counter-reset: h3counter;
-    }
-    h3:before {
-        content: counter(h3counter) ".\0000a0\0000a0";
-        counter-increment: h3counter;
-        counter-reset: h4counter;
-    }
-    h4:before {
-        content: counter(h3counter) "." counter(h4counter) ".\0000a0\0000a0";
-        counter-increment: h4counter;
-        counter-reset: h5counter;
-    }
-    h5:before {
-        content: counter(h3counter) "." counter(h4counter) "." counter(h5counter) ".\0000a0\0000a0";
-        counter-increment: h5counter;
-    }
+body {counter-reset: h2}
+  h2 {counter-reset: h3}
+  h3 {counter-reset: h4}
+  h4 {counter-reset: h5}
+  h5 {counter-reset: h6}
+
+  h2:before {counter-increment: h2; content: counter(h2) ". "}
+  h3:before {counter-increment: h3; content: counter(h2) "." counter(h3) ". "}
+  h4:before {counter-increment: h4; content: counter(h2) "." counter(h3) "." counter(h4) ". "}
+  h5:before {counter-increment: h5; content: counter(h2) "." counter(h3) "." counter(h4) "." counter(h5) ". "}
+  h6:before {counter-increment: h6; content: counter(h2) "." counter(h3) "." counter(h4) "." counter(h5) "." counter(h6) ". "}
+
+  h2.nocount:before, h3.nocount:before, h4.nocount:before, h5.nocount:before, h6.nocount:before { content: ""; counter-increment: none } 
+
     
 </style>
 
@@ -116,7 +107,7 @@ This file is used during <i>terrac</i> compilation to validate the event and fun
 Any customized data structure used by events or functions are also defined in this file.
 Additionally, the developer may define constant values to be used in the new functionalities. 
 </p>
-<h5>Contants</h5>
+<h5>Constants</h5>
 <p>A constant definition use the <code>#define</code> command as used in the C language.
 Some examples are:</p>
 <pre><code>#define HIGH 1
