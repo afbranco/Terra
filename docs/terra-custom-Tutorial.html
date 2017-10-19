@@ -103,12 +103,6 @@ In general this very basic customization is based on TerraNet customization.</i>
 <li>The VMCustom.h file located in <code>~/Terra/TerraVM/src/platform/<i>XXX</i></code> directory.</li>
 <li>The VMCustomP.nc file also located in <code>~/Terra/TerraVM/src/platform/<i>XXX</i></code> directory.</li>
 </ul>
-<p>In general, small functionalities are written inside <i>VMCustomP.nc</i> file.
-If a new functionality requires additional files, a nesC component and/or a library of external functions may be created.
-In this case the developer may need to modify the <i>VMCustom<b>C</b>.nc</i> file and 
-must modify the Make system to be able to compile the new functionalities.
-These modifications are out of scope of this tutorial.
-</p>
 
 <p>The definitions between these three files must be compatibles.
 In the case of events, the numeric IDs must be equal to equivalent operations.
@@ -116,8 +110,15 @@ In the case of data structures, the type and position of the each fields must be
 Same events and functions may have different names between the files.
 </p>
 <p>The syntax of each type of operations are described in the sequence.
-At the last section you will find some real code examples.
+Last section presents some real code examples.
 </p> 
+
+<p>In general, small functionalities are written inside <i>VMCustomP.nc</i> file.
+If a new functionality requires additional files, a nesC component and/or a library of external functions may be created.
+In this case the developer may need to modify the <i>VMCustom<b>C</b>.nc</i> file and 
+must modify the Make system to be able to compile the new functionalities.
+These modifications are out of scope of this tutorial.
+</p>
 
 <h4>Terra<i>XXX</i>.defs file</h4>
 <p>
@@ -125,7 +126,7 @@ This file is used during <i>terrac</i> compilation to validate the event and fun
 Any customized data structure used by events or functions are also defined in this file.
 Additionally, the developer may define constant values to be used in the new functionalities. 
 </p>
-<h5>Constants</h5>
+<h5>Constant definition</h5>
 <p>A constant definition use the <code>#define</code> command as used in the C language.
 Some examples are:</p>
 <pre><code>#define HIGH 1
@@ -134,10 +135,10 @@ Some examples are:</p>
 #define OFF 0
 </code></pre>
 
-<h5>Data structures</h5>
+<h5>Data structures definitions</h5>
 <p>TBD</p>
 
-<h5>Output events</h5>
+<h5>Output event  definition</h5>
 <p>Output events are defined by:</p>
 <pre><code><b>output void</b> <i>EventName</i> <i>ArgumentType</i> <i>NumericID</i>;</code></pre>
 <p>Where:</p>
@@ -150,7 +151,7 @@ Some examples are:</p>
 <pre><code>output void REQ_DHT ubyte 10;</code></pre>
 <p><b>Note</b> that all output events must return void.</p>
 
-<h5>Input events</h5>
+<h5>Input event  definition</h5>
 <p>Input events are defined by:</p>
 <pre><code><b>input</b> <i>ReturnType</i> <i>EventName</i> <i>ArgumentType</i> <i>NumericID</i>;</code></pre>
 <p>Where:</p>
@@ -163,7 +164,7 @@ Some examples are:</p>
 <p>A an example of input event definition is:</p>
 <pre><code>input ubyte SEND_DONE void 41;</code></pre>
 
-<h5>Functions</h5>
+<h5>Function  definition</h5>
 <p>Functions events are defined by:</p>
 <pre><code><b>function</b> <i>ReturnType</i> <i>FunctionName</i>(<i>ListOfArgumentsType</i>) <i>NumericID</i>;</code></pre>
 <p>Where:</p>
