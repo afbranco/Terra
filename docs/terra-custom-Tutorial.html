@@ -184,7 +184,7 @@ These IDs are defined as a list of enumeration values as:
 
 <h3>Simplified Example</h3>
 
-<p>Example file for <code>TerraXXX.defs</code></p>
+<h4>Example file for <code>TerraXXX.defs</code></h4>
 <pre><code>// Interruption used for DHT sensor
 #define INT0 0  // PD0
 #define INT1 1  // PD1 
@@ -217,7 +217,7 @@ function ushort getNodeId()                      <xg>0</xg>;
 function ubyte  pinWrite(ubyte,ubyte,ubyte) 	<xg>21</xg>;
 </code></pre>
 
-<p>Example file for <code>VMCustom.h</code></p>
+<h4>Example file for <code>VMCustom.h</code></h4>
 <pre><code>enum{
   O_DHT           =<xb>10</xb>,
   O_SEND          =<xb>40</xb>,
@@ -231,7 +231,7 @@ function ubyte  pinWrite(ubyte,ubyte,ubyte) 	<xg>21</xg>;
 }
 </code></pre>
 
-<p>Example file for <code>VMCustomP.nc</code></p>
+<h4>Example file for <code>VMCustomP.nc</code></h4>
 <pre><code>void <b>proc_req_dht_read(uint16_t id, uint32_t value)</b>{
 	call dht.read((uint8_t)value);
 }
