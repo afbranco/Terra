@@ -341,11 +341,13 @@ and <var>value</var> is a integer value representing either the value of argumen
 </p>
 <p>Then, the <code>VM.procOutEvt()</code> function implements a <code>switch/case</code> for
 all expected output events.
-Each <code>case</code> test the <var>id</var> to call a specific function like <code>proc_EvtX(id,value);</code>.
+Each <code>case</code> tests the <var>id</var> to call a specific function like <code>proc_EvtX(id,value);</code>.
 The new custom operation must be implemented in this function paying attention to get corretly the argument value.
-If the value is an integer argument, a cast is enough to get the correct value.
+If the value is an integer argument, a cast is enough to get the correct value like: <code>uint16_t val = (uint16_t)value;</code>.
 If the value is an address, you must execute the function <code>VM.getRealAddr()</code> casting the result 
 to the type of expected data structure.
+For example: <code>usrMsg_t* usrMsg = (usrMsg_t*)signal VM.getRealAddr(addr);
+</code>
 </p>
 
 <p>
