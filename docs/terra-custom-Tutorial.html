@@ -339,15 +339,14 @@ as defined in the following tables</p>
 <code>VM.procOutEvt(uint8_t id,uint32_t value)</code>, where <var>id</var> is the EVTx numeric identifier 
 and <var>value</var> is a integer value representing either the value of argument or the address of data structure.
 </p>
-<p>Then, the <code>VM.procOutEvt()</code> function implements a <code>switch/case</code> for
+<p>Then, the <code>VM.procOutEvt()</code> function implements a <code>switch/case</code> block for
 all expected output events.
 Each <code>case</code> tests the <var>id</var> to call a specific function like <code>proc_EvtX(id,value);</code>.
 The new custom operation must be implemented in this function paying attention to get corretly the argument value.
 If the value is an integer argument, a cast is enough to get the correct value like: <code>uint16_t val = (uint16_t)value;</code>.
 If the value is an address, you must execute the function <code>VM.getRealAddr()</code> casting the result 
 to the type of expected data structure.
-For example: <code>usrMsg_t* usrMsg = (usrMsg_t*)signal VM.getRealAddr(addr);
-</code>
+For example: <code>usrMsg_t* usrMsg = (usrMsg_t*)signal VM.getRealAddr(value);</code>
 </p>
 
 <p>
@@ -373,9 +372,52 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 
 
 <h5>Function - code structure</h5>
-VM engine entry point
-Argument stack - pop()
-returned value - push()
+<p>The entry point for functions are very similar to output events.
+The function <code>VM.callFunction(uint8_t id)</code> is called when a Céu-T function is executed.
+The <var>id</var> argument identify the function and, similar to the output event, 
+a block of <code>switch/case</code> calls a specific <code>func_xxx(id);</code>.
+The main differences are that a function allows more than one argument and alwais returns a basic type value.
+Both the arguments and return values are passed using the stack, 
+this allows the use of functions in expressions.
+</p>
+<p>
+Similar to the output events, the new custom operation must be implemented in <code>func_xxx(id);</code>
+function also paying attention to get corretly the values of each argument.
+The arguments must be popped out in reverse sequence, from the last to the first, 
+using the function <code>VM.pop();</code> and casting the result to corresponding type.
+For example, use the comand <code>uint8_t val = (uint8_t)signal VM.pop();</code> to 
+pop a <var>ubyte</var> argument.
+If the argument is a data structure address, you must first pop it as <var>ushort</var> type
+and use the function <code>VM.getRealAddr()</code> to get the data pointer value.  
+</p>
+
+<p>After getting the arguments and executing the custom function operation,
+you must push the result value to the stack.
+Use the function <code>VM.push(val);</code> to push a basic type value to the stack.
+Remenber that you can push only one value.
+The following code shows a example of customized function.</p>
+<pre><code><xg><xg>// Custom function</xg>
+void <b>func_pinWrite(uint16_t id)</b>{
+  uint8_t stat=0;
+  uint8_t port, pin, val;
+  val  = (uint8_t)signal VM.pop(); <xz>// pop 3⁰ arg from stack</xz>
+  pin  = (uint8_t)signal VM.pop(); <xz>// pop 2⁰ arg from stack</xz>
+  port = (uint8_t)signal VM.pop(); <xz>// pop 1⁰ arg from stack</xz>
+  stat = pinWrite(port,pin,val);   <xz>// execute local function</xz>
+  signal VM.push(stat);            <xz>// Returns the stat value</xz>
+}
+
+<xg>// Entry point</xg>
+command void VM.callFunction(uint8_t id){
+  switch (id){
+  	...
+    case <xg>F_PIN_WRITE</xg> : <b>func_pinWrite(id)</b>; break;
+	...
+  }
+}
+</code></pre>
+
+
 
 <h5>Input event - code structure</h5>
 Internal event trigger
