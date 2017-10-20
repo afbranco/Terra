@@ -268,7 +268,7 @@ The rules to convert the structures are very simple,
 (iii) you need to follow the same  sequence of the fields definition.
 </p>
 <p>The next code shows an example of an equivalent data structure definition.</p>
-<pre><code>// Céu-T Struct                // nx nesC struct
+<pre><code>// Céu-T Struct                // nesC nx struct
 regtype dhtData_t with         typedef nx_struct dhtData {
   var ubyte stat;                nx_uint8_t stat;
   var ubyte hum;                 nx_uint8_t hum;
@@ -276,13 +276,11 @@ regtype dhtData_t with         typedef nx_struct dhtData {
 end                            } dhtData_t;
 </code></pre>
 
-<p>Each Céu-T type must be associated to respetive network type <b>nx</b> as defined in the following table</p>
+<p>Each Céu-T type must be associated to respetive network type <b>nx</b> 
+as defined in the following tables</p>
   <table class="table">
     <thead>
       <tr>
-        <th>Céu-T type</th>
-        <th>C type</th>
-        <th> </th>
         <th>Céu-T type</th>
         <th>C type</th>
       </tr>
@@ -291,30 +289,40 @@ end                            } dhtData_t;
       <tr>
         <td>ubyte</td>
         <td>nx_uint8_t</td>
-        <td></td>
-        <td>byte</td>
-        <td>nx_int8_t</td>
       </tr>
       <tr>
         <td>ushort</td>
         <td>nx_uint16_t</td>
-        <td></td>
-        <td>short</td>
-        <td>nx_int16_t</td>
       </tr>
       <tr>
         <td>ulong</td>
         <td>nx_uint32_t</td>
-        <td></td>
-        <td>long</td>
-        <td>nx_int32_t</td>
       </tr>
       <tr>
         <td>float</td>
         <td>nx_float</td>
-        <td></td>
-        <td></td>
-        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Céu-T type</th>
+        <th>C type</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>byte</td>
+        <td>nx_int8_t</td>
+      </tr>
+      <tr>
+        <td>short</td>
+        <td>nx_int16_t</td>
+      </tr>
+      <tr>
+        <td>long</td>
+        <td>nx_int32_t</td>
       </tr>
     </tbody>
   </table>
