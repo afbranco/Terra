@@ -130,7 +130,7 @@ Additionally, the developer may define constant values to be used in the new fun
 <h5>Constant definition</h5>
 <p>A constant definition use the <code>#define</code> command as used in the C language.
 Some examples are:</p>
-<pre><code>#define HIGH 1
+<pre><code><b>#define</b> HIGH 1
 <b>#define</b> LOW 0
 <b>#define</b> ON 1
 <b>#define</b> OFF 0
@@ -242,9 +242,132 @@ These IDs are defined as a list of enumeration values as:
 </div>
 
 <h4>VMCustomP.nc file</h4>
-<p>TBD</p>
+<p>The entry point of new functionalities are written in this file.
+In the case of functions or output events, you may write all functionality code inside this file or you may call external library functions or nesC component commands.
+In the case of input events you need to call a internal TerraVM function passing the event ID and event data as argument.
+In general an input event is triggered by a nesC event, a callback operation, or some kind of system interruption.
+Data structures must be created when required.
+</p>
 
-<h3>Simple Example</h3>
+<div class="alert alert-info">
+  <strong>Note:</strong> customized operations must comply to Terra assynchronous execution model.
+Blocking operations are forbiden!
+</div>
+
+<h5>Custom data structures</h5>
+<p>
+If you create a custom data structures in the <i>.defs</i> file, then you must define the equivalent
+structure in nesC code to be used by the custom operations.
+The definition of this structure can be placed in the file of your project at your convenience.
+For example, may be in the VMCustom.h, VMCustomP.nc, or another additional file.
+</p>
+<p>
+The rules to convert the structures are very simple, 
+(i) each basic data type of Ceú-T has its equivalent in nesC, 
+(ii) you must use nesC <code>typedef nx_struct</code> construct to define the structure, and
+(iii) you need to follow the same  sequence of the fields definition.
+</p>
+<p>The next code shows an example of an equivalent data structure definition.</p>
+<pre><code>// Céu-T Struct                // nx nesC struct
+regtype dhtData_t with         typedef nx_struct dhtData {
+  var ubyte stat;                nx_uint8_t stat;
+  var ubyte hum;                 nx_uint8_t hum;
+  var ubyte temp;                nx_uint8_t temp;
+end                            } dhtData_t;
+</code></pre>
+
+<p>Each Céu-T type must be associated to respetive network type <b>nx</b> as defined in the following table</p>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Céu-T type</th>
+        <th>C type</th>
+        <th> </th>
+        <th>Céu-T type</th>
+        <th>C type</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>ubyte</td>
+        <td>nx_uint8_t</td>
+        <td></td>
+        <td>byte</td>
+        <td>nx_int8_t</td>
+      </tr>
+      <tr>
+        <td>ushort</td>
+        <td>nx_uint16_t</td>
+        <td></td>
+        <td>short</td>
+        <td>nx_int16_t</td>
+      </tr>
+      <tr>
+        <td>ulong</td>
+        <td>nx_uint32_t</td>
+        <td></td>
+        <td>long</td>
+        <td>nx_int32_t</td>
+      </tr>
+      <tr>
+        <td>float</td>
+        <td>nx_float</td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+<h5>Output event - code structure</h5>
+<p>During the script execution, a Céu-T command like <code>emit EVTx(Arg1);</code> will call the command
+<code>VM.procOutEvt(uint8_t id,uint32_t value)</code>, where <var>id</var> is the EVTx numeric identifier 
+and <var>value</var> is a integer value representing either the value of argument or the address of data structure.
+</p>
+<p>Then, the <code>VM.procOutEvt()</code> function implements a <code>switch/case</code> for
+all expected output events.
+Each <code>case</code> test the <var>id</var> to call a specific function like <code>proc_EvtX(id,value);</code>.
+The new custom operation must be implemented in this function paying attention to get corretly the argument value.
+If the value is an integer argument, a cast is enough to get the correct value.
+If the value is an address, you must execute the function <code>VM.getRealAddr()</code> casting the result 
+to the type of expected data structure.
+</p>
+
+<p>
+In the case of a new output event, you must create a new <code>case</code> inside <code>VM.procOutEvt()</code>
+and implement the respective <code>proc_xxxx()</code> function.
+The following code shows a example of customized output event.</p>
+<pre><code><xg>// Custom operation</xg>
+void <b>proc_req_dht_read(uint16_t id, uint32_t value)</b>{
+	call dht.read((uint8_t)value);
+}
+
+<xg>// Entry point</xg>
+command void VM.procOutEvt(uint8_t id,uint32_t value){
+  switch (id){
+	...
+    case <xb>O_DHT</xb>  : <b>proc_req_dht_read(id,value)</b>; break;
+	...
+  }
+}
+</code></pre>
+
+
+
+
+<h5>Function - code structure</h5>
+VM engine entry point
+Argument stack - pop()
+returned value - push()
+
+<h5>Input event - code structure</h5>
+Internal event trigger
+Data buffer
+Terra event generation
+
+
+
+<h3>Example</h3>
 
 <h4>Example file for <code>TerraXXX.defs</code></h4>
 <pre><code>// Interruption used for DHT sensor
