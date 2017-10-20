@@ -353,16 +353,16 @@ For example: <code>usrMsg_t* usrMsg = (usrMsg_t*)signal VM.getRealAddr(value);</
 In the case of a new output event, you must create a new <code>case</code> inside <code>VM.procOutEvt()</code>
 and implement the respective <code>proc_xxxx()</code> function.
 The following code shows a example of customized output event.</p>
-<pre><code><xg>// Custom operation</xg>
+<pre><code><xz>// Custom operation</xz>
 void <b>proc_req_dht_read(uint16_t id, uint32_t value)</b>{
 	call dht.read((uint8_t)value);
 }
 
-<xg>// Entry point</xg>
+<xz>// Entry point</xz>
 command void VM.procOutEvt(uint8_t id,uint32_t value){
   switch (id){
 	...
-    case <xb>O_DHT</xb>  : <b>proc_req_dht_read(id,value)</b>; break;
+    case O_DHT  : <b>proc_req_dht_read(id,value)</b>; break;
 	...
   }
 }
@@ -396,7 +396,7 @@ you must push the result value to the stack.
 Use the function <code>VM.push(val);</code> to push a basic type value to the stack.
 Remenber that you can push only one value.
 The following code shows a example of customized function.</p>
-<pre><code><xg><xg>// Custom function</xg>
+<pre><code><xz>// Custom function</xz>
 void <b>func_pinWrite(uint16_t id)</b>{
   uint8_t stat=0;
   uint8_t port, pin, val;
@@ -407,11 +407,11 @@ void <b>func_pinWrite(uint16_t id)</b>{
   signal VM.push(stat);            <xz>// Returns the stat value</xz>
 }
 
-<xg>// Entry point</xg>
+<xz>// Entry point</xz>
 command void VM.callFunction(uint8_t id){
   switch (id){
   	...
-    case <xg>F_PIN_WRITE</xg> : <b>func_pinWrite(id)</b>; break;
+    case F_PIN_WRITE : <b>func_pinWrite(id)</b>; break;
 	...
   }
 }
