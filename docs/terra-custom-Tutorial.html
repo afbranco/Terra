@@ -27,40 +27,6 @@ body {counter-reset: h3}
 
 <h2>Tutorial for new customizations</h2>
 <p>
-Basic concepts
-
-User script - Semantic and syntax for events and functions
-ubyte stat = emit EVENT(arg);
-ubyte ret = await EVENT(ubyte);
-type ret = FUNCTION(arg1,..., argn);
-
-".defs" file
-	Constant definitions
-	Custom data structures
-	output event ID, arg1, return1
-	input event ID, arg1, return1
-	functions ID, args, return1
-
-"TerraCustom.h"
-	Constant definitions
-	Custom data structures
-	output event ID
-	input event ID
-	functions ID
-
-"TerraCustomP.nc"
-	switch/case - output events
-	switch/case - functions
-	
-	Custom events/functions implementation
-		Resources - push and pop the stack - number of arguments must comply with .defs file.
-		Insert a input event - Data structure pointer or basic type value must comply with .defs file.
-
-
-IDs ..
-
-
-
 </p>
 
 
@@ -369,8 +335,6 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 </code></pre>
 
 
-
-
 <h5>Function - code structure</h5>
 <p>The entry point for functions are very similar to output events.
 The function <code>VM.callFunction(uint8_t id)</code> is called when a Céu-T function is executed.
@@ -420,13 +384,64 @@ command void VM.callFunction(uint8_t id){
 
 
 <h5>Input event - code structure</h5>
-Internal event trigger
-Data buffer
-Terra event generation
+<p>
+In general, a input event is generated outside the core of the Virtual Machine and 
+must be notified to the VM engine.
+The command <code>VM.queueEvt()</code> is used to enqueue a Terra event and its respective data 
+allowing the engine to trigger, as necesserary, the script <code>await</code> commands.
+</p>
+<div class="alert alert-info">
+  <strong>Note:</strong> In the absence of an active await, Terra discards the respective event.
+</div>
 
+<p>Depending on the custom operation, 
+the event source may be a nesC event, a callback operation, or some kind of system interruption.
+All option will end up running a local customized function that must call <code>VM.queueEvt()</code>
+passing the event ID, the sub-event value, and a pointer to the data buffer.
+</p>
 
+<p> The sub-event value is an <var>uint8_t</var> value used as base to filter which specific <var>await</var>
+must be triggered for same input event. 
+For example, in the Radio receive event, the sub-event indicates the user message ID value.
+In this case is possible to have a Céu-T trail waiting for a <var>RECEIVE(id)</var> event 
+with a specific message ID.
+The sub-event 0 is used as general sub-event ID that triggers events without arguments. 
+For example, the command <code> msg = await RECEIVE();</code> will be triggered for any received message, 
+no matter what the message ID is.
+The <var>RECEIVE</var> event is an example where the <code>VM.queueEvt()</code> is called twice, one 
+passing the message ID as sub-event and another passing 0 as sub-event.
+</p>
 
-<h3>Example</h3>
+<p>As the event receiving is not synchronous with VM engine execution, an event must stores 
+its data in a global buffer.  
+The buffer is read later by the VM engine when handling internaly the event.
+This data buffer is a global variable or global data structure that stores, when necessary, the last event data.
+Each event must have its own data buffer.
+If a next specific event may happen before the previous one be handled by the VM engine, 
+the custom implementation must allocate more than one buffer. 
+For example a circular buffer may be used to avoid data overwriting.
+</p>
+<div class="alert alert-info">
+  <strong>Note:</strong> 1 - Be cautious when using large buffers, mainly when running TerraVM in low memory platforms. <nb>
+2 - In general, a single buffer by event type is enough for devices where the own hardware limmits the data rate. 
+</div>
+
+<p>Next code excerpt shows an example of custom input event implementation for the <code>SEND_DONE</code> event.
+In this event the <code>VM.queueEvt()</code> is called twice for different sub-event IDs.
+</p>
+
+<pre><code>
+nx_uint8_t ExtDataSendDoneError;
+event void BSRadio.sendDone(uint8_t am_id,message_t* msg,void* dataMsg, error_t error){
+  if (am_id == AM_USRMSG){
+    ExtDataSendDoneError = (uint8_t)error;
+    signal VM.queueEvt(<xr>I_SEND_DONE_ID</xr>, ((usrMsg_t*)dataMsg)->type, &ExtDataSendDoneError);
+    signal VM.queueEvt(<xr>I_SEND_DONE</xr>   ,                          0, &ExtDataSendDoneError);
+  }
+}
+</code></pre>
+
+<h3>Implementation examples</h3>
 
 <h4>Example file for <code>TerraXXX.defs</code></h4>
 <pre><code>// Interruption used for DHT sensor
