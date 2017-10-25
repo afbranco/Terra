@@ -5,4 +5,6 @@ defaults:
     scope:
       path: "" # an empty string here means all files in the project
     values:
-      terra_tutorial: "http://www.inf.puc-rio.br/~abranco/index.html#tab2-5"
+      terra_home_link: "http://www.inf.puc-rio.br/~abranco/terra.html"
+      terra_tutorial_link: "http://www.inf.puc-rio.br/~abranco/index.html#tab2-5"
+      terra_language_link: "http://www.inf.puc-rio.br/~abranco/#tab2-2"
