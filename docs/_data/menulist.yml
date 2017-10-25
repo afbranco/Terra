@@ -9,6 +9,9 @@ docs:
   - page: Introduction (TBD)
     url: terra-platf-intro.html  
 
+  - page: _div
+    url: 
+
   - page: TinyOS (TBD)
     url: terra-platf-tinyos.html  
 
@@ -29,6 +32,9 @@ docs:
 
   - page: Intro
     url: terra-custom-Intro.html  
+
+  - page: _div
+    url: 
 
   - page: TinyOS - Net
     url: terra-custom-TerraNet.html  
