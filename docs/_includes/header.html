@@ -29,7 +29,7 @@
         <span class="caret"></span></a>
         <ul class="dropdown-menu">
 	        {% for entry in item.submenu %}
-	          {% if entry.page == "-" %}
+	          {% if entry.page == "_div" %}
 	            <li class="divider"></li>
 	          {% else %}
 	            <li><a href="{{ entry.url }}">{{ entry.page }}</a></li>
