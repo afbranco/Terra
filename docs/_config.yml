@@ -1,1 +1,8 @@
 theme: jekyll-theme-cayman
+
+defaults:
+  -
+    scope:
+      path: "" # an empty string here means all files in the project
+    values:
+      terra_tutorial: "http://www.inf.puc-rio.br/~abranco/index.html#tab2-5"
