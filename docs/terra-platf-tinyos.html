@@ -2,6 +2,242 @@
 ---
 {% include header.html %}
 
-	TBD
+<h2>Introduction</h2> 
+	<p>
+	In this page we explain:
+	<ul>
+	<li> how to install TinyOS-2.1.2 environment in an Ubuntu16.04 64bits machine,</li>
+	<li> how to install Terra development environment,</li>
+	<li> how to compile the firmware for TinyOS version of TerraVM and flash it into a device,</li>
+	<li> how to compile your Terra Script,</li>
+	<li> how to load a Terra Script bytecode in the network, and</li>
+	</ul>
+	</p>
+<p>	In theory it is possible to compile Terra for all platforms available for TinyOS. 
+But currently Terra has been tested on the following boards:
+	<ul>
+	<li>TelosB</li>
+	<li>MicaZ</li>
+	<li>Iris</li>
+	<li>Mica2</li>
+	<li>Mica2Dot</li>
+	</ul>
+</p>	
+
+<p>You will find in <a target="_blank" href="terra-custom-TerraNet.html">TerraNet</a> and
+ <a target="_blank" href="terra-custom-TerraGrp.html">TerraGrp</a>
+ detailed informations about TerraNet and TerraGrp specific events and functions.</p>	
+	
+<h2>Installing Terra for TinyOS in a Linux Box</h2> 
+
+<h3>Pre-requisites</h3>
+<ul>
+<li>Linux machine. This procedure was tested with Ubuntu 16.04.</li>
+<li>Internet access.</li>
+</ul>
+
+<h3>Installation Steps</h3>
+
+<h4>Installing TinyOS 2.1.2</h4>
+<p>
+These steps will install the production version of TinyOS 2.1.2 and the corresponding tools
+for AVR (mica fammily) and MSP (TelosB/MoteSky).
+This was tested with Ubuntu 16.04 64bits.
+(Adapted from http://tinyprod.net/repos/debian/)
+</p>
+
+<h5>Install TinyOS Tools and msp430/avr support</h5>
+<p>Open a command terminal and execute the following commands.</p>
+<pre><code>wget -O - http://tinyprod.net/repos/debian/tinyprod.key | sudo apt-key add -
+sudo -s
+
+cd /etc/apt/sources.list.d
+echo "deb http://tinyprod.net/repos/debian wheezy main" >> tinyprod-debian.list
+echo "deb http://tinyprod.net/repos/debian msp430-46 main" >> tinyprod-debian.list
+
+exit
+
+sudo apt-get update
+sudo apt-get install nescc tinyos-tools msp430-46 gcc-avr binutils-avr avr-libc</code></pre>
+
+
+<h5>Install python/serial and previous gcc/g++</h5>
+<p>Open a command terminal and execute the following commands.</p>
+<pre><code>sudo apt-get install python-dev python-serial
+sudo apt-get install gcc-4.8 g++-4.8</code></pre>
+
+
+<h5>Dowload TinyOS TinyOS 2.1.2 repository</h5>
+<p>Open a command terminal and execute the following commands.</p>
+<pre><code>
+wget http://github.com/tinyos/tinyos-release/archive/tinyos-2_1_2.tar.gz
+tar xf tinyos-2_1_2.tar.gz 
+sudo mv tinyos-release-tinyos-2_1_2 /opt/tinyos-2.1.2</code></pre>
+
+<h5>Patch some TinyOS files</h5>
+<p>Open a command terminal and execute the following commands.</p>
+<pre><code>sudo sed -i 's/GCC=gcc/GCC=gcc-4.8/g' /opt/tinyos-2.1.2/support/make/sim.extra
+sudo sed -i 's/GPP=g++/GPP=g++-4.8/g' /opt/tinyos-2.1.2/support/make/sim.extra
+sudo sed -i 's/shell python --version/shell python2 --version/g' /opt/tinyos-2.1.2/support/make/sim.extra
+sudo sed -i 's/+\\{0,1\\}/\*/g' /opt/tinyos-2.1.2/support/make/sim.extra
+
+sudo sed -i '/-fnesc-no-debug/a -D__AVR_ATmega128__' /opt/tinyos-2.1.2/tos/platforms/micaz/.platform
+sudo sed -i '/-fnesc-no-debug/a -D__AVR_ATmega128__' /opt/tinyos-2.1.2/tos/platforms/mica2/.platform
+sudo sed -i '/-fnesc-no-debug/a -D__AVR_ATmega128__' /opt/tinyos-2.1.2/tos/platforms/mica2dot/.platform
+sudo sed -i '/-fnesc-no-debug/a -D__AVR_ATmega128__' /opt/tinyos-2.1.2/tos/platforms/btnode3/.platform
+sudo sed -i '/-fnesc-no-debug/a -D__AVR_ATmega1281__' /opt/tinyos-2.1.2/tos/platforms/iris/.platform
+sudo sed -i '/-fnesc-no-debug/a -D__AVR_ATmega128RFA1__' /opt/tinyos-2.1.2/tos/platforms/ucmini/.platform
+
+sudo sed -i 's/typedef/typedef const/g' /opt/tinyos-2.1.2/tos/chips/atm128/atm128const.h
+sudo sed -i 's/resQ\[qTail\] = id/resQ[qTail\%size] = id/g' /opt/tinyos-2.1.2/tos/system/FcfsResourceQueueC.nc
+</code></pre>
+
+
+<h5>.bashrc Environment symbols</h5>
+<p>Open a command terminal and execute the following commands <b>as one command</b>.</p>
+<pre><code>echo \
+'#TinyOS 2.1.2
+# Setup the environment variables needed by the TinyOS make system
+export TOSROOT="/opt/tinyos-2.1.2"
+echo "setting up TinyOS source path to $TOSROOT"
+export TOSDIR="$TOSROOT/tos"
+export CLASSPATH=$CLASSPATH:$TOSROOT/support/sdk/java/tinyos.jar:.
+export MAKERULES="$TOSROOT/support/make/Makerules"
+export PYTHONPATH=$PYTHONPATH:$TOSROOT/support/sdk/python
+' >> ~/.bashrc</code></pre>
+
+
+<h4>Adjust USB access permission for your user:</h4>
+<pre><code>sudo usermod -a -G dialout $USER</code></pre>
+<p><b>Note:</b> You must logout and login again to validate this new permission.</p>
+
+
+<h4>Install Git and Lua packages.</h4>
+<p>Open a command terminal and execute the following commands.</p>
+<pre><code>sudo apt-get update
+sudo apt-get install git lua5.1 lua-lpeg</code></pre>
+
+<h4>Get Terra source code from the repository</h4>
+<p>Clone Terra repository into home directory.</p>
+<p>Open a command terminal, change to home directory, and download Terra repository.</p>
+<pre><code>cd ~
+git clone https://github.com/afbranco/Terra</code></pre>
+<p>The next time use the command <code>git pull</code> from the new <var>Terra</var> dir to get last update</p>
+
+<h4>Create Terra specific environment definitions</h4>
+<p>Open a command terminal and execute the following commands <b>as one command</b>.</p>
+<pre><code>echo \
+'# Export Terra paths
+export TERRADIR=$HOME/Terra
+export CLASSPATH=$TERRADIR/TerraControl/tinyos.jar:.$CLASSPATH
+# Tools alias
+alias terrac="$TERRADIR/terrac/terrac -I$TERRADIR/TerraVM/src/TerraDefs"
+alias ttool="java -jar $TERRADIR/TerraControl/TControl.jar"
+alias sf="java net.tinyos.sf.SerialForwarder"
+' >> ~/.bashrc</code></pre>
+<p>Open a new command terminal to get the new environment.</p>
+
+
+<h2>Compiling and flashing</h2>
+<p>After a successful installation, you can generate a compiled file and 
+flash it into an compatible TinyOS board.</p> 
+<p>Terra development environment uses a Make system to build and install the firmware.
+You must change to the <code>$HOME/Terra/TerraVM/src</code> directory and execute <code>make</code> 
+command with additional parameters.
+</p>
+<p>The follow command is an example of Terra compilation for MicaZ board:</p>
+<pre><code>make micaz TYPE:BOTH VM:NET MOD:MSGQ USB:/dev/ttyUSB0 BS_BAUD:57600 install.2</code></pre>
+
+<h3>Attention points</h3>
+<p>We must pay attention for some details when compiling and installing Terra for TinyOS.</p>
+
+<p>The <b>TYPE:<i>type</i></b> parameter indicates if your node will communicate 
+via USB interface (<i>BOTH</i>) or not (<i>NOBS</i>).
+Usually one node, acting as BaseStation or sink node, is connected to a computer via USB interface when
+the all nodes communicate via radio.
+Hybrid networks may create a bridge connecting two node with different radios via serial/USB interface.
+</p>
+
+<p>The <b>BS_BAUD:<i>value</i></b> configures the USB baud rate for Terra operation.
+(This does not change the firmware flashing baud rate that is configured internally in the system.)
+</p> 
+
+<p>The <b>INSTAL.<i>n</i></b> parameter indicates to flash the compiled file. 
+The <i>n</i> is the unique node identifier for its network.</p>
+
+<p>The <b>real node address</b> is the combination of the Network ID and the unique node identifier. 
+For example, the default Network Id for the cc2420 network is the number 1.
+The node address, considering the unique ID 2, will be <code>(1*2048)+1 = 2050</code>.</p>
+
+<p>The <b>USB:<i>path</i></b> identifies the USB connected to flash the board.
+This value is usually <code>/dev/ttyUSB0</code>, 
+this depends on the FDDI chip used in the board. 
+But its number may change if the previous connection is already allocated.
+Use the command <code>ls /dev/ttyU*</code> to find the correct port.   
+</p>
+
+<h3>Terra compilation parameters</h3>
+<p>These are the allowed parameters when compiling for a TinyOS board.
+The command <code>make help xxx</code>, where <i>xxx</i> is the platform, will show an updated definition.</p>
+<ul>
+<li> VM:  Define the VM flavor: NET, GRP | default NET</li>
+<li> MOD: Define additional modules: MSGQ | default ''</li>
+<li> SENSOR: Configure sensorboard: MTS300CA or MTS300CB(wired) or MDA100 | default MDA100</li>
+<li> QUEUE: Generate short or long queues | default SHORT</li>
+<li> TYPE: Configure runtime type: NOBS or BOTH | default BOTH</li>
+<li> MOTE_TYPE: Define mote type: 1..254 | Default 1</li>
+<li> VERB: Verbose Compilation mode: Y or N | Default N</li>
+<li> RFPOWER: RF Power: 0 1 2 3 4 5 6 7 | default 7</li>
+<li> LPL: Low Power Listening mode: Y or N | default N</li>
+<li> IFLASH: Internal Flash for prog storage: Y or N | default Y</li>
+<li> NET_ID: Network identifier - 0..30 | default 0:cc1000, 1:cc2420, 2:wifi-udp, 3:esp, 4:nrf24, 5:xbee</li> 
+<li> install.<nodeid> - Install command + unique node identifier inside its network - 1..2047 | default 1</li>
+<li> USB: USB dev path. | default /dev/ttyUSB0</li>
+<li>  BS_BAUD: BaseStation baudrate - 115200, 57600, 19200 | default <i>platform specific or 19200</i>
+	<ul>
+   	<li>Platform specific = telosb, tmote, eyes, intelmote2 => 115200; micaz,mica2, iris => 57600; mica2dot=>19200</li>
+   	<li>Do not change baudrate for mica2dot.</li>
+ 	</ul>
+</ul>
+
+<h2>Compiling a Terra script</h2>
+<p>Terra scripts rely on a definition file targeting a specific customization. 
+In the case of TerraNet or TerraGrp, the <code>TerraNet.defs</code> file is used for the the basic customization and
+the <code>TerraGrp.defs</code> file is used for the Group customization. 
+One of these files must be referenced in the beginning of your script code as <code>#include "TerraNet.defs"</code>.
+</p>
+
+<p>Use the <code>terrac</code> command to compile your script. 
+Assuming that the name of your script file is myScript.terra, type the following command:</p>
+<pre><code>terrac myScript.terra</code></pre>
+<p>This command will generate a bytecode file named myScript.vmx</p>
+
+
+<h2>Loading a Terra Script into network</h2>
+<p>Considering that you already have a script compiled with <code>terrac</code> compiler,
+you need to load the script bytecode into the Terra network nodes.
+Two tools must be started to that: The TinyOS <i>SerialForwarder</i> application and the <i>Terra Control</i> tool.
+</p>
+<p>The use of the Terra Control tool was explained in the Terra tutorial  
+at <a target="_blank" href={{ page.terra_tutorial_link }}>Terra Site</a>.
+The tool can be started by the <code>ttool</code> command. 
+After started, the tool waits for the SerialForwarder to connect to the USB.
+</p>
+<p>The SerialForwarder is started by <code>sf -comm serial@<i>path</i>:<i>baud</i> </code> command, 
+where <i>path</i> is the path to the USB interface (data port)
+and <i>baud</i> is the baud rate indicated in the BS_BAUD parameter or the platform name.
+
+<pre><code>sf -comm serial@/dev/ttyUSB1:micaz</code></pre>
+</p>
+<div class="alert alert-info">
+  <strong>Note:</strong> The mica family boards open a second USB port to data communication. 
+  For example, a mib520 USB adapter will open the /dev/ttyUSB0 for firmware flashing and
+  the /dev/ttyUSB1 for the data comunication used by Terra.  
+</div>
+
+
+
+
+
 
 {% include footer.html %}
