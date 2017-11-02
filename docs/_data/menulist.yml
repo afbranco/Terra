@@ -12,7 +12,7 @@ docs:
   - page: _div
     url: 
 
-  - page: TinyOS (TBD)
+  - page: TinyOS
     url: terra-platf-tinyos.html  
 
   - page: Linux/RPi (TBD)
