@@ -74,6 +74,11 @@ sudo sed -i 's/GPP=g++/GPP=g++-4.8/g' /opt/tinyos-2.1.2/support/make/sim.extra
 sudo sed -i 's/shell python --version/shell python2 --version/g' /opt/tinyos-2.1.2/support/make/sim.extra
 sudo sed -i 's/+\\{0,1\\}/\*/g' /opt/tinyos-2.1.2/support/make/sim.extra
 
+sudo sed -i 's/GCC=gcc/GCC=gcc-4.8/g' /opt/tinyos-2.1.2/support/make/sim-sf.extra
+sudo sed -i 's/GPP=g++/GPP=g++-4.8/g' /opt/tinyos-2.1.2/support/make/sim-sf.extra
+sudo sed -i 's/shell python --version/shell python2 --version/g' /opt/tinyos-2.1.2/support/make/sim-sf.extra
+sudo sed -i 's/+\\{0,1\\}/\*/g' /opt/tinyos-2.1.2/support/make/sim-sf.extra
+
 sudo sed -i '/-fnesc-no-debug/a -D__AVR_ATmega128__' /opt/tinyos-2.1.2/tos/platforms/micaz/.platform
 sudo sed -i '/-fnesc-no-debug/a -D__AVR_ATmega128__' /opt/tinyos-2.1.2/tos/platforms/mica2/.platform
 sudo sed -i '/-fnesc-no-debug/a -D__AVR_ATmega128__' /opt/tinyos-2.1.2/tos/platforms/mica2dot/.platform
