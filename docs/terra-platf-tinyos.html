@@ -28,25 +28,17 @@ But currently Terra has been tested on the following boards:
  <a target="_blank" href="terra-custom-TerraGrp.html">TerraGrp</a>
  detailed informations about TerraNet and TerraGrp specific events and functions.</p>	
 	
-<h2>Installing Terra for TinyOS in a Linux Box</h2> 
-
-<h3>Pre-requisites</h3>
-<ul>
-<li>Linux machine. This procedure was tested with Ubuntu 16.04.</li>
-<li>Internet access.</li>
-</ul>
-
-<h3>Installation Steps</h3>
-
-<h4>Installing TinyOS 2.1.2</h4>
+<h2>Installing TinyOS 2.1.2</h2>
 <p>
 These steps will install the production version of TinyOS 2.1.2 and the corresponding tools
-for AVR (mica fammily) and MSP (TelosB/MoteSky).
+for AVR (mica family) and MSP (TelosB/MoteSky).
 This was tested with Ubuntu 16.04 64bits.
 (Adapted from http://tinyprod.net/repos/debian/)
 </p>
 
-<h5>Install TinyOS Tools and msp430/avr support</h5>
+<h3>Installation Steps</h3>
+
+<h4>Install TinyOS Tools and msp430/avr support</h4>
 <p>Open a command terminal and execute the following commands.</p>
 <pre><code>wget -O - http://tinyprod.net/repos/debian/tinyprod.key | sudo apt-key add -
 sudo -s
@@ -61,20 +53,20 @@ sudo apt-get update
 sudo apt-get install nescc tinyos-tools msp430-46 gcc-avr binutils-avr avr-libc</code></pre>
 
 
-<h5>Install python/serial and previous gcc/g++</h5>
+<h4>Install python/serial and previous gcc/g++</h4>
 <p>Open a command terminal and execute the following commands.</p>
 <pre><code>sudo apt-get install python-dev python-serial
 sudo apt-get install gcc-4.8 g++-4.8</code></pre>
 
 
-<h5>Dowload TinyOS TinyOS 2.1.2 repository</h5>
+<h4>Dowload TinyOS TinyOS 2.1.2 repository</h4>
 <p>Open a command terminal and execute the following commands.</p>
 <pre><code>
 wget http://github.com/tinyos/tinyos-release/archive/tinyos-2_1_2.tar.gz
 tar xf tinyos-2_1_2.tar.gz 
 sudo mv tinyos-release-tinyos-2_1_2 /opt/tinyos-2.1.2</code></pre>
 
-<h5>Patch some TinyOS files</h5>
+<h4>Patch some TinyOS files</h4>
 <p>Open a command terminal and execute the following commands.</p>
 <pre><code>sudo sed -i 's/GCC=gcc/GCC=gcc-4.8/g' /opt/tinyos-2.1.2/support/make/sim.extra
 sudo sed -i 's/GPP=g++/GPP=g++-4.8/g' /opt/tinyos-2.1.2/support/make/sim.extra
@@ -93,7 +85,7 @@ sudo sed -i 's/resQ\[qTail\] = id/resQ[qTail\%size] = id/g' /opt/tinyos-2.1.2/to
 </code></pre>
 
 
-<h5>.bashrc Environment symbols</h5>
+<h4>.bashrc Environment symbols</h4>
 <p>Open a command terminal and execute the following commands <b>as one command</b>.</p>
 <pre><code>echo \
 '#TinyOS 2.1.2
@@ -111,6 +103,16 @@ export PYTHONPATH=$PYTHONPATH:$TOSROOT/support/sdk/python
 <pre><code>sudo usermod -a -G dialout $USER</code></pre>
 <p><b>Note:</b> You must logout and login again to validate this new permission.</p>
 
+
+<h2>Installing Terra for TinyOS in a Linux Box</h2> 
+
+<h3>Pre-requisites</h3>
+<ul>
+<li>Linux machine. This procedure was tested with Ubuntu 16.04 64bits.</li>
+<li>Internet access.</li>
+</ul>
+
+<h3>Installation Steps</h3>
 
 <h4>Install Git and Lua packages.</h4>
 <p>Open a command terminal and execute the following commands.</p>
