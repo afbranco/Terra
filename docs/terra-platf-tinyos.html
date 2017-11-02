@@ -40,7 +40,7 @@ This was tested with Ubuntu 16.04 64bits.
 
 <h4>Install TinyOS Tools and msp430/avr support</h4>
 <p>Open a command terminal and execute the following commands.</p>
-<pre><code>wget -O - http://tinyprod.net/repos/debian/tinyprod.key | sudo apt-key add -
+<pre><code>sudo wget -O - http://tinyprod.net/repos/debian/tinyprod.key | sudo apt-key add -
 sudo -s
 
 cd /etc/apt/sources.list.d
@@ -51,7 +51,7 @@ exit
 
 sudo apt-get update
 sudo apt-get install nescc tinyos-tools msp430-46 gcc-avr binutils-avr avr-libc</code></pre>
-
+<p><i>I got a error at the end, but this error do not affect the system installatio.</i></p>
 
 <h4>Install python/serial and previous gcc/g++</h4>
 <p>Open a command terminal and execute the following commands.</p>
@@ -148,7 +148,8 @@ You must change to the <code>$HOME/Terra/TerraVM/src</code> directory and execut
 command with additional parameters.
 </p>
 <p>The follow command is an example of Terra compilation for MicaZ board:</p>
-<pre><code>make micaz TYPE:BOTH VM:NET MOD:MSGQ USB:/dev/ttyUSB0 BS_BAUD:57600 install.2</code></pre>
+<pre><code>cd $HOME/Terra/TerraVM/src
+make micaz TYPE:BOTH VM:NET MOD:MSGQ USB:/dev/ttyUSB0 BS_BAUD:57600</code></pre>
 
 <h3>Attention points</h3>
 <p>We must pay attention for some details when compiling and installing Terra for TinyOS.</p>
