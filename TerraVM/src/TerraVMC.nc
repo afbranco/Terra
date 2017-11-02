@@ -1313,8 +1313,10 @@ void f_pusharr_v(uint8_t Modifier){
 	if (getMVal(Vidx,tp2) >= Max) 
 		evtError(E_IDXOVF);
 	else {
+#ifndef NO_DEBUG
 		dbg(APPNAME,"VM::f_pusharr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, IDX OVERFLOW=%s idx=%d, v1_len=%d\n",Modifier,Maddr,Vidx,Max,
 			_TFstr(getMVal(Vidx,tp2) > Max),getMVal(Vidx,v2_len),v1_len);
+#endif
 		push(Maddr+((getMVal(Vidx,tp2)%Max)*v1_len));
 	}
 }
@@ -1471,7 +1473,9 @@ void f_inc(uint8_t Modifier){
 #endif
 #endif
 	Maddr = (uint16_t)pop();
+#ifndef NO_DEBUG
 	dbg(APPNAME,"VM::f_inc(%02x): v1_len=%d, Maddr=%d, value+1=%d, \n",Modifier,v1_len,Maddr,getMVal(Maddr,tp1)+1);
+#endif
 	setMVal((getMVal(Maddr,tp1)+1),Maddr,tp1,tp1);	
 }
 void f_dec(uint8_t Modifier){
@@ -1489,7 +1493,9 @@ void f_dec(uint8_t Modifier){
 #endif
 #endif
 	Maddr = (uint16_t)pop();
+#ifndef NO_DEBUG
 	dbg(APPNAME,"VM::f_dec(%02x): v1_len=%d, Maddr=%d, value-1=%d, \n",Modifier,v1_len,Maddr,getMVal(Maddr,tp1)-1);
+#endif
 	setMVal((getMVal(Maddr,tp1)-1),Maddr,tp1,tp1);	
 }
 
@@ -1511,11 +1517,15 @@ void f_set_e(uint8_t Modifier){
 	if (tp1 == F32){
 		float Value = popf();
 		setMVal(*(uint32_t*)&Value,Maddr1,F32,tp1);
+#ifndef NO_DEBUG
 		dbg(APPNAME,"VM::f_set_e(%02x): v1_len=%d, Maddr1=%d, Value=%f, ValuePos=%d\n",Modifier,v1_len,Maddr1,Value,getMValf(Maddr1));
+#endif
 	} else {
 		uint32_t Value = pop();
 		setMVal(Value,Maddr1,S32,tp1);
+#ifndef NO_DEBUG
 		dbg(APPNAME,"VM::f_set_e(%02x): v1_len=%d, Maddr1=%d, Value=%d, ValuePos=%d\n",Modifier,v1_len,Maddr1,Value,getMVal(Maddr1,v1_len));
+#endif
 	}
 }
 
@@ -1646,7 +1656,9 @@ void f_set_c(uint8_t Modifier){
 	p2_len = (uint8_t)(getBits(Modifier,4,5)+1);
 	Maddr = getPar16(p1_1len);
 	Const = getPar32(p2_len);
+#ifndef NO_DEBUG
 	dbg(APPNAME,"VM::f_set_c(%02x): v1_len=%d, p1_1len=%d, p2_len=%d, Maddr=%d, Const=%d\n",Modifier,v1_len,p1_1len,p2_len,Maddr,Const);
+#endif
 	if (tp1==F32){
 		float buffer =*(float*)&Const;
 		setMVal(*(uint32_t*)&buffer,Maddr,F32,tp1);
