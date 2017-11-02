@@ -18,19 +18,22 @@ implementation{
 #include <util/delay_basic.h>
 
 	void _delay_us(uint16_t us) {_delay_loop_2(us * (F_CPU/4000000ul));}
+	uint8_t *lastTxData;
 
 	//void TWIInit()
 	event void Boot.booted(){
 		atomic{TWIInfo.mode = Ready;}
 		atomic{TWIInfo.errorCode = 0xFF;}
 		atomic{TWIInfo.repStart = 0;}
+		// Enable TWI power
+		PRR0 &= ~(1 <<  PRTWI); 
 		// Set pre-scalers (no pre-scaling)
 		TWSR = 0;
 		// Set bit rate
 		TWBR = ((F_CPU / TWI_FREQ) - 16) / 2;
 		// Enable TWI and interrupt
 		TWCR = (1 << TWIE) | (1 << TWEN);
-		
+
 	}
 
 	uint8_t isTWIReady()
@@ -50,6 +53,7 @@ implementation{
 		if (dataLen <= TXMAXBUFLEN)
 		{
 			uint8_t *data, i;
+			lastTxData = (uint8_t *)TXdata;
 			// Wait until ready
 			while (!isTWIReady()) {_delay_us(1);}
 			// Set repeated start mode
@@ -76,6 +80,9 @@ implementation{
 			{
 				TWIInfo.mode = Initializing;
 				TWISendStart();
+//while ((TWCR & _BV(TWINT)) == 0) ; /* wait for transmission */
+//PORTB |= (1<<4);
+				
 			}
 			
 		}
@@ -108,7 +115,7 @@ implementation{
 		return 1;
 	}
 
-	AVR_ATOMIC_HANDLER(TWI_vect)
+AVR_ATOMIC_HANDLER(TWI_vect)
 	{
 PORTB |= (1<<4);
 
@@ -160,8 +167,7 @@ PORTB |= (1<<4);
 				}
 				break;
 			
-			case TWI_MR_DATA_ACK: // Data has been received, ACK has been transmitted.
-			
+			case TWI_MR_DATA_ACK: // Data has been received, ACK has been transmitted.			
 				/// -- HANDLE DATA BYTE --- ///
 				TWIReceiveBuffer[RXBuffIndex++] = TWDR;
 				// If there is more than one byte to be read, receive data byte and return an ACK
@@ -244,7 +250,6 @@ PORTB |= (1<<4);
 	}
 
 	command uint8_t i2c.write(void *const TXdata, uint8_t dataLen, uint8_t repStart){
-		PORTB |= (1<<6);
 		return TWITransmitData(TXdata,dataLen,repStart);
 	}
 	command uint8_t i2c.read(uint8_t TWIaddr, uint8_t bytesToRead, uint8_t repStart){

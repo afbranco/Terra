@@ -105,7 +105,7 @@ do
 	input ubyte 	CUSTOM 			void 	15;
 	// TerraNet Custom Input events
 	input ubyte 	SEND_DONE 		ubyte	40;
-	input ushort 	SEND_DONE 		void 	41;
+	input ubyte 	SEND_DONE 		void 	41;
 	input ubyte 	SEND_DONE_ACK	ubyte	42;
 	input ubyte 	SEND_DONE_ACK	void	43;
 	input radioMsg	RECEIVE 		ubyte 	44;

@@ -85,7 +85,7 @@ implementation {
         if(qHead == NO_ENTRY)
 	        qHead = id;
 	      else
-  	      resQ[qTail] = id;
+  	      resQ[qTail%size] = id;
 	      qTail = id;
         return SUCCESS;
       }

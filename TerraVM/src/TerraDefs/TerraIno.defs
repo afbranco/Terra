@@ -225,6 +225,7 @@ do
 		var payload[20] data;
 	end
 	
+	// DHT11 data structure
 	regtype dhtData_t with
 		var ubyte stat;
 		var ubyte hum;
@@ -273,7 +274,7 @@ do
 
 	// TerraNet Custom Input events
 	input ubyte 	SEND_DONE 		ubyte	40;
-	input ushort 	SEND_DONE 		void 	41;
+	input ubyte 	SEND_DONE 		void 	41;
 	input ubyte 	SEND_DONE_ACK	ubyte	42;
 	input ubyte 	SEND_DONE_ACK	void	43;
 	input radioMsg	RECEIVE 		ubyte 	44;

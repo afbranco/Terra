@@ -1613,14 +1613,18 @@ void f_outevt_v(uint8_t Modifier){
 
 void f_set_c(uint8_t Modifier){
 #ifndef MEGA
+#ifndef NO_DEBUG
 	uint8_t v1_len;
+#endif
 #endif
 	uint8_t p1_1len,p2_len, tp1;
 	uint16_t Maddr;
 	uint32_t Const;
 	tp1 = getBits(Modifier,0,2);
 #ifndef MEGA
+#ifndef NO_DEBUG
 	v1_len = (tp1==F32)? 4 : 1<<(tp1&0x3);	
+#endif
 #endif
 	p1_1len = getBitsPow(Modifier,3,3);
 	p2_len = (uint8_t)(getBits(Modifier,4,5)+1);

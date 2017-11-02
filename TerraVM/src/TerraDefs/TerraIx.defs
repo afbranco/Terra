@@ -69,22 +69,35 @@ do
 //	output void		INIT			ubyte 0;
 	output void 	REQ_CUSTOM_A	ubyte 20;
 	output void 	REQ_CUSTOM		void 23;
-	// TerraIx Custom Output events
-
+	// TerraNet Custom Output events
+	output void 	SEND			radioMsg 40;
+	output void 	SEND_ACK		radioMsg 41;
+	
 	// TerraIx Local Input events
 	input ubyte 	ERROR 		 	ubyte 	0;
 	input ubyte 	ERROR 			void	1;
 	input ubyte 	CUSTOM_A		ubyte 	12;
 	input ubyte 	CUSTOM_A 		void 	13;
 	input ubyte 	CUSTOM 			void 	15;
-	// TerraIx Custom Input events
+	// TerraNet Custom Input events
+	input ubyte 	SEND_DONE 		ubyte	40;
+	input ubyte 	SEND_DONE 		void 	41;
+	input ubyte 	SEND_DONE_ACK	ubyte	42;
+	input ubyte 	SEND_DONE_ACK	void	43;
+	input radioMsg	RECEIVE 		ubyte 	44;
+	input radioMsg	RECEIVE 		void 	45;
+	input ubyte 	Q_READY 		void 	46;
 
 	// Terra basic functions
 	function pure ushort getNodeId()		0;
 	function pure ushort random()			1;
 	function pure ubyte getMem(ushort)		2;
 	function pure ulong getTime()			3;
-	// TerraIx custom functions
+	// TerraNet custom functions
+	function nohold ubyte qPut(radioMsg) 	10;
+	function nohold ubyte qGet(radioMsg) 	11;
+	function pure ubyte qSize()				12;
+	function pure ubyte qClear()			13;
 
 // Determinist
 

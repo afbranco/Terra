@@ -38,13 +38,14 @@ implementation{
 	event void Boot.booted(){
 		DDRK=0xff;
 		DDRB=0xff;
-		PORTK=0x11;
+		PORTK=0x00;
 		atomic{state = IDLE;}
 		call TestTimer.startOneShot(2000);
 	}
 
 	command void rtc.setDateTime(rtcDateTime_t* data){
 		uint8_t msg[16];
+		PORTK=0x01;
 		msg[0] = (DS3231_ADDRESS << 1) & 0xFE;
 		msg[1] = 0; // 1st reg addr
 		memcpy(&dataBuffer,data,sizeof(rtcDateTime_t));
@@ -91,9 +92,9 @@ implementation{
 
 
 	async event void i2c.writeDone(error_t error, uint16_t addr, uint8_t length, uint8_t *data){
-		PORTB |= (1<<7);
+		PORTB |= (1<<5);
 		switch(state){
-			case SET_DATETIME_PROC 	: PORTK = data[0]; PORTB |= (1<<4); break;
+			case SET_DATETIME_PROC 	: PORTK = data[0]; break;
 			case GET_DATETIME_PROC 	: break;
 			case SET_ALARM_PROC 	: break;
 			case SET_ALARMMODE_PROC : break;
