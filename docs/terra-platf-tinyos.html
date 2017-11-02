@@ -246,8 +246,37 @@ and <i>baud</i> is the baud rate indicated in the BS_BAUD parameter or the platf
   the /dev/ttyUSB1 for the data comunication used by Terra.  
 </div>
 
+<h2>Simulating Terra with TOSSIM</h2>
+<p>The Terra project has a customized grid simulator that allows some tests and experiments.
+The TOSSIM simulator is used to run a Terra firmware and a simple visual interface was built
+to represent, as possible, the simulation execution.
+</p>
+<p>The simulation is started using two scripts - <code>TerraSim.py</code> and <code>TerraViewer.py</code>.
+The first one executes a TOSSIM scripts and receives as arguments the grid size and execution time.
+The second executes a graphical network animation based on the output informattion from the TOSSIM execution.
+After started a simulation, the <code>ttool</code> command must be used to load a Terra script into the network.
+<b>Note</b> that the <i>SerialForward</i> tool is not used.
+</p>
 
+<p>The following command syntax must be used:
+<code>./TerraSim.py <i>lines</i> <i>columns</i> 0 0 <i>time</i> | ./TerraViewer.py</code>,
+where <i>lines</i> and <i>columns</i> are, respectivately, 
+the number of lines and columns that define the network grid. These numbers can vary from 1 up to 9.
+The two 0 are constants used for advanced tests and the <i>time</i> is the execution time in seconds that the
+simulation will run.
+</p>
 
+<p>For example, the command bellow will start a 5 minutes (300 seconds) simulation for a 2x3 grid.</p>
+<pre><code>./TerraSim.py 2 3 0 0 300 | ./TerraViewer.py
+</code></pre> 
+
+<div class="alert alert-info">
+  <strong>Note:</strong> More details how to use the simulation are find in 
+  <a target="_blank" href={{ page.terra_tutorial_link }}>Terra Tutorial</a>. 
+  But, considering the differete way to start the simulation.
+</div>
+
+<BR>
 
 
 
