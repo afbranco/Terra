@@ -50,14 +50,15 @@ echo "deb http://tinyprod.net/repos/debian msp430-46 main" >> tinyprod-debian.li
 exit
 
 sudo apt-get update
-sudo apt-get remove openjdk-9-*
 sudo apt-get install openjdk-8-jdk
 sudo apt-get install nescc tinyos-tools msp430-46 gcc-avr binutils-avr avr-libc</code></pre>
-<p><i>I got a error at the end, but this error do not affect the system installatio.</i></p>
+<p><i>** At the end, I got the error </i>Errors were encountered while processing:
+ /var/cache/apt/archives/nescc_1.3.5-1_amd64.deb<i>, 
+ but this error looks like that does not affect the system installation.</i></p>
 
 <h4>Install python/serial and previous gcc/g++</h4>
 <p>Open a command terminal and execute the following commands.</p>
-<pre><code>sudo apt-get install python-dev python-serial
+<pre><code>sudo apt-get install python-dev python-serial python-pygame
 sudo apt-get install gcc-4.8 g++-4.8</code></pre>
 
 
