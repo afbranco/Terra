@@ -89,6 +89,10 @@ endif
 
 __USB ?= /dev/ttyACM0
 
+# Force RTC component
+#CFLAGS += -DM_RTC_INO
+
+
 # Extract all "tos_uno"/"tos_mega" subdirectories as includes
 INCDIRS := $(addprefix -I,$(shell find $(VMDIR)/$(TOS_INO)/ -type d -print))
 #$(error INCDIRS: $(INCDIRS))

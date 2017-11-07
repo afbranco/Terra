@@ -53,8 +53,9 @@ module VMCustomP{
     uses interface HplAtm8IoInterrupt as Int3;
 
 	uses interface dht;
+#ifdef M_RTC_INO
 	uses interface rtc;
-
+#endif
 }
 implementation{
 

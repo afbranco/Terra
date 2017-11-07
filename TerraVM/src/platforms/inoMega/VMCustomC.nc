@@ -58,10 +58,11 @@ implementation{
 	components dhtC as DHT;
 	custom.dht -> DHT;
 
+#ifdef M_RTC_INO
 	// RTC
 	components rtcC as rtc;
 	custom.rtc -> rtc;
-	
+#endif
 	// Custom Queues
 #ifdef M_MSG_QUEUE
 	components new dataQueueC(usrMsg_t,USRMSG_QSIZE,(char)unique("dataQueueC")) as usrDataQ;
