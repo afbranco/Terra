@@ -271,6 +271,37 @@ void  func_RFPower(uint16_t id){
 	signal VM.push(SUCCESS);
 }
 
+#ifdef M_STAT
+void  func_stat1(uint16_t id){
+	uint16_t i;
+	nx_uint16_t *sensorReads;
+	uint16_t arraySize;
+	uint16_t max,min,avg;
+	uint32_t sum;
+	stat1_ret_t *retData;
+	uint16_t bufAddr;
+
+	bufAddr = (uint16_t)signal VM.pop();
+	retData = (stat1_ret_t*)signal VM.getRealAddr(bufAddr);
+	arraySize = (uint16_t)signal VM.pop();
+	bufAddr = (uint16_t)signal VM.pop();
+	sensorReads = (nx_uint16_t*)signal VM.getRealAddr(bufAddr);
+
+	max = 65535U;
+	min = 0;
+	sum=0;
+	for (i=0; i<arraySize; i++){
+		sum = sum + sensorReads[i];
+		if (max < sensorReads[i]) max = sensorReads[i];
+		if (min > sensorReads[i]) min = sensorReads[i];
+		}
+	avg = sum / arraySize;
+	retData->max = max;
+	retData->min = min;
+	retData->avg = avg;	
+	signal VM.push(avg);
+}
+#endif
 
 /**
  *	procOutEvt(uint8_t id)
@@ -322,6 +353,9 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 #endif
 			case F_SETUP_MIC: func_setupMic(id); break;
 			case F_RFPOWER: func_RFPower(id); break;
+#ifdef M_STAT
+			case F_STAT1 	: func_stat1(id); break;
+#endif
 
 		}
 	}

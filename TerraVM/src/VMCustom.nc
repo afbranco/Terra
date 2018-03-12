@@ -40,6 +40,7 @@ interface VMCustom{
 	event void setMVal(uint32_t value,uint16_t Maddr, uint8_t fromTp, uint8_t tpTp);
 	event void* getRealAddr(uint16_t Maddr);
 	event bool getHaltedFlag();
+	event void setHaltedFlag(uint8_t value);
 	event void evtError(uint8_t ecode);
 	event uint32_t getTime();
 

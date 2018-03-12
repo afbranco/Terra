@@ -49,16 +49,15 @@ droid_FAMILY = DROID
 esp_FAMILY = ESP
 
 # define options
-ALL_OPTIONS = VM TYPE MOD INSTALL QUEUE DEBUG WIFI_SSID WIFI_PASSWD SENSOR MOTE_TYPE VERB SETDATA RFPOWER INO_HALF_CLOCK INO_RADIO USB SERIAL LPL IFLASH BS_BAUD NET_ID ANA0_REF ANA1_REF ANA2_REF ANA3_REF  INO_TOOLS_PATH
-TOS_OPTIONS = VM TYPE MOD INSTALL QUEUE DEBUG SENSOR MOTE_TYPE VERB SETDATA RFPOWER USB LPL IFLASH BS_BAUD NET_ID
+ALL_OPTIONS = VM TYPE MOD INSTALL QUEUE DEBUG WIFI_SSID WIFI_PASSWD SENSOR MOTE_TYPE VERB SETDATA RFPOWER INO_HALF_CLOCK INO_RADIO USB SERIAL LPL IFLASH BS_BAUD NET_ID ANA0_REF ANA1_REF ANA2_REF ANA3_REF  INO_TOOLS_PATH HDFILE
+TOS_OPTIONS = VM TYPE MOD INSTALL QUEUE DEBUG SENSOR MOTE_TYPE VERB SETDATA RFPOWER USB LPL IFLASH BS_BAUD NET_ID HDFILE
 INO_OPTIONS = VM TYPE MOD INSTALL QUEUE DEBUG MOTE_TYPE VERB SETDATA RFPOWER INO_HALF_CLOCK INO_RADIO USB SERIAL IFLASH BS_BAUD NET_ID ANA0_REF ANA1_REF ANA2_REF ANA3_REF INO_TOOLS_PATH
 IX_OPTIONS  = VM MOD INSTALL QUEUE DEBUG MOTE_TYPE VERB SETDATA IFLASH NET_ID
 ESP_OPTIONS = VM TYPE MOD INSTALL QUEUE DEBUG WIFI_SSID WIFI_PASSWD MOTE_TYPE VERB SETDATA RFPOWER USB IFLASH BS_BAUD NET_ID
 DROID_OPTIONS  = VM MOD INSTALL CLEAN QUEUE DEBUG MOTE_TYPE VERB SETDATA IFLASH NET_ID
 
-
 # define MOD available values
-MOD_VALUES = MSGQ
+MOD_VALUES = MSGQ STAT
 
 #===================================================================================
 #  Save makecmdgoals (a read only var) to goals so that we can modify it.
@@ -101,6 +100,12 @@ else
     endif
   endif
 endif
+# If necessary, re-assignment HDFILE without upper-case
+HDFILE_ = $(filter HDFILE%,$(GoalOptsValues))
+ifneq ($(HDFILE_),)
+  $(eval __$(HDFILE_))
+endif
+
 
 
 # Extract Target mote
@@ -176,12 +181,14 @@ __VM ?= NET
 ifneq ($(filter $(_MOTE),$(TOS_TARGETS)),)
   ifneq ($(__VM),NET)
    ifneq ($(__VM),GRP)
-      $(error Mote "$(_MOTE)" supports only VM,NET or VM,GRP)
+     ifneq ($(__VM),THIN)
+	      $(error Mote "$(_MOTE)" supports only VM:NET or VM:GRP or VM:THIN)
+     endif
    endif
   endif
 else
   ifneq ($(__VM),NET)
-      $(error Mote "$(_MOTE)" supports only VM,NET)
+      $(error Mote "$(_MOTE)" supports only VM:NET)
   endif
 endif
 
@@ -434,7 +441,8 @@ ifneq ($(filter $(_MOTE),$(TOS_TARGETS)),)
 		CFLAGS += -I/opt/tinyos-2.1.2/tos/lib/tossim/sf/sim/ -I/opt/tinyos-2.1.2/tos/platforms/micaz/
 	endif
 	CFLAGS +=  -I$(COMMONDIR) -I$(VMDIR) 
-  else
+  endif
+  ifeq ($(__VM),GRP)
   	COMMONDIR = $(APPDIR)/platforms/TinyOS/common
 	VMDIR = $(APPDIR)/platforms/TinyOS/Grp
 	CFLAGS += -I. 
@@ -444,6 +452,29 @@ ifneq ($(filter $(_MOTE),$(TOS_TARGETS)),)
 	CFLAGS +=  -I$(COMMONDIR) -I$(VMDIR) 
 	PFLAGS += -DMODULE_CTP
 	CFLAGS += -I$(TOSDIR)/lib/net/ -I$(TOSDIR)/lib/net/4bitle -I$(TOSDIR)/lib/net/ctp 
+  endif
+  ifeq ($(__VM),THIN)
+	COMMONDIR = $(APPDIR)/platforms/TinyOS/common
+	VMDIR = $(APPDIR)/platforms/TinyOS/Thin
+	CFLAGS += -I. 
+	CFLAGS += -D__FLASH_HARDCODED__ 
+    CFLAGS +=  -I$(COMMONDIR) -I$(VMDIR) 
+    CFLAGS += -DVM_THIN
+    CFLAGS += $(VMDIR)/rsa64.o $(VMDIR)/sense64.o
+    __HARDCODED_FILE__ = $(__HDFILE)
+    
+    STAT =  $(shell cp $(__HARDCODED_FILE__) $(VMDIR)/_HardcodedTempFile.h; echo $$?)
+    ifeq ($(STAT),1)
+      $(error ) 
+    endif   
+    STAT = $(shell msp430-gcc -c -mcpu=430 -Os -mmcu=msp430f1611 -Wall -Wshadow -fno-strict-aliasing -o$(VMDIR)/rsa64.o $(VMDIR)/rsa64lib.c; echo $$?)
+    ifeq ($(STAT),1)
+      $(error ) 
+    endif   
+    STAT = $(shell msp430-gcc -c -mcpu=430 -Os -mmcu=msp430f1611 -Wall -Wshadow -fno-strict-aliasing -o$(VMDIR)/sense64.o $(VMDIR)/sense64lib.c; echo $$?)
+    ifeq ($(STAT),1)
+      $(error ) 
+    endif   
   endif
 endif
 
@@ -663,11 +694,18 @@ ifneq ($(filter $(_MOTE),$(TOS_TARGETS)),)
       MB_SHORT_NOBS = 100
       MB_LONG_ALL = 64
       MB_LONG_NOBS = 71
-    else
+    endif
+    ifeq ($(__VM),GRP)
       MB_SHORT_ALL =24
       MB_SHORT_NOBS = 32
       MB_LONG_ALL = 10
       MB_LONG_NOBS = 10
+    endif
+    ifeq ($(__VM),THIN)
+      MB_SHORT_ALL = 100
+      MB_SHORT_NOBS = 100
+      MB_LONG_ALL = 100
+      MB_LONG_NOBS = 100
     endif
     ifeq ($(__QUEUE) , SHORT)
       ifeq ($(__TYPE),BOTH)
@@ -707,6 +745,7 @@ GENERAL_MAX__BLKS = 220
 # Define MemBlocks Size for each additional module/operations
 M_SETDATA = 16
 M_MSGQ = 8
+M_STAT = 0
 M_INTFLASH = 0
 M_BSTATION = 5
 
@@ -732,7 +771,6 @@ ifneq ($(words $(INVALID_MODS)),0)
   $(error )
 endif
 
-
 # Reset MODULES if VM!=NET
 ifeq ($(__VM) , GRP)
 	MODULES = 'Not applicable'
@@ -744,6 +782,12 @@ endif
 ifneq ($(findstring MSGQ,$(MODULES)),)
     CFLAGS += -DM_MSG_QUEUE
     DM_MSGQ = $(M_MSGQ)
+else
+    DM_MSGQ = 0
+endif
+ifneq ($(findstring STAT,$(MODULES)),)
+    CFLAGS += -DM_STAT
+    DM_STAT = $(M_STAT)
 else
     DM_MSGQ = 0
 endif

@@ -21,6 +21,9 @@ configuration ProgStorageC{
 	provides interface ProgStorage;
 }
 implementation{
+#ifdef __FLASH_HARDCODED__
+	components ProgStorageHardCodedP as ProgStorageP;
+#else
 	components ProgStorageP;
 #ifdef __AVR__
 	components Avr_InternalFlashC as IntFlash;
@@ -33,6 +36,7 @@ implementation{
 #endif
 	
 	ProgStorageP.InternalFlash -> IntFlash;
+#endif
 	ProgStorage = ProgStorageP;
 	
 }

@@ -66,7 +66,7 @@ implementation
 
 	// Ceu Environment vars
 	progEnv_t envData;
-/*
+/* EnvData
 	uint16_t ProgStart;
 	uint16_t ProgEnd;
 	uint16_t nTracks;
@@ -113,7 +113,7 @@ implementation
 	/*
 	 * Auxiliary functions
 	 */
-
+/*
 	uint8_t getOpCode(uint8_t* Opcode, uint8_t* Modifier){
 		uint8_t i;
 		*Opcode = (uint8_t)(CEU_data[PC]);
@@ -127,6 +127,17 @@ implementation
 				break;
 			}
 		}
+		return (*Opcode);
+	}
+*/
+	// TPC new getOpCode()
+	uint8_t getOpCode(uint8_t* Opcode, uint8_t* Modifier){
+		uint8_t tempOpc;
+		tempOpc = (uint8_t)(CEU_data[PC]);
+		dbg(APPNAME,"VM::getOpCode(): CEU_data[%d]=%d (0x%02x)  %s \n",PC,tempOpc,tempOpc,(tempOpc==op_end)?"--> f_end":"");
+		PC++;
+		*Modifier = (uint8_t)(tempOpc & IS_Mask[(tempOpc>>3)]);
+		*Opcode   = (uint8_t)(tempOpc & ~IS_Mask[(tempOpc>>3)]);	
 		return (*Opcode);
 	}
 
@@ -169,9 +180,12 @@ void TViewer(char* cmd,uint16_t p1, uint16_t p2){
 	uint8_t getPar8(uint8_t p_len){
 		uint8_t temp=(uint8_t)CEU_data[PC];
 		PC++;
-		dbg(APPNAME,"VM::getPar8: PC=%d, p_len=%d, value=%d\n",PC-1,p_len,temp);
+		//dbg(APPNAME,"VM::getPar8: PC=%d, p_len=%d, value=%d\n",PC-1,p_len,temp);
 		return temp;
 	}
+	
+	//TPC
+/*
 	uint16_t getPar16(uint8_t p_len){
 		uint16_t temp=0, temp2;
 		uint8_t idx;
@@ -186,6 +200,27 @@ void TViewer(char* cmd,uint16_t p1, uint16_t p2){
 		dbg(APPNAME,"VM::getPar16: PC=%d, p_len=%d, value=%d\n",PC-idx,p_len,temp);
 		return temp;
 	}
+*/
+	uint16_t getPar16(uint8_t p_len){
+		uint16_t temp=0L;
+		
+		switch (p_len){
+			case 1: 
+				temp = ((uint16_t)((uint8_t)CEU_data[PC])<<0); 
+				PC++;
+				break;
+			case 2: 
+				temp = ((uint16_t)((uint8_t)CEU_data[PC])<<8); 
+				PC++;
+				temp = temp + ((uint16_t)((uint8_t)CEU_data[PC])<<0); 
+				PC++;
+				break;
+		}
+		return temp;
+	}
+
+	// TPC 	
+/*
 	uint32_t getPar32(uint8_t p_len){
 		uint32_t temp=0L, temp2;
 		uint8_t idx;
@@ -200,11 +235,53 @@ void TViewer(char* cmd,uint16_t p1, uint16_t p2){
 		dbg(APPNAME,"VM::getPar32: PC=%d, p_len=%d, value=%d\n",PC-idx,p_len,temp);
 		return temp;
 	}
+*/
+	uint32_t getPar32(uint8_t p_len){
+		uint32_t temp=0L;
+		
+		switch (p_len){
+			case 1: 
+				temp = ((uint32_t)((uint8_t)CEU_data[PC])<<0); 
+				PC++;
+				break;
+			case 2: 
+				temp = ((uint32_t)((uint8_t)CEU_data[PC])<<8); 
+				PC++;
+				temp = temp + ((uint32_t)((uint8_t)CEU_data[PC])<<0); 
+				PC++;
+				break;
+			case 3: 
+				temp = ((uint32_t)((uint8_t)CEU_data[PC])<<16); 
+				PC++;
+				temp = temp + ((uint32_t)((uint8_t)CEU_data[PC])<<8); 
+				PC++;
+				temp = temp + ((uint32_t)((uint8_t)CEU_data[PC])<<0); 
+				PC++;
+				break;
+			case 4: 
+				temp = ((uint32_t)((uint8_t)CEU_data[PC])<<24); 
+				PC++;
+				temp = temp + ((uint32_t)((uint8_t)CEU_data[PC])<<16); 
+				PC++;
+				temp = temp + ((uint32_t)((uint8_t)CEU_data[PC])<<8); 
+				PC++;
+				temp = temp + ((uint32_t)((uint8_t)CEU_data[PC])<<0); 
+				PC++;
+				break;	
+		}
+		return temp;
+	}
 
 uint8_t getBits(uint8_t data, uint8_t stBit, uint8_t endBit){
 	uint8_t ret=0;
-	uint8_t pos;
-	for (pos=stBit; pos<=endBit; pos++) ret += ((data & 1<<pos)==0)?0:(1<<(pos-stBit));
+	// TPC Coment next 2 lines
+	// uint8_t pos;
+	//for (pos=stBit; pos<=endBit; pos++) ret += ((data & 1<<pos)==0)?0:(1<<(pos-stBit));
+
+/* TPC */
+	ret =(data<<(7-endBit));
+	ret = ret >> (7-endBit+stBit);
+
 	return ret;	
 }
 uint8_t getBitsPow(uint8_t data, uint8_t stBit, uint8_t endBit){return (1 << getBits(data,stBit,endBit));}
@@ -1839,6 +1916,9 @@ void f_set_c(uint8_t Modifier){
 	}
 	event bool VMCustom.getHaltedFlag(){
 		return haltedFlag;
+	}
+	event void VMCustom.setHaltedFlag(uint8_t value){
+		haltedFlag = value;
 	}
 
 

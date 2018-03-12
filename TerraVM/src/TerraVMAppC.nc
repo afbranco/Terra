@@ -36,7 +36,11 @@ implementation
 {
 	// Main modules
     components TerraVMC as terra;
+#ifdef VM_THIN
+    components BasicServicesThinC as BS;
+#else
     components BasicServicesC as BS;
+#endif
 	terra.BSBoot -> BS;
 	terra.BSUpload -> BS;
 	terra.BSTimerVM -> BS.BSTimerVM;
@@ -44,6 +48,7 @@ implementation
 #ifdef MODE_INTFLASH
 	terra.ProgStorage -> BS;
 #endif
+
     components VMCustomC as custom;
 	terra.VMCustom -> custom; 
 

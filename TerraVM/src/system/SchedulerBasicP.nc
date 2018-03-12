@@ -149,6 +149,8 @@ implementation
 		return TRUE;
 	}
 
+uint8_t x123_;
+
 	command void Scheduler.taskLoop()
 	{
 		for (;;)

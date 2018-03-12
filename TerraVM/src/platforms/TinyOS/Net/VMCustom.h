@@ -94,6 +94,9 @@ enum{
 	F_FFT 			= 15,
 	F_SETUP_MIC		= 16,
 	F_RFPOWER		= 17,
+	
+	// Stat functions
+	F_STAT1			= 20,
 
 	// Event Type ID - 3 msb bits of EvtId
 	TID_SENSOR_DONE = 0 << 5,
@@ -121,5 +124,9 @@ typedef nx_struct qData{
 	nx_uint8_t len;
 } qData_t;
 
-
+typedef nx_struct stat1_ret{
+	nx_uint16_t max;
+	nx_uint16_t min;
+	nx_uint16_t avg;
+} stat1_ret_t;
 #endif /* VMCUSTOM_H */

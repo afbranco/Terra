@@ -70,6 +70,13 @@ do
 		var long i;
 	end
 
+	// Stat module - stat1() return data
+	regtype stat1_ret with
+		var ushort max;
+		var ushort min;
+		var ushort avg;
+	end
+
 
 	// TerraNet local Output events
 //	output void		INIT			ubyte 0;
@@ -133,6 +140,9 @@ do
 	function nohold  ubyte fft(ubyte*, ulong*, ulong*)			15;
 	function ubyte setupMic(ushort*,ushort,ulong,ubyte)			16;
 	function ubyte setRFPower(ubyte)			17;
+
+	function nohold ushort stat1(ushort*, ushort, stat1_ret)		20;
+
 
 // Determinist
 
