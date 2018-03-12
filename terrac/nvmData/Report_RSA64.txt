@@ -1,0 +1,157 @@
+Data Result Terra
+=================
+*** Write from $4a84: $12f4 = 0xa1ed
+*** Write from $4a84: $12f6 = 0xbdaa
+*** Write from $4a84: $12f8 = 0xe58c
+*** Write from $4a84: $12fa = 0x2605
+
+Data Resul C
+=================
+*** Write from $468c: ciphertext = 0xa1ed
+*** Write from $468c: $1194 = 0xbdaa
+*** Write from $468c: $1196 = 0xe58c
+*** Write from $468c: $1198 = 0x2605
+
+
+Cpu active cycles - Terra = 78989 Cycles, 19ms
+=================
+Cycles: 131933  CPU Cycles: 131933  Time: 4118 msec
+Cycles: 210922  CPU Cycles: 210922  Time: 4137 msec
+ 
+Cpu active cycles - C = 31240 Cycles, 12msVM FRAM Accesses
+=================
+Cycles:  1958  CPU Cycles:  1958  Time:  0 msec
+Cycles: 33198  CPU Cycles: 33198  Time: 12 msec
+
+****** CPU Terra/C = 2.53
+
+
+
+Function profile - Terra
+========================
+Function                              Calls    Average       Total  Exclusive
+divide_mp_elements                        2       9327       18655       2568
+multiply_mp_elements                      2       5710       11420       2808
+TerraVMC__getOpCode                     100        107       10749      10735
+TerraVMC__getBits                       125         83       10422      10422
+add_mp_elements                          64        131        8384       4800
+multiply_sp_by_mp_element                16        355        5680       4624
+TerraVMC__getPar32                       43        112VM FRAM Accesses        4821       4821
+fkn_at_$8814                              8        561        4490       4490
+TerraVMC__pop                            65         69        4485       1235
+TerraVMC__push                           65         69        4485       1690
+TerraVMC__getPar16                       44         83        3667       3653
+add_word                                128         28        3584       3584
+__nesc_ntoh_uint32                       71         50        3550       3550
+TerraVMC__getBitsPow                     44         79        3505        652
+__nesc_hton_uint32                       68         43        2924       2924
+mult_by_power_of_b                       10        222        2220       1380
+set_to_zero                              31         70        2172       2172
+subtract_mp_elements                      8        263        2111       2111
+memcpy                                    8        217        1739       1739
+compare_mp_elements                      18         88        1586       1586
+TerraVMC__setMVal                        18         71        1282       1153
+TerraVMC__getMVal                        19         50         962        506
+mp_bit_length                             1        689         689         50
+bit_length                                1        639         639        639
+TerraVMC__ceu_track_rem                   2        207         414        180
+MotePlatformC__TOSH_FLASH_M25P_DP_bit     8         43         349        152
+TerraVMC__ceu_track_ins                   2        161         322        170
+Msp430ClockP__set_dco_calib              13         24         312        312
+TerraVMC__getPar8.clone.22               13         17         221        221
+__nesc_ntoh_uint16                       16         12         192        192
+TransformAlarmC__0__Counter__get          1        113         113         74
+copy_mp                                   2         55         110        110
+TOSH_CLR_UCLK0_PIN                        9         10          90         90
+TOSH_SET_UCLK0_PIN                        9          9          81         81
+fkn_at_$87cc                              2         37          74         74
+memset                                    1         64          64         64
+TOSH_SET_SIMO0_PIN                        6          9          54         54
+RealMainP__Scheduler__runNextTask         2         23          46         24
+mp_ith_bit                                1         35          35         35
+__nesc_atomic_start                       2         14          29         29
+Msp430TimerP__0__Event__fired             2         14          28         28
+SchedulerBasicP__popTask                  2         11          22         22
+TOSH_SET_FLASH_CS_PIN                     2         10          20         20
+__nesc_atomic_end                         2          8          17         17
+BasicServicesThinP__BSBoot__booted        1         17          17         17
+Msp430TimerP__1__Timer__get               1         16          16         16
+Msp430AlarmC__0__Msp430TimerControl__disableEvents1         10          10         10
+VMCustomP__trigF3                         1         10          10         10
+VMCustomP__trigF1                         1          9           9          9
+
+
+
+Function profile - C
+========================
+Function                              Calls    Average       Total  Exclusive
+test_rsa_encrypt                          1      31225       31225         26
+mod_exp                                   1      31199       31199        123
+multiply_mod_p                            2      15086       30173         98
+divide_mp_elements                        2       9327       18655       2568
+multiply_mp_elements                      2       5710       11420       2808
+add_mp_elements                          64        131        8384       4800
+multiply_sp_by_mp_element                16        355        5680       4624
+fkn_at_$4ad4                              8        561        4490       4490
+add_word                                128         28        3584       3584
+mult_by_power_of_b                       10        222        2220       1380
+set_to_zero                              31         70        2172       2172
+subtract_mp_elements                      8        263        2111       2111
+compare_mp_elements                      18         88        1586       1586
+mp_bit_length                             1        689         689         50
+bit_length                                1        639         639        639
+copy_mp                                   2         55         110        110
+mp_ith_bit                                1         46          46         46
+trigF3                                    1         10          10         10
+trigF1                                    1          9           9          9
+
+
+=================================================================
+
+(#E_Cycles x ChkPoint_Cost) + C_Exec_Cost  <==> Terra_Exec_Cost + (#FRAM_RdWR x FRAM_Cost)
+
+#E_Cycles = C_Exec_Cost / E_Stored
+ChkPoint_Cost = 2 x ChkSize x FRAM_Cost
+
+(C_Exec_Cost / E_Stored) x 2 x ChkSize x FRAM_Cost  <==> Terra_Exec_Cost + (#FRAM_RdWR x FRAM_Cost)
+
+[/FRAM_Cost] (C_Exec_Cost / E_Stored) x 2 x ChkSize  <==> Terra_Exec_Cost/FRAM_Cost + #FRAM_RdWR
+
+[#FRAM_RdWR = MEM_ovhd * ChkSize] (C_Exec_Cost / E_Stored) x 2 x ChkSize  <==> Terra_Exec_Cost/FRAM_Cost + MEM_ovhd * ChkSize
+
+[/ChkSize] (C_Exec_Cost / E_Stored) x 2  <==> (Terra_Exec_Cost/(FRAM_Cost x ChkSize)) + MEM_ovhd
+
+[Terra_Exec_Cost  = C_Exec_Cost x VM_ovhd]   (C_Exec_Cost / E_Stored) x 2  <==> (C_Exec_Cost x VM_ovhd/(FRAM_Cost x ChkSize)) + MEM_ovhd
+
+[/C_Exec_Cost]    E_Stored x 2  <==> (VM_ovhd/(FRAM_Cost x ChkSize)) + (MEM_ovhd / C_Exec_Cost)
+
+===========================================
+VM FRAM Accesses
+(#E_Cycles x ChkPoint_Cost) + C_Exec_Cost  <==> Terra_Exec_Cost + (#FRAM_RdWR x FRAM_Cost)
+
+ChkPoint_Cost = 2 x ChkSize x FRAM_Cost
+#E_Cycles x 2 x ChkSize x FRAM_Cost + C_Exec_Cost  <==> Terra_Exec_Cost + (#FRAM_RdWR x FRAM_Cost)
+
+#E_Cycles x 2 x ChkSize x FRAM_Cost  <==> (Terra_Exec_Cost - C_Exec_Cost) + (#FRAM_RdWR x FRAM_Cost)
+
+[/FRAM_Cost] 
+#E_Cycles x 2 x ChkSize  <==> (Terra_Exec_Cost - C_Exec_Cost)/FRAM_Cost + #FRAM_RdWR
+
+(#E_Cycles x 2 x ChkSize) - #FRAM_RdWR  <==> (Terra_Exec_Cost - C_Exec_Cost)/FRAM_Cost
+
+Terra_Exec_Cost = Terra_Cycles x CycleCost
+C_Exec_Cost     = C_Cycles     x CycleCost
+
+(#E_Cycles x 2 x ChkSize) - #FRAM_RdWR  <==> (Terra_Cycles - C_Cycles) x (CycleCost/FRAM_Cost)
+
+
+((#E_Cycles x 2 x ChkSize) - #FRAM_RdWR) x FRAM_Cost  <==> (Terra_Cycles - C_Cycles) x CycleCost
+
+===========================================
+
+
+
+
+
+
+

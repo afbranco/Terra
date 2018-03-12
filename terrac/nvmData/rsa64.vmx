@@ -1,0 +1,303 @@
+86 302 1 0 0 0 0 0 0 332
+00 | 00000 0 track 0
+00 | 00001 0
+00 | 00002 0
+00 | 00003 0
+00 | 00004 0 track 1
+00 | 00005 0
+00 | 00006 0
+00 | 00007 0
+00 | 00008 0000 $ret:1, 
+00 | 00009 0001 align_:1, 
+00 | 00010 0002 n:8, 
+00 | 00011 0003 
+00 | 00012 0004 
+00 | 00013 0005 
+00 | 00014 0006 
+00 | 00015 0007 
+00 | 00016 0008 
+00 | 00017 0009 
+00 | 00018 0010 e:4, 
+00 | 00019 0011 
+00 | 00020 0012 
+00 | 00021 0013 
+00 | 00022 0014 plaintext:8, 
+00 | 00023 0015 
+00 | 00024 0016 
+00 | 00025 0017 
+00 | 00026 0018 
+00 | 00027 0019 
+00 | 00028 0020 
+00 | 00029 0021 
+00 | 00030 0022 ciphertext:8, 
+00 | 00031 0023 
+00 | 00032 0024 
+00 | 00033 0025 
+00 | 00034 0026 
+00 | 00035 0027 
+00 | 00036 0028 
+00 | 00037 0029 
+00 | 00038 0030 tmpglobal_temp:8, 
+00 | 00039 0031 
+00 | 00040 0032 
+00 | 00041 0033 
+00 | 00042 0034 
+00 | 00043 0035 
+00 | 00044 0036 
+00 | 00045 0037 
+00 | 00046 0038 tmpglobal_ab:16, 
+00 | 00047 0039 
+00 | 00048 0040 
+00 | 00049 0041 
+00 | 00050 0042 
+00 | 00051 0043 
+00 | 00052 0044 
+00 | 00053 0045 
+00 | 00054 0046 
+00 | 00055 0047 
+00 | 00056 0048 
+00 | 00057 0049 
+00 | 00058 0050 
+00 | 00059 0051 
+00 | 00060 0052 
+00 | 00061 0053 
+00 | 00062 0054 tmpglobal_q:8, 
+00 | 00063 0055 
+00 | 00064 0056 
+00 | 00065 0057 
+00 | 00066 0058 
+00 | 00067 0059 
+00 | 00068 0060 
+00 | 00069 0061 
+00 | 00070 0062 i:2, 
+00 | 00071 0063 
+00 | 00072 0064 e_length:2, 
+00 | 00073 0065 
+00 | 00074 0066 p_length:2, 
+00 | 00075 0067 
+00 | 00076 0068 t:2, 
+00 | 00077 0069 
+00 | 00078 0070 idx:4, 
+00 | 00079 0071 
+00 | 00080 0072 
+00 | 00081 0073 
+00 | 00082 0074 __idx_0x8608028:4, 
+00 | 00083 0075 
+00 | 00084 0076 
+00 | 00085 0077 
+40 | 00086 40 push_c 1                      | push 1
+01 | 00087 01 
+24 | 00088 24 func 4                        | func trigFx
+04 | 00089 04 
+17 | 00090 17 popx                          | popx 
+d1 | 00091 d1 set_c ushort 2 0x78ab         | n[0] = 0x78ab
+02 | 00092 02 
+78 | 00093 78 
+ab | 00094 ab 
+d1 | 00095 d1 set_c ushort 4 0xbaaf         | n[1] = 0xbaaf
+04 | 00096 04 
+ba | 00097 ba 
+af | 00098 af 
+d1 | 00099 d1 set_c ushort 6 0xe788         | n[2] = 0xe788
+06 | 00100 06 
+e7 | 00101 e7 
+88 | 00102 88 
+d1 | 00103 d1 set_c ushort 8 0x6d49         | n[3] = 0x6d49
+08 | 00104 08 
+6d | 00105 6d 
+49 | 00106 49 
+d1 | 00107 d1 set_c ushort 10 0x0100        | e[0] = 0x0100
+0a | 00108 0a 
+01 | 00109 01 
+00 | 00110 00 
+d1 | 00111 d1 set_c ushort 12 0x0100        | e[1] = 0x0100
+0c | 00112 0c 
+01 | 00113 01 
+00 | 00114 00 
+d1 | 00115 d1 set_c ushort 14 0x654d        | plaintext[0] = 0x654d
+0e | 00116 0e 
+65 | 00117 65 
+4d | 00118 4d 
+d1 | 00119 d1 set_c ushort 16 0x656d        | plaintext[1] = 0x656d
+10 | 00120 10 
+65 | 00121 65 
+6d | 00122 6d 
+d1 | 00123 d1 set_c ushort 18 0x746e        | plaintext[2] = 0x746e
+12 | 00124 12 
+74 | 00125 74 
+6e | 00126 6e 
+d1 | 00127 d1 set_c ushort 20 0x736f        | plaintext[3] = 0x736f
+14 | 00128 14 
+73 | 00129 73 
+6f | 00130 6f 
+c1 | 00131 c1 set_c ushort 64 1             | e_length = 1
+40 | 00132 40 
+01 | 00133 01 
+c1 | 00134 c1 set_c ushort 66 4             | p_length = 4
+42 | 00135 42 
+04 | 00136 04 
+40 | 00137 40 push_c 10                     | push_c &e:ushort*
+0a | 00138 0a 
+91 | 00139 91 push_v ushort 64              | push e_length:ushort
+40 | 00140 40 
+24 | 00141 24 func 30                       | func mp_bit_length
+1e | 00142 1e 
+a5 | 00143 a5 pop short 68                  | pop t
+44 | 00144 44 
+40 | 00145 40 push_c 22                     | push_c &ciphertext:ushort*
+16 | 00146 16 
+91 | 00147 91 push_v ushort 66              | push p_length:ushort
+42 | 00148 42 
+24 | 00149 24 func 31                       | func set_to_zero
+1f | 00150 1f 
+17 | 00151 17 popx                          | popx 
+d1 | 00152 d1 set_c ushort 22 0x0100        | ciphertext[0] = 0x0100
+16 | 00153 16 
+01 | 00154 01 
+00 | 00155 00 
+c2 | 00156 c2 set_c ulong 70 0              | idx = 0
+46 | 00157 46 
+00 | 00158 00 
+40 | 00159 40 push_c 1                      | push 1
+01 | 00160 01 
+95 | 00161 95 push_v short 68               | push t:short
+44 | 00162 44 
+06 | 00163 06 add                           | add
+a2 | 00164 a2 pop ulong 74                  | pop __idx_0x8608028
+4a | 00165 4a 
+92 | 00166 92 push_v ulong 74               | push __idx_0x8608028:ulong
+4a | 00167 4a 
+92 | 00168 92 push_v ulong 70               | push idx:ulong
+46 | 00169 46 
+11 | 00170 11 gte                           | gte
+4f | 00171 4f ifelse 31 32                  | ifelse True_31 False_32
+00 | 00172 .00 addr:176
+b0 | 00173 .1f 
+00 | 00174 .00 addr:184
+b8 | 00175 .20 
+3d | 00176 3d tkins_z 1 6 15                | insert track Loop_out_15 tree 6
+86 | 00177 86 
+01 | 00178 .00 addr:295
+27 | 00179 .0f 
+01 | 00180 01 end                           | end
+39 | 00181 39 exec 33                       | goto  33
+00 | 00182 .00 addr:166
+a6 | 00183 .0d 
+40 | 00184 40 push_c 3                      | push 3
+03 | 00185 03 
+24 | 00186 24 func 4                        | func trigFx
+04 | 00187 04 
+17 | 00188 17 popx                          | popx 
+92 | 00189 92 push_v ulong 70               | push idx:ulong
+46 | 00190 46 
+95 | 00191 95 push_v short 68               | push t:short
+44 | 00192 44 
+05 | 00193 05 sub                           | sub
+a5 | 00194 a5 pop short 62                  | pop i
+3e | 00195 3e 
+40 | 00196 40 push_c 38                     | push_c &tmpglobal_ab:ushort*
+26 | 00197 26 
+40 | 00198 40 push_c 22                     | push_c &ciphertext:ushort*
+16 | 00199 16 
+40 | 00200 40 push_c 22                     | push_c &ciphertext:ushort*
+16 | 00201 16 
+91 | 00202 91 push_v ushort 66              | push p_length:ushort
+42 | 00203 42 
+24 | 00204 24 func 32                       | func multiply_mp_elements
+20 | 00205 20 
+17 | 00206 17 popx                          | popx 
+40 | 00207 40 push_c 54                     | push_c &tmpglobal_q:ushort*
+36 | 00208 36 
+40 | 00209 40 push_c 30                     | push_c &tmpglobal_temp:ushort*
+1e | 00210 1e 
+40 | 00211 40 push_c 38                     | push_c &tmpglobal_ab:ushort*
+26 | 00212 26 
+91 | 00213 91 push_v ushort 66              | push p_length:ushort
+42 | 00214 42 
+40 | 00215 40 push_c 2                      | push 2
+02 | 00216 02 
+08 | 00217 08 mult                          | mult
+40 | 00218 40 push_c 2                      | push_c &n:ushort*
+02 | 00219 02 
+91 | 00220 91 push_v ushort 66              | push p_length:ushort
+42 | 00221 42 
+24 | 00222 24 func 33                       | func divide_mp_elements
+21 | 00223 21 
+17 | 00224 17 popx                          | popx 
+40 | 00225 40 push_c 22                     | push_c &ciphertext:ushort*
+16 | 00226 16 
+40 | 00227 40 push_c 30                     | push_c &tmpglobal_temp:ushort*
+1e | 00228 1e 
+91 | 00229 91 push_v ushort 66              | push p_length:ushort
+42 | 00230 42 
+24 | 00231 24 func 34                       | func copy_mp
+22 | 00232 22 
+17 | 00233 17 popx                          | popx 
+40 | 00234 40 push_c 1                      | push 1
+01 | 00235 01 
+40 | 00236 40 push_c 10                     | push_c &e:ushort*
+0a | 00237 0a 
+95 | 00238 95 push_v short 62               | push i:short
+3e | 00239 3e 
+24 | 00240 24 func 35                       | func mp_ith_bit
+23 | 00241 23 
+0f | 00242 0f eq                            | eq
+4f | 00243 4f ifelse 29 30                  | ifelse True_29 EndIf_30
+00 | 00244 .00 addr:248
+f8 | 00245 .1d 
+01 | 00246 .00 addr:289
+21 | 00247 .1e 
+40 | 00248 40 push_c 38                     | push_c &tmpglobal_ab:ushort*
+26 | 00249 26 
+40 | 00250 40 push_c 22                     | push_c &ciphertext:ushort*
+16 | 00251 16 
+40 | 00252 40 push_c 14                     | push_c &plaintext:ushort*
+0e | 00253 0e 
+91 | 00254 91 push_v ushort 66              | push p_length:ushort
+42 | 00255 42 
+24 | 00256 24 func 32                       | func multiply_mp_elements
+20 | 00257 20 
+17 | 00258 17 popx                          | popx 
+40 | 00259 40 push_c 54                     | push_c &tmpglobal_q:ushort*
+36 | 00260 36 
+40 | 00261 40 push_c 30                     | push_c &tmpglobal_temp:ushort*
+1e | 00262 1e 
+40 | 00263 40 push_c 38                     | push_c &tmpglobal_ab:ushort*
+26 | 00264 26 
+91 | 00265 91 push_v ushort 66              | push p_length:ushort
+42 | 00266 42 
+40 | 00267 40 push_c 2                      | push 2
+02 | 00268 02 
+08 | 00269 08 mult                          | mult
+40 | 00270 40 push_c 2                      | push_c &n:ushort*
+02 | 00271 02 
+91 | 00272 91 push_v ushort 66              | push p_length:ushort
+42 | 00273 42 
+24 | 00274 24 func 33                       | func divide_mp_elements
+21 | 00275 21 
+17 | 00276 17 popx                          | popx 
+40 | 00277 40 push_c 22                     | push_c &ciphertext:ushort*
+16 | 00278 16 
+40 | 00279 40 push_c 30                     | push_c &tmpglobal_temp:ushort*
+1e | 00280 1e 
+91 | 00281 91 push_v ushort 66              | push p_length:ushort
+42 | 00282 42 
+24 | 00283 24 func 34                       | func copy_mp
+22 | 00284 22 
+17 | 00285 17 popx                          | popx 
+39 | 00286 39 exec 30                       | goto  30
+01 | 00287 .00 addr:289
+21 | 00288 .1e 
+40 | 00289 40 push_c 70                     | push &idx
+46 | 00290 46 
+62 | 00291 62 inc ulong                     | inc ulong
+39 | 00292 39 exec 33                       | goto  33
+00 | 00293 .00 addr:166
+a6 | 00294 .0d 
+40 | 00295 40 push_c 2                      | push 2
+02 | 00296 02 
+24 | 00297 24 func 4                        | func trigFx
+04 | 00298 04 
+17 | 00299 17 popx                          | popx 
+01 | 00300 01 end                           | end
+01 | 00301 01 end                           | end

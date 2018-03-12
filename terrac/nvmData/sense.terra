@@ -1,0 +1,13 @@
+#include "TerraNet.defs"
+
+
+await 1s;
+loop do
+	await 500ms;
+	emit REQ_TEMP();
+	var ushort val = await TEMP();
+	if (val > 512) then
+		emit LED0(TOGGLE);
+	end
+end
+

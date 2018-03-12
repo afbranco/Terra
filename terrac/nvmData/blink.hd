@@ -1,0 +1,20 @@
+progEnv_t _env;
+
+void initData() {
+_env.Version=1;
+_env.ProgStart=17;
+_env.ProgEnd=36;
+_env.nTracks=1;
+_env.wClocks=1;
+_env.asyncs=0;
+_env.wClock0=0;
+_env.gate0=8;
+_env.inEvts=0;
+_env.async0=8;
+_env.appSize=42;
+_env.persistFlag=1;
+}
+
+
+uint8_t _bytecode[]={
+88, 6, 2, 41, 3, 0, 1, 244, 0, 17, 1, 72, 0, 8, 1, 72, 0, 8, 1, };

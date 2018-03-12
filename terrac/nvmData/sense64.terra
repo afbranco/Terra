@@ -1,0 +1,41 @@
+#include "TerraNet.defs"
+
+#define NUM_READS 64
+var ushort[NUM_READS] sensorReads;
+var stat1_ret retData;
+var ubyte count=0;
+var ubyte i;
+await 1s;
+
+loop do
+	//loop i, NUM_READS do
+	i=0;
+	loop do
+		emit LED0(TOGGLE);
+		inc i;
+		if (i > NUM_READS) then break; end
+		//emit REQ_TEMP();
+		var ushort xx;// = await TEMP();
+		sensorReads[i] = xx;
+		await 50ms;
+	end
+
+	emit LED1(ON);
+	
+//	var ushort avg1 = stat1(sensorReads,NUM_READS,retData);	
+	
+
+	var ushort max,min,avg;
+	var long sum;
+	max = 65535;
+	min = 0;
+	sum=0;
+	loop i, NUM_READS do
+		sum = sum + sensorReads[i];
+		if max < sensorReads[i] then max = sensorReads[i]; end
+		if min > sensorReads[i] then min = sensorReads[i]; end
+	end
+	avg = sum / NUM_READS;
+
+	emit LED1(OFF);
+end

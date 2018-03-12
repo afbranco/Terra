@@ -1,0 +1,105 @@
+#include "TerraThin.defs"
+
+
+trigFx(1);
+    
+#define KEYLEN 4
+#define KEYLENx2 8
+
+var ubyte align_;
+var ushort[KEYLEN] n;
+var ushort[2] e;
+var ushort[KEYLEN] plaintext;
+var ushort[KEYLEN] ciphertext;
+
+
+
+// main (void)
+/*
+n[0] = 0xab78; n[1] = 0xafba; n[2] = 0x88e7; n[3] = 0x496d;
+e[0] = 0x0001; e[1] = 0x0001; 
+
+plaintext[0] = 0x4d65; // Me
+plaintext[1] = 0x6d65; // me
+plaintext[2] = 0x6e74; // nt
+plaintext[3] = 0x6f73; // os
+*/
+
+//============== Terra is big endian- MSP430: Setting as little endian to internal functions
+n[0] = 0x78ab; n[1] = 0xbaaf; n[2] = 0xe788; n[3] = 0x6d49;
+e[0] = 0x0100; e[1] = 0x0100; 
+
+plaintext[0] = 0x654d; // Me
+plaintext[1] = 0x656d; // me
+plaintext[2] = 0x746e; // nt
+plaintext[3] = 0x736f; // os
+//==============
+
+var ushort[KEYLEN] tmpglobal_temp;
+var ushort[KEYLENx2] tmpglobal_ab;
+var ushort[KEYLEN] tmpglobal_q;
+
+// --
+
+// test_rsa_encrypt();
+	// mod_exp(ciphertext, plaintext, e, 1, n, KEYLEN);
+
+
+		// mod_exp(uint16_t * A, uint16_t * g, uint16_t * e_, uint16_t e_length, uint16_t * p, uint16_t p_length)
+		// A -> ciphertext
+		// g -> plaintext
+		// e_ -> e
+		// e_length -> 1
+		// p -> n
+		// p_length -> KEYLEN
+    var short  i;
+    var ushort e_length = 1;
+    var ushort p_length = KEYLEN;
+    var short  t = mp_bit_length(e,e_length);
+	
+    set_to_zero(ciphertext, p_length);
+    ciphertext[0] = 0x0100; 
+	
+    //for (i = t; i >= 0; i--) { // Note, first decrease, then work
+    loop idx,t+1 do
+trigFx(3);
+    	i = t - idx;
+        //2.1 A = A*A mod p
+        //multiply_mod_p(_tmpglobal_temp, ciphertext, ciphertext, n, p_length);
+        //void multiply_mod_p(uint16_t * c, uint16_t * a, uint16_t * b, uint16_t * p, uint8_t wordlength){
+        	// c -> _tmpglobal_temp
+        	// a -> ciphertext
+        	// b -> ciphertext
+        	// p -> n
+        	// wordlength -> p_length
+        	
+    		multiply_mp_elements(tmpglobal_ab, ciphertext, ciphertext, p_length);
+		
+		// divide_mp_elements(_tmpglobal_q, c, _tmpglobal_ab, 2*wordlength, p, wordlength);
+    		divide_mp_elements(tmpglobal_q, tmpglobal_temp, tmpglobal_ab, 2*p_length, n, p_length);
+
+        
+        copy_mp(ciphertext, tmpglobal_temp, p_length);
+
+        //2.2 If e_i = 1 then A = Mont(A,x_hat)
+        if (mp_ith_bit(e, i) == 1) then
+            // multiply_mod_p(_tmpglobal_temp, ciphertext, plaintext, n, p_length);
+		    //void multiply_mod_p(uint16_t * c, uint16_t * a, uint16_t * b, uint16_t * p, uint8_t wordlength){
+		    	// c -> _tmpglobal_temp
+		    	// a -> ciphertext
+		    	// b -> plaintext
+		    	// p -> n
+		    	// wordlength -> p_length
+		    	
+		    	// -- var ushort _tmpglobal_ab[2*KEYLEN];
+		    	// --var ushort _tmpglobal_q[KEYLEN];
+				multiply_mp_elements(tmpglobal_ab, ciphertext, plaintext, p_length);
+
+			// divide_mp_elements(_tmpglobal_q, c, _tmpglobal_ab, 2*wordlength, p, wordlength);
+				divide_mp_elements(tmpglobal_q, tmpglobal_temp, tmpglobal_ab, 2*p_length, n, p_length);
+
+            copy_mp(ciphertext, tmpglobal_temp, p_length);
+        end
+    end
+    trigFx(2);
+    

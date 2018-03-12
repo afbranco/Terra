@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+avrora='java -jar /home/branco/avrora/avrora-beta-1.7.117.jar'
+
+execfile='/home/branco/gitspace/Terra/TerraVM/src/build/micaz/main.elf'
+#execfile='/home/branco/gitspace/tests/sense64/src/build/micaz/main.elf'
+
+#eepromfile=$HOME/gitspace/Terra/terrac/nvmData/sense.eeprom
+eepromfile=$HOME/gitspace/Terra/terrac/nvmData/sense64.eeprom
+
+rm data.txt
+for (( i=3000; i<=3000; i++))
+	do
+		tt=$(bc -l <<< "$i/10")
+		echo "Number $tt"
+		$avrora -platform=micaz -colors=false -monitors=leds,memory,energy,energy-profile,stack -eeprom-load-image=$eepromfile -seconds=$tt $execfile  > logMem.txt
+		./computeEnergy.lua logMem.txt >> data.txt
+	done

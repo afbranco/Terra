@@ -1,0 +1,69 @@
+#include "TerraThin.defs"
+
+#define NUM_READS 64
+var ushort[NUM_READS] sensorReads;
+var stat1_ret retData;
+var ubyte count=0;
+var ubyte k;
+var ulong sumdiffs;
+var short diff;
+var ushort stddev;
+//await 1s;
+
+aclm_setup();
+//loop do
+	trigFx(1);
+
+	loop i, NUM_READS do
+		emit REQ_ACLM();
+		sensorReads[i] = await ACLM();
+		//sensorReads[i] = sampleAclm();
+	end
+
+/*
+	k=0;
+	loop do
+		emit REQ_CUSTOM_A(1);
+		await CUSTOM_A();
+		inc k;
+		if (k > NUM_READS) then break; end
+		sensorReads[k] = sampleAclm();
+	end
+*/
+
+/*
+	k=0;
+	loop do
+		emit REQ_ACLM();
+		sensorReads[k] = await ACLM();
+		inc k;
+		if (k >= NUM_READS) then break; end
+	end
+*/
+
+
+	var ushort max,min,avg;
+	var long sum;
+	max = 65535;
+	min = 0;
+	sum=0;
+	loop i, NUM_READS do
+		sum = sum + sensorReads[i];
+		if max < sensorReads[i] then max = sensorReads[i]; end
+		if min > sensorReads[i] then min = sensorReads[i]; end
+	end
+
+	avg = sum / NUM_READS;
+
+    sumdiffs = 0;
+	loop i, NUM_READS do
+		diff = sensorReads[i] - avg;
+		sumdiffs = sumdiffs + (diff * diff);
+	end
+    stddev = fast_sqrt((sumdiffs / NUM_READS));
+    
+	trigFx(2);
+
+    store();
+
+//end

@@ -1,0 +1,6 @@
+#include "TerraNet.defs"
+
+loop do
+	emit LED0(TOGGLE);
+	await 500ms;
+end
