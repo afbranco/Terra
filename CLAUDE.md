@@ -63,6 +63,9 @@ de lá.
 - Abertas em 2026-11-22: #15 release v1.0.0 (acompanhamento), #16 teste com micaz real, #17
   comparação de float na VM (a confirmar), #18 build reproduzível bit a bit, #19 await de 0 ms
   (fechada pelo PR #20, na v1.0.1).
+- Relatados pelo Prof. em 2026-11-22: #21 (P2) gramática do `terrac` incompatível com o lpeg 1.x
+  (`loop body may accept empty string`); #22 (P1) a otimização (`optm.lua`) às vezes quebra a
+  execução na VM. A otimização é **ligada por padrão**; o TerraSim compila com `--no-opt`.
 - Correções vindas de outras sessões (ex.: TerraSim) entram como issue aqui antes do código.
 
 ## Quem e o quê
