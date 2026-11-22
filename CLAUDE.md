@@ -25,7 +25,12 @@ de lá.
     independente da `.ova`: `_TOSSIM.so` + `TOSSIM.py` Net/Grp (Python 3.14, x86_64), firmware
     micaz NOBS e BS (`.exe` e `.ihex`), `terrac` empacotado e `TerraVMControl.jar`. Uso e
     gravação com ID em `release/README.md`. Em PR só compila e testa; numa tag `v*` cria a
-    release em **rascunho** (o Prof. revisa e publica).
+    release em **rascunho**; depois completo as notas (commit, imagem e digest, sha256 dos anexos
+    e dos `_TOSSIM.so` de dentro dos tar.gz) e publico, com o ok do Prof.
+  - **`v1.0.1` publicada** (tag no `e77a509`, merge do PR #20, 2026-11-22): o `await` de 0 ms
+    não congela mais o relógio (mínimo de 1 tick, #19). Teste `tests/wclock`. Oráculo do
+    TerraSim: 18 de 20 pares iguais à v1.0.0; os 2 restantes são o efeito esperado
+    (`routing_target`, sementes 1 e 3). O TerraSim cria a v1.1.0 em cima dela.
   - Alinhada com a release **tinyos-toolchain `2.1.2-r2`** (decidido pelo Prof. em 2026-11-22;
     antes era a r1, `f42bac7`, digest `7e21b1b9…`). O workflow fixa a imagem
     `2.1.2-resolute-py3-21d8fb1@sha256:4198b12302181edd0e8b20ae06cd3af0a2d483a06355a78c1f83371250de47ec`.
@@ -57,7 +62,7 @@ de lá.
   issues #2 a #12, de 2017) e não vale para o `master`.
 - Abertas em 2026-11-22: #15 release v1.0.0 (acompanhamento), #16 teste com micaz real, #17
   comparação de float na VM (a confirmar), #18 build reproduzível bit a bit, #19 await de 0 ms
-  (correção no PR #20, em espera até depois da v1.0.0; sai na v1.0.1).
+  (fechada pelo PR #20, na v1.0.1).
 - Correções vindas de outras sessões (ex.: TerraSim) entram como issue aqui antes do código.
 
 ## Quem e o quê
@@ -85,7 +90,7 @@ testes e no controle das inovações". Feito em 2026-11-22: relatório em
 `handoff/avaliacao-vm-tinyos.md`, com 31 commits que tocam o build TinyOS e os bugs
 encontrados. Alguns valem também para a produção e são candidatos a correção no `master`
 (potência de RF do Grp, comparação de float). O oráculo do `.so` novo contra o de produção
-passou (ver "Oráculo"). A v1.0.0 saiu em 2026-11-22. Próximo passo: a v1.0.1 (PR #20) e os
+passou (ver "Oráculo"). A v1.0.0 e a v1.0.1 saíram em 2026-11-22. Próximo passo: os
 ajustes e bugs de compilação que o Prof. conhece.
 
 ## O que já se sabe (sessão tinyos-toolchain, 2026-11-21)
@@ -194,9 +199,7 @@ e `.rodata` iguais aos do `459a2091`), refazer o oráculo e criar a TerraSim v1.
 - Se o `handoff/` (scripts e tabelas da análise de versão) entra no repositório. Hoje está
   fora do git (`.git/info/exclude`).
 - Teste do Prof. com micaz real (MIB520, #16, roteiro em `release/README.md`): não bloqueou a
-  v1.0.0 e consta como pendente nas notas dela.
-- **v1.0.1**: merge do PR #20 (await de 0 ms), tag `v1.0.1`; o workflow faz o rascunho e eu
-  completo as notas (commit, imagem e digest, sha256 dos anexos e dos `_TOSSIM.so`).
+  v1.0.0 nem a v1.0.1 e consta como pendente nas notas delas.
 - Quais correções de bugs achados na integração valem para a produção.
 
 ## Como trabalhar (mesmas regras do tinyos-toolchain)
