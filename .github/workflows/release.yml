@@ -1,0 +1,92 @@
+# Compila e testa os artefatos de release do Terra e, numa tag v*, cria a release como
+# rascunho (o Prof. revisa as notas e publica).
+# - pull request e execução manual: compila, testa e guarda os artefatos no Actions;
+# - tag v*: o mesmo e depois a release em rascunho com os anexos, SHA256SUMS e BUILDINFO.
+# A imagem do toolchain é fixa (tag com commit e digest), da release tinyos-toolchain 2.1.2-r1.
+name: release
+
+on:
+  pull_request:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  TOOLCHAIN_RELEASE: 2.1.2-r1
+  TOOLCHAIN_IMAGE: ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-f42bac7@sha256:7e21b1b9863fd8b5d77e9b313654690ce33cb53ea88ae20b85b3d266a28873da
+
+jobs:
+  tinyos:
+    name: VM (TOSSIM e micaz) e TerraControl
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - name: Versão
+        run: echo "VER=$(case "$GITHUB_REF" in refs/tags/v*) echo "${GITHUB_REF_NAME#v}";; *) echo "dev-${GITHUB_SHA::7}";; esac)" >> "$GITHUB_ENV"
+      - name: Build e testes
+        run: |
+          mkdir -p dist
+          podman pull -q "$TOOLCHAIN_IMAGE"
+          podman run --rm -v "$PWD:/terra:ro,Z" -v "$PWD/dist:/out:Z" -w /terra \
+            "$TOOLCHAIN_IMAGE" release/build-tinyos.sh "$VER" /out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tinyos
+          path: dist/
+
+  terrac:
+    name: terrac
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - name: Versão
+        run: echo "VER=$(case "$GITHUB_REF" in refs/tags/v*) echo "${GITHUB_REF_NAME#v}";; *) echo "dev-${GITHUB_SHA::7}";; esac)" >> "$GITHUB_ENV"
+      - name: Lua 5.1 e lpeg 0.10.2 (a versão que o terrac usa)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lua5.1 liblua5.1-0-dev luarocks
+          sudo luarocks --lua-version=5.1 install lpeg 0.10.2-1
+      - name: Build e testes
+        run: release/build-terrac.sh "$VER" dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: terrac
+          path: dist/
+
+  release:
+    name: Release (rascunho)
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [tinyos, terrac]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: SHA256SUMS e BUILDINFO
+        run: |
+          cd dist
+          tar -czf logs.tar.gz logs && rm -rf logs
+          {
+            echo "Terra $GITHUB_REF_NAME"
+            echo "commit: $GITHUB_SHA"
+            echo "tinyos-toolchain: $TOOLCHAIN_RELEASE"
+            echo "imagem: $TOOLCHAIN_IMAGE"
+            echo "workflow: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          } > BUILDINFO
+          sha256sum * > SHA256SUMS
+          cat BUILDINFO SHA256SUMS
+      - name: Cria a release em rascunho
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" -R "$GITHUB_REPOSITORY" --draft --verify-tag \
+            --title "Terra $GITHUB_REF_NAME" \
+            --notes "Rascunho gerado pelo workflow. Ver BUILDINFO e logs.tar.gz." dist/*
