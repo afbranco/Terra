@@ -39,6 +39,15 @@ for v in net grp; do
     mkdir -p "$W/run-$v"
     (cd "$W/run-$v" && python3 "$ROOT/release/smoke-tossim.py" "$d") | tee -a "$OUT/logs/tossim-$v.log"
     tail -1 "$OUT/logs/tossim-$v.log" | grep -q '^smoke-tossim: .* OK$' || { echo "FALHOU: smoke $v"; exit 1; }
+    if [ $v = net ]; then
+        # Testes da VM com programa Terra carregado (tests/*/test_*.py, programas TerraNet).
+        for t in "$ROOT"/tests/*/test_*.py; do
+            n=$(basename "$(dirname "$t")")
+            mkdir -p "$W/run-$v-$n"
+            (cd "$W/run-$v-$n" && python3 "$t" "$d") | tee -a "$OUT/logs/tossim-$v.log"
+            tail -1 "$OUT/logs/tossim-$v.log" | grep -q ': OK$' || { echo "FALHOU: $n"; exit 1; }
+        done
+    fi
 done
 
 # Firmware micaz. O ID do nó é gravado na instalação (ver release/README.md).

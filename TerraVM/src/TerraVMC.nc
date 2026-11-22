@@ -545,8 +545,8 @@ int ceu_wclock_lt (tceu_wclock* tmr) {
 void ceu_wclock_enable (int gte, s32 us, tceu_nlbl lbl) {
 	tceu_wclock* tmr = (tceu_wclock*)(MEM+wClock0+(gte*sizeof(tceu_wclock)));
     s32 dt = us - CEU->wclk_late;
-//afb Prevent negative dt
-	dt = (dt<0)?0:dt;
+//afb Prevent negative dt. Mínimo de 1 tick: com 0 o timer dispara no mesmo instante para sempre e o relógio simulado não avança.
+	dt = (dt<1)?1:dt;
 
     dbg(APPNAME,"CEU::ceu_wclock_enable(): gate=%d, time=%d, lbl=%d, dt=%ld, wClock0=%d\n",gte,us,lbl,dt,wClock0);
 //printf("[%d/%d] (%ld - %d) = %ld",gte,lbl,us,CEU->wclk_late,dt);printfflush();

@@ -1,0 +1,13 @@
+#include "TerraNet.defs"
+
+// Issue: um await de 0 ms não pode congelar o relógio (teste tests/wclock).
+var ushort z = 0;
+var ushort n = 0;
+loop do
+	await (z)ms;
+	n = n + 1;
+	if n >= 100 then
+		n = 0;
+		emit LED0(TOGGLE);
+	end
+end
