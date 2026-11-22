@@ -25,10 +25,14 @@ de lá.
     micaz NOBS e BS (`.exe` e `.ihex`), `terrac` empacotado e `TerraVMControl.jar`. Uso e
     gravação com ID em `release/README.md`. Em PR só compila e testa; numa tag `v*` cria a
     release em **rascunho** (o Prof. revisa e publica).
-  - Alinhada com a release **tinyos-toolchain `2.1.2-r1`** (tag git no `f42bac7`, criada pela
-    sessão tinyos com o OK do Prof.). O workflow fixa a imagem
-    `2.1.2-resolute-py3-f42bac7@sha256:7e21b1b9863fd8b5d77e9b313654690ce33cb53ea88ae20b85b3d266a28873da`.
+  - Alinhada com a release **tinyos-toolchain `2.1.2-r2`** (decidido pelo Prof. em 2026-11-22;
+    antes era a r1, `f42bac7`, digest `7e21b1b9…`). O workflow fixa a imagem
+    `2.1.2-resolute-py3-21d8fb1@sha256:4198b12302181edd0e8b20ae06cd3af0a2d483a06355a78c1f83371250de47ec`.
     Cada release do Terra registra a imagem, o digest e a release do toolchain (`BUILDINFO`).
+    A r2 só corrige scripts Python 2 (`tos-storage-*`, `tos-deluge`...) e acrescenta o
+    `python3-serial`. Com o `master`, o firmware micaz sai idêntico byte a byte ao da r1 e o
+    `_TOSSIM.so` tem o mesmo código e dados (só DWARF e build-id diferem), então o oráculo feito
+    na r1 vale. `MOD=VCN_DAT` falha na r1 e compila na r2.
   - Testes do workflow (todos passaram no CI e localmente):
     - `.so`: boot de dois nós e 30 s simulados. A VM faz `exit(0)` se não consegue criar o
       `sensors.bin` na pasta corrente, então o teste roda numa pasta gravável e exige a linha OK;
@@ -123,9 +127,9 @@ Ambiente do usuário: `ova-tinyos.sh`, `ova-terra_env.sh`. O Terra nela é a dis
   VM=NET|GRP TYPE=ALL` gera `_TOSSIM.so`. Hardware micaz, `master` (`RFPOWER=4`), bytes de ROM:
   Net ALL 50.488, NOBS 49.724, BS 43.990; Grp ALL 71.762, NOBS 65.952, BS 47.684 (com
   `RFPOWER=1`, o padrão antigo, são 4 B a menos).
-- Bug da imagem r1: 5 scripts `tos-*` ainda são Python 2 (`tos-storage-at45db`, `-stm25p`,
+- Bug da imagem r1: 5 scripts `tos-*` ainda eram Python 2 (`tos-storage-at45db`, `-stm25p`,
   `-pxa27xp30`, `tos-deluge`, `tos-dump.py`). No Terra só afeta `MOD=VCN_DAT` (usa
-  `BlockStorageC`); o `|| rm` do make esconde a falha. A sessão tinyos prepara a `2.1.2-r2`.
+  `BlockStorageC`); o `|| rm` do make esconde a falha. Corrigido na `2.1.2-r2`.
 - O snapshot de 2018 (sintaxe `NOME:valor`) também compila: sim-sf Net e Grp, micaz
   `VM:GRP TYPE:NOBS QUEUE:SHORT` (65.304 B). O Makefile precisa de `bc` (já na imagem).
 - As 6 classes Java do `mig` saem idênticas às commitadas.
@@ -175,11 +179,6 @@ o daemon em py3, a medição de RAM em 64 bits e a troca do `.so` no servidor.
   fora do git (`.git/info/exclude`).
 - **v1.0.0**: falta o avaliador da TerraSim em py3 e o teste do Prof. com micaz real (MIB520,
   roteiro em `release/README.md`). Depois, criar a tag `v1.0.0`, e o workflow faz o rascunho.
-- **r1 ou r2 do toolchain** (decisão do Prof., aguardando a sessão tinyos): a r2 corrige os
-  scripts Python 2, mas a imagem é remontada do zero e pode trazer gcc, avr-gcc, Python ou Java
-  mais novos. A sessão tinyos vai comparar as versões de pacote entre a r1 e a r2. Recomendação:
-  a v1.0.0 sai na r1 (validada pelo oráculo); a troca para a r2, se houver, vira uma release
-  própria e exige refazer o oráculo.
 - Quais correções de bugs achados na integração valem para a produção.
 
 ## Como trabalhar (mesmas regras do tinyos-toolchain)
