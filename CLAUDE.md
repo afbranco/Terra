@@ -43,9 +43,10 @@ de lá.
     - `.so`: boot de dois nós e 30 s simulados. A VM faz `exit(0)` se não consegue criar o
       `sensors.bin` na pasta corrente, então o teste roda numa pasta gravável e exige a linha OK;
     - firmware: cabe em 128 KB de flash e 4 KB de RAM;
-    - `terrac`: os `.vmx` de `terrac/samples` saem iguais aos commitados (Count2Leds só em
-      espaços de comentário). Exige Lua 5.1 e **lpeg 0.10.2**; com o lpeg 1.0 falha. O fonte pede
-      `lpeg_0_10_2_1-lpeg` (nome do luarocks da época); o script da release injeta um alias;
+    - `terrac`: os `.vmx` de `terrac/samples` e `tests/*/` saem iguais aos commitados (Count2Leds
+      só em espaços de comentário), e os programas de `tests/terrac/` dão o erro e a linha de
+      `erros.esperado`. Roda com o lpeg 0.10.2 (luarocks; o anexo da release sai dele) e com o da
+      distribuição (1.x): as saídas têm de ser iguais. Até a v1.0.1 só o 0.10.2 servia (#21);
     - `TerraVMControl.jar`: compilado do fonte com as bibliotecas da TerraDist v0.3.0 (idênticas
       às do jar de 2016); `app.ControlForm` e o `MoteIF` carregam.
   - Conferido contra a produção de 2016 (`handoff/ova/TerraNG/`, a distribuição da `.ova`): o
@@ -63,9 +64,22 @@ de lá.
 - Abertas em 2026-11-22: #15 release v1.0.0 (acompanhamento), #16 teste com micaz real, #17
   comparação de float na VM (a confirmar), #18 build reproduzível bit a bit, #19 await de 0 ms
   (fechada pelo PR #20, na v1.0.1).
-- Relatados pelo Prof. em 2026-11-22: #21 (P2) gramática do `terrac` incompatível com o lpeg 1.x
-  (`loop body may accept empty string`); #22 (P1) a otimização (`optm.lua`) às vezes quebra a
-  execução na VM. A otimização é **ligada por padrão**; o TerraSim compila com `--no-opt`.
+- `terrac`, relatados pelo Prof. em 2026-11-22:
+  - #21 lpeg 1.x: **fechada** (PR #25). As mensagens de erro `EM`/`EV`/`EK` terminam em `* P(1)`.
+    44 de 90 mensagens de sintaxe ficaram mais precisas; nenhum `.vmx` mudou.
+  - #23 número de linha: **fechada** (PR #26). Com `libc6-dev`, o `cpp -C` inclui o
+    `stdc-predef.h` e as linhas saíam 42 acima; agora vêm dos marcadores do `cpp` (`_SRCLINE`).
+    O `server/terrac_linhas.py` do TerraSim compensava isso e tem de ser desligado na troca
+    (avisado em 2026-11-22). Ainda sem release.
+  - #24 códigos de erro estáveis e `--diag=json` (mensagens em inglês; o texto atual continua
+    o padrão). Mostrar o formato ao TerraSim antes do merge.
+  - #22 (P1) otimização (`optm.lua`) às vezes quebra a execução na VM. Ligada **por padrão**; o
+    TerraSim compila com `--no-opt`. Não reproduzida: os 20 programas Net daqui e do TerraSim se
+    comportam igual com e sem `--opt` (VMDBG nó a nó, sem os `executing trail`, e TVIEW). Para
+    comparar, completar o `.vmx` otimizado com `end` até o tamanho do outro: senão o deploy
+    muda de tamanho e o rádio diverge sem bug. Falta um programa que mostre o erro, e a VM Grp.
+- Imagens locais de teste do terrac: `localhost/terrac-lpeg:0.10.2`, `:1.0.2` (ambas com
+  `libc6-dev`) e `:semlibc` (1.0.2 sem `libc6-dev`); Containerfiles no scratchpad da sessão.
 - Correções vindas de outras sessões (ex.: TerraSim) entram como issue aqui antes do código.
 
 ## Quem e o quê
