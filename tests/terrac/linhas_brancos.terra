@@ -1,0 +1,16 @@
+#include "TerraNet.defs"
+// Erro proposital depois de 12 linhas vazias: o cpp troca as linhas por um marcador (#23).
+
+
+
+
+
+
+
+
+
+
+
+
+var ubyte y = 2;
+y = ;
