@@ -47,6 +47,17 @@ de lá.
     `.defs` são idênticos; o jar tem as mesmas classes e assinaturas (só métodos sintéticos
     do compilador diferem).
 
+## Backlog (GitHub Issues, desde 2026-11-22)
+
+- O backlog são as issues de `afbranco/Terra`. Uma issue por mudança, com checklist e o teste
+  previsto; o commit ou PR que resolve cita a issue (`Fixes #N`).
+- Rótulos: prioridade `P1`/`P2`/`P3`; área `vm`, `terrac`, `terracontrol`, `build`, `release`;
+  tipo `bug`/`enhancement`. `integracao-heterogenea` marca o que é da linha 2016-2018 (as
+  issues #2 a #12, de 2017) e não vale para o `master`.
+- Abertas em 2026-11-22: #15 release v1.0.0 (acompanhamento), #16 teste com micaz real, #17
+  comparação de float na VM (a confirmar), #18 build reproduzível bit a bit.
+- Correções vindas de outras sessões (ex.: TerraSim) entram como issue aqui antes do código.
+
 ## Quem e o quê
 
 - O dono é o Prof. Adriano Branco (PUC-Rio), autor do Terra. Conversar com ele em **português
