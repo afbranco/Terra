@@ -2,7 +2,7 @@
 # rascunho (o Prof. revisa as notas e publica).
 # - pull request e execução manual: compila, testa e guarda os artefatos no Actions;
 # - tag v*: o mesmo e depois a release em rascunho com os anexos, SHA256SUMS e BUILDINFO.
-# A imagem do toolchain é fixa (tag com commit e digest), da release tinyos-toolchain 2.1.2-r1.
+# A imagem do toolchain é fixa (tag com commit e digest), da release tinyos-toolchain 2.1.2-r2.
 name: release
 
 on:
@@ -15,8 +15,8 @@ permissions:
   contents: read
 
 env:
-  TOOLCHAIN_RELEASE: 2.1.2-r1
-  TOOLCHAIN_IMAGE: ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-f42bac7@sha256:7e21b1b9863fd8b5d77e9b313654690ce33cb53ea88ae20b85b3d266a28873da
+  TOOLCHAIN_RELEASE: 2.1.2-r2
+  TOOLCHAIN_IMAGE: ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-21d8fb1@sha256:4198b12302181edd0e8b20ae06cd3af0a2d483a06355a78c1f83371250de47ec
 
 jobs:
   tinyos:

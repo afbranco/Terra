@@ -2,7 +2,7 @@
 
 As releases a partir da 1.0 são geradas pelo workflow `.github/workflows/release.yml`. Ele usa a
 imagem fixa do [tinyos-toolchain](https://github.com/afbranco/tinyos-toolchain), release
-`2.1.2-r1`: `ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-f42bac7`, cujo digest está no
+`2.1.2-r2`: `ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-21d8fb1`, cujo digest está no
 workflow e no `BUILDINFO` de cada release.
 
 ## Anexos
@@ -27,7 +27,7 @@ numa MIB520 em `/dev/ttyUSB0`:
 
 ```bash
 podman run --rm -it --device /dev/ttyUSB0 -v "$PWD:/w:Z" -w /w \
-  ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-f42bac7 sh -c '
+  ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-21d8fb1 sh -c '
     tos-set-symbols --objcopy avr-objcopy --objdump avr-objdump --target ihex \
       terra-<v>-net-micaz-nobs.exe no2.ihex TOS_NODE_ID=2 ActiveMessageAddressC__addr=2 &&
     avrdude -cmib510 -P/dev/ttyUSB0 -pm128 -U hfuse:w:0xd9:m -U efuse:w:0xff:m \
@@ -57,6 +57,6 @@ TinyOS, ou com o simulador.
 
 ```bash
 podman run --rm -v "$PWD:/terra:ro,Z" -v "$PWD/dist:/out:Z" -w /terra \
-  ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-f42bac7 release/build-tinyos.sh dev /out
+  ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-21d8fb1 release/build-tinyos.sh dev /out
 release/build-terrac.sh dev dist     # com Lua 5.1 e lpeg 0.10.2 instalados
 ```
