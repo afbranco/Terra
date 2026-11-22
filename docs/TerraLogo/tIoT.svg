@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="4cm" height="4cm" viewBox="132 76 69 73" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <rect style="fill: #000099" x="133.816" y="79.4336" width="65.633" height="65.633" rx="14" ry="14"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 3; stroke-linejoin: round; stroke: #000099" x="133.816" y="79.4336" width="65.633" height="65.633" rx="14" ry="14"/>
+  </g>
+  <g>
+    <text font-size="62.0889" style="fill: #ffffff;text-anchor:start;font-family:DejaVu Sans;font-style:normal;font-weight:normal" x="137.508" y="133.75">
+      <tspan x="137.508" y="133.75">t</tspan>
+    </text>
+    <text font-size="19.1911" style="fill: #ffffff;text-anchor:start;font-family:DejaVu Sans;font-style:normal;font-weight:700" x="162.308" y="113.81">
+      <tspan x="162.308" y="113.81">IoT</tspan>
+    </text>
+  </g>
+</svg>

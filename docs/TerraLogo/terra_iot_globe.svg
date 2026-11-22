@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="7cm" height="7cm" viewBox="-62 -64 134 134" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <rect style="fill: #7f7f7f" x="-59.6412" y="-62.3588" width="130" height="130" rx="14" ry="14"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 3; stroke-linejoin: round; stroke: #000099" x="-59.6412" y="-62.3588" width="130" height="130" rx="14" ry="14"/>
+  </g>
+  <ellipse style="fill: none; fill-opacity:0; stroke-width: 3; stroke-linejoin: round; stroke: #000099" cx="6" cy="2" rx="60" ry="60"/>
+  <path style="fill: none; fill-opacity:0; stroke-width: 3; stroke-linejoin: round; stroke: #000099" d="M 66,2 A 75.4584,75.4584 0 0 0 -36.4264,-40.4264"/>
+  <path style="fill: none; fill-opacity:0; stroke-width: 3; stroke-linejoin: round; stroke: #000099" d="M 42,-48 A 97.2624,97.2624 0 0 0 -52,28"/>
+  <path style="fill: none; fill-opacity:0; stroke-width: 3; stroke-linejoin: round; stroke: #000099" d="M 48,48 A 153.933,153.933 0 0 0 6,-58"/>
+  <path style="fill: none; fill-opacity:0; stroke-width: 3; stroke: #000099" d="M 6 -58 C -28,-40 52,-12 42,-48"/>
+  <path style="fill: none; fill-opacity:0; stroke-width: 3; stroke: #000099" d="M -20 -56 C -36,-24 28,8 60,-28"/>
+  <path style="fill: none; fill-opacity:0; stroke-width: 3; stroke: #000099" d="M -56 0 C -52,46 14,66 52,44"/>
+  <path style="fill: none; fill-opacity:0; stroke-width: 3; stroke: #000099" d="M -48 -28 C -51.2,-15.6 -49.6,-12 -39.2,-2.8"/>
+  <path style="fill: none; fill-opacity:0; stroke-width: 3; stroke: #000099" d="M 45.2 16.8 C 56.8,13.8 62.6,9.8 68,4"/>
+  <text font-size="62.0889" style="fill: #ffffff;text-anchor:start;font-family:DejaVu Sans;font-style:normal;font-weight:normal" x="-34.6776" y="35.1934">
+    <tspan x="-34.6776" y="35.1934">t</tspan>
+  </text>
+  <text font-size="19.1911" style="fill: #ffffff;text-anchor:start;font-family:DejaVu Sans;font-style:normal;font-weight:700" x="-9.87764" y="15.2534">
+    <tspan x="-9.87764" y="15.2534">IoT</tspan>
+  </text>
+  <text font-size="22.5778" style="fill: #ffffff;text-anchor:start;font-family:DejaVu Sans;font-style:normal;font-weight:700" x="-10.571" y="35.3286">
+    <tspan x="-10.571" y="35.3286">erra</tspan>
+  </text>
+</svg>

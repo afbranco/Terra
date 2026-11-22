@@ -1,0 +1,10 @@
+theme: jekyll-theme-cayman
+
+defaults:
+  -
+    scope:
+      path: "" # an empty string here means all files in the project
+    values:
+      terra_home_link: "http://www.inf.puc-rio.br/~prjterra/"
+      terra_tutorial_link: "http://www.inf.puc-rio.br/~prjterra/#tab5"
+      terra_language_link: "http://www.inf.puc-rio.br/~prjterra/#tab2"

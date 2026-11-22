@@ -1,0 +1,562 @@
+---
+---
+{% include header.html %}
+
+<style>
+xb {font-weight:bold; color: blue;}
+xr {font-weight:bold; color: red;}
+xg {font-weight:bold; color: green;}
+xz {font-weight:bold; color: gray;}
+
+body {counter-reset: h3}
+  h1 {counter-reset: h3}
+  h2 {counter-reset: h3}
+  h3 {counter-reset: h4}
+  h4 {counter-reset: h5}
+  h5 {counter-reset: h6}
+
+  h3:before {counter-increment: h3; content: counter(h3) ". "}
+  h4:before {counter-increment: h4; content: counter(h3) "." counter(h4) ". "}
+  h5:before {counter-increment: h5; content: counter(h3) "." counter(h4) "." counter(h5) ". "}
+  h6:before {counter-increment: h6; content: counter(h3) "." counter(h4) "." counter(h5) "." counter(h6) ". "}
+
+  h2.nocount:before, h3.nocount:before, h4.nocount:before, h5.nocount:before, h6.nocount:before { content: ""; counter-increment: none } 
+
+    
+</style>
+
+<h2>Tutorial for new customizations</h2>
+
+<p>This tutorial explain how to modify the VMCustom module of Terra System to add new functionalities.
+Having some familiarity with nesC will help you understand this tutorial.
+Also understanding the event-driven model and the importance of not creating blocking operations 
+is critical to avoiding side effects in the Terra execution.
+Finally, it is strongly recommended to already know the Terra programming environment, 
+especially the Céu-T features.
+</p>
+
+
+<h3>Customization Process</h3>
+
+<p> The next figure presents the customization and usage flows.
+The developer activities related to customization are indicated in <xb>blue</xb> and 
+the user activities related to application script are indicated in <xr>red</xr>.
+The user activities are presented in more details in
+the <a target="_blank" href={{ page.terra_tutorial_link }}>Terra tutorial page</a> 
+and at the end of the 
+<a target="_blank" href="terra-platf-tinyos.html">TinyOS platform page</a>.
+Next section presents the developer activities to customize a basic Terra implementation.
+</p>
+<p> The main developer activities are:
+</p>
+<ul>
+<li><xb>(1)</xb> modifications in TerraVM source code. Optionally, the developer may create new components and/or libs.</li>
+<li><xb>(2)</xb> creation of a new <code>.defs</code> file or modification on an existing one.</li>
+<li><xb>(3)</xb> build and flash TerraVM.</li>
+</ul>
+
+<br>
+<figure>
+<figcaption >Figure: Customization flow (<xb>Dev</xb>) <i>vs</i> Usage flow (<xr>User</xr>)</figcaption>
+<img class="img-responsive rounded" style='clear:both;margin-right:10px; margin-top:10px; padding:3px; outline: 1px solid LightGray;' 
+	src="images/CustomizationDiagram.png" alt="Customization Process Diagram">
+</figure>
+
+
+<h3>The developer activities</h4>
+<div class="alert alert-info">
+  <strong>Note:</strong> This procedure assumes that you already have Terra  
+ported to the desired platform with a very basic customization.
+In general this very basic customization is based on TerraNet customization.
+</div>
+
+<p>At least three files must be edited to add new functionalities to a specific customization.</p>
+<ul>
+<li>The Terra<i>XXX</i>.defs file located in <code>~/Terra/terrac/samples</code> directory, where <i>XXX</i> is the base customization (<code>Net</code> or <code>Grp</code>).</li>
+<li>The VMCustom<i>XXX</i>.h file located in <code>~/Terra/TerraVM/src/CustomVMs/Terra<i>XXX</i></code> directory.</li>
+<li>The VMCustomP.nc file also located in <code>~/Terra/TerraVM/src/CustomVMs/Terra<i>XXX</i></code> directory.</li>
+</ul>
+
+<p>The definitions between these three files must be compatibles.
+In the case of events, the numeric IDs must be equal to equivalent operations.
+In the case of data structures, the type and position of the each fields must be equivalent. 
+Same events and functions may have different names between the files, 
+considering that the numeric IDs are the same.
+</p>
+<p>The syntax of each type of operations are described in the sequence.
+The last section presents some real code examples.
+</p> 
+
+<p>In general, small functionalities are written inside <i>VMCustomP.nc</i> file.
+If a new functionality requires additional files, a nesC component and/or a library of external functions may be created.
+In this case the developer may need to modify the <i>VMCustom<b>C</b>.nc</i> file and 
+must modify the Make system to be able to compile the new functionalities.
+These modifications are out of scope of this tutorial.
+</p>
+
+<h4>Terra<i>XXX</i>.defs file</h4>
+<p>
+This file is used during <i>terrac</i> compilation to validate the event and function names. 
+Any customized data structure used by events or functions are also defined in this file.
+Additionally, the developer may define constant values to be used in the new functionalities. 
+</p>
+<h5>Constant definition</h5>
+<p>A constant definition uses the <code>#define</code> command as used in the C language.
+Some examples are:</p>
+<pre><code><b>#define</b> HIGH 1
+<b>#define</b> LOW 0
+<b>#define</b> ON 1
+<b>#define</b> OFF 0
+</code></pre>
+
+<h5>Data structures definition</h5>
+
+<div class="alert alert-info">
+  <strong>Note:</strong> you need to be familiar with Terra data structures.
+The page <a target="_blank" href={{ page.terra_language_link }}>Céu-T Language</a>
+presents details about the <em>Types and data structures</em> of Terra scripting language.
+</div>
+
+<p><b>Registers</b> - Some new functionalities may need exchange values that a single basic type 
+cannot support.
+In these cases we need to create a specific data structure that includes all needed values.
+In Céu-T language, a <code>regtype</code> declaration creates a new register type. 
+A register can only have fields that are values of basic Terra types or arrays of basic types.
+In Céu-T, all variables must start with a lowercase character.
+</p>
+<pre><code><xz>// regtype example</xz>
+<b>regtype</b> dhtData_t <b>with</b>
+	<b>var ubyte</b> stat;
+	<b>var ubyte</b> hum;
+	<b>var ubyte</b> temp;
+<b>end</b>
+</code></pre>
+
+<p><b>Packets</b> - In special cases the new functionality may leave some fields to be defined by the user.
+This is the case of Radio messages where one part of the message (header) is predefined by the Terra message protocol
+ and second part (payload) is application dependent.
+ The <code>pktype</code> declaration creates a new abstract type with predefined fields and a payload section.
+ The predefined fields depend on the new functionality needs and the payload section is left to the user application needs.
+</p>
+<pre><code><xz>// pktype example</xz>
+<b>packet</b> radioMsg <b>with</b>
+	<b>var ubyte</b> type;
+	<b>var ushort</b> source;
+	<b>var ushort</b> target;
+	<b>var payload</b>[20] data;
+<b>end</b>
+</code></pre>
+
+<p>When using registers in events or functions, Terra system always pass the data address instead of data values.
+Then, you must use the TerraVM internal support to copy memory data when building your customized function.
+See below the "VMCustomP.nc file" section to find some examples.
+</p>
+
+<h5>Output event  definition</h5>
+<p>Output events are defined by:</p>
+<pre><code><b>output void</b> <i>EventName</i> <i>ArgumentType</i> <i>NumericID</i>;</code></pre>
+<p>Where:</p>
+<ul>
+  <li> <i>EventName</i> is the event name used in the Terra Script. Must be uppercase.</li>
+  <li> <i>ArgumentType</i> is the type of the argument. Must be any basic Terra type, void or any custom data structure. </li>
+  <li> <i>NumericID</i> is an integer number that identifies internally the event. This number must be unique in all output events.</li>
+</ul>
+<p>An example of output event definition is:</p>
+<pre><code>output void REQ_DHT ubyte 10;</code></pre>
+<div class="alert alert-info">
+  <strong>Note:</strong> all output events must return void.
+</div>
+
+<h5>Input event  definition</h5>
+<p>Input events are defined by:</p>
+<pre><code><b>input</b> <i>ReturnType</i> <i>EventName</i> <i>ArgumentType</i> <i>NumericID</i>;</code></pre>
+<p>Where:</p>
+<ul>
+  <li> <i>ReturnType</i> is the type of the <i>await</i> value. Must be any basic Terra type, void or any custom data structure. </li>
+  <li> <i>EventName</i> is the event name used in the Terra Script.  Must be uppercase.</li>
+  <li> <i>ArgumentType</i> is the type of the argument. Must be an ubyte type or void. This argument, in general, identifies a <i>sub-event</i> type.</li>
+  <li> <i>NumericID</i> is an integer number that identifies internally the event. This number must be unique in all input events.</li>
+</ul>
+<p>An example of input event definition is:</p>
+<pre><code>input ubyte SEND_DONE void 41;</code></pre>
+
+<h5>Function  definition</h5>
+<p>Functions are defined by:</p>
+<pre><code><b>function</b> <i>ReturnType</i> <i>FunctionName</i>(<i>ListOfArgumentsType</i>) <i>NumericID</i>;</code></pre>
+<p>Where:</p>
+<ul>
+  <li> <i>ReturnType</i> is the type of the function return value. Accepts only basic Terra types. </li>
+  <li> <i>FunctionName</i> is the function name used in the Terra Script. Must start with a lowercase.</li>
+  <li> <i>ListOfArgumentsType</i> May be empty or a list of types. The types must be any basic Terra type or any custom data structure.  Leave it empty in the case of void. </li>
+  <li> <i>NumericID</i> is an integer number that identifies internally the function. This number must be unique in all functions.</li>
+</ul>
+<p>Examples of function definition are:</p>
+<pre><code>function ushort getNodeId() 0;
+function ubyte  pinWrite(ubyte,ubyte,ubyte) 21;</code></pre>
+
+
+<h4>VMCustom<i>XXX</i>.h file</h4>
+<p>
+This file defines the events and function numeric identifiers to be used during the building of TerraVM firmware.
+Each numeric ID must be equal to the equivalent one in the <code>.defs</code> file.
+These IDs are defined as a list of enumeration values as:
+</p>
+<pre><code>enum{
+  <i>OutEvent1</i> =<i>NumericId1</i>,
+  <i>OutEvent2</i> =<i>NumericId2</i>,
+  <i>InEvent1</i>  =<i>NumericId1</i>,
+  <i>InEvent2</i>  =<i>NumericId2</i>,
+  <i>Function1</i> =<i>NumericId1</i>,
+  <i>Function2</i> =<i>NumericId2</i>,
+}
+</code></pre>
+<div class="alert alert-info">
+  <strong>Note:</strong> the Numeric ID must be different only for each group of OutEvent, InEvent, and Function.
+</div>
+
+<h4>VMCustomP.nc file</h4>
+<p>The entry point of custom functionalities are written in this file.
+In the case of functions or output events, you may write all functionality code inside this file or you may call external library functions or nesC component commands.
+In the case of input events you need to call a internal TerraVM function passing the event ID and event data as argument.
+In general an input event is triggered by a nesC event, a callback operation, or some kind of system interruption.
+Data structures must be created when required.
+</p>
+
+<div class="alert alert-info">
+  <strong>Note:</strong> customized operations must comply to Terra asynchronous execution model.
+Blocking operations are forbidden!
+</div>
+
+<h5>Custom data structures</h5>
+<p>
+If you have  created a custom data structures in the <i>.defs</i> file, 
+then you must define an equivalent structure in nesC code to be used by the custom operations.
+The definition of this structure can be placed in any file of your project at your convenience.
+For example, may be in the VMCustom<i>XXX</i>.h, VMCustomP.nc, or another additional file.
+</p>
+<p>
+The rules to convert the structures are very simple, 
+(i) each basic data type of Ceú-T has its equivalent in nesC, 
+(ii) you must use nesC <code>typedef nx_struct</code> construct to define the structure, and
+(iii) you need to follow the same  sequence of the fields definition.
+</p>
+<p>The next code shows an example of an equivalent data structure definitions.</p>
+<pre><code>// Céu-T Struct                // nesC nx struct
+regtype dhtData_t with         typedef nx_struct dhtData {
+  var ubyte stat;                nx_uint8_t stat;
+  var ubyte hum;                 nx_uint8_t hum;
+  var ubyte temp;                nx_uint8_t temp;
+end                            } dhtData_t;
+</code></pre>
+
+<p>Each Céu-T type must be associated to respective network type <b>nx</b> 
+as defined in the following tables</p>
+<div class="col-md-12">
+<div class="table-responsive col-md-4">
+  <table class="table" style="width:auto">
+    <thead>
+      <tr>
+        <th>Céu-T type</th>
+        <th>C type</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>ubyte</td>
+        <td>nx_uint8_t</td>
+      </tr>
+      <tr>
+        <td>ushort</td>
+        <td>nx_uint16_t</td>
+      </tr>
+      <tr>
+        <td>ulong</td>
+        <td>nx_uint32_t</td>
+      </tr>
+      <tr>
+        <td>float</td>
+        <td>nx_float</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="table-responsive col-md-4">
+  <table class="table"  style="width:auto">
+    <thead>
+      <tr>
+        <th>Céu-T type</th>
+        <th>C type</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>byte</td>
+        <td>nx_int8_t</td>
+      </tr>
+      <tr>
+        <td>short</td>
+        <td>nx_int16_t</td>
+      </tr>
+      <tr>
+        <td>long</td>
+        <td>nx_int32_t</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+
+<h5>Output event - code structure</h5>
+<p>During the script execution, a Céu-T command like <code>emit EVTx(Arg1);</code> will call the command
+<code>VM.procOutEvt(uint8_t id,uint32_t value)</code>, where <var>id</var> is the EVTx numeric identifier 
+and <var>value</var> is a integer value representing either the value of argument or the address of data structure.
+</p>
+<p>Then, the <code>VM.procOutEvt()</code> function implements a <code>switch/case</code> block for
+all expected output events.
+Each <code>case</code> tests the <var>id</var> to call a specific function like <code>proc_EvtX(id,value);</code>.
+The new custom operation must be implemented in this function paying attention to get corretly the argument value.
+If the value is an integer argument, a cast operation is enough to get the correct value like: <code>uint16_t val = (uint16_t)value;</code>.
+If the value is an address, you must execute the function <code>VM.getRealAddr()</code> casting the result 
+to the type of expected data structure.
+For example: <code>usrMsg_t* usrMsg = (usrMsg_t*)signal VM.getRealAddr(value);</code>
+</p>
+
+<p>
+In the case of a new output event, you must create a new <code>case</code> inside <code>VM.procOutEvt()</code>
+and must implement the respective <code>proc_xxxx()</code> function.
+The following code shows a example of customized output event.</p>
+<pre><code><xz>// Custom operation</xz>
+void <b>proc_req_dht_read(uint16_t id, uint32_t value)</b>{
+	call dht.read((uint8_t)value);
+}
+
+<xz>// Entry point</xz>
+command void VM.procOutEvt(uint8_t id,uint32_t value){
+  switch (id){
+	...
+    case O_DHT  : <b>proc_req_dht_read(id,value)</b>; break;
+	...
+  }
+}
+</code></pre>
+
+
+<h5>Function - code structure</h5>
+<p>Function entry points are very similar to those for exit events.
+The function <code>VM.callFunction(uint8_t id)</code> is called when a Céu-T function is executed.
+The <var>id</var> argument identify the function and, similar to the output event, 
+a block of <code>switch/case</code> calls a specific <code>func_xxx(id);</code>.
+The main differences are that a function allows more than one argument and always returns a basic type value.
+Both the arguments and return values are passed using the stack, 
+this allows the use of functions in expressions.
+</p>
+
+
+<p>
+Similar to the output events, the new custom operation must be implemented in <code>func_xxx(id);</code>
+function also paying attention to get corretly the values of each argument.
+The arguments must be popped out in reverse sequence, from the last to the first, 
+using the function <code>VM.pop();</code> and casting the result to corresponding type.
+For example, use the comand <code>uint8_t val = (uint8_t)signal VM.pop();</code> to 
+pop a <var>ubyte</var> argument.
+If the argument is a data structure address, you must first pop it as <var>ushort</var> type
+and use the function <code>VM.getRealAddr()</code> to get the data pointer value.  
+</p>
+
+<p>After getting the arguments and executing the custom function operation,
+you must push the result value to the stack.
+Use the function <code>VM.push(val);</code> to push a basic type value to the stack.
+Remenber that you can push only the value type that was defined in the <code>.defs</code> file.
+The following code shows a example of customized function.</p>
+<pre><code><xz>// Custom function</xz>
+void <b>func_pinWrite(uint16_t id)</b>{
+  uint8_t stat=0;
+  uint8_t port, pin, val;
+  val  = (uint8_t)signal VM.pop(); <xz>// pop 3⁰ arg from stack</xz>
+  pin  = (uint8_t)signal VM.pop(); <xz>// pop 2⁰ arg from stack</xz>
+  port = (uint8_t)signal VM.pop(); <xz>// pop 1⁰ arg from stack</xz>
+  stat = pinWrite(port,pin,val);   <xz>// execute local function</xz>
+  signal VM.push(stat);            <xz>// Returns the stat value</xz>
+}
+
+<xz>// Entry point</xz>
+command void VM.callFunction(uint8_t id){
+  switch (id){
+  	...
+    case F_PIN_WRITE : <b>func_pinWrite(id)</b>; break;
+	...
+  }
+}
+</code></pre>
+
+
+
+<h5>Input event - code structure</h5>
+<p>
+In general, a input event is generated outside the core of the Virtual Machine and 
+must be notified to the VM engine.
+The command <code>VM.queueEvt()</code> is used to enqueue a Terra event and its respective data 
+allowing the engine to trigger, as necesserary, the script <code>await</code> commands.
+</p>
+<div class="alert alert-info">
+  <strong>Note:</strong> In the absence of an active await, Terra engine discards the respective event.
+</div>
+
+<p>Depending on the custom operation, 
+the event source may be a nesC event, a callback operation, or some kind of system interruption.
+All options will end up running a local customized function that must call <code>VM.queueEvt()</code>
+passing the event ID, the sub-event value, and a pointer to the data buffer.
+</p>
+
+<p> The sub-event value is an <var>uint8_t</var> value used as base to filter a 
+specific <var>await</var> that must be triggered for same input event. 
+For example, in the Radio receive event, the sub-event indicates the user message ID value.
+In this case is possible to have a Céu-T trail waiting for a <var>RECEIVE(id)</var> event 
+with a specific message ID.
+The sub-event 0 is used as general sub-event ID that triggers events without arguments. 
+For example, the command <code> msg = await RECEIVE();</code> will be triggered for any received message, 
+no matter what the message ID is.
+The <var>RECEIVE</var> event is an example where the <code>VM.queueEvt()</code> is called twice, one 
+passing the message ID as sub-event and another passing 0 as sub-event.
+</p>
+
+<p>As the event receiving is not synchronous with VM engine execution, an event must stores 
+its data in a global buffer. 
+Later, when handling internally the event, the VM engine copies, if necessary, the buffer to the target script variable or data structure.
+Each event must have its own data buffer.
+This data buffer is a global variable or global data structure that stores, when necessary, the last event data.
+If a next specific event may happen before the previous one be handled by the VM engine, 
+the custom implementation may allocate more than one buffer avoiding data overlay. 
+For example, a circular buffer may be used to avoid data overlay.
+</p>
+<div class="alert alert-info">
+  <strong>Note:</strong> 1 - Be cautious when using large buffers, mainly when running TerraVM in low memory platforms. <br>
+2 - In general, a single buffer by event type is enough for devices where the own hardware limmits the data rate. 
+</div>
+
+<p>Next code excerpt shows an example of custom input event implementation for the <code>SEND_DONE</code> event.
+In this event the <code>VM.queueEvt()</code> is called twice for different sub-event IDs.
+</p>
+
+<pre><code>
+nx_uint8_t ExtDataSendDoneError;
+event void BSRadio.sendDone(uint8_t am_id,message_t* msg,void* dataMsg, error_t error){
+  if (am_id == AM_USRMSG){
+    ExtDataSendDoneError = (uint8_t)error;
+    signal VM.queueEvt(I_SEND_DONE_ID, ((usrMsg_t*)dataMsg)->type, &ExtDataSendDoneError);
+    signal VM.queueEvt(I_SEND_DONE   ,                          0, &ExtDataSendDoneError);
+  }
+}
+</code></pre>
+
+<h3>Implementation examples</h3>
+
+<h4>Example file for <code>TerraXXX.defs</code></h4>
+<pre><code>// Interruption used for DHT sensor
+#define INT0 0  // PD0
+#define INT1 1  // PD1 
+#define INT2 2  // PD2 
+#define INT3 3  // PD3 
+
+// DHT11 data structure
+regtype <i>dhtData_t</i> with
+	var ubyte stat;
+	var ubyte hum;
+	var ubyte temp;
+end
+
+// radioMsg - Radio/Queue Data Message Register
+packet <i>radioMsg</i> with
+	var ubyte type;
+	var ushort source;
+	var ushort target;
+	var payload[20] data;
+end
+
+output void   REQ_DHT   ubyte    <xb>10</xb>;
+output void   SEND      <i>radioMsg</i> <xb>40</xb>;
+
+input  <i>dhtData_t</i> DHT    void      <xr>6</xr>;
+input  ubyte     SEND_DONE ubyte <xr>40</xr>;
+input  ubyte     SEND_DONE void  <xr>41</xr>;
+
+function ushort getNodeId()                      <xg>0</xg>;
+function ubyte  pinWrite(ubyte,ubyte,ubyte) 	<xg>21</xg>;
+</code></pre>
+
+<h4>Example file for <code>VMCustom<i>XXX</i>.h</code></h4>
+<pre><code>enum{
+  O_DHT           =<xb>10</xb>,
+  O_SEND          =<xb>40</xb>,
+
+  I_DHT           = <xr>6</xr>,
+  I_SEND_DONE_ID  =<xr>40</xr>,
+  I_SEND_DONE     =<xr>41</xr>,
+  
+  F_GETNODEID     =  <xg>0</xg>,
+  F_PIN_WRITE     = <xg>21</xg>,
+}
+</code></pre>
+
+<h4>Example file for <code>VMCustomP.nc</code></h4>
+<pre><code>void <b>proc_req_dht_read(uint16_t id, uint32_t value)</b>{
+	call dht.read((uint8_t)value);
+}
+
+void  <b>proc_send(uint16_t id, uint32_t addr)</b>{
+  usrMsg_t* usrMsg;
+  usrMsg = (usrMsg_t*)signal VM.getRealAddr(addr);
+  // .....
+}
+
+void  <b>func_getNodeId(uint16_t id)</b>{
+  uint16_t stat;
+  stat = TOS_NODE_ID;
+  signal VM.push(stat);<xz>// Returns a value</xz>
+}	
+
+void <b>func_pinWrite(uint16_t id)</b>{
+  uint8_t stat=0;
+  uint8_t port, pin, val;
+  val  = (uint8_t)signal VM.pop(); <xz>// pop 3⁰ arg from stack</xz>
+  pin  = (uint8_t)signal VM.pop(); <xz>// pop 2⁰ arg from stack</xz>
+  port = (uint8_t)signal VM.pop(); <xz>// pop 1⁰ arg from stack</xz>
+  stat = pinWrite(port,pin,val);   <xz>// execute local function</xz>
+  signal VM.push(stat);            <xz>// Returns a value</xz>
+}
+
+dhtData_t ExtDHTData;
+event void dht.readDone(dhtData_t* data){
+  memcpy(&ExtDHTData,data,sizeof(dhtData_t));  <xz>// copy data to event buffer</xz>
+  signal VM.queueEvt(<xr>I_DHT</xr>, 0, &ExtDHTData); <xz>// Generates a Terra event</xz>
+}
+
+nx_uint8_t ExtDataSendDoneError;
+event void BSRadio.sendDone(uint8_t am_id,message_t* msg,void* dataMsg, error_t error){
+  if (am_id == AM_USRMSG){
+    ExtDataSendDoneError = (uint8_t)error;
+    signal VM.queueEvt(<xr>I_SEND_DONE_ID</xr>, ((usrMsg_t*)dataMsg)->type, &ExtDataSendDoneError);
+    signal VM.queueEvt(<xr>I_SEND_DONE</xr>   ,                          0, &ExtDataSendDoneError);
+  }
+}
+
+command void VM.procOutEvt(uint8_t id,uint32_t value){
+  switch (id){
+    case <xb>O_DHT</xb>  : <b>proc_req_dht_read(id,value)</b>; break;
+    case <xb>O_SEND</xb> : <b>proc_send(id,value)</b>; break;
+  }
+}
+
+command void VM.callFunction(uint8_t id){
+  switch (id){
+    case <xg>F_GETNODEID</xg> : <b>func_getNodeId(id)</b>; break;
+    case <xg>F_PIN_WRITE</xg> : <b>func_pinWrite(id)</b>; break;
+  }
+}
+</code></pre>
+
+
+<p>
+
+{% include footer.html %}

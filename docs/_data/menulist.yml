@@ -1,0 +1,34 @@
+docs_list_title: Terra IoT
+docs:
+- menu: Home
+  url: terra-home.html
+  
+- menu: Platforms
+  submenu:
+
+  - page: TinyOS
+    url: terra-platf-tinyos.html  
+
+- menu: Custom Flavors
+  submenu:
+
+  - page: Intro
+    url: terra-custom-Intro.html  
+
+  - page: _div
+    url: 
+
+  - page: TinyOS - Net
+    url: terra-custom-TerraNet.html  
+
+  - page: TinyOS - Grp
+    url: terra-custom-TerraGrp.html  
+
+  - page: _div
+    url: 
+
+  - page: Tutorial New Custom
+    url: terra-custom-Tutorial.html
+
+- menu: License
+  url: terra-license.html
