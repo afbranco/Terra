@@ -19,7 +19,8 @@ de lá.
   - **`v0.3.0` publicada** (tag no `380d863`): referência histórica, feita à mão. Os
     `_TOSSIMmodule.so` de produção originais (py2, i386, os da `.ova` e do TerraSim), o
     `SHA256SUMS` e a receita de reprodução nas notas.
-  - **`v1.0.0`** (ainda não criada): a primeira do toolchain novo, gerada pelo workflow
+  - **`v1.0.0` publicada** (tag no `e6ef49f`, 2026-11-22, a pedido do Prof.): a primeira do
+    toolchain novo, gerada pelo workflow
     `.github/workflows/release.yml` (PR #13, no `master` desde `ff3f9f5`). Traz tudo, para ficar
     independente da `.ova`: `_TOSSIM.so` + `TOSSIM.py` Net/Grp (Python 3.14, x86_64), firmware
     micaz NOBS e BS (`.exe` e `.ihex`), `terrac` empacotado e `TerraVMControl.jar`. Uso e
@@ -55,7 +56,8 @@ de lá.
   tipo `bug`/`enhancement`. `integracao-heterogenea` marca o que é da linha 2016-2018 (as
   issues #2 a #12, de 2017) e não vale para o `master`.
 - Abertas em 2026-11-22: #15 release v1.0.0 (acompanhamento), #16 teste com micaz real, #17
-  comparação de float na VM (a confirmar), #18 build reproduzível bit a bit.
+  comparação de float na VM (a confirmar), #18 build reproduzível bit a bit, #19 await de 0 ms
+  (correção no PR #20, em espera até depois da v1.0.0; sai na v1.0.1).
 - Correções vindas de outras sessões (ex.: TerraSim) entram como issue aqui antes do código.
 
 ## Quem e o quê
@@ -83,8 +85,8 @@ testes e no controle das inovações". Feito em 2026-11-22: relatório em
 `handoff/avaliacao-vm-tinyos.md`, com 31 commits que tocam o build TinyOS e os bugs
 encontrados. Alguns valem também para a produção e são candidatos a correção no `master`
 (potência de RF do Grp, comparação de float). O oráculo do `.so` novo contra o de produção
-passou (ver "Oráculo"). Próximo passo: a v1.0.0 e, depois, os ajustes e bugs de compilação que
-o Prof. conhece.
+passou (ver "Oráculo"). A v1.0.0 saiu em 2026-11-22. Próximo passo: a v1.0.1 (PR #20) e os
+ajustes e bugs de compilação que o Prof. conhece.
 
 ## O que já se sabe (sessão tinyos-toolchain, 2026-11-21)
 
@@ -181,15 +183,20 @@ semente). Resultados do Net, todos **idênticos byte a byte** à referência do 
   (`handoff/py3/`, sha256 Net `459a2091…`).
 
 O avaliador estatístico (`measure_baseline.py`) do Net reproduzido ficou dentro do ruído. O Grp
-não foi testado no TerraSim (só a reprodução binária). Seguem do lado TerraSim: o avaliador com
-o daemon em py3, a medição de RAM em 64 bits e a troca do `.so` no servidor.
+não foi testado no TerraSim (só a reprodução binária). O avaliador com o daemon em py3 também
+ficou dentro do ruído (6 rodadas: 4x4 96,9%, 8x8 79,0%, 9x9 75,9%, contra 97,1/78,5/72,4 da
+produção). O TerraSim está em produção com o `.so` do CI do PR #13 (`459a2091…`, r1) desde o
+557b0b8. Ele vai trocá-lo pelo anexo da v1.0.0 (`_TOSSIM.so` Net `6ddea5c4…`: `.text`, `.data`
+e `.rodata` iguais aos do `459a2091`), refazer o oráculo e criar a TerraSim v1.1.0.
 
 ## Pendências para decidir com o Prof.
 
 - Se o `handoff/` (scripts e tabelas da análise de versão) entra no repositório. Hoje está
   fora do git (`.git/info/exclude`).
-- **v1.0.0**: falta o avaliador da TerraSim em py3 e o teste do Prof. com micaz real (MIB520,
-  roteiro em `release/README.md`). Depois, criar a tag `v1.0.0`, e o workflow faz o rascunho.
+- Teste do Prof. com micaz real (MIB520, #16, roteiro em `release/README.md`): não bloqueou a
+  v1.0.0 e consta como pendente nas notas dela.
+- **v1.0.1**: merge do PR #20 (await de 0 ms), tag `v1.0.1`; o workflow faz o rascunho e eu
+  completo as notas (commit, imagem e digest, sha256 dos anexos e dos `_TOSSIM.so`).
 - Quais correções de bugs achados na integração valem para a produção.
 
 ## Como trabalhar (mesmas regras do tinyos-toolchain)
