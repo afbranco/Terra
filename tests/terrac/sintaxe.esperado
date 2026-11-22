@@ -1,0 +1,9 @@
+# Mensagem esperada de cada tests/terrac/sintaxe_*.terra, sem o número da linha (ver a issue #23).
+sintaxe_await: after `await´ : expected event
+sintaxe_comando: before `awiat´ : expected statement (not last statement as `return´ or `break´)
+sintaxe_end: after `;´ : expected statement (not last statement as `return´ or `break´)
+sintaxe_expressao: after `=´ : expected expression
+sintaxe_parentese: after `LED0´ : expected `;´
+sintaxe_pontoevirgula: after `1´ : expected `;´
+sintaxe_then: after `1´ : expected `then´
+sintaxe_tipo: after `x´ : expected a not reserved identifier beginning with lower-case

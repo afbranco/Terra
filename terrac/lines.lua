@@ -1,4 +1,4 @@
-m = require 'lpeg_0_10_2_1-lpeg'
+m = require 'lpeg'
 
 m.setmaxstack(1000)
 

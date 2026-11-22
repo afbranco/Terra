@@ -1,0 +1,5 @@
+#include "TerraNet.defs"
+// Erro de sintaxe proposital (teste do terrac, ver release/build-terrac.sh).
+loop do
+    await 1s;
+    emit LED0(TOGGLE);

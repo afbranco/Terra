@@ -1,0 +1,6 @@
+#include "TerraNet.defs"
+// Erro de sintaxe proposital (teste do terrac, ver release/build-terrac.sh).
+var ubyte x = 1;
+if x == 1
+    emit LED0(TOGGLE);
+end

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Empacota o terrac num script Lua único (terrac/pak.lua) e testa compilando os exemplos de
-# terrac/samples contra os .vmx commitados. Precisa de lua5.1, do lpeg e do cpp.
+# terrac/samples contra os .vmx commitados. Precisa de lua5.1, do lpeg (0.10 ou 1.x) e do cpp.
 #   release/build-terrac.sh <versão> <pasta de saída>
 set -euo pipefail
 VER=${1:?versão}
@@ -12,13 +12,8 @@ LOG="$OUT/logs/terrac.log"
 
 cp -a "$ROOT/terrac" "$W/terrac"
 (cd "$W/terrac" && lua5.1 pak.lua)
-# O fonte pede o lpeg com o nome versionado do luarocks da época ('lpeg_0_10_2_1-lpeg').
-# O script da release aceita também o lpeg instalado com o nome comum.
-{
-    head -1 "$W/terrac/terrac"
-    echo "package.preload['lpeg_0_10_2_1-lpeg'] = package.preload['lpeg_0_10_2_1-lpeg'] or function() return require 'lpeg' end"
-    tail -n +2 "$W/terrac/terrac"
-} > "$W/terrac.out"
+cp "$W/terrac/terrac" "$W/terrac.out"
+lua5.1 -e 'print("terrac: lpeg " .. require("lpeg").version())' | tee -a "$LOG"
 
 D="$W/terrac-$VER"
 mkdir -p "$D"
@@ -46,6 +41,21 @@ for vmx in "$ROOT"/terrac/samples/*.vmx "$ROOT"/tests/*/*.vmx; do
         fail=1
     fi
 done
+
+# Teste: cada tests/terrac/sintaxe_*.terra dá a mensagem de erro esperada (sem o número da
+# linha, ver a issue #23). Com o lpeg 0.10 e com o 1.x a mensagem tem de ser a mesma.
+while IFS= read -r esperado; do
+    case "$esperado" in ''|'#'*) continue;; esac
+    name=${esperado%%: *}
+    obtido="$name: $(cd "$W/t" && lua5.1 "$D/terrac" "$name.terra" 2>&1 | head -1 |
+        sed -E 's/^ERR : line [0-9]+ : //; s/[[:space:]]+$//' || true)"
+    if [ "$obtido" = "$esperado" ]; then
+        echo "terrac: $name: mensagem esperada" | tee -a "$LOG"
+    else
+        echo "terrac: $name: mensagem DIFERENTE: $obtido" | tee -a "$LOG"
+        fail=1
+    fi
+done < "$ROOT/tests/terrac/sintaxe.esperado"
 
 tar -C "$W" -czf "$OUT/terrac-$VER.tar.gz" "terrac-$VER"
 rm -rf "$W"
