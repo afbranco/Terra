@@ -1,0 +1,168 @@
+/*{-{*/
+#ifndef _TERRANET_
+#define _TERRANET_
+
+
+config 
+	name : TerraNet_MsgQ ,
+	code:00.02.00 , 
+	{
+		tossim: 1728,
+		telosb_full: 4224,
+		iris_full: 4224,
+		telosb_hyb: 1920,
+		iris_hyb: 1920,
+		micaz : 1920,
+		mica2 : 1920,
+		mica2dot : 1920,
+	} 
+do
+/*
+ * ATENTION: DO NOT use comments with '/**', always use only one star!
+ * Current compiler has a bug to identifier this type of comments. 
+ */
+ 
+ 
+/*
+ * Define constants
+ */
+
+// error_t
+#define SUCCESS 0 
+     // FAIL > 0
+// Boolean
+#define TRUE 1
+#define FALSE 0
+// Leds Constants
+#define ON 1
+#define OFF 0
+#define TOGGLE 2
+// Interrupt config
+#define RISING 1
+#define FALLING 0
+#define DISABLE 2
+// Port Cfg
+#define pIN 0
+#define pOUT 1
+// Message
+#define BROADCAST 0xffff
+#define SEND_DATA_SIZE 16
+// VM Error codes
+#define E_DIVZERO 10 // Division by zero
+#define E_IDXOVF  11 // Array index overflow
+#define E_STKOVF  20 // Stack overflow -- fatal
+
+/*
+ * Define custom registers
+ */
+
+	// radioMsg - Radio/Queue Data Message Register
+	packet radioMsg with
+		var ubyte type;
+		var ushort source;
+		var ushort target;
+		var payload[20] data;
+	end
+	
+	// FFT element value
+	regtype fft_cpx with
+		var long r;
+		var long i;
+	end
+
+
+	// TerraNet local Output events
+//	output void		INIT			ubyte 0;
+	output void		LEDS			ubyte 5;
+	output void		LED0			ubyte 6;
+	output void		LED1			ubyte 7;
+	output void		LED2			ubyte 8;
+	output void		REQ_TEMP		void 9;
+	output void		REQ_PHOTO		void 10;
+	output void		REQ_VOLTS		void 11;
+	output void		SET_PORT_A		ubyte 12;
+	output void		SET_PORT_B		ubyte 13;
+	output void 	CFG_PORT_A		ubyte 14;
+	output void 	CFG_PORT_B		ubyte 15;
+	output void 	REQ_PORT_A		ubyte 16;
+	output void 	REQ_PORT_B		ubyte 17;
+	output void 	CFG_INT_A		ubyte 18;
+	output void 	CFG_INT_B		ubyte 19;
+	output void 	REQ_CUSTOM_A	ubyte 20;
+	output void		REQ_MIC			void  21;
+	output void		BEEP			ushort  22;
+	output void 	REQ_CUSTOM		void 23;
+	// TerraNet Custom Output events
+	output void 	SEND			radioMsg 40;
+	output void 	SEND_ACK		radioMsg 41;
+
+	// TerraNet Local Input events
+	input ubyte 	ERROR 		 	ubyte 	0;
+	input ubyte 	ERROR 			void	1;
+	input ushort 	TEMP 			void 	5;
+	input ushort 	PHOTO 			void 	6;
+	input ushort	VOLTS 			void 	7;
+	input ubyte 	PORT_A 			void 	8;
+	input ubyte 	PORT_B 			void 	9;
+	input ubyte 	INT_A 			void 	10;
+	input ubyte 	INT_B 			void 	11;
+	input ubyte 	CUSTOM_A		ubyte 	12;
+	input ubyte 	CUSTOM_A 		void 	13;
+	input ubyte 	MIC 			void 	14;
+	input ubyte 	CUSTOM 			void 	15;
+	// TerraNet Custom Input events
+	input ubyte 	SEND_DONE 		ubyte	40;
+	input ushort 	SEND_DONE 		void 	41;
+	input ubyte 	SEND_DONE_ACK	ubyte	42;
+	input ubyte 	SEND_DONE_ACK	void	43;
+	input radioMsg	RECEIVE 		ubyte 	44;
+	input radioMsg	RECEIVE 		void 	45;
+	input ubyte 	Q_READY 		void 	46;
+
+	// Terra basic functions
+	function pure ushort getNodeId()		0;
+	function pure ushort random()			1;
+	function pure ubyte getMem(ushort)		2;
+	function pure ulong getTime()			3;
+	// TerraNet custom functions
+	function nohold ubyte qPut(radioMsg) 	10;
+	function nohold ubyte qGet(radioMsg) 	11;
+	function pure ubyte qSize()				12;
+	function pure ubyte qClear()			13;
+	function nohold ubyte fftAlloc(ushort, ushort, ubyte*, ushort*)		14;
+	function nohold  ubyte fft(ubyte*, ulong*, ulong*)			15;
+	function ubyte setupMic(ushort*,ushort,ulong,ubyte)			16;
+	function ubyte setRFPower(ubyte)			17;
+
+// Determinist
+
+unsafe LEDS 		with LEDS, LED0, LED1, LED2;
+unsafe LED0 		with LEDS, LED0, LED1, LED2;
+unsafe LED1 		with LEDS, LED0, LED1, LED2;
+unsafe LED2 		with LEDS, LED0, LED1, LED2;
+unsafe REQ_TEMP 	with REQ_TEMP, REQ_PHOTO,REQ_VOLTS;
+unsafe REQ_PHOTO 	with REQ_TEMP, REQ_PHOTO,REQ_VOLTS;
+unsafe REQ_VOLTS 	with REQ_TEMP, REQ_PHOTO,REQ_VOLTS;
+unsafe REQ_CUSTOM_A with REQ_CUSTOM_A;
+unsafe SEND			with SEND,SEND_ACK;
+unsafe SEND_ACK		with SEND,SEND_ACK;
+
+unsafe SET_PORT_A	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
+unsafe SET_PORT_B	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
+unsafe CFG_PORT_A	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
+unsafe CFG_PORT_B	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
+unsafe REQ_PORT_A	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
+unsafe REQ_PORT_B	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
+unsafe CFG_INT_A	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
+unsafe CFG_INT_B	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
+					
+// Request/await macros
+#define getTemp(var)  emit REQ_TEMP();  var=await TEMP 
+#define getPhoto(var) emit REQ_PHOTO(); var=await PHOTO 
+#define getVolts(var) emit REQ_VOLTS(); var=await VOLTS 
+// await/until macro
+#define await_until(ret,evt,cond) loop do ret = await evt; if cond then break; end end
+
+end
+#endif
+/*}-}*/

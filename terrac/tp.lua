@@ -1,25 +1,3 @@
---[[
-Copyright (C) 2012 Francisco Sant'Anna
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
---]]
-
 _WRN = {
     n_wrns = 0;       --afb Count warning messages
 }
@@ -330,10 +308,9 @@ end
 -- Copyright 2009: hans@hpelbers.org
 -- This is freeware
  
-function print_r (t, name, indent, maxLevel)
+function print_r (t, name, indent)
   local tableList = {}
-  maxLevel = maxLevel or 1000
-  function table_r (t, name, indent, full, maxLevel)
+  function table_r (t, name, indent, full)
     local id = not full and name
         or type(name)~="number" and tostring(name) or '['..name..']'
     local tag = indent .. id .. ' = '
@@ -344,11 +321,8 @@ function print_r (t, name, indent, maxLevel)
         tableList[t]= full and (full .. '.' .. id) or id
         if next(t) then -- Table not empty
           table.insert(out, tag .. '{')
-          maxLevel = maxLevel - 1
           for key,value in pairs(t) do
-            if maxLevel > 0 then
-              table.insert(out,table_r(value,key,indent .. '|  ',tableList[t],maxLevel))
-            end
+            table.insert(out,table_r(value,key,indent .. '|  ',tableList[t]))
           end
           table.insert(out,indent .. '}')
         else table.insert(out,tag .. '{}') end
@@ -359,6 +333,6 @@ function print_r (t, name, indent, maxLevel)
     end
     return table.concat(out, '\n')
   end
-  return table_r(t,name or 'Value',indent or '', nil,maxLevel)
+  return table_r(t,name or 'Value',indent or '')
 end
 --- =========================================

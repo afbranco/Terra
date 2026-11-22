@@ -1,147 +1,45 @@
-#-------------
-#  	Terra IoT System - A small Virtual Machine and Reactive Language for IoT applications.
-#  	Copyright (C) 2014-2017  Adriano Branco
-#	
-#	This file is part of Terra IoT.
-#	
-#	Terra IoT is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    Terra IoT is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with Terra IoT.  If not, see <http://www.gnu.org/licenses/>.  
-#-------------
 
-# Initial paths/files
-BUILDDIR ?= build/$(_MOTE)
-MAIN_APPC = $(BUILDDIR)/app.c
+PLATFORM=ino
+BUILDDIR ?= build/$(PLATFORM)
 MAIN_EXE = $(BUILDDIR)/main.exe
 MAIN_SREC = $(BUILDDIR)/main.srec
 MAIN_IHEX = $(BUILDDIR)/main.ihex
 MAIN_HEX = $(BUILDDIR)/main.hex
-DUMP_FILE = $(BUILDDIR)/wiring-check.xml
+OBJDUMP = avr-objdump
+GCC=/home/branco/arduino-1.0.5/hardware/tools/avr/bin/avr-gcc
 
-ifeq ($(__INO_TOOLS_PATH),)
-  AVR_TOOLS_PATH=
-else
-  ifeq ($(__INO_TOOLS_PATH),A)
-    AVR_TOOLS_PATH = $(strip $(subst /avr/bin/avr-gcc,, $(shell locate tools/avr/bin/avr-gcc --limit=1)))
-  else
-   AVR_TOOLS_PATH = $(__INO_TOOLS_PATH)
-  endif
-endif
+OPT_1 = -fnesc-include=tos  -topdir=/home/branco/gitspace/Terra/nescino  -fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask  -o $(MAIN_EXE) -Os -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -fnesc-cfile=build/ino/app.c --param max-inline-insns-single=100000 -fnesc-dump=wiring   -fnesc-dumpfile=build/ino/wiring-check.xml $(COMPONENT).nc -lm  -gcc=avr-gcc -mmcu=$(CPU) -fnesc-target=avr -fnesc-no-debug
 
-ifneq ($(AVR_TOOLS_PATH),)
-  # programs and config "path/names"
-  OBJCOPY = $(AVR_TOOLS_PATH)/avr/bin/avr-objcopy
-  OBJDUMP = avr-objdump
-  GCC = $(AVR_TOOLS_PATH)/avr/bin/avr-gcc
-  AVRDUDE = $(AVR_TOOLS_PATH)/avrdude
-  AVRDUDECONF = $(AVR_TOOLS_PATH)/avrdude.conf
-  $(info INFO:: Using Arduino AVR-GCC compiler located in: $(GCC))
-else
-  OBJCOPY = avr-objcopy
-  OBJDUMP = avr-objdump
-  GCC = avr-gcc
-  AVRDUDE = avrdude
-  AVRDUDECONF = /etc/avrdude.conf
-  $(info INFO:: Using original AVR-GCC compiler)
-endif
+OPT_2 = $(CFLAGS) -I/home/branco/arduino-1.0.5/hardware/tools/avr/lib/avr/include/
 
-EXEC_AVR = $(shell command -v $(GCC) 2> /dev/null)
-ifeq ($(EXEC_AVR),)
-  $(info ******************************************************************)
-  $(info *** FAILED )
-  $(info *** Command avr-ggc not found in: $(GCC) )
-  $(info ***  - Check the avr-gcc installation or the INO_TOOLS_PATH: option.)
-  $(info ******************************************************************)
-  $(error )
-endif
+#OPT_3 = -I/home/branco/gitspace/Terra/nescino/src/ino/atm1281 -I/opt/tinyos-2.1.2/tos/platforms/iris -I/opt/tinyos-2.1.2/tos/platforms/micaz -I/opt/tinyos-2.1.2/tos/platforms/mica -I/opt/tinyos-2.1.2/tos/platforms/iris/chips/rf230 -I/opt/tinyos-2.1.2/tos/chips/rf230 -I/opt/tinyos-2.1.2/tos/lib/rfxlink/layers -I/opt/tinyos-2.1.2/tos/lib/rfxlink/util  -I/opt/tinyos-2.1.2/tos/chips/atm1281 -I/opt/tinyos-2.1.2/tos/chips/atm1281/adc -I/opt/tinyos-2.1.2/tos/chips/atm1281/timer -I/opt/tinyos-2.1.2/tos/chips/atm128 -I/opt/tinyos-2.1.2/tos/chips/atm128/adc -I/opt/tinyos-2.1.2/tos/chips/atm128/pins -I/opt/tinyos-2.1.2/tos/chips/atm128/spi -I/opt/tinyos-2.1.2/tos/chips/atm128/i2c -I/opt/tinyos-2.1.2/tos/chips/atm128/timer -I/opt/tinyos-2.1.2/tos/lib/timer -I/opt/tinyos-2.1.2/tos/lib/serial -I/opt/tinyos-2.1.2/tos/lib/power -I/opt/tinyos-2.1.2/tos/lib/diagmsg -I/opt/tinyos-2.1.2/tos/interfaces -I/opt/tinyos-2.1.2/tos/types -I/opt/tinyos-2.1.2/tos/system -DMHZ=16
+
+# Tentativa para o UNO, falta recriar os arquivos de hardware/port/pins para o ATmega168/328
+OPT_3 =  -I/home/branco/gitspace/Terra/nescino/src/ino/atm328p  -I/opt/tinyos-2.1.2/tos/platforms/mica -I/opt/tinyos-2.1.2/tos/platforms/iris/chips/rf230 -I/opt/tinyos-2.1.2/tos/chips/rf230 -I/opt/tinyos-2.1.2/tos/lib/rfxlink/layers -I/opt/tinyos-2.1.2/tos/lib/rfxlink/util  -I/opt/tinyos-2.1.2/tos/chips/atm128 -I/opt/tinyos-2.1.2/tos/chips/atm128/adc -I/opt/tinyos-2.1.2/tos/chips/atm128/timer -I/opt/tinyos-2.1.2/tos/chips/atm128 -I/opt/tinyos-2.1.2/tos/chips/atm128/adc -I/opt/tinyos-2.1.2/tos/chips/atm128/pins -I/opt/tinyos-2.1.2/tos/chips/atm128/spi -I/opt/tinyos-2.1.2/tos/chips/atm128/i2c -I/opt/tinyos-2.1.2/tos/chips/atm128/timer -I/opt/tinyos-2.1.2/tos/lib/timer -I/opt/tinyos-2.1.2/tos/lib/serial -I/opt/tinyos-2.1.2/tos/lib/power -I/opt/tinyos-2.1.2/tos/lib/diagmsg -I/opt/tinyos-2.1.2/tos/interfaces -I/opt/tinyos-2.1.2/tos/types -I/opt/tinyos-2.1.2/tos/system -DMHZ=4
 
 
-# MCU and CLOCK
-ifeq ($(_MOTE),uno)
-  AVRDUDE_MCU = m328p
-  MCU=atmega328p
-  MCUCLK = 16
-  F_CPU = 16000000ul
-  DEVTYPE = __AVR_ATmega328P__
-  TOS_INO = tos_uno
-  ISP_BAUDRATE = 115200
-  AVRDUDEPROG = arduino
-else ifeq ($(_MOTE),mega)
-  AVRDUDE_MCU = atmega2560
-  MCU=atmega2560
-  MCUCLK = 16
-  F_CPU = 16000000ul
-  DEVTYPE = __AVR_ATmega2560__
-  TOS_INO = tos_mega
-  ISP_BAUDRATE = 115200
-  AVRDUDEPROG = wiring
-endif
-
-
-__USB ?= /dev/ttyACM0
-
-# Force RTC component
-#CFLAGS += -DM_RTC_INO
-
-
-# Extract all "tos_uno"/"tos_mega" subdirectories as includes
-INCDIRS := $(addprefix -I,$(shell find $(VMDIR)/$(TOS_INO)/ -type d -print))
-#$(error INCDIRS: $(INCDIRS))
-
-OPT_1 =  -fnesc-include=tos -topdir=$(APPDIR) -fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask  -o $(MAIN_EXE) -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -fnesc-cfile=$(MAIN_APPC) --param max-inline-insns-single=100000 -fnesc-dump=wiring   -fnesc-dumpfile=$(DUMP_FILE) -lm  -fnesc-target=avr -fnesc-no-debug
-
-OPT_2 =  -mmcu=$(MCU) -DMHZ=$(MCUCLK) -D$(DEVTYPE) -DF_CPU=$(F_CPU)
-
-OPT_3 =  $(INCDIRS) $(CFLAGS)
-
-mega: builddir exe bytes $(BUILD_EXTRA_DEPS)
+mega:
 	$(info **********  Makefile Ino: Mega *************)
 
-uno: builddir exe bytes $(BUILD_EXTRA_DEPS)
+uno:
 	$(info **********  Makefile Ino: Uno *************)
 
 exe: 
 	@echo "    compiling $(COMPONENT) to a $(PLATFORM) binary"
-	nescc $(OPT_1) $(OPT_2) $(OPT_3) -gcc=$(GCC) $(COMPONENT).nc
-	@$(OBJCOPY) -O ihex -R .eeprom $(MAIN_EXE) $(MAIN_HEX)
+	nescc $(OPT_1) $(OPT_2) $(OPT_3) -gcc=$(GCC)
+	/home/branco/arduino-1.0.5/hardware/tools/avr/bin/avr-objcopy -O ihex -R .eeprom $(MAIN_EXE) $(MAIN_HEX)
 	@echo "    compiled $(COMPONENT) to $(MAIN_EXE)"
-
-%:
+	
+ino: builddir exe bytes 
 	@:
-
-install.%: exe $(__USB)
-	@$(AVRDUDE) -C$(AVRDUDECONF)  -v -p$(AVRDUDE_MCU) -c$(AVRDUDEPROG) -P$(__USB) -b$(ISP_BAUDRATE) -D -Uflash:w:$(MAIN_HEX):i
-
-install: exe $(__USB)
-	@$(AVRDUDE) -C$(AVRDUDECONF)  -v -p$(AVRDUDE_MCU) -c$(AVRDUDEPROG) -P$(__USB) -b$(ISP_BAUDRATE) -D -Uflash:w:$(MAIN_HEX):i
-
-
-$(__USB):
-	$(info )
-	$(info ******************************************************************)
-	$(info ***  FAILED  )
-	$(info ***  Could not find: $(__USB) to install the TerraVM firmware.)
-	$(info ***    1 - Check if the device is connected.  )
-	$(info ***    2 - Confirm the correct USB path.  )
-	$(info ***    3 - Check the USB: option in the make command.  )
-	$(info ******************************************************************)
-	$(info )
-	$(error )
-
+	
+install: ino
+	/home/branco/arduino-1.0.5/hardware/tools/avrdude -C/home/branco/arduino-1.0.5/hardware/tools/avrdude.conf  -v -patmega2560 -cwiring -P$(INO_INSTALL_PORT) -b115200 -D -Uflash:w:$(MAIN_HEX):i
+	
+	
 builddir: 
-	@mkdir -p $(BUILDDIR)
+	mkdir -p $(BUILDDIR)
 
 bytes: 
-	@echo "******** Application memory size ***************"
 	@$(OBJDUMP) -h $(MAIN_EXE) | perl -ne '$$b{$$1}=hex $$2 if /^\s*\d+\s*\.(text|data|bss)\s+(\S+)/; END { printf("%16d bytes in ROM\n%16d bytes in RAM\n",$$b{text}+$$b{data},$$b{data}+$$b{bss}); }'
-	@echo "************************************************"
-
+	

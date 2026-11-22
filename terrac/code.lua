@@ -1,24 +1,3 @@
---[[
-Copyright (C) 2012 Francisco Sant'Anna
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
---]]
 
 _CODE = {
     labels = { 'Inactive', 'Init' },
@@ -140,9 +119,8 @@ function BLOCK_GATES (me)
             if n > 0 then
 --                LINE(me, '//> memset(PTR_EXT(IN_'..ext.id..','..t[1]..'), 0, '
 --                    ..n..'*sizeof(tceu_nlbl));')
-            local gateLen = ((ext.inArg and 1) or 0) + 2
-		        codeB = LINE(me, 'clear EXT gates for '..ext.id..'['.. t[1] ..']',nil,'// stop awaiting inner externals') 
-		        BYTECODE(me,codeB,'op_memclr', n*_ENV.c.tceu_nlbl.len + ((ext.inArg and 1) or 0), _MEM.gtes[ext.n]+2+t[1]*gateLen)
+		        codeB = LINE(me, 'clear EXT gates for '..ext.id,nil,'// stop awaiting inner externals') 
+		        BYTECODE(me,codeB,'op_memclr', n*_ENV.c.tceu_nlbl.len, _MEM.gtes[ext.n]+2)
             end
         end
     end
@@ -327,7 +305,6 @@ function getAuxValues(e1)
               x1.id = e1[1][2][1]..'.'..e1[1][3]
               x1.arr = field.dim
             else
---  print("code::getAuxValues: Var.field",e1[1][2].tp,e1[1][2].val,field.offset)
               x1.auxtag1 = 'Var.field'
               x1.auxtag2 = 'Var'
               x1.val = e1[1][2].val+field.offset
@@ -416,7 +393,7 @@ end
 
 function tryDerefCode(me,tag,tp)
     local ntp = (_TP.deref(tp) and 'ushort') or tp
---print("code::tryDerefCode:",tag,tp, ntp,me.tag)
+--print("code::tryDerefCode:",tag,tp, ntp)
     if (  tag == 'Op2_idx' or tag == 'Op2_.')
      then
       codeB = LINE(me,'deref '..tp,nil,'// deref Var ')
@@ -1292,7 +1269,7 @@ F = {
 --print('________________________________________________________')
 --print('code:Op2_.::',me.val,me.tp, e1.tag,e1.val,e1.tp,id)
 --print('code:Op2_.::',me.fst.val, id,field.offset,field.tp,field.arr)
---print(print_r(me,'code::Op2_.:me',nil,5))
+--print(print_r(me,'code::Op2_.:me'))
 --print('--------------------------------------------------------')
 
     if _TP.deref(e1.tp) then
@@ -1304,8 +1281,7 @@ F = {
         BYTECODE(me,codeB,'op2_any','add')
       end
     else -- push varAddr+FieldPos
---print('code:Op2_.::',e1[1],id,me.tag,me.fst[1],me.lval,me[2])
-      codeB = LINE(me,'push &'..e1[1]..'.'..id,nil,'// push &Var ')
+      codeB = LINE(me,'push '..e1[1]..'.'..id,nil,'// push &Var ')
       BYTECODE(me,codeB,'op_push_c',e1.val+field.offset)
     end
   end,
@@ -1415,10 +1391,6 @@ F = {
     for k,arg in ipairs(me) do
 --print("code::ExpList: arg=",k, arg.tag,arg.tp)    
       CONC(me,arg);
-      if ((arg.tag == "Op2_.") or (arg.tag == "Op2_idx")) and (vartype[arg.tp] ~= nil ) then
-        codeB = LINE(me,'deref '.. arg.tp,nil,'// deref Var ')
-        BYTECODE(me,codeB,'op_deref',arg.tp)
-      end
     end
   end,
 

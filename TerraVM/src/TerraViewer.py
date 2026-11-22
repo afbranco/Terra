@@ -1,25 +1,5 @@
 #!/usr/bin/python
 
-#-------------
-#  	Terra IoT System - A small Virtual Machine and Reactive Language for IoT applications.
-#  	Copyright (C) 2014-2017  Adriano Branco
-#	
-#	This file is part of Terra IoT.
-#	
-#	Terra IoT is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    Terra IoT is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with Terra IoT.  If not, see <http://www.gnu.org/licenses/>.  
-#-------------
-
 import sys
 import pygame
 from pygame.locals import *
@@ -27,18 +7,6 @@ from collections import deque
 import re
 import select
 from struct import *
-
-# Drawing the Terra Icon
-iconImg = pygame.Surface((32,32))									# Create an empty surface 32x32 bits
-iconImg.fill((255,255,255))											# White background
-pygame.draw.circle (iconImg, (0,37,122)   , [16, 18], 16)			# Top blue clicle
-pygame.draw.rect   (iconImg, (0,37,122)   , [0, 16, 32, 32])		# Bottom blue rectangule
-pygame.draw.line   (iconImg, (255,255,255), [13, 28], [13,16], 2)	# Vertical T line
-pygame.draw.line   (iconImg, (255,255,255), [ 7, 16], [19,16], 2)	# Horizontal T line
-pygame.draw.circle (iconImg, (0,37,122)   , [28, 3], 2)				# Outside star
-pygame.draw.circle (iconImg, (255,255,255), [16, 7], 2)				# Inside star 1
-pygame.draw.circle (iconImg, (255,255,255), [24, 12], 2)			# Inside star 2
-pygame.display.set_icon(iconImg)									# Set draw as icon
 
 BLACK = (  0,   0,   0)
 WHITE = (255, 255, 255)
@@ -89,7 +57,6 @@ class gNode:
         self.sensorValue(1)
         self.sensorValue(2)
         self.sensorValue(3)
-        self.sensorValue(4)
         pygame.display.update(rect)
     def update(self):
         self.xx = nodeDist*self.column + offset
@@ -106,7 +73,6 @@ class gNode:
         self.sensorValue(1)
         self.sensorValue(3)
         self.sensorValue(2)
-        self.sensorValue(4)
         if self.isStarted:
             self.vmstart()
         else:
@@ -235,20 +201,16 @@ class gNode:
         self.sfont = pygame.font.SysFont("dejavusans", 3*zoom)
         if self.id > 1 :
             if stype == 1:
-                self.s1text = self.sfont.render(format(sData[(self.id*4)+stype-1],'04d'), 1, GRAY,BACKGROUND)
+                self.s1text = self.sfont.render(format(sData[(self.id*3)+stype-1],'04d'), 1, GRAY,BACKGROUND)
                 screen.blit(self.s1text, [self.xx+nodeSize-8*zoom,self.yy+nodeSize-11*zoom])
                 pygame.display.update()
             elif stype == 2:
-                self.s2text = self.sfont.render(format(sData[(self.id*4)+stype-1],'04d'), 1, GRAY,BACKGROUND)
+                self.s2text = self.sfont.render(format(sData[(self.id*3)+stype-1],'04d'), 1, GRAY,BACKGROUND)
                 screen.blit(self.s2text, [self.xx+nodeSize-8*zoom,self.yy+nodeSize-15*zoom])
                 pygame.display.update()
-            elif stype == 3 :
-                self.s3text = self.sfont.render(format(sData[(self.id*4)+stype-1],'04d'), 1, GRAY,BACKGROUND)
-                screen.blit(self.s3text, [self.xx+nodeSize-8*zoom,self.yy+nodeSize-19*zoom])
-                pygame.display.update()
             else :
-                self.s4text = self.sfont.render(format(sData[(self.id*4)+stype-1],'02d'), 1, GREEN,BACKGROUND)
-                screen.blit(self.s4text, [self.xx+nodeSize-18*zoom,self.yy+nodeSize-10*zoom])
+                self.s3text = self.sfont.render(format(sData[(self.id*3)+stype-1],'04d'), 1, GRAY,BACKGROUND)
+                screen.blit(self.s3text, [self.xx+nodeSize-8*zoom,self.yy+nodeSize-19*zoom])
                 pygame.display.update()
         else:
             if stype == 1:
@@ -257,12 +219,9 @@ class gNode:
             elif stype == 2:
                 self.s2text = self.sfont.render('photo', 1, GRAY,BACKGROUND)
                 screen.blit(self.s2text, [self.xx+nodeSize-10*zoom,self.yy+nodeSize-15*zoom])
-            elif stype == 3:
+            else :
                 self.s3text = self.sfont.render('volts', 1, GRAY,BACKGROUND)
                 screen.blit(self.s3text, [self.xx+nodeSize-10*zoom,self.yy+nodeSize-19*zoom])
-            else :
-                self.s4text = self.sfont.render('type', 1, GREEN,BACKGROUND)
-                screen.blit(self.s4text, [self.xx+nodeSize-18*zoom,self.yy+nodeSize-10*zoom])
         
 
     def sensor(self,stype):
@@ -505,7 +464,7 @@ def update(ScreenSize):
 
 
 def writeSData():
-    buff = pack('400H',*sData)
+    buff = pack('300H',*sData)
     fData = open('sensors.bin', "wb")
     fData.write(buff)
     fData.close()
@@ -513,8 +472,8 @@ def writeSData():
 def readSData():
     global sData
     fData = open('sensors.bin', "rb")
-    buff = fData.read(800)
-    sData = unpack('400H',buff)
+    buff = fData.read(600)
+    sData = unpack('300H',buff)
     fData.close()
 
 def mouseClick(button,pos):
@@ -532,27 +491,18 @@ def mouseClick(button,pos):
                 sId = 2
             elif (dy>=9 and dy <= 11):
                 sId = 1
-        if (dx>=2 and dx <=4) and (dy>=10 and dy <= 12):
-            sId = 4
-
         if (sId>0):
             step = 0
             if (button==(1,0,0)):
-                if (sId==4):
-                   step = 1
-                else:
-                   step = 10
+                step = 10
             if (button==(0,0,1)):
-                if (sId==4):
-                   step = -1
-                else:
-                   step = -10
+                step = -10
             lData = list(sData)
-            lData[(nodeId*4)+sId-1]=lData[(nodeId*4)+sId-1]+step
-            if lData[(nodeId*4)+sId-1] < 0:
-                lData[(nodeId*4)+sId-1] = 0
-            if lData[(nodeId*4)+sId-1] > 0x03ff:
-                lData[(nodeId*4)+sId-1] = 0x03ff
+            lData[(nodeId*3)+sId-1]=lData[(nodeId*3)+sId-1]+step
+            if lData[(nodeId*3)+sId-1] < 0:
+                lData[(nodeId*3)+sId-1] = 0
+            if lData[(nodeId*3)+sId-1] > 0x03ff:
+                lData[(nodeId*3)+sId-1] = 0x03ff
             sData = tuple(lData)
             gNodes[nodeId].sensorValue(sId)
             writeSData()

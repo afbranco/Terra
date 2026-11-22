@@ -7,12 +7,12 @@ package messages;
 public class newProgBlockMsg extends net.tinyos.message.Message {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 29;
+    public static final int DEFAULT_MESSAGE_SIZE = 28;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 161;
 
-    /** Create a new newProgBlockMsg of size 29. */
+    /** Create a new newProgBlockMsg of size 28. */
     public newProgBlockMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -85,9 +85,6 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
     public String toString() {
       String s = "Message <newProgBlockMsg> \n";
       try {
-        s += "  [moteType=0x"+Long.toHexString(get_moteType())+"]\n";
-      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
-      try {
         s += "  [versionId=0x"+Long.toHexString(get_versionId())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
@@ -106,72 +103,9 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
     // Message-type-specific access methods appear below.
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: moteType
-    //   Field type: short, unsigned
-    //   Offset (bits): 0
-    //   Size (bits): 8
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'moteType' is signed (false).
-     */
-    public static boolean isSigned_moteType() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'moteType' is an array (false).
-     */
-    public static boolean isArray_moteType() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'moteType'
-     */
-    public static int offset_moteType() {
-        return (0 / 8);
-    }
-
-    /**
-     * Return the offset (in bits) of the field 'moteType'
-     */
-    public static int offsetBits_moteType() {
-        return 0;
-    }
-
-    /**
-     * Return the value (as a short) of the field 'moteType'
-     */
-    public short get_moteType() {
-        return (short)getUIntBEElement(offsetBits_moteType(), 8);
-    }
-
-    /**
-     * Set the value of the field 'moteType'
-     */
-    public void set_moteType(short value) {
-        setUIntBEElement(offsetBits_moteType(), 8, value);
-    }
-
-    /**
-     * Return the size, in bytes, of the field 'moteType'
-     */
-    public static int size_moteType() {
-        return (8 / 8);
-    }
-
-    /**
-     * Return the size, in bits, of the field 'moteType'
-     */
-    public static int sizeBits_moteType() {
-        return 8;
-    }
-
-    /////////////////////////////////////////////////////////
     // Accessor methods for field: versionId
     //   Field type: int, unsigned
-    //   Offset (bits): 8
+    //   Offset (bits): 0
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -193,14 +127,14 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'versionId'
      */
     public static int offset_versionId() {
-        return (8 / 8);
+        return (0 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'versionId'
      */
     public static int offsetBits_versionId() {
-        return 8;
+        return 0;
     }
 
     /**
@@ -234,7 +168,7 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: blockId
     //   Field type: int, unsigned
-    //   Offset (bits): 24
+    //   Offset (bits): 16
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -256,14 +190,14 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'blockId'
      */
     public static int offset_blockId() {
-        return (24 / 8);
+        return (16 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'blockId'
      */
     public static int offsetBits_blockId() {
-        return 24;
+        return 16;
     }
 
     /**
@@ -297,7 +231,7 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: data
     //   Field type: short[], unsigned
-    //   Offset (bits): 40
+    //   Offset (bits): 32
     //   Size of each element (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -319,7 +253,7 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'data'
      */
     public static int offset_data(int index1) {
-        int offset = 40;
+        int offset = 32;
         if (index1 < 0 || index1 >= 24) throw new ArrayIndexOutOfBoundsException();
         offset += 0 + index1 * 8;
         return (offset / 8);
@@ -329,7 +263,7 @@ public class newProgBlockMsg extends net.tinyos.message.Message {
      * Return the offset (in bits) of the field 'data'
      */
     public static int offsetBits_data(int index1) {
-        int offset = 40;
+        int offset = 32;
         if (index1 < 0 || index1 >= 24) throw new ArrayIndexOutOfBoundsException();
         offset += 0 + index1 * 8;
         return offset;

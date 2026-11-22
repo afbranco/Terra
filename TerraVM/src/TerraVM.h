@@ -1,23 +1,3 @@
-/*
-  	Terra IoT System - A small Virtual Machine and Reactive Language for IoT applications.
-  	Copyright (C) 2014-2017  Adriano Branco
-	
-	This file is part of Terra IoT.
-	
-	Terra IoT is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    Terra IoT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Terra IoT.  If not, see <http://www.gnu.org/licenses/>.  
-*/
-
 /***********************************************
  * TerraVM - Terra virtual machine project
  * MArch, 2014
@@ -49,42 +29,6 @@ const uint8_t IS_RangeMask[][3]={
 	{192,255,0x3f},	// 2 Bits Group
 };
 
-const uint8_t IS_Mask[]={
-0x00,
-0x00,
-0x00,
-0x00,
-0x00,
-0x00,
-0x01,
-0x01,
-0x03,
-0x03,
-0x03,
-0x03,
-0x03,
-0x07,
-0x07,
-0x07,
-0x07,
-0x07,
-0x0f,
-0x0f,
-0x0f,
-0x0f,
-0x0f,
-0x0f,
-0x3f,
-0x3f,
-0x3f,
-0x3f,
-0x3f,
-0x3f,
-0x3f,
-0x3f,
-};
-
-
 #define CEU_STACK_MIN 0x01    // min prio for `stack´
 #define CEU_TREE_MAX 0xFF     // max prio for `tree´
 
@@ -107,6 +51,8 @@ const uint8_t IS_Mask[]={
 
 #ifdef TOSSIM
 typedef float nx_float;
+#endif
+
 // short names for types
 typedef int64_t  s64;
 typedef uint64_t u64;
@@ -117,7 +63,6 @@ typedef uint16_t u16;
 typedef int8_t    s8;
 typedef uint8_t   u8;
 typedef float	 f32;
-#endif
 
 enum {
 	

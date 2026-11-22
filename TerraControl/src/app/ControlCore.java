@@ -1,22 +1,3 @@
-/*
-  	Terra IoT System - A small Virtual Machine and Reactive Language for IoT applications.
-  	Copyright (C) 2014-2017  Adriano Branco
-	
-	This file is part of Terra IoT.
-	
-	Terra IoT is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    Terra IoT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Terra IoT.  If not, see <http://www.gnu.org/licenses/>.  
-*/ 
 package app;
 
 import java.io.IOException;
@@ -52,7 +33,6 @@ public class ControlCore implements MessageListener
 	private int TCPretries;
 	
 	private int VersionId=0;
-	private short lastMoteType=0;
 	private int setDataSeq=0;
 	private int CurrRequestMote=0;
 	
@@ -146,14 +126,13 @@ public class ControlCore implements MessageListener
 		}
 	
 
-	public int newData(ProgBin Binary,short moteType){
+	public int newData(ProgBin Binary){
 		progBin = Binary;
 //		pauseConfig=false;
 		erroCount=0;
 		CurrentBlockId=-1;
-		lastMoteType = moteType;
 		controlform.appendControlMsg("ControlCore: newData button.");
-		return sendNewProgVersion(true,moteType);
+		return sendNewProgVersion(true);
 	}
 	
 	public void newSetData(List<SetData> SetDataArray){
@@ -177,31 +156,27 @@ public class ControlCore implements MessageListener
 		if (msg instanceof reqProgBlockMsg) {
 			if (CurrRequestMote == 0 || CurrRequestMote==dest_addr) { // Doesn't answer a second requester until the first one are finished.
 				reqProgBlockMsg omsg = (reqProgBlockMsg)msg;
-				System.out.println("reqProgBlockMsg:: omsg.get_versionId()="+omsg.get_versionId()+" VersionId="+VersionId + " | req. moteType=" + omsg.get_moteType() + "lastMoteType="+lastMoteType);
+				System.out.println("reqProgBlockMsg:: omsg.get_versionId()="+omsg.get_versionId()+" VersionId="+VersionId);
 				if (VersionId > 0){
-					if (lastMoteType==omsg.get_moteType()){
-						if (omsg.get_versionId()==0){
-							CurrRequestMote = 0;
-							sendNewProgVersion(false,lastMoteType);				
-						}else if (VersionId == omsg.get_versionId()){
-							if (CurrRequestMote == 0) CurrRequestMote = dest_addr;
-							controlform.recReqProgBlockMsg(progBin.getBlockStart(),omsg.get_blockId(),progBin.getNumBlocks(),dest_addr);
-							System.out.println(omsg.toString());
-							if (omsg.get_blockId() == (progBin.getNumBlocks()+progBin.getBlockStart()-1)) CurrRequestMote=0;
-								
-							//if (omsg.get_blockId() == progBin.getBlockStart()) {
-							//	sendNewProgBlockAll(omsg.get_blockId(),progBin.getNumBlocks()+progBin.getBlockStart());							
-							//} else {
-								sendNewProgBlock(omsg.get_blockId());							
-							//}
-						} else if (VersionId < omsg.get_versionId()){
-							VersionId = omsg.get_versionId();
-							CurrRequestMote = 0;
-							sendNewProgVersion(false,omsg.get_moteType());				
-						}
+					if (omsg.get_versionId()==0){
+						CurrRequestMote = 0;
+						sendNewProgVersion(false);				
+					}else if (VersionId == omsg.get_versionId()){
+						if (CurrRequestMote == 0) CurrRequestMote = dest_addr;
+						controlform.recReqProgBlockMsg(progBin.getBlockStart(),omsg.get_blockId(),progBin.getNumBlocks(),dest_addr);
+						System.out.println(omsg.toString());
+						if (omsg.get_blockId() == (progBin.getNumBlocks()+progBin.getBlockStart()-1)) CurrRequestMote=0;
+							
+						//if (omsg.get_blockId() == progBin.getBlockStart()) {
+						//	sendNewProgBlockAll(omsg.get_blockId(),progBin.getNumBlocks()+progBin.getBlockStart());							
+						//} else {
+							sendNewProgBlock(omsg.get_blockId());							
+						//}
+					} else if (VersionId < omsg.get_versionId()){
+						VersionId = omsg.get_versionId();
+						CurrRequestMote = 0;
+						sendNewProgVersion(false);				
 					}
-				} else {
-					System.out.println("reqProgBlockMsg:: Not current MoteType! (req. moteType=" + omsg.get_moteType() + "lastMoteType="+lastMoteType+")");
 				}
 			}
 		}
@@ -328,7 +303,7 @@ public class ControlCore implements MessageListener
 		controlform.appendControlMsg("ControlCore: sendNewProgBlock()");
 
 		newProgBlockMsg msg = new newProgBlockMsg();
-		msg.set_moteType(lastMoteType);
+
 		msg.set_blockId(BlockId);
 		msg.set_versionId(VersionId);
 		
@@ -340,12 +315,11 @@ public class ControlCore implements MessageListener
 	}
 
 
-	int sendNewProgVersion(boolean incVersionId, short moteType){
+	int sendNewProgVersion(boolean incVersionId){
 		controlform.appendControlMsg("ControlCore: sendNewProgVersion()");
 		newProgVersionMsg msg = new newProgVersionMsg();
 		CurrRequestMote = 0;
 		if (incVersionId) VersionId++;
-		msg.set_moteType(moteType);
 		msg.set_versionId(VersionId);
 		msg.set_blockLen(progBin.getNumBlocks());
 		msg.set_blockStart(progBin.getBlockStart());
@@ -358,8 +332,6 @@ public class ControlCore implements MessageListener
 		msg.set_gate0(progBin.getGate0());
 		msg.set_inEvts(progBin.getInEvts());
 		msg.set_async0(progBin.getAsync0());
-		msg.set_appSize(progBin.getAppSize());
-		msg.set_persistFlag((short)(progBin.getPersistFlag()?1:0));
 		
 		System.out.println(msg.toString());		
 		TCPtimer.schedule(new sendMsg("NewProgVersion",msg), 10);

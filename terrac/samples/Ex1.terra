@@ -1,7 +1,5 @@
 #include "TerraNet.defs"
 
-setRFPower(0);
-
 // No father id
 #define NO_FATHER 0xfffe
 
@@ -14,8 +12,12 @@ setRFPower(0);
 var ushort nodeId = getNodeId();
 
 // Automatic base node setup - Avrora use 2 (nodes 0..9), TOSSIM use 11 (node 11..xx)
-var ushort baseNode = 1;
-
+var ushort baseNode = 8;
+/*
+if nodeId > 10 then
+	baseNode = 11;
+end
+*/
 var ubyte stat,hop;
 var ushort father=NO_FATHER;
 var ushort seqReq=0;
@@ -85,17 +87,11 @@ msgData.type = ID_DATA;
 msgData.source = nodeId;
 msgData.d16_3 = nodeId;
 
-
-emit LEDS(7);
-await 2s;
-
 msgTopo.source = nodeId;
 
 if nodeId == baseNode then
-	father = 0;
+	father = 1;
 	seqReq = 1;
-else
-//	father = 1;
 end
 
 par do
@@ -114,7 +110,7 @@ par do
 			if father != NO_FATHER then
 				msgData.target = father;
 				inc seqData;
-				//emit LEDS(seqData);
+				emit LEDS(seqData);
 				msgData.d8_3 = seqData;
 				msgData.d16_4 = father;
 				msgData.d8_2 = reqTopoBlind;
@@ -146,7 +142,6 @@ with
 			loop do
 				msgTopo = await RECEIVE(ID_NEW_TOPO);
 				if msgTopo.d16_2 > seqReq then
-emit LED0(OFF);
 					reqTopoBlind = FALSE;
 					seqReq = msgTopo.d16_2;
 					father = msgTopo.source;
@@ -214,7 +209,7 @@ with
 			if qSize() > 0 then
 				reply=0;
 				stat = qGet(msgRadio);
-				if msgRadio.target == BROADCAST or msgRadio.target == 0 then
+				if msgRadio.target == BROADCAST then
 					emit SEND(msgRadio);
 					await SEND_DONE(msgRadio.type);
 				else

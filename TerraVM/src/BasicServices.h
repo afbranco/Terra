@@ -1,22 +1,3 @@
-/*
-  	Terra IoT System - A small Virtual Machine and Reactive Language for IoT applications.
-  	Copyright (C) 2014-2017  Adriano Branco
-	
-	This file is part of Terra IoT.
-	
-	Terra IoT is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    Terra IoT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Terra IoT.  If not, see <http://www.gnu.org/licenses/>.  
-*/    
 /***********************************************
  * TerraVM - Terra virtual machine project
  * March, 2014
@@ -54,9 +35,10 @@ enum{
 
 #ifdef MODULE_CTP
 	AM_SENDBS = 150,
-#endif
+#endif			
 	AM_RESERVED_END = 127,
 
+	BStation = 1, 				// Base Station Mote ID
 	// Send message control
 	RESEND_DELAY = 20L,
 	SEND_TIMEOUT = 1000L,
@@ -124,23 +106,17 @@ enum{
 	
 };
 
-#ifndef RFPOWER_IDX
-#define RFPOWER_IDX 3
-#endif
-
-#define RFPower_IDs 8
 
 /**
  * Msg structures
  */
  
 typedef nx_struct newProgVersion{
-	nx_uint8_t  moteType;		// Hardware/Firmware type. Distinguishes different types of motes
 	nx_uint16_t versionId; 		// Version ID
 	nx_uint16_t blockLen; 		// Number of program blocks
 	nx_uint16_t blockStart; 	// first block
 	nx_uint16_t startProg; 		// Start prog addr. 
-	nx_uint16_t endProg; 		// End prog addr. 
+	nx_uint16_t endProg; 		// Start prog addr. 
 	nx_uint16_t nTracks; 		// Tracks number
 	nx_uint16_t wClocks; 		// Clocks number
 	nx_uint16_t asyncs; 		// Asyncs number
@@ -148,12 +124,9 @@ typedef nx_struct newProgVersion{
 	nx_uint16_t gate0;	 		// Gate0 addr
 	nx_uint16_t inEvts;	 		// In Evts number
 	nx_uint16_t async0;	 		// Async0 addr
-	nx_uint16_t appSize;	 	// Application size in bytes. Used to check against VM memory size.
-	nx_uint8_t  persistFlag;	// If TRUE it will backup the script into internal persistent memory
 } newProgVersion_t;	
 	
 typedef nx_struct newProgBlock{	
-	nx_uint8_t  moteType;		// Hardware/Firmware type. Distinguishes different types of motes
 	nx_uint16_t versionId; // Version ID
 	nx_uint16_t blockId; // Block number
 	nx_uint8_t data[BLOCK_SIZE]; // Data buffer
@@ -161,7 +134,6 @@ typedef nx_struct newProgBlock{
 	
 typedef nx_struct reqProgBlock{	
 	nx_uint8_t reqOper; 	// Request operation: Request newVersion, full data or single data
-	nx_uint8_t  moteType;	// Hardware/Firmware type. Distinguishes different types of motes
 	nx_uint16_t versionId; 	// Version ID
 	nx_uint16_t blockId; 	// Block number
 } reqProgBlock_t;	
@@ -200,7 +172,6 @@ typedef nx_struct GenericData {
 	nx_uint8_t AM_ID;
 	nx_uint8_t DataSize;
 	nx_uint16_t sendToMote;
-	nx_uint8_t fromSerial;
 	nx_uint8_t reqAck;
 	nx_uint8_t RFPower;
 	nx_uint8_t Data[MSG_BUFF_SIZE];
@@ -210,5 +181,11 @@ typedef nx_struct ctpMsg {
 	nx_uint8_t  data[MSG_BUFF_SIZE];
 } ctpMsg_t;
 
-
+#if defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS)
+	#define RFPower_IDs 8
+	uint8_t RFPowerTab[RFPower_IDs]={03, 07, 11, 15, 19, 23, 27, 31};
+#elif defined(PLATFORM_MICA2) || defined(PLATFORM_MICA2DOT)
+	#define RFPower_IDs 8
+	uint8_t RFPowerTab[RFPower_IDs]={02, 05, 10, 51, 102, 153, 204, 255};
+#endif
 #endif /* BASIC_SERVICES_H */

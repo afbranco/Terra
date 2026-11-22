@@ -6,25 +6,19 @@
 <target>micaz</target>
 <make-extras/>
 <includes>
-<include global="false" include="system" ncc="true" recursive="true">/home/branco/gitspace/Terra/TerraVM/src/platforms/inoMega</include>
-<include global="false" include="system" ncc="true" recursive="false">/opt/tinyos-2.1.2/tos/lib/net/ctp</include>
-<include global="false" include="none" ncc="true" recursive="false">/home/branco/gitspace/Terra/TerraVM/src/interfaces</include>
-<include global="false" include="none" ncc="true" recursive="false">/home/branco/gitspace/Terra/TerraVM/src/lib</include>
-<include global="false" include="none" ncc="true" recursive="false">/home/branco/gitspace/Terra/TerraVM/src/system</include>
+<include global="false" include="source" ncc="true" recursive="true">/opt/tinyos-2.1.2/tos/lib/net/ctp</include>
+<include global="false" include="source" ncc="true" recursive="false">/home/branco/gitspace/Terra/nescino/src/ino</include>
 </includes>
 <excludes>
 <exclude>.*\.svn.*</exclude>
 </excludes>
 <typedefs/>
 <macros>
-<macro content="" name="WITH_BSTATION" ncc="true" yeti="true"/>
-<macro content="" name="NRF24" ncc="true" yeti="true"/>
-<macro content="" name="PLATFORM_MICAZ" ncc="false" yeti="true"/>
-<macro content="1" name="TERRA_NODE_ID" ncc="true" yeti="true"/>
-<macro content="" name="WITH_AUX_BSTATION" ncc="true" yeti="true"/>
+<macro content="1" name="MODULE_CTP" ncc="true" yeti="true"/>
+<macro content="" name="M_VOLCANO" ncc="false" yeti="true"/>
 </macros>
 <boards>
-<board>mda100</board>
+<board>mts300</board>
 </boards>
 <no-std-incl>false</no-std-incl>
 <component/>

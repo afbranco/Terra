@@ -1,22 +1,3 @@
-/*
-  	Terra IoT System - A small Virtual Machine and Reactive Language for IoT applications.
-  	Copyright (C) 2014-2017  Adriano Branco
-	
-	This file is part of Terra IoT.
-	
-	Terra IoT is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    Terra IoT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Terra IoT.  If not, see <http://www.gnu.org/licenses/>.  
-*/ 
 package app;
 
 import java.awt.EventQueue;
@@ -45,7 +26,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 //import java.util.List;
 import java.util.Properties;
 import java.util.Timer;
@@ -73,7 +53,6 @@ import java.awt.event.ItemEvent;
 import messages.*;
 */
 import javax.swing.JCheckBox;
-import javax.swing.event.ChangeListener;
 
 public class ControlForm {
 
@@ -118,8 +97,6 @@ public class ControlForm {
 	JProgressBar barFSM;
 	JProgressBar barFSM2;
 	JComboBox<String> comboPrefix;
-	JComboBox<Integer> comboMoteType;
-	JCheckBox persistFlag;
 	JTextArea DataMsgs;
 	JTextArea ControlMsgs;
 
@@ -320,7 +297,7 @@ public class ControlForm {
 			}
 		});
 		
-		btnApply.setBounds(760, 26+54, 113, 40);
+		btnApply.setBounds(760, 26, 113, 40);
 		btnApply.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				Apply();
@@ -377,22 +354,6 @@ public class ControlForm {
 		controlPanel.add(comboPrefix);
 		fillComboPrefix();
 
-		JLabel lblMoteType = new JLabel("Mote Type:");
-		lblMoteType.setBounds(530+250, 25, 212, 15);
-		controlPanel.add(lblMoteType);
-
-		comboMoteType = new JComboBox<Integer>();
-		comboMoteType.setFont(new Font("Dialog", Font.PLAIN, 12));
-		comboMoteType.setBounds(530+250, 41, 60, 24);
-		for (int i=1;i<=20;i++) comboMoteType.addItem(i);
-		controlPanel.add(comboMoteType);
-		
-		persistFlag = new JCheckBox("Persist?");
-		persistFlag.setSelected(false);
-		persistFlag.setBounds(762-180, 41+60, 120, 24);
-		controlPanel.add(persistFlag);
-		
-		
 		JButton btnRefresh = new JButton("");
 		btnRefresh.setIcon(new ImageIcon(ControlForm.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeLeaf.gif")));
 		
@@ -404,8 +365,8 @@ public class ControlForm {
 		});
 		controlPanel.add(btnRefresh);
 
-		lbllastVersion = new JLabel("Last version: 00000");
-		lbllastVersion.setBounds(762-180, 10+75, 140, 15);
+		lbllastVersion = new JLabel("Last ver.: 000");
+		lbllastVersion.setBounds(762, 10, 140, 15);
 		controlPanel.add(lbllastVersion);
 		
 		
@@ -491,7 +452,7 @@ public class ControlForm {
 		
 		JLabel lblControlMsgs = new JLabel("Control Commands and Messages");
 		lblControlMsgs.setFont(new Font("Dialog", Font.BOLD, 14));
-		lblControlMsgs.setBounds(297-100, 90, 278, 15);
+		lblControlMsgs.setBounds(297, 90, 278, 15);
 		controlPanel.add(lblControlMsgs);
 		
 		JSeparator separator_2 = new JSeparator();
@@ -954,6 +915,7 @@ public class ControlForm {
 		String AppPrefix = (String) comboPrefix.getSelectedItem();
 		String binFile = AppDir+AppPrefix + vmSufix;
 		// Dir and File exists?
+		// TODO
 		try {
 			FileInputStream fstream = new FileInputStream(binFile);
 			fstream.close();
@@ -962,19 +924,11 @@ public class ControlForm {
 			JOptionPane.showMessageDialog(mainFrame,"Please, select a vmx file.", "File not found!", JOptionPane.ERROR_MESSAGE);
 			return;
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		lastDir = AppDir;
-
-		// Confirm prog persistence
-		if (persistFlag.isSelected()) {
-			if (JOptionPane.showConfirmDialog(null, "Please, confirm if you wold like to persist program inside the devices?" 
-					, "Terra Control Tool", JOptionPane.OK_CANCEL_OPTION) != 0) {
-				return;
-			}
-		}
-
 		
 		// Load data
 		terracore.pauseConfig();
@@ -989,7 +943,6 @@ public class ControlForm {
 			appendControlMsg("****** "+error);
 			return;
 		}
-		progBin.setPersistFlag(persistFlag.isSelected());
 
 		// Start the new configuration
 		barFSM.setValue(0);
@@ -1000,15 +953,16 @@ public class ControlForm {
 		reqConfigDigits=1;
 		StartTime = System.currentTimeMillis();
 		CountElapsedTime = true;
-		Integer moteType = (Integer)comboMoteType.getSelectedItem();
-		lastVersionSeq = terracore.newData(progBin,moteType.shortValue());
-		lbllastVersion.setText("Last version: "+lastVersionSeq.toString());
+		lastVersionSeq = terracore.newData(progBin);
+		lbllastVersion.setText("Last ver.: "+lastVersionSeq.toString());
 		prop.setProperty("lastVersionSeq", lastVersionSeq.toString());
 		try {
 			prop.store(new FileOutputStream(new File(userHome+"/.TerraConfig")), null);
 		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -1017,7 +971,6 @@ public class ControlForm {
 	private void fillComboPrefix(){
 		File fd = new File(textFolder.getText());
 		String[] Names = fd.list(new ControlFileFilter(vmSufix));
-		Arrays.sort(Names);
 		System.out.println("Folder: "+ fd.getPath() +" #prefix:"+Names.length);
 		comboPrefix.removeAllItems();
 		if (Names.length>0) {
@@ -1069,8 +1022,6 @@ public class ControlForm {
 		lblTCPStatus2.repaint();
 		//lblTCPStatus3.repaint(); // dataForm
 		lblTCPRetries.repaint();
-		btnApply.repaint();
-		controlPanel.repaint();
 		
 	}
 	
@@ -1146,7 +1097,7 @@ public class ControlForm {
 	
 	public void sendBSMsg(int Sender, int EvtId, int Seq, String Data){
 //		System.out.println("sendBSMsg");
-		String line = String.format("%s:sendBSMsg: Snd=%05d(%01d:%03d), eid=%02d, data=[%s]\n", DateFormat.format(System.currentTimeMillis()),Sender,Sender>>11,Sender & 0x07ff,EvtId,Data);	
+		String line = String.format("%s:sendBSMsg: Sender= %03d, EvtId=%02d, data=[%s]\n", DateFormat.format(System.currentTimeMillis()),Sender,EvtId,Data);	
 		DataMsgs.append(line);
 		DataMsgs.setCaretPosition(DataMsgs.getDocument().getLength());
 	}

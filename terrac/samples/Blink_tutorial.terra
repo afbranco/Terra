@@ -2,7 +2,7 @@
 
 par do
 	loop do
-		await 1s;
+		await 1000ms;
 		emit LED0(TOGGLE);
 	end
 with
@@ -16,4 +16,3 @@ with
 		emit LED2(TOGGLE);
 	end
 end
-

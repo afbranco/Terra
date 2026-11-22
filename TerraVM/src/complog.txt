@@ -1,0 +1,1602 @@
+***********************
+*** NET BS Micaz ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = micaz
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mda100
+TYPE        = BS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 80
+VM_MEM      = 1920
+TOSVERSION  = 212
+***********************
+Make Cmds- micaz
+mkdir -p build/micaz
+    compiling TerraVMAppC to a micaz binary
+ncc -o build/micaz/main.exe  -Os -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=micaz -fnesc-cfile=build/micaz/app.c -board=mda100 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/micaz -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DONLY_BSTATION -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=80 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea4fdL -DIDENT_UIDHASH=0xee060a66L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/micaz/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/micaz/main.exe
+           25230 bytes in ROM
+            3555 bytes in RAM
+avr-objcopy --output-target=srec build/micaz/main.exe build/micaz/main.srec
+avr-objcopy --output-target=ihex build/micaz/main.exe build/micaz/main.ihex
+    writing TOS image
+***********************
+*** NET NOBS Micaz MDA100 ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = micaz
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mda100
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 80
+VM_MEM      = 1920
+TOSVERSION  = 212
+***********************
+Make Cmds- micaz
+mkdir -p build/micaz
+    compiling TerraVMAppC to a micaz binary
+ncc -o build/micaz/main.exe  -Os -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=micaz -fnesc-cfile=build/micaz/app.c -board=mda100 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/micaz -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DNO_BSTATION -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=80 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea500L -DIDENT_UIDHASH=0xe2cac530L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/micaz/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/micaz/main.exe
+           36600 bytes in ROM
+            3445 bytes in RAM
+avr-objcopy --output-target=srec build/micaz/main.exe build/micaz/main.srec
+avr-objcopy --output-target=ihex build/micaz/main.exe build/micaz/main.ihex
+    writing TOS image
+***********************
+*** NET NOBS Micaz MTS300CA ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = micaz
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mts300
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 80
+VM_MEM      = 1920
+TOSVERSION  = 212
+***********************
+Make Cmds- micaz
+mkdir -p build/micaz
+    compiling TerraVMAppC to a micaz binary
+ncc -o build/micaz/main.exe  -Os -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=micaz -fnesc-cfile=build/micaz/app.c -board=mts300 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/micaz -O2 -DMTS300CA -DSBOARD=300 -DNO_BSTATION -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=80 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea503L -DIDENT_UIDHASH=0x5287773dL -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/micaz/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/micaz/main.exe
+           41694 bytes in ROM
+            3525 bytes in RAM
+avr-objcopy --output-target=srec build/micaz/main.exe build/micaz/main.srec
+avr-objcopy --output-target=ihex build/micaz/main.exe build/micaz/main.ihex
+    writing TOS image
+***********************
+*** NET NOBS Micaz MTS300CB ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = micaz
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mts300
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 80
+VM_MEM      = 1920
+TOSVERSION  = 212
+***********************
+Make Cmds- micaz
+mkdir -p build/micaz
+    compiling TerraVMAppC to a micaz binary
+ncc -o build/micaz/main.exe  -Os -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=micaz -fnesc-cfile=build/micaz/app.c -board=mts300 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/micaz -O2 -DMTS300CB -DSBOARD=300 -DNO_BSTATION -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=80 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea506L -DIDENT_UIDHASH=0x788d2656L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/micaz/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/micaz/main.exe
+           41694 bytes in ROM
+            3525 bytes in RAM
+avr-objcopy --output-target=srec build/micaz/main.exe build/micaz/main.srec
+avr-objcopy --output-target=ihex build/micaz/main.exe build/micaz/main.ihex
+    writing TOS image
+***********************
+*** NET BS Mica2 ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = mica2
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mda100
+TYPE        = BS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 80
+VM_MEM      = 1920
+TOSVERSION  = 212
+***********************
+Make Cmds- mica2
+mkdir -p build/mica2
+    compiling TerraVMAppC to a mica2 binary
+ncc -o build/mica2/main.exe  -Os -DCC1K_DEF_FREQ=916400000 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=mica2 -fnesc-cfile=build/mica2/app.c -board=mda100 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/mica2 -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DONLY_BSTATION -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=80 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea509L -DIDENT_UIDHASH=0x9047600aL -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/mica2/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/mica2/main.exe
+           22034 bytes in ROM
+            3463 bytes in RAM
+avr-objcopy --output-target=srec build/mica2/main.exe build/mica2/main.srec
+avr-objcopy --output-target=ihex build/mica2/main.exe build/mica2/main.ihex
+    writing TOS image
+***********************
+*** NET NOBS Mica2 MDA100 ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = mica2
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mda100
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 80
+VM_MEM      = 1920
+TOSVERSION  = 212
+***********************
+Make Cmds- mica2
+mkdir -p build/mica2
+    compiling TerraVMAppC to a mica2 binary
+ncc -o build/mica2/main.exe  -Os -DCC1K_DEF_FREQ=916400000 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=mica2 -fnesc-cfile=build/mica2/app.c -board=mda100 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/mica2 -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DNO_BSTATION -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=80 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea50cL -DIDENT_UIDHASH=0xd9e18964L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/mica2/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/mica2/main.exe
+           33580 bytes in ROM
+            3357 bytes in RAM
+avr-objcopy --output-target=srec build/mica2/main.exe build/mica2/main.srec
+avr-objcopy --output-target=ihex build/mica2/main.exe build/mica2/main.ihex
+    writing TOS image
+***********************
+*** NET NOBS Mica2 MTS300CA ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = mica2
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mts300
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 80
+VM_MEM      = 1920
+TOSVERSION  = 212
+***********************
+Make Cmds- mica2
+mkdir -p build/mica2
+    compiling TerraVMAppC to a mica2 binary
+ncc -o build/mica2/main.exe  -Os -DCC1K_DEF_FREQ=916400000 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=mica2 -fnesc-cfile=build/mica2/app.c -board=mts300 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/mica2 -O2 -DMTS300CA -DSBOARD=300 -DNO_BSTATION -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=80 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea510L -DIDENT_UIDHASH=0xe3157e1cL -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/mica2/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/mica2/main.exe
+           38432 bytes in ROM
+            3437 bytes in RAM
+avr-objcopy --output-target=srec build/mica2/main.exe build/mica2/main.srec
+avr-objcopy --output-target=ihex build/mica2/main.exe build/mica2/main.ihex
+    writing TOS image
+***********************
+*** NET NOBS Mica2 MTS300CB ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = mica2
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mts300
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 80
+VM_MEM      = 1920
+TOSVERSION  = 212
+***********************
+Make Cmds- mica2
+mkdir -p build/mica2
+    compiling TerraVMAppC to a mica2 binary
+ncc -o build/mica2/main.exe  -Os -DCC1K_DEF_FREQ=916400000 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=mica2 -fnesc-cfile=build/mica2/app.c -board=mts300 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/mica2 -O2 -DMTS300CB -DSBOARD=300 -DNO_BSTATION -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=80 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea513L -DIDENT_UIDHASH=0xbf8df040L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/mica2/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/mica2/main.exe
+           38432 bytes in ROM
+            3437 bytes in RAM
+avr-objcopy --output-target=srec build/mica2/main.exe build/mica2/main.srec
+avr-objcopy --output-target=ihex build/mica2/main.exe build/mica2/main.ihex
+    writing TOS image
+***********************
+*** NET BS Mica2Dot ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = mica2dot
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = 
+TYPE        = BS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 80
+VM_MEM      = 1920
+TOSVERSION  = 212
+***********************
+Make Cmds- mica2dot
+mkdir -p build/mica2dot
+    compiling TerraVMAppC to a mica2dot binary
+ncc -o build/mica2dot/main.exe  -Os -DCC1K_DEF_FREQ=916400000 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=mica2dot -fnesc-cfile=build/mica2dot/app.c -board= -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/mica2dot -O2 -DONLY_BSTATION -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=80 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea516L -DIDENT_UIDHASH=0x070b2ed9L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/mica2dot/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/mica2dot/main.exe
+           20034 bytes in ROM
+            3407 bytes in RAM
+avr-objcopy --output-target=srec build/mica2dot/main.exe build/mica2dot/main.srec
+avr-objcopy --output-target=ihex build/mica2dot/main.exe build/mica2dot/main.ihex
+    writing TOS image
+***********************
+*** NET NOBS Mica2Dot No_Sensor ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = mica2dot
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = 
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 80
+VM_MEM      = 1920
+TOSVERSION  = 212
+***********************
+Make Cmds- mica2dot
+mkdir -p build/mica2dot
+    compiling TerraVMAppC to a mica2dot binary
+ncc -o build/mica2dot/main.exe  -Os -DCC1K_DEF_FREQ=916400000 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=mica2dot -fnesc-cfile=build/mica2dot/app.c -board= -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/mica2dot -O2 -DNO_BSTATION -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=80 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea518L -DIDENT_UIDHASH=0xb7e4e1f7L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/mica2dot/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/mica2dot/main.exe
+           31196 bytes in ROM
+            3299 bytes in RAM
+avr-objcopy --output-target=srec build/mica2dot/main.exe build/mica2dot/main.srec
+avr-objcopy --output-target=ihex build/mica2dot/main.exe build/mica2dot/main.ihex
+    writing TOS image
+***********************
+*** NET BS TelosB ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = telosb
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = 
+TYPE        = BS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 80
+VM_MEM      = 1920
+TOSVERSION  = 212
+***********************
+Make Cmds- telosb
+mkdir -p build/telosb
+    compiling TerraVMAppC to a telosb binary
+
+    WARNING: Minimum recommended msp430-gcc version for this TinyOS release is 4.6.3!!!
+
+ncc -o build/telosb/main.exe  -Os -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=telosb -fnesc-cfile=build/telosb/app.c -board= -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 -Ibuild/telosb -Os -DONLY_BSTATION -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=80 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea51bL -DIDENT_UIDHASH=0x12b80e2fL  TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/telosb/main.exe
+           24818 bytes in ROM
+            3750 bytes in RAM
+msp430-objcopy --output-target=ihex build/telosb/main.exe build/telosb/main.ihex
+    writing TOS image
+***********************
+*** NET NOBS TelosB ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = telosb
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = 
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 80
+VM_MEM      = 1920
+TOSVERSION  = 212
+***********************
+Make Cmds- telosb
+mkdir -p build/telosb
+    compiling TerraVMAppC to a telosb binary
+
+    WARNING: Minimum recommended msp430-gcc version for this TinyOS release is 4.6.3!!!
+
+ncc -o build/telosb/main.exe  -Os -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=telosb -fnesc-cfile=build/telosb/app.c -board= -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 -Ibuild/telosb -Os -DNO_BSTATION -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=80 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea51dL -DIDENT_UIDHASH=0xdee0fe48L  TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/telosb/main.exe
+           35062 bytes in ROM
+            3584 bytes in RAM
+msp430-objcopy --output-target=ihex build/telosb/main.exe build/telosb/main.ihex
+    writing TOS image
+***********************
+*** NET BS TelosB Full ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = telosb
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = 
+TYPE        = BS
+HYB         = NO
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 176
+VM_MEM      = 4224
+TOSVERSION  = 212
+***********************
+Make Cmds- telosb
+mkdir -p build/telosb
+    compiling TerraVMAppC to a telosb binary
+
+    WARNING: Minimum recommended msp430-gcc version for this TinyOS release is 4.6.3!!!
+
+ncc -o build/telosb/main.exe  -Os -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=telosb -fnesc-cfile=build/telosb/app.c -board= -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 -Ibuild/telosb -Os -DONLY_BSTATION -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=176 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea520L -DIDENT_UIDHASH=0x655c9e7dL  TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/telosb/main.exe
+           24818 bytes in ROM
+            6066 bytes in RAM
+msp430-objcopy --output-target=ihex build/telosb/main.exe build/telosb/main.ihex
+    writing TOS image
+***********************
+*** NET NOBS TelosB Full ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = telosb
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = 
+TYPE        = NOBS
+HYB         = NO
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 176
+VM_MEM      = 4224
+TOSVERSION  = 212
+***********************
+Make Cmds- telosb
+mkdir -p build/telosb
+    compiling TerraVMAppC to a telosb binary
+
+    WARNING: Minimum recommended msp430-gcc version for this TinyOS release is 4.6.3!!!
+
+ncc -o build/telosb/main.exe  -Os -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=telosb -fnesc-cfile=build/telosb/app.c -board= -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 -Ibuild/telosb -Os -DNO_BSTATION -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=176 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea522L -DIDENT_UIDHASH=0xe73a15c4L  TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/telosb/main.exe
+           35062 bytes in ROM
+            5900 bytes in RAM
+msp430-objcopy --output-target=ihex build/telosb/main.exe build/telosb/main.ihex
+    writing TOS image
+***********************
+*** NET BS Iris ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = iris
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mda100
+TYPE        = BS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 80
+VM_MEM      = 1920
+TOSVERSION  = 212
+***********************
+Make Cmds- iris
+mkdir -p build/iris
+    compiling TerraVMAppC to a iris binary
+ncc -o build/iris/main.exe  -Os -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=iris -fnesc-cfile=build/iris/app.c -board=mda100 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/iris -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DONLY_BSTATION -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=80 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea524L -DIDENT_UIDHASH=0x61440de1L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/iris/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/iris/main.exe
+           24212 bytes in ROM
+            3660 bytes in RAM
+avr-objcopy --output-target=srec build/iris/main.exe build/iris/main.srec
+avr-objcopy --output-target=ihex build/iris/main.exe build/iris/main.ihex
+    writing TOS image
+***********************
+*** NET NOBS Iris MDA100 ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = iris
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mda100
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 80
+VM_MEM      = 1920
+TOSVERSION  = 212
+***********************
+Make Cmds- iris
+mkdir -p build/iris
+    compiling TerraVMAppC to a iris binary
+ncc -o build/iris/main.exe  -Os -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=iris -fnesc-cfile=build/iris/app.c -board=mda100 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/iris -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DNO_BSTATION -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=80 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea527L -DIDENT_UIDHASH=0xb54029beL -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/iris/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/iris/main.exe
+           35322 bytes in ROM
+            3562 bytes in RAM
+avr-objcopy --output-target=srec build/iris/main.exe build/iris/main.srec
+avr-objcopy --output-target=ihex build/iris/main.exe build/iris/main.ihex
+    writing TOS image
+***********************
+*** NET NOBS Iris MTS300CA ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = iris
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mts300
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 80
+VM_MEM      = 1920
+TOSVERSION  = 212
+***********************
+Make Cmds- iris
+mkdir -p build/iris
+    compiling TerraVMAppC to a iris binary
+ncc -o build/iris/main.exe  -Os -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=iris -fnesc-cfile=build/iris/app.c -board=mts300 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/iris -O2 -DMTS300CA -DSBOARD=300 -DNO_BSTATION -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=80 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea52aL -DIDENT_UIDHASH=0x3b19e8e5L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/iris/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/iris/main.exe
+           40058 bytes in ROM
+            3642 bytes in RAM
+avr-objcopy --output-target=srec build/iris/main.exe build/iris/main.srec
+avr-objcopy --output-target=ihex build/iris/main.exe build/iris/main.ihex
+    writing TOS image
+***********************
+*** NET NOBS Iris MTS300CB ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = iris
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mts300
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 80
+VM_MEM      = 1920
+TOSVERSION  = 212
+***********************
+Make Cmds- iris
+mkdir -p build/iris
+    compiling TerraVMAppC to a iris binary
+ncc -o build/iris/main.exe  -Os -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=iris -fnesc-cfile=build/iris/app.c -board=mts300 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/iris -O2 -DMTS300CB -DSBOARD=300 -DNO_BSTATION -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=80 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea52eL -DIDENT_UIDHASH=0x13bf8fa0L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/iris/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/iris/main.exe
+           40058 bytes in ROM
+            3642 bytes in RAM
+avr-objcopy --output-target=srec build/iris/main.exe build/iris/main.srec
+avr-objcopy --output-target=ihex build/iris/main.exe build/iris/main.ihex
+    writing TOS image
+***********************
+*** NET BS Iris ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = iris
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mda100
+TYPE        = BS
+HYB         = NO
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 176
+VM_MEM      = 4224
+TOSVERSION  = 212
+***********************
+Make Cmds- iris
+mkdir -p build/iris
+    compiling TerraVMAppC to a iris binary
+ncc -o build/iris/main.exe  -Os -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=iris -fnesc-cfile=build/iris/app.c -board=mda100 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/iris -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DONLY_BSTATION -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=176 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea532L -DIDENT_UIDHASH=0x9ed5ac51L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/iris/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/iris/main.exe
+           24214 bytes in ROM
+            5976 bytes in RAM
+avr-objcopy --output-target=srec build/iris/main.exe build/iris/main.srec
+avr-objcopy --output-target=ihex build/iris/main.exe build/iris/main.ihex
+    writing TOS image
+***********************
+*** NET NOBS Iris HYB=NO MDA100 ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = iris
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mda100
+TYPE        = NOBS
+HYB         = NO
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 176
+VM_MEM      = 4224
+TOSVERSION  = 212
+***********************
+Make Cmds- iris
+mkdir -p build/iris
+    compiling TerraVMAppC to a iris binary
+ncc -o build/iris/main.exe  -Os -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=iris -fnesc-cfile=build/iris/app.c -board=mda100 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/iris -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DNO_BSTATION -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=176 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea535L -DIDENT_UIDHASH=0x2530c707L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/iris/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/iris/main.exe
+           35324 bytes in ROM
+            5878 bytes in RAM
+avr-objcopy --output-target=srec build/iris/main.exe build/iris/main.srec
+avr-objcopy --output-target=ihex build/iris/main.exe build/iris/main.ihex
+    writing TOS image
+***********************
+*** NET NOBS Iris HYB=NO MTS300CA ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = iris
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mts300
+TYPE        = NOBS
+HYB         = NO
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 176
+VM_MEM      = 4224
+TOSVERSION  = 212
+***********************
+Make Cmds- iris
+mkdir -p build/iris
+    compiling TerraVMAppC to a iris binary
+ncc -o build/iris/main.exe  -Os -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=iris -fnesc-cfile=build/iris/app.c -board=mts300 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/iris -O2 -DMTS300CA -DSBOARD=300 -DNO_BSTATION -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=176 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea538L -DIDENT_UIDHASH=0xfea9b946L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/iris/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/iris/main.exe
+           40060 bytes in ROM
+            5958 bytes in RAM
+avr-objcopy --output-target=srec build/iris/main.exe build/iris/main.srec
+avr-objcopy --output-target=ihex build/iris/main.exe build/iris/main.ihex
+    writing TOS image
+***********************
+*** NET NOBS Iris HYB=NO MTS300CB ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = iris
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mts300
+TYPE        = NOBS
+HYB         = NO
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 176
+VM_MEM      = 4224
+TOSVERSION  = 212
+***********************
+Make Cmds- iris
+mkdir -p build/iris
+    compiling TerraVMAppC to a iris binary
+ncc -o build/iris/main.exe  -Os -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=iris -fnesc-cfile=build/iris/app.c -board=mts300 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/iris -O2 -DMTS300CB -DSBOARD=300 -DNO_BSTATION -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=176 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea53bL -DIDENT_UIDHASH=0x83054d33L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/iris/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/iris/main.exe
+           40060 bytes in ROM
+            5958 bytes in RAM
+avr-objcopy --output-target=srec build/iris/main.exe build/iris/main.srec
+avr-objcopy --output-target=ihex build/iris/main.exe build/iris/main.ihex
+    writing TOS image
+***********************
+*** NET ALL TOSSIM ****
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = micaz
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mda100
+TYPE        = ALL
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 72
+VM_MEM      = 1728
+TOSVERSION  = 212
+***********************
+Make Cmds- micaz sim-sf
+mkdir -p simbuild/micaz
+  placing object files in simbuild/micaz
+  writing XML schema to app.xml
+  compiling TerraVMAppC to object file sim.o
+ncc -c -shared -fPIC -o simbuild/micaz/sim.o -g -O0 -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -tossim -fnesc-nido-tosnodes=1000 -fnesc-simulate -fnesc-nido-motenumber=sim_node\(\) -I/opt/tinyos-2.1.2/tos/lib/tossim/sf -Wall -Wshadow -Wnesc-all -target=micaz -fnesc-cfile=simbuild/micaz/app.c -board=mda100 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Isimbuild/micaz -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=72 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea53fL -DIDENT_UIDHASH=0x17c2756fL -Wno-nesc-data-race TerraVMAppC.nc   -fnesc-dump=components -fnesc-dump=variables -fnesc-dump=constants -fnesc-dump=typedefs -fnesc-dump=interfacedefs -fnesc-dump=tags -fnesc-dumpfile=app.xml
+  compiling Python support and C libraries into pytossim.o, tossim.o, and c-support.o
+g++ -c  -shared -fPIC -o simbuild/micaz/pytossim.o -g -O0 -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=72 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea53fL -DIDENT_UIDHASH=0x17c2756fL  -I/opt/tinyos-2.1.2/tos/lib/tossim/sf /opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx -I/usr/include/python2.7 -I/opt/tinyos-2.1.2/tos/lib/tossim -DHAVE_CONFIG_H 
+g++ -c  -shared -fPIC -o simbuild/micaz/tossim.o -g -O0 -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=72 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea53fL -DIDENT_UIDHASH=0x17c2756fL  -I/opt/tinyos-2.1.2/tos/lib/tossim/sf /opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim.c -I/usr/include/python2.7 -I/opt/tinyos-2.1.2/tos/lib/tossim
+g++ -c  -shared -fPIC -o simbuild/micaz/c-support.o -g -O0 -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=72 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea53fL -DIDENT_UIDHASH=0x17c2756fL  -I/opt/tinyos-2.1.2/tos/lib/tossim/sf /opt/tinyos-2.1.2/tos/lib/tossim/hashtable.c -I/usr/include/python2.7 -I/opt/tinyos-2.1.2/tos/lib/tossim
+  compiling sf support and C libraries into sf.o, c-sf.o, and throttle.o
+g++ -c  -shared -fPIC -o simbuild/micaz/c-sf.o -g -O0 -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=72 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea53fL -DIDENT_UIDHASH=0x17c2756fL  -I/opt/tinyos-2.1.2/tos/lib/tossim/sf /opt/tinyos-2.1.2/tos/lib/tossim/sf/sim_serial_forwarder.c -I/usr/include/python2.7 -I/opt/tinyos-2.1.2/tos/lib/tossim
+g++ -c  -shared -fPIC -o simbuild/micaz/sf.o -g -O0 -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=72 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea53fL -DIDENT_UIDHASH=0x17c2756fL  -I/opt/tinyos-2.1.2/tos/lib/tossim/sf /opt/tinyos-2.1.2/tos/lib/tossim/sf/SerialForwarder.c  -I/usr/include/python2.7 -I/opt/tinyos-2.1.2/tos/lib/tossim
+g++ -c  -shared -fPIC -o simbuild/micaz/throttle.o -g -O0 -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=72 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea53fL -DIDENT_UIDHASH=0x17c2756fL  -I/opt/tinyos-2.1.2/tos/lib/tossim/sf /opt/tinyos-2.1.2/tos/lib/tossim/sf/Throttle.cpp -I/usr/include/python2.7 -I/opt/tinyos-2.1.2/tos/lib/tossim
+  linking into shared object ./_TOSSIMmodule.so
+g++ -shared -fPIC  simbuild/micaz/pytossim.o simbuild/micaz/sim.o simbuild/micaz/tossim.o simbuild/micaz/c-support.o simbuild/micaz/c-sf.o simbuild/micaz/sf.o simbuild/micaz/throttle.o  -lstdc++  -lm -o _TOSSIMmodule.so
+  copying Python script interface TOSSIM.py from lib/tossim to local directory
+ 
+*** Successfully built micaz TOSSIM library with TOSSIM Live extensions. 
+***********************
+*** GRP BS Micaz ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = micaz
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mda100
+TYPE        = BS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 32
+VM_MEM      = 768
+TOSVERSION  = 212
+***********************
+Make Cmds- micaz
+mkdir -p build/micaz
+    compiling TerraVMAppC to a micaz binary
+ncc -o build/micaz/main.exe  -Os -DMODULE_CTP -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=micaz -fnesc-cfile=build/micaz/app.c -board=mda100 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/micaz -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DONLY_BSTATION -DSHORT_QUEUES -DVM_MEM_BLKS=32 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea547L -DIDENT_UIDHASH=0x14bdb264L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/micaz/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/micaz/main.exe
+           33228 bytes in ROM
+            3650 bytes in RAM
+avr-objcopy --output-target=srec build/micaz/main.exe build/micaz/main.srec
+avr-objcopy --output-target=ihex build/micaz/main.exe build/micaz/main.ihex
+    writing TOS image
+***********************
+*** GRP NOBS Micaz MDA100 ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = micaz
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mda100
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 32
+VM_MEM      = 768
+TOSVERSION  = 212
+***********************
+Make Cmds- micaz
+mkdir -p build/micaz
+    compiling TerraVMAppC to a micaz binary
+ncc -o build/micaz/main.exe  -Os -DMODULE_CTP -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=micaz -fnesc-cfile=build/micaz/app.c -board=mda100 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/micaz -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DNO_BSTATION -DSHORT_QUEUES -DVM_MEM_BLKS=32 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea54aL -DIDENT_UIDHASH=0x48b6f610L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/micaz/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/micaz/main.exe
+           53164 bytes in ROM
+            3572 bytes in RAM
+avr-objcopy --output-target=srec build/micaz/main.exe build/micaz/main.srec
+avr-objcopy --output-target=ihex build/micaz/main.exe build/micaz/main.ihex
+    writing TOS image
+***********************
+*** GRP NOBS Micaz MTS300CA ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = micaz
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mts300
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 32
+VM_MEM      = 768
+TOSVERSION  = 212
+***********************
+Make Cmds- micaz
+mkdir -p build/micaz
+    compiling TerraVMAppC to a micaz binary
+ncc -o build/micaz/main.exe  -Os -DMODULE_CTP -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=micaz -fnesc-cfile=build/micaz/app.c -board=mts300 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/micaz -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMTS300CA -DSBOARD=300 -DNO_BSTATION -DSHORT_QUEUES -DVM_MEM_BLKS=32 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea54eL -DIDENT_UIDHASH=0x86864ff2L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/micaz/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/micaz/main.exe
+           57836 bytes in ROM
+            3652 bytes in RAM
+avr-objcopy --output-target=srec build/micaz/main.exe build/micaz/main.srec
+avr-objcopy --output-target=ihex build/micaz/main.exe build/micaz/main.ihex
+    writing TOS image
+***********************
+*** GRP NOBS Micaz MTS300CB ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = micaz
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mts300
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 32
+VM_MEM      = 768
+TOSVERSION  = 212
+***********************
+Make Cmds- micaz
+mkdir -p build/micaz
+    compiling TerraVMAppC to a micaz binary
+ncc -o build/micaz/main.exe  -Os -DMODULE_CTP -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=micaz -fnesc-cfile=build/micaz/app.c -board=mts300 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/micaz -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMTS300CB -DSBOARD=300 -DNO_BSTATION -DSHORT_QUEUES -DVM_MEM_BLKS=32 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea552L -DIDENT_UIDHASH=0x6dd7d3d8L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/micaz/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/micaz/main.exe
+           57836 bytes in ROM
+            3652 bytes in RAM
+avr-objcopy --output-target=srec build/micaz/main.exe build/micaz/main.srec
+avr-objcopy --output-target=ihex build/micaz/main.exe build/micaz/main.ihex
+    writing TOS image
+***********************
+*** GRP BS Mica2 ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = mica2
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mda100
+TYPE        = BS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 32
+VM_MEM      = 768
+TOSVERSION  = 212
+***********************
+Make Cmds- mica2
+mkdir -p build/mica2
+    compiling TerraVMAppC to a mica2 binary
+ncc -o build/mica2/main.exe  -Os -DMODULE_CTP -DCC1K_DEF_FREQ=916400000 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=mica2 -fnesc-cfile=build/mica2/app.c -board=mda100 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/mica2 -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DONLY_BSTATION -DSHORT_QUEUES -DVM_MEM_BLKS=32 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea557L -DIDENT_UIDHASH=0x437b3d31L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/mica2/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/mica2/main.exe
+           30012 bytes in ROM
+            3490 bytes in RAM
+avr-objcopy --output-target=srec build/mica2/main.exe build/mica2/main.srec
+avr-objcopy --output-target=ihex build/mica2/main.exe build/mica2/main.ihex
+    writing TOS image
+***********************
+*** GRP NOBS Mica2 MDA100 ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = mica2
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mda100
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 32
+VM_MEM      = 768
+TOSVERSION  = 212
+***********************
+Make Cmds- mica2
+mkdir -p build/mica2
+    compiling TerraVMAppC to a mica2 binary
+ncc -o build/mica2/main.exe  -Os -DMODULE_CTP -DCC1K_DEF_FREQ=916400000 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=mica2 -fnesc-cfile=build/mica2/app.c -board=mda100 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/mica2 -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DNO_BSTATION -DSHORT_QUEUES -DVM_MEM_BLKS=32 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea55bL -DIDENT_UIDHASH=0xef0e7defL -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/mica2/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/mica2/main.exe
+           49758 bytes in ROM
+            3412 bytes in RAM
+avr-objcopy --output-target=srec build/mica2/main.exe build/mica2/main.srec
+avr-objcopy --output-target=ihex build/mica2/main.exe build/mica2/main.ihex
+    writing TOS image
+***********************
+*** GRP NOBS Mica2 MTS300CA ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = mica2
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mts300
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 32
+VM_MEM      = 768
+TOSVERSION  = 212
+***********************
+Make Cmds- mica2
+mkdir -p build/mica2
+    compiling TerraVMAppC to a mica2 binary
+ncc -o build/mica2/main.exe  -Os -DMODULE_CTP -DCC1K_DEF_FREQ=916400000 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=mica2 -fnesc-cfile=build/mica2/app.c -board=mts300 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/mica2 -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMTS300CA -DSBOARD=300 -DNO_BSTATION -DSHORT_QUEUES -DVM_MEM_BLKS=32 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea55eL -DIDENT_UIDHASH=0x4ffd9e02L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/mica2/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/mica2/main.exe
+           55192 bytes in ROM
+            3492 bytes in RAM
+avr-objcopy --output-target=srec build/mica2/main.exe build/mica2/main.srec
+avr-objcopy --output-target=ihex build/mica2/main.exe build/mica2/main.ihex
+    writing TOS image
+***********************
+*** GRP NOBS Mica2 MTS300CB ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = mica2
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mts300
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 32
+VM_MEM      = 768
+TOSVERSION  = 212
+***********************
+Make Cmds- mica2
+mkdir -p build/mica2
+    compiling TerraVMAppC to a mica2 binary
+ncc -o build/mica2/main.exe  -Os -DMODULE_CTP -DCC1K_DEF_FREQ=916400000 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=mica2 -fnesc-cfile=build/mica2/app.c -board=mts300 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/mica2 -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMTS300CB -DSBOARD=300 -DNO_BSTATION -DSHORT_QUEUES -DVM_MEM_BLKS=32 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea562L -DIDENT_UIDHASH=0xdf13f9a7L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/mica2/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/mica2/main.exe
+           55192 bytes in ROM
+            3492 bytes in RAM
+avr-objcopy --output-target=srec build/mica2/main.exe build/mica2/main.srec
+avr-objcopy --output-target=ihex build/mica2/main.exe build/mica2/main.ihex
+    writing TOS image
+***********************
+*** GRP BS Mica2Dot ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = mica2dot
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = 
+TYPE        = BS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 32
+VM_MEM      = 768
+TOSVERSION  = 212
+***********************
+Make Cmds- mica2dot
+mkdir -p build/mica2dot
+    compiling TerraVMAppC to a mica2dot binary
+ncc -o build/mica2dot/main.exe  -Os -DMODULE_CTP -DCC1K_DEF_FREQ=916400000 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=mica2dot -fnesc-cfile=build/mica2dot/app.c -board= -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/mica2dot -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DONLY_BSTATION -DSHORT_QUEUES -DVM_MEM_BLKS=32 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea566L -DIDENT_UIDHASH=0xafa12440L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/mica2dot/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/mica2dot/main.exe
+           28266 bytes in ROM
+            3438 bytes in RAM
+avr-objcopy --output-target=srec build/mica2dot/main.exe build/mica2dot/main.srec
+avr-objcopy --output-target=ihex build/mica2dot/main.exe build/mica2dot/main.ihex
+    writing TOS image
+***********************
+*** GRP NOBS Mica2Dot No_Sensor ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = mica2dot
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = 
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 32
+VM_MEM      = 768
+TOSVERSION  = 212
+***********************
+Make Cmds- mica2dot
+mkdir -p build/mica2dot
+    compiling TerraVMAppC to a mica2dot binary
+ncc -o build/mica2dot/main.exe  -Os -DMODULE_CTP -DCC1K_DEF_FREQ=916400000 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=mica2dot -fnesc-cfile=build/mica2dot/app.c -board= -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/mica2dot -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DNO_BSTATION -DSHORT_QUEUES -DVM_MEM_BLKS=32 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea569L -DIDENT_UIDHASH=0xb71bcebaL -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/mica2dot/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/mica2dot/main.exe
+           47930 bytes in ROM
+            3354 bytes in RAM
+avr-objcopy --output-target=srec build/mica2dot/main.exe build/mica2dot/main.srec
+avr-objcopy --output-target=ihex build/mica2dot/main.exe build/mica2dot/main.ihex
+    writing TOS image
+***********************
+*** GRP BS TelosB ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = telosb
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = 
+TYPE        = BS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 32
+VM_MEM      = 768
+TOSVERSION  = 212
+***********************
+Make Cmds- telosb
+mkdir -p build/telosb
+    compiling TerraVMAppC to a telosb binary
+
+    WARNING: Minimum recommended msp430-gcc version for this TinyOS release is 4.6.3!!!
+
+ncc -o build/telosb/main.exe  -Os -DMODULE_CTP -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=telosb -fnesc-cfile=build/telosb/app.c -board= -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 -Ibuild/telosb -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -Os -DONLY_BSTATION -DSHORT_QUEUES -DVM_MEM_BLKS=32 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea56cL -DIDENT_UIDHASH=0xfd2b2ed1L  TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/telosb/main.exe
+           31024 bytes in ROM
+            3886 bytes in RAM
+msp430-objcopy --output-target=ihex build/telosb/main.exe build/telosb/main.ihex
+    writing TOS image
+***********************
+*** GRP NOBS TelosB ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = telosb
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = 
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 32
+VM_MEM      = 768
+TOSVERSION  = 212
+***********************
+Make Cmds- telosb
+mkdir -p build/telosb
+    compiling TerraVMAppC to a telosb binary
+
+    WARNING: Minimum recommended msp430-gcc version for this TinyOS release is 4.6.3!!!
+
+ncc -o build/telosb/main.exe  -Os -DMODULE_CTP -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=telosb -fnesc-cfile=build/telosb/app.c -board= -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 -Ibuild/telosb -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -Os -DNO_BSTATION -DSHORT_QUEUES -DVM_MEM_BLKS=32 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea570L -DIDENT_UIDHASH=0x525e5cc5L  TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/telosb/main.exe
+           47168 bytes in ROM
+            3768 bytes in RAM
+msp430-objcopy --output-target=ihex build/telosb/main.exe build/telosb/main.ihex
+    writing TOS image
+***********************
+*** GRP BS TelosB Full ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = telosb
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = 
+TYPE        = BS
+HYB         = NO
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 184
+VM_MEM      = 4416
+TOSVERSION  = 212
+***********************
+Make Cmds- telosb
+mkdir -p build/telosb
+    compiling TerraVMAppC to a telosb binary
+
+    WARNING: Minimum recommended msp430-gcc version for this TinyOS release is 4.6.3!!!
+
+ncc -o build/telosb/main.exe  -Os -DMODULE_CTP -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=telosb -fnesc-cfile=build/telosb/app.c -board= -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 -Ibuild/telosb -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -Os -DONLY_BSTATION -DSHORT_QUEUES -DVM_MEM_BLKS=184 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea573L -DIDENT_UIDHASH=0x7fd814e0L  TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/telosb/main.exe
+           31026 bytes in ROM
+            7552 bytes in RAM
+msp430-objcopy --output-target=ihex build/telosb/main.exe build/telosb/main.ihex
+    writing TOS image
+***********************
+*** GRP NOBS TelosB Full ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = telosb
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = 
+TYPE        = NOBS
+HYB         = NO
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 184
+VM_MEM      = 4416
+TOSVERSION  = 212
+***********************
+Make Cmds- telosb
+mkdir -p build/telosb
+    compiling TerraVMAppC to a telosb binary
+
+    WARNING: Minimum recommended msp430-gcc version for this TinyOS release is 4.6.3!!!
+
+ncc -o build/telosb/main.exe  -Os -DMODULE_CTP -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=telosb -fnesc-cfile=build/telosb/app.c -board= -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 -Ibuild/telosb -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -Os -DNO_BSTATION -DSHORT_QUEUES -DVM_MEM_BLKS=184 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea576L -DIDENT_UIDHASH=0x3ca0517aL  TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/telosb/main.exe
+           47170 bytes in ROM
+            7436 bytes in RAM
+msp430-objcopy --output-target=ihex build/telosb/main.exe build/telosb/main.ihex
+    writing TOS image
+***********************
+*** GRP BS Iris ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = iris
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mda100
+TYPE        = BS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 32
+VM_MEM      = 768
+TOSVERSION  = 212
+***********************
+Make Cmds- iris
+mkdir -p build/iris
+    compiling TerraVMAppC to a iris binary
+ncc -o build/iris/main.exe  -Os -DMODULE_CTP -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=iris -fnesc-cfile=build/iris/app.c -board=mda100 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/iris -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DONLY_BSTATION -DSHORT_QUEUES -DVM_MEM_BLKS=32 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea579L -DIDENT_UIDHASH=0x97b6fbe3L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/iris/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/iris/main.exe
+           32790 bytes in ROM
+            3687 bytes in RAM
+avr-objcopy --output-target=srec build/iris/main.exe build/iris/main.srec
+avr-objcopy --output-target=ihex build/iris/main.exe build/iris/main.ihex
+    writing TOS image
+***********************
+*** GRP NOBS Iris MDA100 ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = iris
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mda100
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 32
+VM_MEM      = 768
+TOSVERSION  = 212
+***********************
+Make Cmds- iris
+mkdir -p build/iris
+    compiling TerraVMAppC to a iris binary
+ncc -o build/iris/main.exe  -Os -DMODULE_CTP -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=iris -fnesc-cfile=build/iris/app.c -board=mda100 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/iris -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DNO_BSTATION -DSHORT_QUEUES -DVM_MEM_BLKS=32 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea57cL -DIDENT_UIDHASH=0xda591b4dL -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/iris/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/iris/main.exe
+           52478 bytes in ROM
+            3617 bytes in RAM
+avr-objcopy --output-target=srec build/iris/main.exe build/iris/main.srec
+avr-objcopy --output-target=ihex build/iris/main.exe build/iris/main.ihex
+    writing TOS image
+***********************
+*** GRP NOBS Iris MTS300CA ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = iris
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mts300
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 32
+VM_MEM      = 768
+TOSVERSION  = 212
+***********************
+Make Cmds- iris
+mkdir -p build/iris
+    compiling TerraVMAppC to a iris binary
+ncc -o build/iris/main.exe  -Os -DMODULE_CTP -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=iris -fnesc-cfile=build/iris/app.c -board=mts300 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/iris -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMTS300CA -DSBOARD=300 -DNO_BSTATION -DSHORT_QUEUES -DVM_MEM_BLKS=32 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea580L -DIDENT_UIDHASH=0x392b035fL -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/iris/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/iris/main.exe
+           57540 bytes in ROM
+            3697 bytes in RAM
+avr-objcopy --output-target=srec build/iris/main.exe build/iris/main.srec
+avr-objcopy --output-target=ihex build/iris/main.exe build/iris/main.ihex
+    writing TOS image
+***********************
+*** GRP NOBS Iris MTS300CB ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = iris
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mts300
+TYPE        = NOBS
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 32
+VM_MEM      = 768
+TOSVERSION  = 212
+***********************
+Make Cmds- iris
+mkdir -p build/iris
+    compiling TerraVMAppC to a iris binary
+ncc -o build/iris/main.exe  -Os -DMODULE_CTP -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=iris -fnesc-cfile=build/iris/app.c -board=mts300 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/iris -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMTS300CB -DSBOARD=300 -DNO_BSTATION -DSHORT_QUEUES -DVM_MEM_BLKS=32 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea584L -DIDENT_UIDHASH=0xb15184a3L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/iris/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/iris/main.exe
+           57540 bytes in ROM
+            3697 bytes in RAM
+avr-objcopy --output-target=srec build/iris/main.exe build/iris/main.srec
+avr-objcopy --output-target=ihex build/iris/main.exe build/iris/main.ihex
+    writing TOS image
+***********************
+*** GRP BS Iris HYB=NO ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = iris
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mda100
+TYPE        = BS
+HYB         = NO
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 184
+VM_MEM      = 4416
+TOSVERSION  = 212
+***********************
+Make Cmds- iris
+mkdir -p build/iris
+    compiling TerraVMAppC to a iris binary
+ncc -o build/iris/main.exe  -Os -DMODULE_CTP -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=iris -fnesc-cfile=build/iris/app.c -board=mda100 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/iris -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DONLY_BSTATION -DSHORT_QUEUES -DVM_MEM_BLKS=184 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea589L -DIDENT_UIDHASH=0xfac9c946L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/iris/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/iris/main.exe
+           32798 bytes in ROM
+            7354 bytes in RAM
+avr-objcopy --output-target=srec build/iris/main.exe build/iris/main.srec
+avr-objcopy --output-target=ihex build/iris/main.exe build/iris/main.ihex
+    writing TOS image
+***********************
+*** GRP NOBS Iris HYB=NO MDA100 ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = iris
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mda100
+TYPE        = NOBS
+HYB         = NO
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 184
+VM_MEM      = 4416
+TOSVERSION  = 212
+***********************
+Make Cmds- iris
+mkdir -p build/iris
+    compiling TerraVMAppC to a iris binary
+ncc -o build/iris/main.exe  -Os -DMODULE_CTP -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=iris -fnesc-cfile=build/iris/app.c -board=mda100 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/iris -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DNO_BSTATION -DSHORT_QUEUES -DVM_MEM_BLKS=184 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea58cL -DIDENT_UIDHASH=0x53bc45bbL -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/iris/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/iris/main.exe
+           52480 bytes in ROM
+            7284 bytes in RAM
+avr-objcopy --output-target=srec build/iris/main.exe build/iris/main.srec
+avr-objcopy --output-target=ihex build/iris/main.exe build/iris/main.ihex
+    writing TOS image
+***********************
+*** GRP NOBS Iris HYB=NO MTS300CA ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = iris
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mts300
+TYPE        = NOBS
+HYB         = NO
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 184
+VM_MEM      = 4416
+TOSVERSION  = 212
+***********************
+Make Cmds- iris
+mkdir -p build/iris
+    compiling TerraVMAppC to a iris binary
+ncc -o build/iris/main.exe  -Os -DMODULE_CTP -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=iris -fnesc-cfile=build/iris/app.c -board=mts300 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/iris -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMTS300CA -DSBOARD=300 -DNO_BSTATION -DSHORT_QUEUES -DVM_MEM_BLKS=184 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea590L -DIDENT_UIDHASH=0xaf3020f8L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/iris/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/iris/main.exe
+           57538 bytes in ROM
+            7364 bytes in RAM
+avr-objcopy --output-target=srec build/iris/main.exe build/iris/main.srec
+avr-objcopy --output-target=ihex build/iris/main.exe build/iris/main.ihex
+    writing TOS image
+***********************
+*** GRP NOBS Iris HYB=NO MTS300CB ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = iris
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mts300
+TYPE        = NOBS
+HYB         = NO
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 184
+VM_MEM      = 4416
+TOSVERSION  = 212
+***********************
+Make Cmds- iris
+mkdir -p build/iris
+    compiling TerraVMAppC to a iris binary
+ncc -o build/iris/main.exe  -Os -DMODULE_CTP -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -fnesc-separator=__ -Wall -Wshadow -Wnesc-all -target=iris -fnesc-cfile=build/iris/app.c -board=mts300 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Ibuild/iris -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMTS300CB -DSBOARD=300 -DNO_BSTATION -DSHORT_QUEUES -DVM_MEM_BLKS=184 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea594L -DIDENT_UIDHASH=0xb3034326L -fnesc-dump=wiring -fnesc-dump='interfaces(!abstract())' -fnesc-dump='referenced(interfacedefs, components)' -fnesc-dumpfile=build/iris/wiring-check.xml TerraVMAppC.nc -lm 
+    compiled TerraVMAppC to build/iris/main.exe
+           57538 bytes in ROM
+            7364 bytes in RAM
+avr-objcopy --output-target=srec build/iris/main.exe build/iris/main.srec
+avr-objcopy --output-target=ihex build/iris/main.exe build/iris/main.ihex
+    writing TOS image
+***********************
+*** GRP ALL TOSSIM ****
+***********************
+**** Configuration ****
+VM          = GRP
+MODULES     = 'Not applicable' -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = micaz
+RFPOWER     = 4
+LPL         = NO
+SENSORBOARD = mda100
+TYPE        = ALL
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 24
+VM_MEM      = 576
+TOSVERSION  = 212
+***********************
+Make Cmds- micaz sim-sf
+mkdir -p simbuild/micaz
+  placing object files in simbuild/micaz
+  writing XML schema to app.xml
+  compiling TerraVMAppC to object file sim.o
+ncc -c -shared -fPIC -o simbuild/micaz/sim.o -g -O0 -DMODULE_CTP -DCC2420_DEF_RFPOWER=19 -DRFPOWER_IDX=4 -fno-strict-aliasing  -tossim -fnesc-nido-tosnodes=1000 -fnesc-simulate -fnesc-nido-motenumber=sim_node\(\) -I/opt/tinyos-2.1.2/tos/lib/tossim/sf -Wall -Wshadow -Wnesc-all -target=micaz -fnesc-cfile=simbuild/micaz/app.c -board=mda100 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Isimbuild/micaz -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DSHORT_QUEUES -DVM_MEM_BLKS=24 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea598L -DIDENT_UIDHASH=0x9ff3d0f5L -Wno-nesc-data-race TerraVMAppC.nc   -fnesc-dump=components -fnesc-dump=variables -fnesc-dump=constants -fnesc-dump=typedefs -fnesc-dump=interfacedefs -fnesc-dump=tags -fnesc-dumpfile=app.xml
+  compiling Python support and C libraries into pytossim.o, tossim.o, and c-support.o
+g++ -c  -shared -fPIC -o simbuild/micaz/pytossim.o -g -O0 -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DSHORT_QUEUES -DVM_MEM_BLKS=24 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea598L -DIDENT_UIDHASH=0x9ff3d0f5L  -I/opt/tinyos-2.1.2/tos/lib/tossim/sf /opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx -I/usr/include/python2.7 -I/opt/tinyos-2.1.2/tos/lib/tossim -DHAVE_CONFIG_H 
+g++ -c  -shared -fPIC -o simbuild/micaz/tossim.o -g -O0 -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DSHORT_QUEUES -DVM_MEM_BLKS=24 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea598L -DIDENT_UIDHASH=0x9ff3d0f5L  -I/opt/tinyos-2.1.2/tos/lib/tossim/sf /opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim.c -I/usr/include/python2.7 -I/opt/tinyos-2.1.2/tos/lib/tossim
+g++ -c  -shared -fPIC -o simbuild/micaz/c-support.o -g -O0 -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DSHORT_QUEUES -DVM_MEM_BLKS=24 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea598L -DIDENT_UIDHASH=0x9ff3d0f5L  -I/opt/tinyos-2.1.2/tos/lib/tossim/sf /opt/tinyos-2.1.2/tos/lib/tossim/hashtable.c -I/usr/include/python2.7 -I/opt/tinyos-2.1.2/tos/lib/tossim
+  compiling sf support and C libraries into sf.o, c-sf.o, and throttle.o
+g++ -c  -shared -fPIC -o simbuild/micaz/c-sf.o -g -O0 -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DSHORT_QUEUES -DVM_MEM_BLKS=24 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea598L -DIDENT_UIDHASH=0x9ff3d0f5L  -I/opt/tinyos-2.1.2/tos/lib/tossim/sf /opt/tinyos-2.1.2/tos/lib/tossim/sf/sim_serial_forwarder.c -I/usr/include/python2.7 -I/opt/tinyos-2.1.2/tos/lib/tossim
+g++ -c  -shared -fPIC -o simbuild/micaz/sf.o -g -O0 -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DSHORT_QUEUES -DVM_MEM_BLKS=24 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea598L -DIDENT_UIDHASH=0x9ff3d0f5L  -I/opt/tinyos-2.1.2/tos/lib/tossim/sf /opt/tinyos-2.1.2/tos/lib/tossim/sf/SerialForwarder.c  -I/usr/include/python2.7 -I/opt/tinyos-2.1.2/tos/lib/tossim
+g++ -c  -shared -fPIC -o simbuild/micaz/throttle.o -g -O0 -I/opt/tinyos-2.1.2/tos/lib/net/ -I/opt/tinyos-2.1.2/tos/lib/net/4bitle -I/opt/tinyos-2.1.2/tos/lib/net/ctp  -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DSHORT_QUEUES -DVM_MEM_BLKS=24 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraGrp -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"branco\" -DIDENT_HOSTNAME=\"Branco-VirtualB\" -DIDENT_USERHASH=0x0620a7d8L -DIDENT_TIMESTAMP=0x572ea598L -DIDENT_UIDHASH=0x9ff3d0f5L  -I/opt/tinyos-2.1.2/tos/lib/tossim/sf /opt/tinyos-2.1.2/tos/lib/tossim/sf/Throttle.cpp -I/usr/include/python2.7 -I/opt/tinyos-2.1.2/tos/lib/tossim
+  linking into shared object ./_TOSSIMmodule.so
+g++ -shared -fPIC  simbuild/micaz/pytossim.o simbuild/micaz/sim.o simbuild/micaz/tossim.o simbuild/micaz/c-support.o simbuild/micaz/c-sf.o simbuild/micaz/sf.o simbuild/micaz/throttle.o  -lstdc++  -lm -o _TOSSIMmodule.so
+  copying Python script interface TOSSIM.py from lib/tossim to local directory
+ 
+*** Successfully built micaz TOSSIM library with TOSSIM Live extensions. 
+
+
+====================================================================
+
+ Alocação de memória
+
+***********************
+*** NET BS Micaz ****
+***********************
+VM_MEM      = 1920
+           25230 bytes in ROM
+            3555 bytes in RAM
+***********************
+*** NET NOBS Micaz MDA100 ****
+***********************
+VM_MEM      = 1920
+           36600 bytes in ROM
+            3445 bytes in RAM
+***********************
+*** NET NOBS Micaz MTS300CA ****
+***********************
+VM_MEM      = 1920
+           41694 bytes in ROM
+            3525 bytes in RAM
+***********************
+*** NET NOBS Micaz MTS300CB ****
+***********************
+VM_MEM      = 1920
+           41694 bytes in ROM
+            3525 bytes in RAM
+***********************
+*** NET BS Mica2 ****
+***********************
+VM_MEM      = 1920
+           22034 bytes in ROM
+            3463 bytes in RAM
+***********************
+*** NET NOBS Mica2 MDA100 ****
+***********************
+VM_MEM      = 1920
+           33580 bytes in ROM
+            3357 bytes in RAM
+***********************
+*** NET NOBS Mica2 MTS300CA ****
+***********************
+VM_MEM      = 1920
+           38432 bytes in ROM
+            3437 bytes in RAM
+***********************
+*** NET NOBS Mica2 MTS300CB ****
+***********************
+VM_MEM      = 1920
+           38432 bytes in ROM
+            3437 bytes in RAM
+***********************
+*** NET BS Mica2Dot ****
+***********************
+VM_MEM      = 1920
+           20034 bytes in ROM
+            3407 bytes in RAM
+***********************
+*** NET NOBS Mica2Dot No_Sensor ****
+***********************
+VM_MEM      = 1920
+           31196 bytes in ROM
+            3299 bytes in RAM
+***********************
+*** NET BS TelosB ****
+***********************
+VM_MEM      = 1920
+           24818 bytes in ROM
+            3750 bytes in RAM
+***********************
+*** NET NOBS TelosB ****
+***********************
+VM_MEM      = 1920
+           35062 bytes in ROM
+            3584 bytes in RAM
+***********************
+*** NET BS TelosB Full ****
+***********************
+VM_MEM      = 4224
+           24818 bytes in ROM
+            6066 bytes in RAM
+***********************
+*** NET NOBS TelosB Full ****
+***********************
+VM_MEM      = 4224
+           35062 bytes in ROM
+            5900 bytes in RAM
+***********************
+*** NET BS Iris ****
+***********************
+VM_MEM      = 1920
+           24212 bytes in ROM
+            3660 bytes in RAM
+***********************
+*** NET NOBS Iris MDA100 ****
+***********************
+VM_MEM      = 1920
+           35322 bytes in ROM
+            3562 bytes in RAM
+***********************
+*** NET NOBS Iris MTS300CA ****
+***********************
+VM_MEM      = 1920
+           40058 bytes in ROM
+            3642 bytes in RAM
+***********************
+*** NET NOBS Iris MTS300CB ****
+***********************
+VM_MEM      = 1920
+           40058 bytes in ROM
+            3642 bytes in RAM
+***********************
+*** NET BS Iris ****
+***********************
+VM_MEM      = 4224
+           24214 bytes in ROM
+            5976 bytes in RAM
+***********************
+*** NET NOBS Iris HYB=NO MDA100 ****
+***********************
+VM_MEM      = 4224
+           35324 bytes in ROM
+            5878 bytes in RAM
+***********************
+*** NET NOBS Iris HYB=NO MTS300CA ****
+***********************
+VM_MEM      = 4224
+           40060 bytes in ROM
+            5958 bytes in RAM
+***********************
+*** NET NOBS Iris HYB=NO MTS300CB ****
+***********************
+VM_MEM      = 4224
+           40060 bytes in ROM
+            5958 bytes in RAM
+***********************
+*** NET ALL TOSSIM ****
+***********************
+VM_MEM      = 1728
+***********************
+*** GRP BS Micaz ****
+***********************
+VM_MEM      = 768
+           33228 bytes in ROM
+            3650 bytes in RAM
+***********************
+*** GRP NOBS Micaz MDA100 ****
+***********************
+VM_MEM      = 768
+           53164 bytes in ROM
+            3572 bytes in RAM
+***********************
+*** GRP NOBS Micaz MTS300CA ****
+***********************
+VM_MEM      = 768
+           57836 bytes in ROM
+            3652 bytes in RAM
+***********************
+*** GRP NOBS Micaz MTS300CB ****
+***********************
+VM_MEM      = 768
+           57836 bytes in ROM
+            3652 bytes in RAM
+***********************
+*** GRP BS Mica2 ****
+***********************
+VM_MEM      = 768
+           30012 bytes in ROM
+            3490 bytes in RAM
+***********************
+*** GRP NOBS Mica2 MDA100 ****
+***********************
+VM_MEM      = 768
+           49758 bytes in ROM
+            3412 bytes in RAM
+***********************
+*** GRP NOBS Mica2 MTS300CA ****
+***********************
+VM_MEM      = 768
+           55192 bytes in ROM
+            3492 bytes in RAM
+***********************
+*** GRP NOBS Mica2 MTS300CB ****
+***********************
+VM_MEM      = 768
+           55192 bytes in ROM
+            3492 bytes in RAM
+***********************
+*** GRP BS Mica2Dot ****
+***********************
+VM_MEM      = 768
+           28266 bytes in ROM
+            3438 bytes in RAM
+***********************
+*** GRP NOBS Mica2Dot No_Sensor ****
+***********************
+VM_MEM      = 768
+           47930 bytes in ROM
+            3354 bytes in RAM
+***********************
+*** GRP BS TelosB ****
+***********************
+VM_MEM      = 768
+           31024 bytes in ROM
+            3886 bytes in RAM
+***********************
+*** GRP NOBS TelosB ****
+***********************
+VM_MEM      = 768
+           47168 bytes in ROM
+            3768 bytes in RAM
+***********************
+*** GRP BS TelosB Full ****
+***********************
+VM_MEM      = 4416
+           31026 bytes in ROM
+            7552 bytes in RAM
+***********************
+*** GRP NOBS TelosB Full ****
+***********************
+VM_MEM      = 4416
+           47170 bytes in ROM
+            7436 bytes in RAM
+***********************
+*** GRP BS Iris ****
+***********************
+VM_MEM      = 768
+           32790 bytes in ROM
+            3687 bytes in RAM
+***********************
+*** GRP NOBS Iris MDA100 ****
+***********************
+VM_MEM      = 768
+           52478 bytes in ROM
+            3617 bytes in RAM
+***********************
+*** GRP NOBS Iris MTS300CA ****
+***********************
+VM_MEM      = 768
+           57540 bytes in ROM
+            3697 bytes in RAM
+***********************
+*** GRP NOBS Iris MTS300CB ****
+***********************
+VM_MEM      = 768
+           57540 bytes in ROM
+            3697 bytes in RAM
+***********************
+*** GRP BS Iris HYB=NO ****
+***********************
+VM_MEM      = 4416
+           32798 bytes in ROM
+            7354 bytes in RAM
+***********************
+*** GRP NOBS Iris HYB=NO MDA100 ****
+***********************
+VM_MEM      = 4416
+           52480 bytes in ROM
+            7284 bytes in RAM
+***********************
+*** GRP NOBS Iris HYB=NO MTS300CA ****
+***********************
+VM_MEM      = 4416
+           57538 bytes in ROM
+            7364 bytes in RAM
+***********************
+*** GRP NOBS Iris HYB=NO MTS300CB ****
+***********************
+VM_MEM      = 4416
+           57538 bytes in ROM
+            7364 bytes in RAM
+***********************
+*** GRP ALL TOSSIM ****
+***********************
+VM_MEM      = 576
+
+====================================================================

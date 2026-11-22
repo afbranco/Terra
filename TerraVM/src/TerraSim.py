@@ -1,25 +1,5 @@
 #!/usr/bin/python
 
-#-------------
-#  	Terra IoT System - A small Virtual Machine and Reactive Language for IoT applications.
-#  	Copyright (C) 2014-2017  Adriano Branco
-#	
-#	This file is part of Terra IoT.
-#	
-#	Terra IoT is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    Terra IoT is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with Terra IoT.  If not, see <http://www.gnu.org/licenses/>.  
-#-------------
-
 from __future__ import print_function
 import sys
 from TOSSIM import *
@@ -95,17 +75,16 @@ class Network:
         #self.tossim.addChannel("TreeRoutingCtl", outDBG)
 
         self.tossim.addChannel("AM", outCMD)
-        self.tossim.addChannel("AM", outDBG)
         ##self.tossim.addChannel("Acks", outDBG)
         self.tossim.addChannel("Packet", outCMD)
-        self.tossim.addChannel("Serial", outDBG)
+        ##self.tossim.addChannel("Serial", outDBG)
         ##self.tossim.addChannel("QueueC", outDBG)
         ##self.tossim.addChannel("HplAtm128Timer0AsyncP", outDBG)
         ##self.tossim.addChannel("Scheduler", outDBG)
         self.tossim.addChannel("LedsC", outCMD)
         
         #--------------------------------------
-        self.tossim.addChannel("terra", outDBG)
+        #self.tossim.addChannel("terra", outDBG)
         #self.tossim.addChannel("TVIEW", outDBG)
         self.tossim.addChannel("TVIEW", outCMD)
         self.tossim.addChannel("VMDBG", outVM)
@@ -362,7 +341,7 @@ if __name__ == '__main__':
             runTime=int(sys.argv[5])
             sys.stderr.write("{} {} {} {} {}\n".format(nLines,nColumnsA,nColumnsB,timeB,runTime))
             if ( nLines >= 1 and nLines <= 9 and \
-                 nColumnsA >= 0 and nColumnsA <=9 and \
+                 nColumnsA >= 1 and nColumnsA <=9 and \
                  nColumnsB >= 0 and nColumnsB <= 9 and \
                  (nColumnsA+nColumnsB) <= 9 and \
                  timeB >= 0 and timeB <= 3600 and \

@@ -1,4 +1,3 @@
-shopt -s expand_aliases
 # Terra alias support
 alias avrora='java -jar /home/terra/TerraNet/sim/avrora-beta-1.7.115.jar'
 alias TerraControl='java -jar /home/terra/TerraNet/tools/TerraVMControl.jar'

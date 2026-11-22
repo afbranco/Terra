@@ -1,25 +1,3 @@
---[[
-Copyright (C) 2012 Francisco Sant'Anna
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
---]]
-
 _CEU = true
 
 _OPTS = {
@@ -385,8 +363,12 @@ end
 pos=endCode
 idx=table.getn(_AST.root.opcode)+1
 
-asmText=''
-asmTextHeader=''
+
+-- ====  Environment parameters  ====
+-- codeAddr,LblTable11_addr,LblTable12_addr,LblTable21_addr,LblTable22_addr,LblTableEnd_addr,n_tracks,n_wavlocks,wclock0,gate0
+asmText = codeAddr..' '..endCode --LblTable11_addr..' '..LblTable12_addr..' '..LblTable21_addr..' '..LblTable22_addr..' '..LblTableEnd_addr
+asmText = asmText ..' '..ALL.n_tracks..' '.._ENV.n_wclocks..' '.. _ENV.n_asyncs ..' '.._MEM.gtes.wclock0
+asmText = asmText ..' '.._ENV.gate0..' '.._ENV.n_ins_active..' '.._MEM.gtes.async0..'\n'
 -- === Tracks ===
 xAddr=0
 for x=1,ALL.n_tracks+1,1 do
@@ -446,46 +428,32 @@ _AST.root.max_stack = 0;
 for x,op in pairs(_AST.root.opcode) do
   if x > endCode then break end
 	if (string.sub(op,1,1) ~= 'L' and string.sub(op,1,1) ~= '_') then 
---print("--",_AST.root.x_stack,(_AST.root.n_stack[x] or 0),_AST.root.max_stack); 
 		_AST.root.x_stack = _AST.root.x_stack + (_AST.root.n_stack[x] or 0);
 		_AST.root.max_stack = math.max(_AST.root.max_stack,_AST.root.x_stack);
---print("  ",_AST.root.x_stack,(_AST.root.n_stack[x] or 0),_AST.root.max_stack); 
+--    asmText = asmText ..trim(op)..' | '..string.format('%05d',_AST.root.op_addr[x])..' '..op..' '..(_AST.root.code2[x] or '')..'\n'
     asmText = asmText .. (_AST.root.opcode_aux[x] or '--') ..' | '..string.format('%05d',_AST.root.op_addr[x])..' '..op..' '..(_AST.root.code2[x] or '')..'\n'
 		nlines=nlines+1;
 		lastBytes=_AST.root.op_addr[x];
 	else
-		--_AST.root.x_stack = 0;
+		_AST.root.x_stack = 0;
 	end	
 end
 
-local BlockSize = 22
 local CodeSize = endCode-codeAddr
-local Stack    = _AST.root.max_stack*4 + 6
-local Tracks = (ALL.n_tracks+1)*4
-local CtlVars  = codeAddr - Tracks
+local CtlVars  = codeAddr
 --local LblTab   = LblTableEnd_addr-endCode
-local TotalMem = Tracks + CtlVars + CodeSize + Stack
-local RadioMsgs = ((codeAddr%BlockSize) == 0 and math.ceil((CodeSize)/BlockSize)) or 1+math.ceil((CodeSize-(BlockSize-codeAddr%BlockSize))/BlockSize)
+local Stack    = _AST.root.max_stack*4
+local TotalMem = CtlVars + CodeSize + Stack
+local RadioMsgs = ((codeAddr%24) == 0 and math.ceil((CodeSize)/24)) or 1+math.ceil((CodeSize-(24-codeAddr%24))/24)
 local lowMaxMem=999999
-
--- ====  Environment parameters  ====
--- codeAddr,LblTable11_addr,LblTable12_addr,LblTable21_addr,LblTable22_addr,LblTableEnd_addr,n_tracks,n_wavlocks,wclock0,gate0
-asmTextHeader = codeAddr..' '..endCode --LblTable11_addr..' '..LblTable12_addr..' '..LblTable21_addr..' '..LblTable22_addr..' '..LblTableEnd_addr
-asmTextHeader = asmTextHeader ..' '..ALL.n_tracks..' '.._ENV.n_wclocks..' '.. _ENV.n_asyncs ..' '.._MEM.gtes.wclock0
-asmTextHeader = asmTextHeader ..' '.._ENV.gate0..' '.._ENV.n_ins_active..' '.._MEM.gtes.async0
-asmTextHeader = asmTextHeader ..' '.. TotalMem ..'\n'
-
-asmText = asmTextHeader .. asmText
-
-
---print((codeAddr%BlockSize) == 0 , ((LblTableEnd_addr-codeAddr)/BlockSize) , 1,LblTableEnd_addr-codeAddr,(BlockSize-codeAddr%BlockSize))
+--print((codeAddr%24) == 0 , ((LblTableEnd_addr-codeAddr)/24) , 1,LblTableEnd_addr-codeAddr,(24-codeAddr%24))
 print('---------------------------------------------------------------------')
 print('-- Terra Compiler: '..string.format('%-20s',_ENV.vm_name)..'     VM Code: '.. string.format('%12s',_ENV.vm_version) .. '  --')
 print('---------------------------------------------------------------------')
 print('--   Memory allocation in bytes:  '.. ((_OPTS.opt and '(code optimized)    ') or '(code not optimized)') ..'             --')
-print('--   Total =  Tracks + Code + Ctl/Vars + Stack   |   Radio Msgs    --')
-print(string.format('--    %4d    %3d    %4d     %4d     %4d      |      %3d        --',
-                    TotalMem,Tracks,CodeSize,CtlVars,Stack,RadioMsgs))
+print('--   Total =  Code + Ctl/Vars + Stack           |    Radio Msgs    --')
+print(string.format('--    %4d    %4d     %4d     %4d            |      %4d        --',
+                    TotalMem,CodeSize,CtlVars,Stack,RadioMsgs))
 print('---------------------------------------------------------------------')
 print('--   Target platforms x Max program size                           --')
 for k,v in pairs(_ENV.motes_max_size) do
