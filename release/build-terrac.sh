@@ -29,7 +29,10 @@ cp "$ROOT/terrac/terra.lang" "$ROOT/terrac/samples/TerraNet.defs" "$ROOT/terrac/
 fail=0
 mkdir -p "$W/t"
 cp "$ROOT"/terrac/samples/* "$W/t/"
-for vmx in "$ROOT"/terrac/samples/*.vmx; do
+# Os programas dos testes da VM (tests/*/) também: o .vmx commitado tem de ser o que o terrac gera.
+for f in "$ROOT"/tests/*/*.terra "$ROOT"/tests/*/*.vmx; do [ -e "$f" ] && cp "$f" "$W/t/"; done
+for vmx in "$ROOT"/terrac/samples/*.vmx "$ROOT"/tests/*/*.vmx; do
+    [ -e "$vmx" ] || continue
     name=$(basename "$vmx" .vmx)
     echo "== terrac $name.terra" >> "$LOG"
     (cd "$W/t" && rm -f "$name.vmx" && lua5.1 "$D/terrac" "$name.terra") >> "$LOG" 2>&1 || true
