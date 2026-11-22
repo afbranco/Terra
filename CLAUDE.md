@@ -106,14 +106,21 @@ partição extraída da `.ova` está no scratchpad da sessão tinyos-toolchain (
 
 ## Ambiente original (montado em 2026-11-22) e reprodução dos `.so` de produção
 
-- Rootfs da `.ova` extraído com `debugfs rdump` em `handoff/ova/rootfs` (2,9 GB, sem
-  `/usr/share/doc`, man, firmware e `/var/cache`), ao lado de `root.img` e do `.vmdk`, que o
-  Prof. quer manter. Roda direto com `podman run ... --rootfs <dir>` (sem `podman import`: falta
-  disco para a cópia dupla). Usar `setarch i686`. Script: `handoff/repro/ovabuild.sh`.
+- Em `handoff/ova/` ficam só o `.vmdk` e o `.ovf` originais (o Prof. quer mantê-los). O
+  rootfs extraído e o `root.img` foram apagados em 2026-11-22 a pedido do Prof., para liberar
+  disco (8,3 GB).
+- Para remontar: `qemu-img convert` do `.vmdk` para raw, `debugfs rdump` da partição para
+  `handoff/ova/rootfs` (sem `/usr/share/doc`, man, firmware e `/var/cache`: cerca de 2,9 GB)
+  e rodar com `podman run ... --rootfs <dir>` (o `--rootfs` depois das outras opções; sem
+  `podman import`, que faz cópia dupla) e `setarch i686`. Script: `handoff/repro/ovabuild.sh`.
 - **Os dois `.so` de produção foram reproduzidos**: código, dados e tabela de linhas idênticos
   byte a byte. A receita está em `handoff/repro/README.md`: `f02b8e6` com o `BasicServices.h`
   de `f32dd25`, `RFPOWER=4`, Net com `MOD=MSGQ`. Os `.so` reproduzidos estão em
   `handoff/repro/{Net,Grp}/`.
+- Oráculo da sessão TerraSim com o Net reproduzido (2026-11-22): traços determinísticos
+  idênticos (md5) aos do vendorizado, com sementes 1 a 5, inclusive com um programa Terra
+  (`routing_tree.terra`) rodando em 4x4; o avaliador de integração ficou dentro do ruído. O Grp
+  não foi testado no TerraSim (só a reprodução binária).
 
 ## Pendências para decidir com o Prof.
 
