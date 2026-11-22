@@ -61,8 +61,8 @@ Arduino Uno"), com a estrutura de pastas da época (`TerraVM/src/CustomVMs/{Terr
   estão nas linhas citadas (23 e 26) só até o `f02b8e6` (no `74b669c` viram outros eventos).
 - O `.so` é de 2016-05-07, o commit de 05-26: compilado com alterações locais, commitadas depois.
 - **Limite**: mudança dentro de uma linha (ex.: uma constante) não aparece nesse método. Prova
-  definitiva: recompilar `f02b8e6` com o toolchain da época e comparar com o `.so` função por
-  função (ver "Ambiente original").
+  definitiva feita em 2026-11-22 (ver "Ambiente original"): achou `RFPOWER=4` e o
+  `BasicServices.h` anterior.
 - Mapa de pastas (o `master` usa o layout antigo; o galho de integração, o novo):
   `CustomVMs/TerraNet` = `platforms/TinyOS/Net`; `CustomVMs/TerraGrp` =
   `platforms/TinyOS/Grp`; `XComps` = `platforms/TinyOS/common`; `dataQueue*`, `vmBitVector*` =
@@ -104,18 +104,22 @@ partição extraída da `.ova` está no scratchpad da sessão tinyos-toolchain (
   um problema de 64 bits na VM do Terra, sem registro encontrado (nem na sessão TerraSim).
   O núcleo público da VM não mostrou os padrões de risco. O oráculo de equivalência é o teste.
 
-## Ambiente original (não montado: o Prof. pediu para esperar)
+## Ambiente original (montado em 2026-11-22) e reprodução dos `.so` de produção
 
-Proposta: transformar a partição da `.ova` numa imagem de contêiner (Ubuntu 12.04 i386 com o
-toolchain da época), para recompilar `f02b8e6` e comparar com o `.so` de produção, e depois
-servir de lado "antigo" do oráculo de equivalência.
+- Rootfs da `.ova` extraído com `debugfs rdump` em `handoff/ova/rootfs` (2,9 GB, sem
+  `/usr/share/doc`, man, firmware e `/var/cache`), ao lado de `root.img` e do `.vmdk`, que o
+  Prof. quer manter. Roda direto com `podman run ... --rootfs <dir>` (sem `podman import`: falta
+  disco para a cópia dupla). Usar `setarch i686`. Script: `handoff/repro/ovabuild.sh`.
+- **Os dois `.so` de produção foram reproduzidos**: código, dados e tabela de linhas idênticos
+  byte a byte. A receita está em `handoff/repro/README.md`: `f02b8e6` com o `BasicServices.h`
+  de `f32dd25`, `RFPOWER=4`, Net com `MOD=MSGQ`. Os `.so` reproduzidos estão em
+  `handoff/repro/{Net,Grp}/`.
 
 ## Pendências para decidir com o Prof.
 
 - Se o `handoff/` (scripts e tabelas da análise de versão) entra no repositório. Hoje está
   fora do git (`.git/info/exclude`).
-- Push do `master` reorganizado, do galho `integracao-heterogenea` e a remoção da `maintained`
-  no GitHub (preparados localmente em 2026-11-22, aguardando o Prof.).
+- Oráculo A: `.so` do toolchain novo (x86_64, Python 3) contra o de produção, no TerraSim.
 - Quais correções de bugs achados na integração valem para a produção.
 
 ## Como trabalhar (mesmas regras do tinyos-toolchain)
