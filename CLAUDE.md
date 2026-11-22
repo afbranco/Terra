@@ -15,8 +15,16 @@ de lá.
   entra por partes e com teste, nunca por merge. A branch `maintained` deixou de ser usada.
 - Tags de referência: **`production-2016-05`** (`f02b8e6`, a versão base de produção) e
   **`snapshot-2018-03`** (`9b4bebe`, o último `master` publicado).
-- Depois: um GitHub Actions que compile a VM com a imagem do tinyos-toolchain e publique os
-  `.so` como releases (o elo que o TerraSim vai consumir). Repositório público: Actions grátis.
+- **Releases** (decidido pelo Prof. em 2026-11-22):
+  - `v0.3.0`: referência histórica, publicada à mão. Os `_TOSSIMmodule.so` de produção (py2,
+    i386, os da `.ova` e do TerraSim), os hashes e a receita de reprodução.
+  - `v1.0.0`: a primeira do toolchain novo, gerada por GitHub Actions com a tag **fixa** da
+    imagem (`2.1.2-resolute-py3-<commit>`, nunca a móvel). Traz tudo, para ficar independente
+    da `.ova`: `_TOSSIM.so` Net/Grp (py3, x86_64), firmware micaz (NOBS e BS), `terrac` e
+    `TerraVMControl.jar`. Sai só depois do oráculo A (traços idênticos aos de produção no
+    TerraSim) e do teste do Prof. com micaz real na MIB520.
+  - Alinhada com uma release marcada do tinyos-toolchain (proposta "2.1.2-r1", enviada à sessão
+    tinyos). Cada release do Terra registra a imagem, o digest e a release do toolchain.
 
 ## Quem e o quê
 
@@ -115,7 +123,8 @@ partição extraída da `.ova` está no scratchpad da sessão tinyos-toolchain (
   `podman import`, que faz cópia dupla) e `setarch i686`. Script: `handoff/repro/ovabuild.sh`.
 - **Os dois `.so` de produção foram reproduzidos**: código, dados e tabela de linhas idênticos
   byte a byte. A receita está em `handoff/repro/README.md`: `f02b8e6` com o `BasicServices.h`
-  de `f32dd25`, `RFPOWER=4`, Net com `MOD=MSGQ`. Os `.so` reproduzidos estão em
+  de `f32dd25`, `RFPOWER=4`, Net com `MOD=MSGQ`. Desde `380d863` o `master` é essa receita
+  (`RFPOWER` padrão 4 e o `BasicServices.h` sem as linhas do Uno). Os `.so` reproduzidos estão em
   `handoff/repro/{Net,Grp}/`.
 - Oráculo da sessão TerraSim com o Net reproduzido (2026-11-22): traços determinísticos
   idênticos (md5) aos do vendorizado, com sementes 1 a 5, inclusive com um programa Terra
