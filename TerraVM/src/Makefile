@@ -25,7 +25,7 @@
 # SetData functionality: YES or NO | default NO
 #    SETDATA=NO
 #
-# RF Power: 0 1 2 3 4 5 6 7 | default 3
+# RF Power: 0 1 2 3 4 5 6 7 | default 4
 #    RFPOWER=1
 #
 # XBee USB Connection: 0 or 1 | default 1
@@ -105,7 +105,7 @@ endif
 
 
 # Default radio power
-RFPOWER ?= 1
+RFPOWER ?= 4
 ifeq ($(findstring $(RFPOWER), 0 1 2 3 4 5 6 7 ),)
     $(error 'RFPOWER must have 1 digit value: 0 1 2 3 4 5 6 7')
 endif
