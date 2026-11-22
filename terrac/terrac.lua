@@ -129,11 +129,33 @@ local inp
 --_STR = inp:read'*a'
 _STR=""
 
--- Remove '#' lines generated from cpp
+-- Remove '#' lines generated from cpp.
+-- Os marcadores de linha do cpp (`# N "arquivo" flags`) dizem de onde veio cada linha:
+-- _SRCLINE[k] é a linha, no programa do usuário, da k-ésima linha que fica em _STR. Uma linha
+-- de um #include vale a linha do #include. Sem isso, o que o cpp acrescenta sozinho (por
+-- exemplo, o stdc-predef.h com os comentários, no gcc 4.8 e depois) desloca as linhas (#23).
+_SRCLINE = {}
+local srcFile, srcLine, mainLine = nil, 1, nil
 for line in io.lines(cpp_file) do
 --  print(string.sub(line,1,1))
   if string.sub(line,1,1) ~= '#' then
     _STR = _STR..line..'\n'
+    if srcFile == _OPTS.input then
+      mainLine = srcLine
+    end
+    _SRCLINE[#_SRCLINE+1] = mainLine or 1
+    srcLine = srcLine + 1
+  else
+    local n, f, flags = string.match(line, '^# (%d+) "(.-)"(.*)$')
+    if n then
+      if srcFile == _OPTS.input and string.match(flags, '^ 1') then
+        mainLine = srcLine      -- entra num #include: vale a linha da diretiva
+      end
+      srcFile, srcLine = f, tonumber(n)
+      if f == _OPTS.input then
+        mainLine = srcLine
+      end
+    end
   end
 end
 os.remove(cpp_file)

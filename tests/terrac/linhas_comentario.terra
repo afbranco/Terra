@@ -1,0 +1,12 @@
+#include "TerraNet.defs"
+// Erro proposital (teste do terrac, ver release/build-terrac.sh).
+/* Um comentário
+   de várias
+   linhas. */
+
+var ubyte x = 1;
+
+loop do
+    await 1s;
+    x = x +;
+end
