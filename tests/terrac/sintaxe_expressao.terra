@@ -1,0 +1,8 @@
+#include "TerraNet.defs"
+// Erro de sintaxe proposital (teste do terrac, ver release/build-terrac.sh).
+var ubyte x = 1;
+if x == 1 then
+    x = 2;
+else
+    x = ;
+end

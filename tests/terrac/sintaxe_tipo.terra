@@ -1,0 +1,3 @@
+#include "TerraNet.defs"
+// Erro de sintaxe proposital (teste do terrac, ver release/build-terrac.sh).
+var x = 1;

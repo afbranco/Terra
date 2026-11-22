@@ -36,6 +36,9 @@ local CK = function (patt, key)
     ERR_msg = '?'
     return C(m.Cmt(patt*key, f))*S
 end
+-- EK, EV e EM registram a mensagem de erro num Cmt que sempre falha. O `* P(1)` no fim nunca
+-- chega a ser testado, mas faz o padrão não aceitar a string vazia: o lpeg 1.x recusa laços
+-- (^0) cujo corpo pode casar vazio. Com `* P(false)` o lpeg descartava o Cmt (e a mensagem).
 local EK = function (tk, key)
     key = key and -m.R('09','__','az','AZ','\127\255')
             or P(true)
@@ -46,7 +49,7 @@ local EK = function (tk, key)
                 ERR_msg = 'expected `'..tk.."´"
             end
             return false
-        end) * P(false)
+        end) * P(1)
 end
 
 local KEY = function (str)
@@ -94,7 +97,7 @@ local EV = function (rule)
                 ERR_msg = 'expected ' .. _V2NAME[rule]
             end
             return false
-        end)
+        end) * P(1)
 end
 
 local EM = function (msg)
@@ -105,7 +108,7 @@ local EM = function (msg)
                 ERR_msg = 'expected ' .. msg
                 return false
             end
-        end)
+        end) * P(1)
 end
 
 TYPES = -- P'void' +
