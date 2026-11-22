@@ -1,0 +1,11 @@
+# Primeira linha de saída de cada tests/terrac/*.terra (sem o "ERR : "): linha e mensagem.
+linhas_comentario: line 11 : before `+´ : expected `;´
+semantica_naodeclarada: line 4 : variable/event/function "y" is not declared
+sintaxe_await: line 4 : after `await´ : expected event
+sintaxe_comando: line 4 : before `awiat´ : expected statement (not last statement as `return´ or `break´)
+sintaxe_end: line 5 : after `;´ : expected statement (not last statement as `return´ or `break´)
+sintaxe_expressao: line 7 : after `=´ : expected expression
+sintaxe_parentese: line 5 : after `LED0´ : expected `;´
+sintaxe_pontoevirgula: line 3 : after `1´ : expected `;´
+sintaxe_then: line 4 : after `1´ : expected `then´
+sintaxe_tipo: line 3 : after `x´ : expected a not reserved identifier beginning with lower-case

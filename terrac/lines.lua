@@ -59,11 +59,13 @@ local close = m.Cmt('/*}-}*/',
     end )
 
 local LINE = 1
+local K = 1         -- a linha de _STR; _SRCLINE[K] é a linha no programa (terrac.lua)
 local line = m.Cmt('\n',
     function (s,i)
         for i=#_I2L, i do
-            _I2L[i] = LINE
+            _I2L[i] = (_SRCLINE and _SRCLINE[K]) or LINE
         end
+        K = K + 1
         if CNT > 0 then
             LINE = LINE + 1
         end

@@ -42,20 +42,20 @@ for vmx in "$ROOT"/terrac/samples/*.vmx "$ROOT"/tests/*/*.vmx; do
     fi
 done
 
-# Teste: cada tests/terrac/sintaxe_*.terra dá a mensagem de erro esperada (sem o número da
-# linha, ver a issue #23). Com o lpeg 0.10 e com o 1.x a mensagem tem de ser a mesma.
+# Teste: cada programa de tests/terrac/erros.esperado dá o erro esperado, com a linha certa
+# (#23: com ou sem o stdc-predef.h do cpp). Com o lpeg 0.10 e com o 1.x tem de ser o mesmo.
 while IFS= read -r esperado; do
     case "$esperado" in ''|'#'*) continue;; esac
     name=${esperado%%: *}
     obtido="$name: $(cd "$W/t" && lua5.1 "$D/terrac" "$name.terra" 2>&1 | head -1 |
-        sed -E 's/^ERR : line [0-9]+ : //; s/[[:space:]]+$//' || true)"
+        sed -E 's/^ERR : //; s/[[:space:]]+$//' || true)"
     if [ "$obtido" = "$esperado" ]; then
         echo "terrac: $name: mensagem esperada" | tee -a "$LOG"
     else
         echo "terrac: $name: mensagem DIFERENTE: $obtido" | tee -a "$LOG"
         fail=1
     fi
-done < "$ROOT/tests/terrac/sintaxe.esperado"
+done < "$ROOT/tests/terrac/erros.esperado"
 
 tar -C "$W" -czf "$OUT/terrac-$VER.tar.gz" "terrac-$VER"
 rm -rf "$W"
