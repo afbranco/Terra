@@ -460,9 +460,9 @@ a0 | 00456 a0 pop ubyte 89                  | pop stat
 39 | 00458 39 exec 62                       | goto  62
 01 | 00459 .00 addr:425
 a9 | 00460 .37 
-48 | 00461 48 memclr 68 2                   | clear EXT gates for RECEIVE()
+48 | 00461 48 memclr 68 3                   | clear EXT gates for RECEIVE()
 44 | 00462 44 
-02 | 00463 02 
+03 | 00463 03 
 01 | 00464 01 end                           | end
 91 | 00465 91 push_v ushort 87              | push baseNode:ushort
 57 | 00466 57 
@@ -534,9 +534,9 @@ a0 | 00530 a0 pop ubyte 89                  | pop stat
 39 | 00532 39 exec 81                       | goto  81
 01 | 00533 .00 addr:482
 e2 | 00534 .46 
-48 | 00535 48 memclr 68 2                   | clear EXT gates for RECEIVE()
-44 | 00536 44 
-02 | 00537 02 
+48 | 00535 48 memclr 71 3                   | clear EXT gates for RECEIVE()
+47 | 00536 47 
+03 | 00537 03 
 01 | 00538 01 end                           | end
 40 | 00539 40 push_c 3                      | push 3
 03 | 00540 03 
@@ -580,9 +580,9 @@ a0 | 00576 a0 pop ubyte 89                  | pop stat
 39 | 00578 39 exec 90                       | goto  90
 02 | 00579 .00 addr:539
 1b | 00580 .52 
-48 | 00581 48 memclr 68 2                   | clear EXT gates for RECEIVE()
-44 | 00582 44 
-02 | 00583 02 
+48 | 00581 48 memclr 74 3                   | clear EXT gates for RECEIVE()
+4a | 00582 4a 
+03 | 00583 03 
 01 | 00584 01 end                           | end
 40 | 00585 40 push_c 3                      | push 3
 03 | 00586 03 
@@ -634,9 +634,9 @@ d0 | 00628 d0
 48 | 00632 48 memclr 32 8                   | clear WClocks gates from 4 to 5
 20 | 00633 20 
 08 | 00634 08 
-48 | 00635 48 memclr 68 2                   | clear EXT gates for RECEIVE()
-44 | 00636 44 
-02 | 00637 02 
+48 | 00635 48 memclr 77 3                   | clear EXT gates for RECEIVE()
+4d | 00636 4d 
+03 | 00637 03 
 01 | 00638 01 end                           | end
 91 | 00639 91 push_v ushort 87              | push baseNode:ushort
 57 | 00640 57 
@@ -826,9 +826,9 @@ ed | 00822 .81
 48 | 00824 48 memclr 40 8                   | clear WClocks gates from 5 to 6
 28 | 00825 28 
 08 | 00826 08 
-48 | 00827 48 memclr 63 2                   | clear EXT gates for SEND_DONE_ACK()
+48 | 00827 48 memclr 63 3                   | clear EXT gates for SEND_DONE_ACK()
 3f | 00828 3f 
-02 | 00829 02 
+03 | 00829 03 
 39 | 00830 39 exec 150                      | goto  150
 02 | 00831 .00 addr:707
 c3 | 00832 .78 
@@ -843,24 +843,24 @@ c3 | 00840 .78
 48 | 00841 48 memclr 40 8                   | clear WClocks gates from 5 to 6
 28 | 00842 28 
 08 | 00843 08 
-48 | 00844 48 memclr 58 2                   | clear EXT gates for SEND_DONE()
+48 | 00844 48 memclr 58 3                   | clear EXT gates for SEND_DONE()
 3a | 00845 3a 
-02 | 00846 02 
-48 | 00847 48 memclr 63 2                   | clear EXT gates for SEND_DONE_ACK()
+03 | 00846 03 
+48 | 00847 48 memclr 63 3                   | clear EXT gates for SEND_DONE_ACK()
 3f | 00848 3f 
-02 | 00849 02 
+03 | 00849 03 
 39 | 00850 39 exec 116                      | goto  116
 02 | 00851 .00 addr:702
 be | 00852 .74 
 48 | 00853 48 memclr 40 8                   | clear WClocks gates from 5 to 6
 28 | 00854 28 
 08 | 00855 08 
-48 | 00856 48 memclr 58 2                   | clear EXT gates for SEND_DONE()
+48 | 00856 48 memclr 58 3                   | clear EXT gates for SEND_DONE()
 3a | 00857 3a 
-02 | 00858 02 
-48 | 00859 48 memclr 63 2                   | clear EXT gates for SEND_DONE_ACK()
+03 | 00858 03 
+48 | 00859 48 memclr 63 3                   | clear EXT gates for SEND_DONE_ACK()
 3f | 00860 3f 
-02 | 00861 02 
+03 | 00861 03 
 48 | 00862 48 memclr 82 2                   | clear EXT gates for Q_READY
 52 | 00863 52 
 02 | 00864 02 

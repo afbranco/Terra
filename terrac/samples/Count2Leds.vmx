@@ -274,9 +274,9 @@ c4 | 00271 .17
 48 | 00272 48 memclr 8 16                   | clear WClocks gates from 1 to 3
 08 | 00273 08 
 10 | 00274 10 
-48 | 00275 48 memclr 26 2                   | clear EXT gates for SEND_DONE()
+48 | 00275 48 memclr 26 3                   | clear EXT gates for SEND_DONE()
 1a | 00276 1a 
-02 | 00277 02 
+03 | 00277 03 
 01 | 00278 01 end                           | end
 d1 | 00279 d1 set_c ushort 34 43            | await RECEIVE[0]
 22 | 00280 22 
@@ -322,9 +322,9 @@ d1 | 00318 d1 set_c ushort 30 51            | await SEND_DONE()[1]
 01 | 00320 .00 addr:279
 17 | 00321 .28 
 01 | 00322 01 end                           | end
-48 | 00323 48 memclr 26 2                   | clear EXT gates for SEND_DONE()
-1a | 00324 1a 
-02 | 00325 02 
+48 | 00323 48 memclr 29 3                   | clear EXT gates for SEND_DONE()
+1d | 00324 1d 
+03 | 00325 03 
 48 | 00326 48 memclr 34 2                   | clear EXT gates for RECEIVE
 22 | 00327 22 
 02 | 00328 02 
