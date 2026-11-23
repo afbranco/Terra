@@ -1,0 +1,26 @@
+#include "TerraNet.defs"
+
+// Issue #17: o resultado de uma comparação de float guardado numa variável inteira.
+// Cada valor aparece nos LEDs do nó, um por segundo (o esperado entre parênteses).
+var float f = 2.5;
+var float g = 1.0;
+var ubyte a = (f >  g);     // (1)
+var ubyte b = (f >= g);     // (1)
+var ubyte c = (f != g);     // (1)
+var ubyte d = (g <  f);     // (1)
+var ubyte e = (g <= f);     // (1)
+var ubyte h = (f == f);     // (1)
+var ubyte k = (g >  f);     // (0)
+var ushort y = (f > g);     // (1)
+var ulong  z = (f > g);     // (1)
+await 1s; emit LEDS(a);
+await 1s; emit LEDS(b);
+await 1s; emit LEDS(c);
+await 1s; emit LEDS(d);
+await 1s; emit LEDS(e);
+await 1s; emit LEDS(h);
+await 1s; emit LEDS(k + 2);                         // (2)
+await 1s; emit LEDS(y);
+await 1s; if z == 1 then emit LEDS(4); else emit LEDS(5); end            // (4)
+await 1s; if (f > g) == 1 then emit LEDS(6); else emit LEDS(7); end      // (6)
+await 1s; if f > g then emit LEDS(3); else emit LEDS(0); end             // (3)

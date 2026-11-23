@@ -1005,7 +1005,7 @@ void f_eq_f(uint8_t Modifier){
 	v2 = popf();
 	dbg(APPNAME,"VM::f_eq_f(%02x): (v1=%f == v2=%f) = %s\n",Modifier,v1,v2,_TFstr(v1 == v2));
 	dbg("VMDBG","VM:: equality test: (%f == %f) = %s \n",v1,v2,_TFstr(v1 == v2));
-	pushf(v1==v2);
+	push(v1==v2);   // resultado inteiro 0/1, não o float 1.0f (#17)
 }
 
 void f_neq_f(uint8_t Modifier){
@@ -1014,7 +1014,7 @@ void f_neq_f(uint8_t Modifier){
 	v2 = popf();
 	dbg(APPNAME,"VM::f_neq_f(%02x): (v1=%f != v2=%f) = %s\n",Modifier,v1,v2,_TFstr(v1 != v2));
 	dbg("VMDBG","VM:: inequality test: (%f != %f) = %s \n",v1,v2,_TFstr(v1 != v2));
-	pushf(v1!=v2);
+	push(v1!=v2);   // resultado inteiro 0/1, não o float 1.0f (#17)
 }
 void f_gte_f(uint8_t Modifier){
 	float v1,v2;
@@ -1022,7 +1022,7 @@ void f_gte_f(uint8_t Modifier){
 	v2 = popf();
 	dbg(APPNAME,"VM::f_gte_f(%02x): (v1=%f >= v2=%f) = %s\n",Modifier,v1,v2,_TFstr(v1>=v2));
 	dbg("VMDBG","VM::  greater-than-equal test: (%f >= %f) = %s \n",v1,v2,_TFstr(v1 >= v2));
-	pushf(v1>=v2);
+	push(v1>=v2);   // resultado inteiro 0/1, não o float 1.0f (#17)
 }
 void f_lte_f(uint8_t Modifier){
 	float v1,v2;
@@ -1030,7 +1030,7 @@ void f_lte_f(uint8_t Modifier){
 	v2 = popf();
 	dbg(APPNAME,"VM::f_lte_f(%02x): (v1=%f <= v2=%f) = %s\n",Modifier,v1,v2,_TFstr(v1<=v2));
 	dbg("VMDBG","VM:: less-than-equal test: (%f <= %f) = %s \n",v1,v2,_TFstr(v1 <= v2));
-	pushf(v1<=v2);
+	push(v1<=v2);   // resultado inteiro 0/1, não o float 1.0f (#17)
 }
 void f_gt_f(uint8_t Modifier){
 	float v1,v2;
@@ -1038,7 +1038,7 @@ void f_gt_f(uint8_t Modifier){
 	v2 = popf();
 	dbg(APPNAME,"VM::f_gt_f(%02x): (v1=%f > v2=%f) = %s\n",Modifier,v1,v2,_TFstr(v1 > v2));
 	dbg("VMDBG","VM::  greater-than test: (%f > %f) = %s \n",v1,v2,_TFstr(v1 > v2));
-	pushf(v1>v2);
+	push(v1>v2);   // resultado inteiro 0/1, não o float 1.0f (#17)
 }
 void f_lt_f(uint8_t Modifier){
 	float v1,v2;
@@ -1046,7 +1046,7 @@ void f_lt_f(uint8_t Modifier){
 	v2 = popf();
 	dbg(APPNAME,"VM::f_lt_f(%02x): (v1=%f < v2=%f) = %s\n",Modifier,v1,v2,_TFstr(v1 < v2));
 	dbg("VMDBG","VM:: less-than test: (%f < %f) = %s \n",v1,v2,_TFstr(v1 < v2));
-	pushf(v1<v2);
+	push(v1<v2);   // resultado inteiro 0/1, não o float 1.0f (#17)
 }
 
 void f_func(uint8_t Modifier){ 
