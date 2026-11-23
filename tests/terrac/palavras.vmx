@@ -1,0 +1,97 @@
+21 96 1 0 0 0 0 0 0
+00 | 00000 0 track 0
+00 | 00001 0
+00 | 00002 0
+00 | 00003 0
+00 | 00004 0 track 1
+00 | 00005 0
+00 | 00006 0
+00 | 00007 0
+00 | 00008 0000 $ret:1, 
+00 | 00009 0001 a:1, 
+00 | 00010 0002 x:1, 
+00 | 00011 0003 b:1, 
+00 | 00012 0004 nota:1, 
+00 | 00013 0005 orx:1, 
+00 | 00014 0006 andy:1, 
+00 | 00015 0007 voidx:1, 
+00 | 00016 0008 r1:1, 
+00 | 00017 0009 r2:1, 
+00 | 00018 0010 r3:1, 
+00 | 00019 0011 r4:1, 
+00 | 00020 0012 r5:1, 
+c0 | 00021 c0 set_c ubyte 1 5               | a = 5
+01 | 00022 01 
+05 | 00023 05 
+c0 | 00024 c0 set_c ubyte 2 2               | x = 2
+02 | 00025 02 
+02 | 00026 02 
+c0 | 00027 c0 set_c ubyte 3 0               | b = 0
+03 | 00028 03 
+00 | 00029 00 
+c0 | 00030 c0 set_c ubyte 4 7               | nota = 7
+04 | 00031 04 
+07 | 00032 07 
+c0 | 00033 c0 set_c ubyte 5 3               | orx = 3
+05 | 00034 05 
+03 | 00035 03 
+c0 | 00036 c0 set_c ubyte 6 4               | andy = 4
+06 | 00037 06 
+04 | 00038 04 
+c0 | 00039 c0 set_c ubyte 7 6               | voidx = 6
+07 | 00040 07 
+06 | 00041 06 
+2a | 00042 2a set_v ubyte 8 ubyte 4         | r1 = nota
+00 | 00043 00 
+08 | 00044 08 
+04 | 00045 04 
+90 | 00046 90 push_v ubyte 5                | push orx:ubyte
+05 | 00047 05 
+90 | 00048 90 push_v ubyte 3                | push b:ubyte
+03 | 00049 03 
+06 | 00050 06 add                           | add
+a0 | 00051 a0 pop ubyte 9                   | pop r2
+09 | 00052 09 
+2a | 00053 2a set_v ubyte 10 ubyte 6        | r3 = andy
+00 | 00054 00 
+0a | 00055 0a 
+06 | 00056 06 
+90 | 00057 90 push_v ubyte 4                | push nota:ubyte
+04 | 00058 04 
+03 | 00059 03 lnot                          | lnot
+a0 | 00060 a0 pop ubyte 11                  | pop r4
+0b | 00061 0b 
+90 | 00062 90 push_v ubyte 5                | push orx:ubyte
+05 | 00063 05 
+90 | 00064 90 push_v ubyte 4                | push nota:ubyte
+04 | 00065 04 
+90 | 00066 90 push_v ubyte 1                | push a:ubyte
+01 | 00067 01 
+16 | 00068 16 land                          | land
+15 | 00069 15 lor                           | lor
+a0 | 00070 a0 pop ubyte 12                  | pop r5
+0c | 00071 0c 
+90 | 00072 90 push_v ubyte 2                | push x:ubyte
+02 | 00073 02 
+90 | 00074 90 push_v ubyte 7                | push voidx:ubyte
+07 | 00075 07 
+90 | 00076 90 push_v ubyte 12               | push r5:ubyte
+0c | 00077 0c 
+90 | 00078 90 push_v ubyte 11               | push r4:ubyte
+0b | 00079 0b 
+90 | 00080 90 push_v ubyte 10               | push r3:ubyte
+0a | 00081 0a 
+90 | 00082 90 push_v ubyte 9                | push r2:ubyte
+09 | 00083 09 
+90 | 00084 90 push_v ubyte 8                | push r1:ubyte
+08 | 00085 08 
+06 | 00086 06 add                           | add
+06 | 00087 06 add                           | add
+06 | 00088 06 add                           | add
+06 | 00089 06 add                           | add
+06 | 00090 06 add                           | add
+06 | 00091 06 add                           | add
+25 | 00092 25 outevt_e 5                    | emit LEDS
+05 | 00093 05 
+01 | 00094 01 end                           | end
+01 | 00095 01 end                           | end

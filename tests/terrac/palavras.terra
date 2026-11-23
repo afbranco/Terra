@@ -1,0 +1,16 @@
+#include "TerraNet.defs"
+// Identificadores que começam com uma palavra-chave (#32): têm de ser lidos como nomes.
+// Antes, `nota` virava `not a`, `b orx` virava `b or x` e `voidx` era recusado.
+var ubyte a = 5;
+var ubyte x = 2;
+var ubyte b = 0;
+var ubyte nota = 7;
+var ubyte orx = 3;
+var ubyte andy = 4;
+var ubyte voidx = 6;
+var ubyte r1 = nota;
+var ubyte r2 = b + orx;
+var ubyte r3 = andy;
+var ubyte r4 = not nota;
+var ubyte r5 = (a and nota) or orx;
+emit LEDS(r1 + r2 + r3 + r4 + r5 + voidx + x);
