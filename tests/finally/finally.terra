@@ -1,0 +1,49 @@
+#include "TerraNet.defs"
+
+// Issue #36: break, return e fim de par/or disparavam os finally de todos os blocos do programa,
+// e não só dos que eles abortam. Nos LEDs do nó, em ordem:
+// 1 e 2 (a outra trilha do par/or), 7 (o finally quando o par/or termina);
+// 3 e 4 (o corpo do do...finally, depois de um break num laço dentro dele), 5 (o finally no fim).
+// 6 (um break dentro do corpo, num laço, aborta o do...finally: o finally roda) e 1 depois do laço.
+// Com o bug: 7 antes de 1 e 5 antes de 3.
+par/or do
+  do
+    await FOREVER;
+  finally
+    emit LEDS(7);           // só quando o par/or termina
+  end
+with
+  loop do                   // break num laço sem finally dentro
+    await 1s;
+    break;
+  end
+  emit LEDS(1);
+  await 1s;
+  emit LEDS(2);
+  await 1s;
+end
+await 1s;
+do
+  loop do                   // break dentro do corpo: não aborta o do...finally
+    await 500ms;
+    break;
+  end
+  emit LEDS(3);
+  await 1s;
+  emit LEDS(4);
+  await 1s;
+finally
+  emit LEDS(5);             // só no fim do corpo
+end
+await 1s;
+loop do
+  do
+    await 500ms;
+    break;                  // aborta o do...finally
+  finally
+    emit LEDS(6);
+  end
+end
+await 1s;
+emit LEDS(1);
+await FOREVER;
