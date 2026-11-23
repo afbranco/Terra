@@ -1,0 +1,26 @@
+#include "TerraNet.defs"
+
+// Issue #35: o otimizador apagava o 'end' que o chkret do par/and pula quando vinha outro 'end'
+// logo depois (await FOREVER, fim do ramo). O pulo caía no 'end' seguinte e a execução seguia no
+// código depois dele: a última trilha do par rodava de novo e n subia. Nos LEDs do nó: 1 no
+// início e 5 aos 5 s (n + 4). Com o bug, n sobe quando os par/and terminam.
+var ubyte n = 0;
+par do
+  par/and do await 2s; with await 1500ms; end
+  await FOREVER;                                    // await FOREVER logo depois
+with
+  par/and do
+    par/and do await 1s; with await 500ms; end      // fim do ramo logo depois
+  with
+    await 3s;
+  end
+  await FOREVER;
+with
+  await 5s;
+  emit LEDS(n + 4);
+  await FOREVER;
+with
+  n = n + 1;
+  emit LEDS(n);
+  await FOREVER;
+end

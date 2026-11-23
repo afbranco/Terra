@@ -237,12 +237,25 @@ end
 --------------------------------------------------
 -- Remove 'end' + 'end'
 --------------------------------------------------
+-- O 'end' logo depois de um 'chkret' fica: o chkret pula exatamente 1 byte (o 'end') quando o
+-- gate do par/and está aberto. Sem ele, o pulo caía no 'end' seguinte e a execução seguia no
+-- código depois dele (#35).
+local function afterChkret (x)
+  local y = x - 1
+  -- volta até o início da instrução anterior: pula operandos (sem code2), rótulos e removidos
+  while y > 0 and (_AST.root.opcode[y] == '_' or string.sub(_AST.root.opcode[y] or '',1,1) == 'L'
+                   or _AST.root.code2[y] == nil) do
+    y = y - 1
+  end
+  return y > 0 and string.sub(_AST.root.code2[y],1,6) == 'chkret'
+end
 for x,op in pairs(_AST.root.opcode) do
 --print(x,op)
   if (string.sub(op,1,1) ~= 'L') then
     local op_num = tonumber('0x'..op)
     if op_num == opcode.op_end  and string.sub((_AST.root.code2[x] or ''),1,3)=='end' then
-      if _AST.root.opcode[x-1]==string.format("%02x",opcode.op_end) and string.sub((_AST.root.code2[x-1] or ''),1,3)=='end' then
+      if _AST.root.opcode[x-1]==string.format("%02x",opcode.op_end) and string.sub((_AST.root.code2[x-1] or ''),1,3)=='end'
+         and not afterChkret(x-1) then
         _AST.root.opcode[x-1]='_'
       end
     end
