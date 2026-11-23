@@ -43,6 +43,9 @@
 == cppif
 {"code":"E1004","severity":"error","file":"cppif.terra","line":2,"col":4,"msg":"error: #if with no expression","args":{"msg":"error: #if with no expression"}}
 {"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true}}
+== cppsemendif
+{"code":"E1004","severity":"error","file":"cppsemendif.terra","line":3,"msg":"error: unterminated #if","args":{"msg":"error: unterminated #if"}}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true}}
 == emitpar
 {"code":"W2001","severity":"warning","file":"emitpar.terra","line":4,"col":3,"msg":"nondeterminism (call conflict) : event `LEDS´ (line 4) vs event `LEDS´ (line 6)","args":{"a":"event `LEDS´ (line 4)","b":"event `LEDS´ (line 6)","kind_a":"event","kind_b":"event","line_a":4,"line_b":6,"name_a":"LEDS","name_b":"LEDS"},"related":[{"file":"emitpar.terra","line":6,"col":3}]}
 {"summary":{"ok":true,"errors":0,"warnings":1,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"},"memory":{"total":50,"code":35,"ctl_vars":15,"stack":0,"radio_msgs":3},"platforms":[{"name":"iris_full","max":4224,"fits":true},{"name":"iris_hyb","max":1920,"fits":true},{"name":"mica2","max":1920,"fits":true},{"name":"mica2dot","max":1920,"fits":true},{"name":"micaz","max":1920,"fits":true},{"name":"telosb_full","max":4224,"fits":true},{"name":"telosb_hyb","max":1920,"fits":true},{"name":"tossim","max":1728,"fits":true}]}}

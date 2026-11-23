@@ -146,13 +146,16 @@ local cpp_file = 'precomp.terra'
         if f then f:close() end
         os.remove(cpp_err)
         for l in string.gmatch(text, '[^\n]+') do
+            -- arquivo:linha:coluna: ou, em alguns erros (ex.: #if sem #endif), arquivo:linha: (#28)
             local file, ln, col, kind, msg = string.match(l, '^(.-):(%d+):(%d+): (%a[%a ]-): (.*)$')
+            if not file then
+                file, ln, kind, msg = string.match(l, '^(.-):(%d+): (%a[%a ]-): (.*)$')
+            end
+            local loc = file and { line=tonumber(ln), col=col and tonumber(col) }
             if file and (kind == 'error' or kind == 'fatal error') then
-                _DIAG.emit('E1004', nil, { msg=kind..': '..msg },
-                           { file=file, loc={ line=tonumber(ln), col=tonumber(col) } })
+                _DIAG.emit('E1004', nil, { msg=kind..': '..msg }, { file=file, loc=loc })
             elseif file and kind == 'warning' then
-                _DIAG.emit('W6001', nil, { msg=kind..': '..msg },
-                           { file=file, loc={ line=tonumber(ln), col=tonumber(col) } })
+                _DIAG.emit('W6001', nil, { msg=kind..': '..msg }, { file=file, loc=loc })
             end
         end
     end
