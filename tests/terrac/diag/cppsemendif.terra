@@ -1,0 +1,4 @@
+#include "TerraNet.defs"
+emit LEDS(0);
+#if 1
+emit LEDS(1);
