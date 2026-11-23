@@ -172,6 +172,12 @@ function _TP.getConstType(val,me,no_wrn)
   else
     local nval = tonumber(val) or string.byte(val,2)
 --print("tp::getConstTypeI:",val,nval)
+    -- negativo (só vem da dobra de constantes): tipo com sinal (#38)
+    if (nval < 0) then
+      if (nval >= -0x80) then return 'byte' end
+      if (nval >= -0x8000) then return 'short' end
+      return 'long'
+    end
   	if (nval <= 0xff) then return 'ubyte' end
     if (nval <= 0xffff) then return 'ushort' end
     if (nval <= 0xffffffff) then return 'ulong' end
@@ -183,6 +189,8 @@ end
 function _TP.getConstLen(val)
 --print("tp::getConstLen:",val)
   local nval = tonumber(val) or string.byte(val,2)
+  -- a VM estende a constante com zeros: negativo vai com 4 bytes em complemento de 2 (#38)
+  if (nval < 0) then return 3 end
   if (nval <= 0xff) then return 0 end
   if (nval <= 0xffff) then return 1 end
   if (nval <= 0xffffff) then return 2 end
@@ -193,6 +201,7 @@ function _TP.getConstBytes(val,len)
   len = len or 0;
   nx=1
   local nval = tonumber(val) or string.byte(val,2)
+  if (nval < 0) then nval = nval + 2^32 end     -- complemento de 2 em 32 bits (#38)
   local bytes = string.format('%02x ',nval % 256)
   while (math.floor(nval/256) > 0 or len>1)  and nx < 4 do
     nx = nx+1;

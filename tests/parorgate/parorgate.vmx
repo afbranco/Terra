@@ -1,4 +1,4 @@
-112 343 4 6 0 0 48 2 48
+112 344 4 6 0 0 48 2 48
 00 | 00000 0 track 0
 00 | 00001 0
 00 | 00002 0
@@ -338,7 +338,8 @@ c0 | 00327 c0 set_c ubyte 91 1              | open gate 2
 3a | 00336 3a chkret 91                     | ParAnd_out_32 -- if (gate 1 == 0) PC=PC+1
 5b | 00337 5b 
 01 | 00338 01 end                           | end
-48 | 00339 48 memclr 0 48                   | clear WClocks gates from 0 to 6
-00 | 00340 00 
-30 | 00341 30 
-01 | 00342 01 end                           | end
+01 | 00339 01 end                           | end
+48 | 00340 48 memclr 0 48                   | clear WClocks gates from 0 to 6
+00 | 00341 00 
+30 | 00342 30 
+01 | 00343 01 end                           | end
