@@ -71,8 +71,13 @@ de lá.
     `stdc-predef.h` e as linhas saíam 42 acima; agora vêm dos marcadores do `cpp` (`_SRCLINE`).
     O `server/terrac_linhas.py` do TerraSim compensava isso e tem de ser desligado na troca
     (avisado em 2026-11-22). Ainda sem release.
-  - #24 códigos de erro estáveis e `--diag=json` (mensagens em inglês; o texto atual continua
-    o padrão). Mostrar o formato ao TerraSim antes do merge.
+  - #24 códigos de erro e `--diag=json`: **fechada** (PR #27, `5e8b4d4`). O catálogo fica em
+    `terrac/errors.lua` (159 códigos; `terrac --catalog` gera o JSON, anexo
+    `terrac-errors-<v>.json` da release). O texto continua igual, salvo as plataformas em ordem
+    de nome (comparado com o antigo em 760 programas). Os W2xxx trazem `kind/name/line_{a,b}`,
+    pedido do TerraSim, que revisou e aprovou o formato. Formato em `release/README.md`.
+    Testes: `tests/terrac/{catalogo,consistencia}.lua` e `diag/json.esperado`. Também corrigiu a
+    queda em `sizeof<5>` (`_V2NAME` incompleto). Os #23 e #24 ainda estão sem release.
   - #22 (P1) otimização (`optm.lua`) às vezes quebra a execução na VM. Ligada **por padrão**; o
     TerraSim compila com `--no-opt`. Não reproduzida: os 20 programas Net daqui e do TerraSim se
     comportam igual com e sem `--opt` (VMDBG nó a nó, sem os `executing trail`, e TVIEW). Para
