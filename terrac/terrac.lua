@@ -1,3 +1,8 @@
+local _ARGS = {...}
+
+-- O terrac roda dentro de _TERRAC, protegido: um erro do Lua vira o diagnóstico E0001 (#24).
+local function _TERRAC ()
+
 _CEU = true
 
 _OPTS = {
@@ -29,7 +34,13 @@ function trim (s)
   return (string.gsub(s, "^%s*(.-)%s*$", "%1"))
 end
 
-local params = {...}
+dofile 'errors.lua'
+
+local params = _ARGS
+-- --diag=json vale para tudo, mesmo para um erro nas outras opções
+for _, p in ipairs(params) do
+    if p == '--diag=json' then _DIAG.json = true end
+end
 local i = 1
 --print("terrac::params:",#params)
 while i <= #params
@@ -43,6 +54,13 @@ do
     elseif p == '-' then
         _OPTS.input = '-'
 
+    elseif p == '--diag=json' or p == '--diag=text' then
+        _DIAG.json = (p == '--diag=json')
+
+    elseif p == '--catalog' then
+        io.stdout:write(_DIAG.catalog())
+        os.exit(0)
+
     elseif string.sub(p, 1, 2) == '--' then
         local no = false
         local opt = string.gsub(string.sub(p,3), '%-', '_')
@@ -52,6 +70,7 @@ do
         end
         if _OPTS[opt]==nil then
           _OPTS.input = nil
+          _DIAG.bad_option = p
           break
         end
         if _OPTS_NPARAMS[opt] == 0 then
@@ -70,6 +89,12 @@ end
 
 --os.exit(0)
 
+if not _OPTS.input and _DIAG.json then
+    if _DIAG.bad_option then
+        ASR(false, nil, 'E1006', { option=_DIAG.bad_option })
+    end
+    ASR(false, nil, 'E1001')
+end
 if not _OPTS.input then
     io.stderr:write([[
 
@@ -81,10 +106,13 @@ if not _OPTS.input then
         --wstrong (--no-wstrong) # warning strong nondeterminism (wstrong)
         --wweak   (--no-wweak)   # warning weak nondeterminism (no-wweak)
         -Ipath                   # Path for include files (.defs)
+        --diag=json              # diagnostics as JSON lines on stderr (text)
+        --catalog                # print the catalog of diagnostic codes (JSON)
 ]])
     os.exit(1)
 end
 if not string.match(_OPTS.input, "(.*)%.terra") then 
+  if _DIAG.json then ASR(false, nil, 'E1002') end
   io.stderr:write([[
   Invalid input file name. It needs a `.terra´ sufix.
   
@@ -96,6 +124,7 @@ local test_file = io.open(_OPTS.input)
 if  test_file then
    io.close(test_file)
 else
+  if _DIAG.json then ASR(false, nil, 'E1003', { file=_OPTS.input }) end
   io.stderr:write([[
   File `]].. _OPTS.input .. [[´ not found.
   
@@ -107,13 +136,35 @@ end
 local cpp_file = 'precomp.terra'
 -- Pre-processor phase
 --    local cpp = assert(io.popen('cpp -C '.._OPTS.input..' ' ..cpp_file, 'w'))
-    local cpp = assert(io.popen('cpp -C '.._OPTS.input..' ' ..cpp_file .. _OPTS.includePath, 'w'))
+    local cpp_err = _DIAG.json and os.tmpname()
+    local cpp = assert(io.popen('cpp -C '.._OPTS.input..' ' ..cpp_file .. _OPTS.includePath ..
+                                (cpp_err and (' 2>'..cpp_err) or ''), 'w'))
     cpp:close()
+    if cpp_err then
+        local f = io.open(cpp_err)
+        local text = f and f:read('*a') or ''
+        if f then f:close() end
+        os.remove(cpp_err)
+        for l in string.gmatch(text, '[^\n]+') do
+            local file, ln, col, kind, msg = string.match(l, '^(.-):(%d+):(%d+): (%a[%a ]-): (.*)$')
+            if file and (kind == 'error' or kind == 'fatal error') then
+                _DIAG.emit('E1004', nil, { msg=kind..': '..msg },
+                           { file=file, loc={ line=tonumber(ln), col=tonumber(col) } })
+            elseif file and kind == 'warning' then
+                _DIAG.emit('W6001', nil, { msg=kind..': '..msg },
+                           { file=file, loc={ line=tonumber(ln), col=tonumber(col) } })
+            end
+        end
+    end
 
 local test_file = io.open(cpp_file)
 if  test_file then
    io.close(test_file)
 else
+  if _DIAG.json then
+    if _DIAG.errors == 0 then ASR(false, nil, 'E1005') end
+    _DIAG.exit(1)
+  end
   io.stderr:write([[
   Preprocessor error!
   
@@ -135,6 +186,7 @@ _STR=""
 -- de um #include vale a linha do #include. Sem isso, o que o cpp acrescenta sozinho (por
 -- exemplo, o stdc-predef.h com os comentários, no gcc 4.8 e depois) desloca as linhas (#23).
 _SRCLINE = {}
+_SRCREAL = {}       -- arquivo e linha reais de cada linha de _STR
 local srcFile, srcLine, mainLine = nil, 1, nil
 for line in io.lines(cpp_file) do
 --  print(string.sub(line,1,1))
@@ -144,6 +196,7 @@ for line in io.lines(cpp_file) do
       mainLine = srcLine
     end
     _SRCLINE[#_SRCLINE+1] = mainLine or 1
+    _SRCREAL[#_SRCREAL+1] = { file=srcFile, line=srcLine }
     srcLine = srcLine + 1
   else
     local n, f, flags = string.match(line, '^# (%d+) "(.-)"(.*)$')
@@ -478,14 +531,21 @@ print(string.format('--    %4d    %4d     %4d     %4d            |      %4d     
                     TotalMem,CodeSize,CtlVars,Stack,RadioMsgs))
 print('---------------------------------------------------------------------')
 print('--   Target platforms x Max program size                           --')
-for k,v in pairs(_ENV.motes_max_size) do
+_DIAG.memory = { total=TotalMem, code=CodeSize, ctl_vars=CtlVars, stack=Stack, radio_msgs=RadioMsgs }
+_DIAG.platforms = {}
+local motes = {}
+for k in pairs(_ENV.motes_max_size) do motes[#motes+1] = k end
+table.sort(motes)   -- antes saía na ordem do pairs(), que varia
+for _,k in ipairs(motes) do
+  local v = _ENV.motes_max_size[k]
   print(string.format('--   %16s = %4s bytes %1s                               --',k,v,(TotalMem>v and '?')or ' '))
   lowMaxMem = ( v < lowMaxMem  and v) or lowMaxMem 
+  table.insert(_DIAG.platforms, _DIAG.OBJ{ {'name', k}, {'max', v}, {'fits', not (TotalMem > v)} })
 end
 print('---------------------------------------------------------------------')
 
 if (TotalMem > lowMaxMem) then
-  WRN(false,_AST.root,'Please check the maximum program size for each mote type!')
+  WRN(false,_AST.root,'W5003',nil,{loc={}})   -- o programa todo: no JSON, sem linha
 end
 
 if _WRN.n_wrns > 0 then
@@ -506,3 +566,15 @@ else
 end
 out2:write(asmText)
 
+_DIAG.summary()
+end -- _TERRAC
+
+local ok, err = xpcall(_TERRAC, debug.traceback)
+if not ok then
+    if _DIAG and _DIAG.json and _OPTS then
+        _DIAG.emit('E0001', nil, { lua=string.match(tostring(err), '^[^\n]*') })
+        _DIAG.exit(1)
+    end
+    io.stderr:write('lua5.1: ' .. tostring(err) .. '\n')
+    os.exit(1)
+end

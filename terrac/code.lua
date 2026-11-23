@@ -414,7 +414,7 @@ function Op2_any(me,mnemonic)
     local op, e1, e2 = unpack(me)
 --print("code::Op2_any:",op,e1.tag,e1.tp,e2.tag,e2.tp,e1.arr,e2.arr,_TP.max(e1.tp,e2.tp))
   local err,cast, _, _, len1, len2 = _TP.tpCompat(e1.tp,e2.tp,e1.arr,e2.arr)
-  ASR(not err ,me,'type/size incompatibility: "'..e1.tp..'/'..len1 .. '" <--> "'..e2.tp..'/'..len2)
+  ASR(not err ,me,'E4014',{left=e1.tp..'/'..len1,right=e2.tp..'/'..len2})
   --WRN(not cast,me,'automatic cast from ['.. e2.tp ..'] to [' .. e1.tp ..'].')
   local maxTp =  _TP.max(e1.tp,e2.tp)
   local toTp = _TP.getCastType(maxTp)  
@@ -746,7 +746,7 @@ F = {
       				BYTECODE(me,codeB,'op_set_c','ubyte',var.awt0,var.n_awaits)
 --                LINE(me, '//> memset(CEU->mem+'..var.awt0..'+1, 0, '   -- gtes[i]=0
 --                        ..(var.n_awaits*_ENV.c.tceu_nlbl.len)..');')
-              WRN(var.n_awaits > 0, var.ln,'event "'..var.id ..'" without any await.')
+              WRN(var.n_awaits > 0, var.ln,'W4002',{name=var.id})
               if var.n_awaits > 0 then
           				codeB = LINE(me, 'clear '.. var.id ..' '..var.n_awaits..' wait(s) ',nil,'// clear event waits') 
           				BYTECODE(me,codeB,'op_memclr', var.n_awaits*_ENV.c.tceu_nlbl.len, var.awt0+1)
@@ -1022,7 +1022,7 @@ F = {
         end
 
      else
-      ASR(false,me,'Emit INPUT_EVENT inside Async is not implemented.')
+      ASR(false,me,'E9001')
 --        assert(ext.pre == 'input')
 --        local async = _AST.iter'Async'()
 --        LINE(me, 'ceu_async_enable('..async.gte..', '..me.lbl_cnt.id..');')
@@ -1045,7 +1045,7 @@ F = {
     end,
 
     EmitT = function (me)
-    	ASR(false,me,'"EmitT" is not implemented.')
+    	ASR(false,me,'E9002')
 
 --        local exp = unpack(me)
 --        local async = _AST.iter'Async'()
@@ -1226,7 +1226,7 @@ F = {
     Op2_call = function (me)
         local _, f, exps = unpack(me)
 --print(print_r(me,"code::Op2_call: me"))
-        ASR(false,me,'"call" is not implemented! ')
+        ASR(false,me,'E9003')
     end,
 --]]    
     ['Op2_-'] = function (me) Op2_any(me,'sub') end,  
@@ -1321,7 +1321,7 @@ F = {
     if (fromTp~=toTp and (fromTp=='float' or toTp=='float')) then
       BYTECODE(me,codeB,'op_cast',fromTp,toTp)
     else
-      WRN(false,me, 'Discarding ineffective "cast" from '..fromTp..' to '..toTp..'.')    
+      WRN(false,me, 'W1002',{from=fromTp,to=toTp})    
     end
   end,
   ['SIZEOF'] = function (me)
@@ -1404,11 +1404,11 @@ F = {
   Func = function (me)
 --print("code::Func:",me.ext.id, me.ext.tp,me.ext.idx)
 --print("code::Func: args:",#me[2],#me.ext.args)
-    ASR(#me[2]==#me.ext.args,me,'invalid number of arguments for function ['.. me.ext.id ..'], received '.. #me[2] .. ' and it was expecting '..#me.ext.args  )
+    ASR(#me[2]==#me.ext.args,me,'E4034',{['function']=me.ext.id,received=#me[2],expected=#me.ext.args})
     for k,arg in ipairs(me.ext.args) do
       local error, cast, ntp1, ntp2, len1, len2 =  _TP.tpCompat(arg,(me[2][k].supertp or me[2][k].tp))
-      ASR(not error ,me,'argument #'..k ..' in function ['.. me.ext.id ..'] must be compatible to "'.. arg.. '/'.. len1 ..'" type, it received "'.. (me[2][k].supertp or me[2][k].tp) ..'/'.. len2 .. '" type')
-      WRN(not cast,me, 'Applying the minimum size: "'.. arg..'/'..len1 ..'" <--> "' .. me[2][k].tp ..'/'..len2 ..'". ')
+      ASR(not error ,me,'E4033',{n=k,['function']=me.ext.id,expected=arg..'/'..len1,received=(me[2][k].supertp or me[2][k].tp)..'/'..len2})
+      WRN(not cast,me, 'W1003',{left=arg..'/'..len1,right=me[2][k].tp..'/'..len2})
     end
     CONC(me,me[2]);
     codeB = LINE(me,'func '..me.ext.id,nil,'')
@@ -1421,24 +1421,24 @@ F = {
 --print(print_r(me,"code::Op2_idx: me"))
 --print("code::Op2_idx:",arr.tag,arr.tp,arr.arr,idx.val, idx_tp)
 --print("code::Op2_idx:",idx.tag,arr.tp,me.tp,arr.val,idx.val,me[2][1],me[2][2])
-    ASR(_TP.isBasicType( _TP.deref(_TP.deref(arr.tp)) or _TP.deref(arr.tp)),me,'Arrays can have only basic types.')
+    ASR(_TP.isBasicType( _TP.deref(_TP.deref(arr.tp)) or _TP.deref(arr.tp)),me,'E4008')
 
     if (arr.tag == 'Var') and (idx.tag=='CONST') then  -- push direct the addr+idx
-        ASR((idx.val*1 < arr.arr*1),me,'array index out of range, 0..'.. arr.arr-1 ..'.')
+        ASR((idx.val*1 < arr.arr*1),me,'E6001',{max=arr.arr-1})
         codeB = LINE(me,'push_c &'..arr[1]..'['..idx.val..']',nil,'')
         BYTECODE(me,codeB,'op_push_c',arr.val+(idx.val*(_ENV.c[_TP.deref(_TP.deref(arr.tp)) or _TP.deref(arr.tp)].len)))  
     elseif (arr.tag == 'Var') and (idx.tag=='Var') then  -- push direct the addr and idx
         codeB = LINE(me,'pusharr_v &'..arr[1]..'['..idx[1]..']',nil,'')
         BYTECODE(me,codeB,'op_pusharr_v',_TP.deref(arr.tp),idx.tp,idx.val,arr.arr*1,arr.val)  
     elseif (arr.tag == 'Op2_.')  and not(_TP.deref(arr[2].tp)) and (idx.tag=='CONST') then  -- push direct the var.field addr + idx
-        ASR((idx.val*1 < arr.arr*1),me,'array index out of range, 0..'.. arr.arr-1 ..'.')
+        ASR((idx.val*1 < arr.arr*1),me,'E6001',{max=arr.arr-1})
 --print("code::Op2_idx: ",arr[2][1]..'.'..arr[3]..'['..idx.val..']', arr[2].val, arr[2].fst.fields[arr[3]].val, me.tp, (idx.val*_ENV.c[me.tp].len))
       codeB = LINE(me,'push_c '..arr[2][1]..'.'..arr[3]..'['..idx.val..']',nil,'')
       BYTECODE(me,codeB,'op_push_c',arr[2].fst.fields[arr[3]].val + (idx.val*_ENV.c[me.tp].len))  
     else
       CONC(me,arr) -- var addr
       if (idx.tag=='CONST') then -- Constant can have a small code
-        ASR((idx.val*1 < arr.arr*1),me,'array index out of range, 0..'.. arr.arr-1 ..'.')
+        ASR((idx.val*1 < arr.arr*1),me,'E6001',{max=arr.arr-1})
         if (idx.val*1) > 0 then -- push only idx > 0
           codeB = LINE(me,'push_c '..'['..idx.val..'] offset',nil,'')
 --          BYTECODE(me,codeB,'op_push_c',(idx.val*_ENV.c[idx_tp].len))  

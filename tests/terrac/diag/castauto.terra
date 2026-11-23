@@ -1,0 +1,5 @@
+#include "TerraNet.defs"
+
+var ushort a = 300;
+var ubyte b;
+b = a;

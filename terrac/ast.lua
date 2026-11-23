@@ -63,6 +63,7 @@ function _AST.copy (node, ln)
         if _AST.isNode(v) then
             ret[k] = _AST.copy(v, ln)
             ret[k].ln = ln or ret[k].ln
+            if ln then ret[k].pos = nil end
         else
             ret[k] = v
         end
@@ -124,7 +125,7 @@ function visit_aux (me, F)
         if _AST.isNode(sub) then
 --DBG('> '.._AST.isNode(sub))
             sub.depth = me.depth + 1
-            ASR(sub.depth < 127, sub, 'max depth of 127')
+            ASR(sub.depth < 127, sub, 'E6002')
             if bef then bef(me, sub) end
             me[i] = visit_aux(sub, F)
             if aft then aft(me, sub) end
@@ -405,7 +406,7 @@ local C; C = {
               local boolT = {}; boolT[true]=1; boolT[false]=0;
               if (v2=='+' or v2=='-' or v2=='/' or v2=='*' or v2 == '%') then
                 if (v2=='/' or v2=='%') and (v3[1]*1)==0 then
-                  ASR(false,v3,'division by zero.')
+                  ASR(false,v3,'E4029')
                 else
                   loadstring('newConst = '..v1[1]..' '..v2..' '..v3[1])()
                 end
@@ -419,7 +420,7 @@ local C; C = {
                         node('CONST')(ln, boolT[relat_result]),select(4,...)
                   )
               elseif (v2=='<<') then
-                  if (v1[2]=='float' or v3[2]=='float') then ASR(false,v3,'Invalid float operation.'); end
+                  if (v1[2]=='float' or v3[2]=='float') then ASR(false,v3,'E4030'); end
                   loadstring('newConst = '.. v1[1].. ' * math.pow( 2,'..v3[1] ..')')()
                   local newConst2 = tonumber(string.format("0x%08x",newConst))
 --print("ast::_Exp: `<<´:",string.format("0x%08x",newConst),tonumber(string.format("0x%08x",newConst)))
@@ -428,14 +429,14 @@ local C; C = {
                           select(4,...)
                     )
               elseif (v2=='>>') then
-                  if (v1[2]=='float' or v3[2]=='float') then ASR(false,v3,'Invalid float operation.'); end
+                  if (v1[2]=='float' or v3[2]=='float') then ASR(false,v3,'E4030'); end
                   loadstring('newConst = '.. v1[1].. ' / math.pow( 2,'..v3[1] ..')')()
                   return C._Exp(ln,
                           node('CONST')(ln, newConst),
                           select(4,...)
                     )
               elseif (v2=='and') then
-                  if (v1[2]=='float' or v3[2]=='float') then ASR(false,v3,'Invalid float operation.'); end
+                  if (v1[2]=='float' or v3[2]=='float') then ASR(false,v3,'E4030'); end
                   newConst = boolT[tonumber(v1[1])~=0 and tonumber(v3[1])~=0]  
 --print("ast::_Exp: `and´:",tonumber(v1[1]),tonumber(v3[1]),tonumber(v1[1])~=0 and tonumber(v3[1])~=0,newConst)
                   return C._Exp(ln,
@@ -443,7 +444,7 @@ local C; C = {
                           select(4,...)
                     )
               elseif (v2=='or') then
-                  if (v1[2]=='float' or v3[2]=='float') then ASR(false,v3,'Invalid float operation.'); end
+                  if (v1[2]=='float' or v3[2]=='float') then ASR(false,v3,'E4030'); end
                   newConst = boolT[tonumber(v1[1])~=0 or tonumber(v3[1])~=0]  
 --print("ast::_Exp: `or´:",tonumber(v1[1]),tonumber(v3[1]),tonumber(v1[1])~=0 or tonumber(v3[1])~=0,newConst)
                   return C._Exp(ln,
@@ -499,8 +500,19 @@ local function i2l (v)
     return _I2L[v]
 end
 
+-- Guarda no nó a posição em _STR onde a regra começou (`pos`), para a coluna dos diagnósticos
+-- (#24). As funções de C continuam recebendo a linha (`ln`) como antes.
+local function setpos (pos, ...)
+    local n = ...
+    if _AST.isNode(n) and n.pos == nil then
+        n.pos = pos
+    end
+    return ...
+end
+
 for rule, f in pairs(C) do
-    _GG[rule] = (m.Cp()/i2l) * _GG[rule] / f
+    _GG[rule] = (m.Cp() * (m.Cp()/i2l) * _GG[rule]) /
+                    function (pos, ...) return setpos(pos, f(...)) end
 end
 
 for i=1, 12 do

@@ -14,6 +14,7 @@ workflow e no `BUILDINFO` de cada release.
 | `terra-<v>-{net,grp}-micaz-nobs.{exe,ihex}` | Firmware micaz, nó comum |
 | `terra-<v>-{net,grp}-micaz-bs.{exe,ihex}` | Firmware micaz, estação base (nó 1, ligado ao computador) |
 | `terrac-<v>.tar.gz` | Compilador `terrac`, `TerraNet.defs`, `TerraGrp.defs` e `terra.lang` |
+| `terrac-errors-<v>.json` | Catálogo dos códigos de erro e aviso do `terrac` (o mesmo de `terrac --catalog`) |
 | `TerraVMControl-<v>.jar` | TerraControl, com todas as bibliotecas dentro |
 | `BUILDINFO`, `SHA256SUMS`, `logs.tar.gz` | Commit, imagem e logs de compilação e de teste |
 
@@ -50,6 +51,37 @@ lua5.1 terrac meuScript.terra      # gera meuScript.vmx; o .defs fica na mesma p
 
 Até a 1.0.1 o `terrac` só funcionava com o lpeg 0.10.2 (`luarocks --lua-version=5.1 install lpeg
 0.10.2-1`). O CI testa as duas versões, e elas têm de gerar o mesmo `.vmx` e as mesmas mensagens.
+
+### Mensagens de erro e `--diag=json`
+
+Cada erro e aviso tem um código estável (`E3001`, `W2003`...), listado em
+`terrac-errors-<v>.json`. Um código nunca muda de significado; um erro novo ganha código novo.
+Grupos: `E0` falha interna do compilador, `E1` entrada e pré-processador, `E2` sintaxe, `E3` nomes
+e declarações, `E4` tipos e expressões, `E5` controle e contexto (`E5001` é o laço sem `await`),
+`E6` limites, `E9` não implementado; `W1` conversões, `W2` não determinismo, `W3`
+alcançabilidade, `W4` declarações, `W5` limites, `W6` pré-processador.
+
+O padrão continua o texto de sempre (`ERR : line 4 : ...`). Com `--diag=json`, o stderr só tem
+linhas JSON, um diagnóstico por linha, e termina sempre com uma linha de resumo:
+
+```json
+{"code":"W2003","severity":"warning","file":"p.terra","line":5,"col":3,"msg":"nondeterminism (write conflict) : variable/event `x´ (line 5) vs variable/event `x´ (line 7)","args":{"a":"variable/event `x´ (line 5)","b":"variable/event `x´ (line 7)"},"related":[{"file":"p.terra","line":7,"col":3}]}
+{"summary":{"ok":true,"errors":0,"warnings":1,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"},"memory":{"total":51,"code":35,"ctl_vars":16,"stack":0,"radio_msgs":3},"platforms":[{"name":"iris_full","max":4224,"fits":true},...]}}
+```
+
+- `line` e `msg` são os mesmos do modo texto; `args` traz os valores que entram na mensagem.
+- `col` (base 1, em caracteres) vem quando o compilador sabe a coluna; nos erros de sintaxe vem
+  também `col_end`, a coluna logo depois do token (exclusiva).
+- Erro dentro de um `#include`: `line` é a linha da diretiva no programa, e `include` traz
+  `{file, line, col}` do ponto real.
+- `related`: o segundo ponto do programa (avisos `W2xxx`). Nesses avisos, `args` traz também
+  `kind_a`, `name_a`, `line_a` e os mesmos com `_b` (os `extra_args` do catálogo): o tipo do
+  acesso (um dos `access_kinds` do catálogo, como `event`, `variable` ou `internal_event`), o
+  nome e a linha, para não depender do texto de `a` e `b`.
+- Erros do `cpp` saem como `E1004` (avisos, `W6001`), com o arquivo, a linha e a coluna dele.
+- `E0001`: falha interna, com a mensagem do Lua em `args.lua`. É bug do `terrac`: favor relatar.
+- O resumo traz `memory` e `platforms` (em ordem de nome) só quando não há erro. Um diagnóstico
+  do programa todo (o `W5003`, de tamanho) vem sem `line`.
 
 ## TerraControl
 

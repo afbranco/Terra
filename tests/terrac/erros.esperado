@@ -8,5 +8,6 @@ sintaxe_end: line 5 : after `;´ : expected statement (not last statement as `re
 sintaxe_expressao: line 7 : after `=´ : expected expression
 sintaxe_parentese: line 5 : after `LED0´ : expected `;´
 sintaxe_pontoevirgula: line 3 : after `1´ : expected `;´
+sintaxe_sizeof: line 2 : after `<´ : expected type
 sintaxe_then: line 4 : after `1´ : expected `then´
 sintaxe_tipo: line 3 : after `x´ : expected a not reserved identifier beginning with lower-case

@@ -1,0 +1,13 @@
+#include "TerraNet.defs"
+
+event ubyte e;
+var ubyte x;
+par/or do
+  loop do
+    await e;
+    x=1;
+  end
+with
+  emit e(1);
+  x = 3;
+end

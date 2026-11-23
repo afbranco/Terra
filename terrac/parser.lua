@@ -87,6 +87,10 @@ local _V2NAME = {
     _Dcl_struct = 'declaration',
 --    ID_evt  = 'identifier',
     Op_var = 'variable',
+    -- usadas com EV e antes sem nome (o terrac caía com erro do Lua, #24):
+    Block = 'program block',
+    ID_typenp = 'type',
+    ID_pay_type = 'a valid basic type or payload',
 
 }
 local EV = function (rule)
@@ -442,8 +446,22 @@ end
 
 if _CEU then
     if not m.P(_GG):match(_STR) then
-        DBG(err())
-        os.exit(1)
+        -- O mesmo texto de err(), pelo _DIAG (código E2xxx, e JSON com --diag=json).
+        local x  = (ERR_i<LST_i) and 'before' or 'after'
+        local tk = I2TK[LST_i] or '?'
+        local code = _DIAG.SYNTAX[ERR_msg]
+        local args = { where=x, token=tk }
+        if not code then
+            code, args.expected = 'E2000', ERR_msg
+        end
+        -- o token termina em LST_i; '<BOF>' e '?' não estão no fonte
+        local lit = (tk ~= '<BOF>' and tk ~= '?' and I2TK[LST_i]) and tk or ''
+        local pos = math.max(1, LST_i - #lit)
+        local opt = { pos=pos }
+        opt.col_end = _DIAG.where(_I2L[LST_i], pos).col
+        if opt.col_end then opt.col_end = opt.col_end + _DIAG.utf8len(lit) end
+        _DIAG.emit(code, _I2L[LST_i], args, opt)
+        _DIAG.exit(1)
     end
 else
     assert(m.P(_GG):match(_STR), err())

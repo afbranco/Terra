@@ -1,0 +1,9 @@
+#include "TerraNet.defs"
+
+event ubyte e;
+par/and do
+  emit e(1);
+with
+  emit e(2);
+end
+await e;

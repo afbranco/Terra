@@ -56,7 +56,7 @@ function newvar (me, blk, pre, tp, dim, id, read_only)
     -- Cheks if name is used by internal event
     for k,evt in ipairs(_ENV.ints) do
 --print("env::newvar():",k,evt.id,evt.ln)
-      ASR(not(evt.id==id), me,'event "'..id..'" was previously declared at line '..evt.ln)
+      ASR(not(evt.id==id), me,'E3006',{name=id,line=evt.ln})
     end
     -- Cheks for context definitions
     for stmt in _AST.iter() do
@@ -64,8 +64,8 @@ function newvar (me, blk, pre, tp, dim, id, read_only)
             break
         elseif stmt.tag == 'Block' then
             for _, var in ipairs(stmt.vars) do
-                ASR(not(var.id==id and blk==stmt ), me,'var "'..id..'" was defined for same context at line '..var.ln)
-                WRN(var.id~=id, me,'declaration of "'..id..'" hides the one at line '..var.ln)
+                ASR(not(var.id==id and blk==stmt ), me,'E3007',{name=id,line=var.ln})
+                WRN(var.id~=id, me,'W4001',{name=id,line=var.ln})
             end
         end
     end
@@ -75,10 +75,10 @@ function newvar (me, blk, pre, tp, dim, id, read_only)
     local isEvt = (pre ~= 'var')
 --print("env::newvar:",id,"pre=",pre,"isEvt=",isEvt)
 
-    ASR(c and c.tag=='type', me, 'undeclared type `'..tp_raw..'´')
+    ASR(c and c.tag=='type', me, 'E3008',{type=tp_raw})
     ASR(_TP.deref(tp) or (not c) or (tp=='void' and isEvt) or c.len>0, me,
-        'cannot instantiate type "'..tp..'"')
-    ASR((not dim) or dim>0, me, 'invalid array dimension')
+        'E4001',{type=tp})
+    ASR((not dim) or dim>0, me, 'E4002')
 
     if isEvt then
       _ENV.ints[id] = {id=id,ln=me.ln}
@@ -160,7 +160,7 @@ F = {
 --print('env::Block_pos:',me.tag,#me.vars)
         for _, var in ipairs(me.vars) do
 --print('env::Block_pos: var:',var.id,var.ln,var.auxtag,var.firstOper)
-          ASR(not(var.auxtag=='pointer' and var.firstOper == 'Exp'),{ln=var.firstOperLn},'pointer "'.. var.id ..'" not initialized at this point.')
+          ASR(not(var.auxtag=='pointer' and var.firstOper == 'Exp'),{ln=var.firstOperLn},'E4003',{name=var.id})
         end
     end,
 
@@ -172,7 +172,7 @@ F = {
             if vars then
                 for _, n in ipairs(vars) do
                     local var = n[1].var
-                    ASR(not var.arr, vars, 'invalid argument')
+                    ASR(not var.arr, vars, 'E4004')
                     n.new = newvar(vars, blk, false, var.tp, nil, var.id)
                 end
             end
@@ -205,12 +205,12 @@ F = {
 
         for k,val in ipairs(_ENV.exts) do
           if val.pre==dir then 
-            ASR(not (val.id==idAux), me, 'event "'..idAux..'" is already declared at line '.. (val.ln or 0))
-            ASR(not (val.idx==idx), me, dir..' event numeric id "'..idx..'" is already in use at line '.. (val.ln or 0))
+            ASR(not (val.id==idAux), me, 'E3009',{name=idAux,line=(val.ln or 0)})
+            ASR(not (val.idx==idx), me, 'E3010',{dir=dir,id=idx,line=(val.ln or 0)})
           end
         end
-        ASR(_ENV.c[tp] or _ENV.packets[tp],me,'type/packet not defined')
-        ASR(idx<255, me, dir..' event numeric id must be less than 255')
+        ASR(_ENV.c[tp] or _ENV.packets[tp],me,'E3020')
+        ASR(idx<255, me, 'E6003',{dir=dir})
         me.ext = {
             ln    = me.ln,
             id    = idAux,
@@ -233,19 +233,19 @@ F = {
     Dcl_int = 'Dcl_var',
     Dcl_var = function (me)
         local pre, tp, dim, id, exp = unpack(me)
-        ASR(_ENV.c[tp] or _ENV.c[_TP.deref(tp)],me,'invalid type')
+        ASR(_ENV.c[tp] or _ENV.c[_TP.deref(tp)],me,'E4005')
         local z =  _TP.getAuxTag(tp,dim)
-        ASR( z.lvl <= 1, me,'invalid pointer to pointer type')
+        ASR( z.lvl <= 1, me,'E4006')
 --print("env::Dcl_var:",tp,dim,id, _TP.isBasicType(_TP.deref(tp) or tp),(not dim) or  _TP.isBasicType(_TP.deref(tp) or tp),me.read_only)
-        ASR( (not dim) or  _TP.isBasicType(_TP.deref(tp) or tp),me,'Arrays can have only basic types')
+        ASR( (not dim) or  _TP.isBasicType(_TP.deref(tp) or tp),me,'E4007')
         me.var = newvar(me, _AST.iter'Block'(), pre, tp, dim, id,me.read_only)
     end,
 
     Dcl_regt = function(me)
 --print(print_r(me,"env::Dcl_regt: me"))
       local RegId = me[1]
-      ASR(not _ENV.c[RegId],me,'Register type `'.. RegId ..'´ is already declared as Register.')
-      ASR(not _ENV.packets[RegId],me,'Register type `'.. RegId ..'´ is already declared as Packet.')
+      ASR(not _ENV.c[RegId],me,'E3014',{name=RegId})
+      ASR(not _ENV.packets[RegId],me,'E3015',{name=RegId})
       local RegFields= {}
       local memsize = 0
       local offset = 0
@@ -255,7 +255,7 @@ F = {
         local var = me[i]
 --print('env::Dcl_regt: var',var)
         local  pre, tp, dim, id = unpack(var)
-        ASR(not RegFields[id],var,'duplicated field id `'..id ..'´')
+        ASR(not RegFields[id],var,'E3013',{name=id})
         local len = ((dim and dim*_ENV.c[var[2]].len) or _ENV.c[var[2]].len)
         lastSize = len
         RegFields[id]={pre=pre,tp=tp,dim=dim,id=id,len=len,offset=offset}
@@ -269,8 +269,8 @@ F = {
     Dcl_packet = function(me)
 --print(print_r(me,"env::Dcl_packet: me"))
       local RegId = me[1]
-      ASR(not _ENV.packets[RegId],me,'Packet type `'.. RegId ..'´ is already declared as Packet.')
-      ASR(not _ENV.c[RegId],me,'Packet type `'.. RegId ..'´ is already declared as Register.')
+      ASR(not _ENV.packets[RegId],me,'E3016',{name=RegId})
+      ASR(not _ENV.c[RegId],me,'E3017',{name=RegId})
       local RegFields= {}
       local memsize = 0
       local offset = 0
@@ -281,7 +281,7 @@ F = {
         local var = me[i]
 --print('env::Dcl_regt: var',var)
         local  pre, tp, dim, id = unpack(var)
-        ASR(not RegFields[id],var,'duplicated field id `'..id ..'´')
+        ASR(not RegFields[id],var,'E3013',{name=id})
         local len = ((dim and dim*_ENV.c[var[2]].len) or _ENV.c[var[2]].len)
         lastSize = len
         RegFields[id]={pre=pre,tp=tp,dim=dim,id=id,len=len,offset=offset}
@@ -290,7 +290,7 @@ F = {
         memsize = memsize + len
         if tp == 'payload' then payloadCount = payloadCount + 1 end
       end
-      ASR(payloadCount == 1, me,'packet needs exactly one `payload´ type, it received '..payloadCount)
+      ASR(payloadCount == 1, me,'E4009',{count=payloadCount})
       _ENV.packets[RegId] = { tag='type', id=RegId, len=memsize , fields=RegFields}
     end,
 
@@ -298,8 +298,8 @@ F = {
 --print(print_r(me,"env::Dcl_pktype: me"))
       local RegId = me[1]
       local packet = me[2]
-      ASR(not _ENV.c[RegId],me,'Register type `'.. RegId ..'´ is already declared.')
-      ASR(_ENV.packets[packet],me,'packet type `'.. packet ..'´ is not defined.')
+      ASR(not _ENV.c[RegId],me,'E3018',{name=RegId})
+      ASR(_ENV.packets[packet],me,'E3019',{name=packet})
       local RegFields= {}
       local memsize = 0
       local offset = 0
@@ -321,7 +321,7 @@ F = {
             local var = me[i]
 --print('env::Dcl_pktype: var',var)
             local  pre, tp, dim, id = unpack(var)
-            ASR(not RegFields[id],var,'duplicated field id `'..id ..'´')
+            ASR(not RegFields[id],var,'E3013',{name=id})
             local len = ((dim and dim*_ENV.c[var[2]].len) or _ENV.c[var[2]].len)
             lastSize = len
             RegFields[id]={pre=pre,tp=tp,dim=dim,id=id,len=len,offset=offset}
@@ -329,7 +329,7 @@ F = {
             pos = pos + 1
 --print('env::Dcl_pktype:',tp,id)
             memsize = memsize + len
-            ASR(memsize<=field.len,me,'subtype size '.. memsize ..' is  greater than payload size '..field.len)
+            ASR(memsize<=field.len,me,'E6006',{size=memsize,max=field.len})
           end
           if memsize < field.len then -- complete remain bytes
             local dim = (field.len - memsize)
@@ -347,19 +347,19 @@ F = {
        local op,mod,tp,id,args,idx = unpack(me)
 --print("env::Dcl_func:", op, mod, tp, id, #args, idx)
 --print("env::Dcl_func:", tp=='void', _TP.deref(tp) , _ENV.c[tp]~=nil)
-        ASR(not(tp=='void' or _TP.deref(tp)) and _ENV.c[tp],me, 'invalid function type "'..tp..'"')
+        ASR(not(tp=='void' or _TP.deref(tp)) and _ENV.c[tp],me, 'E4010',{type=tp})
         for k,val in ipairs(_ENV.exts) do
           if val.pre=='func' then 
-            ASR(not (val.id==id), me, 'function "'..id..'" is already declared at line '.. (val.ln or 0))
-            ASR(not (val.idx==idx), me, ' function numeric id "'..idx..'" is already in use at line '.. (val.ln or 0))
+            ASR(not (val.id==id), me, 'E3011',{name=id,line=(val.ln or 0)})
+            ASR(not (val.idx==idx), me, 'E3012',{id=idx,line=(val.ln or 0)})
           end
         end
-        ASR(idx<255, me,' function event numeric id must be less than 255')
+        ASR(idx<255, me,'E6004')
 
         for k,tp in ipairs(args) do
 --print("env::Dcl_func: arg:",k, tp, (_TP.isBasicType(tp) or _TP.isBasicType(_TP.deref(tp))) or _TP.deref(tp))
-          ASR(not(tp=='void') and (_ENV.c[tp] or _ENV.c[_TP.deref(tp)] or _ENV.packets[tp]) ,me, '<'..tp..'> in position '..k..' is invalid argument type in function <'..id..'>')
-          ASR((_TP.isBasicType(tp) or _TP.isBasicType(_TP.deref(tp))) or not _TP.deref(tp),me, 'register <'..tp..'> in position '..k..' in function <'..id..'> can not be a pointer.')
+          ASR(not(tp=='void') and (_ENV.c[tp] or _ENV.c[_TP.deref(tp)] or _ENV.packets[tp]) ,me, 'E4011',{type=tp,position=k,['function']=id})
+          ASR((_TP.isBasicType(tp) or _TP.isBasicType(_TP.deref(tp))) or not _TP.deref(tp),me, 'E4012',{type=tp,position=k,['function']=id})
         end
         me.ext = {
             ln    = me.ln,
@@ -380,14 +380,14 @@ F = {
     Ext = function (me)
         local id = unpack(me)
 --print("env::Ext:",id,_ENV.exts[id], _ENV.exts[id .. '()'])
-        me.ext = ASR(_ENV.exts[id] or _ENV.exts[id .. '()'],me, 'event "'..id..'" is not declared') -- moved to AwaitExt
+        me.ext = ASR(_ENV.exts[id] or _ENV.exts[id .. '()'],me, 'E3002',{name=id}) -- moved to AwaitExt
     end,
 
     Func = function (me)
 --print("env::Func:",me[1],me.blk)
 --print(print_r(me,"env::Func: me"))
         local id = unpack(me)
-        ASR(_ENV.exts[id],me, 'function "'..id..'" is not declared')
+        ASR(_ENV.exts[id],me, 'E3003',{name=id})
         me.ext = _ENV.exts[id]
         me.tp = _ENV.exts[id].tp
         
@@ -396,7 +396,7 @@ F = {
                 if _TP.deref(tp) or not _TP.isBasicType(tp)  then
                     local blk = me.blk or _AST.iter('Block')()
                     ASR(blk.fin, me,
-                        'block at line '..blk.ln..' must contain `finally´')
+                        'E5010',{line=blk.ln})
                 end
             end
         end
@@ -431,7 +431,7 @@ F = {
             end
             blk = blk.par
         end
-        ASR(false, me, 'variable/event/function "'..id..'" is not declared')
+        ASR(false, me, 'E3001',{name=id})
     end,
 
     Dcl_c = function (me)
@@ -441,12 +441,12 @@ F = {
 
     Dcl_det = function (me)                 -- TODO: verify in _ENV.c
         local id1 = det2id(me[1])
-        ASR(_ENV.exts[id1],me,'event or function `' .. id1 .. '´ was not found.')
+        ASR(_ENV.exts[id1],me,'E3021',{name=id1})
         local t1 = _ENV.dets[id1] or {}
         _ENV.dets[id1] = t1
         for i=2, #me do
             local id2 = det2id(me[i])
-            ASR(_ENV.exts[id2],me,'event or function `' .. id2 .. '´ was not found.')
+            ASR(_ENV.exts[id2],me,'E3021',{name=id2})
             local t2 = _ENV.dets[id2] or {}
             _ENV.dets[id2] = t2
             t1[id2] = true
@@ -456,8 +456,8 @@ F = {
 
     Pause = function (me)
         local exp, _ = unpack(me)
-        ASR(exp.var.isEvt, me, 'event "'..exp.var.id..'" is not declared')
-        ASR(_TP.isNumeric(exp.var.tp), me, 'event type must be numeric')
+        ASR(exp.var.isEvt, me, 'E3002',{name=exp.var.id})
+        ASR(_TP.isNumeric(exp.var.tp), me, 'E5018')
     end,
 
     AwaitExt = function (me)
@@ -466,15 +466,15 @@ F = {
 --print("env::AwaitExt:",idAux..'|'..((e2 and '()') or '')..'|')
         me[1].ext =  _ENV.exts[idAux] or me[1].ext -- Try to overhide value got in 'Exp'
 --print("env::AwaitExt:",e1.ext.id,e1.ext.idx, e1.ext.pre, e2, (e2 and e2.tag),(e2 and e2.tp),(e2 and e2[1].tag))
-        ASR(e1.ext.pre == 'input',me,'await expect an input event, a time expression, or a var event.')
+        ASR(e1.ext.pre == 'input',me,'E5012')
 
         if e2 then
-          ASR(_ENV.exts[idAux],me,'event '.. e1[1] ..' doesn´t expect any argument.')
+          ASR(_ENV.exts[idAux],me,'E5013',{name=e1[1]})
           local err,cast = _TP.tpCompat('ubyte',e2.tp,nil,nil)
-          ASR(not err,me,'type/size incompatibility: '.. 'ubyte' ..' <--> '.. e2.tp..'')
-          WRN(not cast,me, 'Automatic casting from `'.. e2.tp ..'´ to `' .. 'ubyte' ..'´. ')
+          ASR(not err,me,'E4013',{left='ubyte',right=e2.tp})
+          WRN(not cast,me, 'W1001',{from=e2.tp,to='ubyte'})
         else
-          ASR(_ENV.exts[idAux] ,me,'event '.. e1[1] ..' expect an `ubyte/byte´ argument.')
+          ASR(_ENV.exts[idAux] ,me,'E5014',{name=e1[1]})
         end
         
         me.gte = (_ENV.awaits[e1.ext] or 0)
@@ -484,7 +484,7 @@ F = {
     AwaitInt = function (me)
         local exp,_ = unpack(me)
         local var = exp.var
-        ASR(var and var.isEvt, me,'event "'..(var and var.id or '?')..'" is not declared')
+        ASR(var and var.isEvt, me,'E3002',{name=(var and var.id or '?')})
         me.gte = var.n_awaits
         var.n_awaits = var.n_awaits + 1
         me.tp = var.tp
@@ -498,12 +498,12 @@ F = {
 
     EmitInt = function (me)
         local e1, e2 = unpack(me)
-        ASR(e1.var.isEvt, me, 'event "'..e1.var.id..'" is not declared')
+        ASR(e1.var.isEvt, me, 'E3002',{name=e1.var.id})
         if (e2) then
 print("env::EmitInt:",e1.var.tp,e2.tp)
           err, cast,_,_, len1, len2 = _TP.tpCompat(e1.var.tp,e2.tp)
-          ASR(not err,me,'type/size incompatibility: '.. e1.var.tp..'/'..len1 ..' <--> '.. e2.tp..'/'..len2..'')
-          WRN(not cast,me, 'Automatic casting from `'.. e2.tp ..'´ to `' .. e1.var.tp ..'´. ')
+          ASR(not err,me,'E4013',{left=e1.var.tp..'/'..len1,right=e2.tp..'/'..len2})
+          WRN(not cast,me, 'W1001',{from=e2.tp,to=e1.var.tp})
         end
         me.gte = _ENV.n_emits
         _ENV.n_emits = _ENV.n_emits + 2     -- (cnt/awk)
@@ -511,22 +511,22 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
 
     EmitExtS = function (me)
         local e1, _ = unpack(me)
-        ASR(e1.ext.pre=='output', me, 'emit expect an output event or a var event.')
+        ASR(e1.ext.pre=='output', me, 'E5015')
         if e1.ext.pre=='output' then
             F.EmitExtE(me)
         end
     end,
     EmitExtE = function (me)
         local e1, e2 = unpack(me)
-        ASR(e1.ext.pre=='output', me, 'invalid input `emit´')
+        ASR(e1.ext.pre=='output', me, 'E5016')
         me.tp = e1.ext.tp
 
         if e2 then
           err, cast,_,_,len1,len2 = _TP.tpCompat((e1.ext.supertp or e1.ext.tp),(e2.supertp or e2.tp),nil,e2.arr)
-          ASR(not err,me,'type/size incompatibility: '.. e1.ext.tp..'/'..len1 ..' <--> '.. e2.tp..'/'..len2..'')
-          WRN(not cast,me, 'Automatic casting from `'.. e2.tp ..'´ to `' .. e1.ext.tp ..'´. ')
+          ASR(not err,me,'E4013',{left=e1.ext.tp..'/'..len1,right=e2.tp..'/'..len2})
+          WRN(not cast,me, 'W1001',{from=e2.tp,to=e1.ext.tp})
         else
-            ASR(e1.ext.tp=='void',me, "missing parameters on `emit´")
+            ASR(e1.ext.tp=='void',me, 'E5017')
         end
     end,
 
@@ -591,12 +591,12 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
         e1 = e1 or _AST.iter'SetBlock'()[1]
 --print('env::SetExp:',e1.tag,e2.tag, e1[1].tag, e2[1].tag, e1.lval,e1.tp,e2.tp,e1[1].arr,e2[1].arr,no_fin)
 --        WRN(e1.lval and _TP.contains(e1.tp,e2.tp,true),me, 'invalid attribution: ['.. e1.tp ..'] can not contain [' .. e2.tp ..']')
-          ASR(not (e1[1].tag=='CONST'),me,'constant at left side of attribution.')
-          ASR(not (e1[1].tag=='Op1_&'),me,'VarAddr at left side of attribution.')
+          ASR(not (e1[1].tag=='CONST'),me,'E4018')
+          ASR(not (e1[1].tag=='Op1_&'),me,'E4019')
 
         local error, cast, tp1,tp2,len1,len2 = _TP.tpCompat((e1.supertp or e1.tp),(e2.supertp or e2.tp),e1[1].arr,e2[1].arr)
-          ASR(not error,me,'type incompatibility: `'.. (e1.supertp or e1.tp) ..'´ <--> `'.. (e2.supertp or e2.tp) ..'´')
-          WRN(not cast,me, 'Automatic casting from `'.. (e2.supertp or e2.tp) ..'´ to `' .. (e1.supertp or e1.tp) ..'´. ')
+          ASR(not error,me,'E4015',{left=(e1.supertp or e1.tp),right=(e2.supertp or e2.tp)})
+          WRN(not cast,me, 'W1001',{from=(e2.supertp or e2.tp),to=(e1.supertp or e1.tp)})
 
         if no_fin then
             return              -- no `finally´ required
@@ -623,16 +623,16 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
 
     SetAwait = function (me)
         local e1, awt = unpack(me)
-        ASR(e1.lval, me, 'invalid attribution: not a value')
+        ASR(e1.lval, me, 'E4016')
         if awt.ret.tag == 'AwaitT' then
-            ASR(_TP.isNumeric(e1.tp,true), me, 'invalid attribution: not a numeric value')
+            ASR(_TP.isNumeric(e1.tp,true), me, 'E4017')
         else    -- AwaitInt / AwaitExt
             local evt = awt.ret[1].var or awt.ret[1].ext
 --print("env::SetAwait:",e1.supertp, e1.tp)
             -- ASR(_TP.contains(e1.tp,evt.tp,true), me, 'invalid attribution: ['.. e1.tp ..'] can not contain [' .. evt.tp ..']')
             local error, cast, tp1,tp2,len1,len2 = _TP.tpCompat((e1.supertp or e1.tp),evt.tp,e1[1].arr,awt[1].arr)
-            ASR(not error,me,'type/size incompatibility: '.. e1.tp..'/'..len1 ..' <--> '.. evt.tp..'/'..len2..'')
-            WRN(not cast,me, 'Automatic casting from `'.. evt.tp ..'´ to `' .. e1.tp ..'´. ')
+            ASR(not error,me,'E4013',{left=e1.tp..'/'..len1,right=evt.tp..'/'..len2})
+            WRN(not cast,me, 'W1001',{from=evt.tp,to=e1.tp})
         end
         me.fst = awt.fst
     end,
@@ -640,7 +640,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
     CallStmt = function (me)
         local call = unpack(me)
 --print("env::CallStmt:",call[1].tag)
-        ASR(call[1].tag == 'Op2_call', me, 'invalid statement')
+        ASR(call[1].tag == 'Op2_call', me, 'E5019')
     end,
 
     --------------------------------------------------------------------------
@@ -649,7 +649,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
 --print("env::LExp:",me.tag,me[1].auxtag,me[1].tag, me[1].arr, me[1][1],me[1].read_only)
 --print(print_r(me,"env::Exp: me"))
 --        ASR(not(me[1].tag=='Var' and (me[1].arr)),me,'missing array index for "'..me[1][1]..'".')
-        ASR(not(me[1].read_only),me,'`'.. me[1][1] .. '´ is a read only variable')
+        ASR(not(me[1].read_only),me,'E4020',{name=me[1][1]})
 
         me.lval = me[1].lval
         me.tp   = me[1].tp
@@ -676,14 +676,14 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
         if f.tag == 'C' then
             me.c = _ENV.c[ f[1] ]
             ASR(me.c.tag=='func', me,
-                'C function "'..(f[1])..'" is not declared')
+                'E3004',{name=(f[1])})
             me.fid = f[1]
         else
             me.fid = '$anon'
         end
         _ENV.calls[me.fid] = true
         ASR((not _OPTS.c_calls) or _OPTS.c_calls[me.fid],
-            me, 'C calls are disabled')
+            me, 'E5011')
         if not (me.c and (me.c.mod=='pure' or me.c.mod=='nohold')) then
             if me.org then
                 error'oi'
@@ -692,7 +692,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
                 if _TP.deref(exp.tp) and exp.fst then
                     local blk = (exp.fst=='_' and _AST.root) or exp.fst.blk
                     ASR(blk.fin, me,
-                        'block at line '..blk.ln..' must contain `finally´')
+                        'E5010',{line=blk.ln})
                     -- int* pa; _f(pa); -- `pa´ termination must consider `_f´
                 end
             end
@@ -705,8 +705,8 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
 --print("env::Op2_idx:",me[2][1],me[2].tag,me[2].tp,me[2][2],me[3][1],me[3].tag,me[3].tp)
         local _, arr, idx = unpack(me)
 --print("env::Op2_idx:",arr.tp)
-        ASR(arr.arr, me, 'cannot index a non array')
-        local _arr = ASR(_TP.deref(arr.tp,true), me, 'cannot index a non array')
+        ASR(arr.arr, me, 'E4021')
+        local _arr = ASR(_TP.deref(arr.tp,true), me, 'E4021')
 --        ASR(_arr and _TP.isNumeric(idx.tp,true), me, 'invalid array index')
         --me.tp   = _TP.deref(me[2].tp)
         me.tp   = _arr
@@ -718,7 +718,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
     Op2_int_int = function (me)
         local op, e1, e2 = unpack(me)
 --print("env::Op2_int_int:",e2.tag,e2[1])
-        ASR(_TP.isNumeric(e1.tp,true) and _TP.isNumeric(e2.tp,true),me, 'invalid operands to binary "'..op..'"')
+        ASR(_TP.isNumeric(e1.tp,true) and _TP.isNumeric(e2.tp,true),me, 'E4022',{op=op})
 --        ASR((e2.tag=='CONST' and tonumber(e2[1])>0) or (e2.tag~='CONST'),me, 'division by zero')
         me.tp  = _TP.max(e1.tp,e2.tp,true)
     end,
@@ -736,7 +736,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
     Op1_int = function (me)
         local op, e1 = unpack(me)
         ASR(_TP.isNumeric(e1.tp,true),
-                me, 'invalid operand to unary "'..op..'"')
+                me, 'E4023',{op=op})
         me.tp  = (op=='not' and 'ubyte')  or e1.tp
     end,
     ['Op1_~']  = 'Op1_int',
@@ -745,7 +745,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
     Op2_same = function (me)
         local op, e1, e2 = unpack(me)
         ASR(_TP.max(e1.tp,e2.tp,true),
-                me, 'invalid operands to binary "'..op..'"')
+                me, 'E4022',{op=op})
         me.tp  = 'ubyte'
     end,
     ['Op2_=='] = 'Op2_same',
@@ -801,7 +801,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
 
     ['Op1_&'] = function (me)
         local op, e1 = unpack(me)
-        ASR(e1.lval, me, 'invalid operand to unary "&"')
+        ASR(e1.lval, me, 'E4023',{op='&'})
         me.tp   = e1.tp..'*'
         me.lval = false
         me.fst  = e1.fst
@@ -810,9 +810,9 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
 
     ['Op2_.'] = function (me)
         local op, e1, id = unpack(me)
-        ASR(_ENV.c[_TP.deref(e1.tp) or e1.tp].fields, me,'var "'.. e1[1]..'" is not a register. ')
+        ASR(_ENV.c[_TP.deref(e1.tp) or e1.tp].fields, me,'E3022',{name=e1[1]})
         local field = _ENV.c[_TP.deref(e1.tp) or e1.tp].fields[id]
-        ASR(field, me, 'invalid field name')
+        ASR(field, me, 'E3023')
         me.tp   = (field.dim and field.tp..'*') or field.tp
         me.lval = true
         me.fst  = e1.fst
@@ -823,7 +823,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
     Op_var = function (me)
         local op, exp = unpack(me)
 --print("env::Op_var:", op,exp[1].tag,exp[1].tp, exp[1].tag,exp[1].lval,exp[1].fst,_TP.isNumeric(exp.tp),_TP.deref(exp.tp))
-        ASR((exp.tag=='Var' or exp.tag=='Op2_idx' or exp.tag=='Op2_.') and _TP.isBasicType(exp.tp), me, 'invalid "inc/dec" target. Received a "'..exp.tag..'" of type "'..exp.tp..'"')
+        ASR((exp.tag=='Var' or exp.tag=='Op2_idx' or exp.tag=='Op2_.') and _TP.isBasicType(exp.tp), me, 'E4024',{tag=exp.tag,type=exp.tp})
         me.tp   = exp.tp
         me.lval = exp.lval
         me.fst  = exp.fst
@@ -833,8 +833,8 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
     Op1_cast = function (me)
         local tp, exp = unpack(me)
 --print("env::Op1_cast:", tp)
-        ASR(not _TP.deref(exp.tp),me,'can not cast an address value')
-        ASR(_TP.isBasicType(exp.tp),me,'can not cast register types')
+        ASR(not _TP.deref(exp.tp),me,'E4025')
+        ASR(_TP.isBasicType(exp.tp),me,'E4026')
         me.tp   = tp
         me.lval = exp.lval
         me.fst  = exp.fst
@@ -845,7 +845,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
         local id = unpack(me)
         local c = _ENV.c[id]
         ASR(c and (c.tag=='var' or c.tag=='func'), me,
-            'C variable/function "'..id..'" is not declared')
+            'E3005',{name=id})
         me.tp   = '_'
         me.lval = '_'
         me.fst  = '_'
@@ -866,7 +866,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
     end,
 
     STRING = function (me)
-        ASR(false, me, 'strings are not allowed')
+        ASR(false, me, 'E4027')
         me.tp   = 'char*'
         me.lval = false
         me.fst  = false
@@ -877,7 +877,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
         me.tp   = _TP.getConstType(v,me)
         me.lval = false
         me.fst  = false
-        ASR(string.sub(v,1,1)=="'" or tonumber(v), me, 'malformed number')
+        ASR(string.sub(v,1,1)=="'" or tonumber(v), me, 'E4028')
     end,
     NULL = function (me)
         me.tp   = 'void*'

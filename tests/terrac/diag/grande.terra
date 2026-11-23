@@ -1,0 +1,3 @@
+#include "TerraNet.defs"
+
+var ubyte[2000] a;

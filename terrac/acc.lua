@@ -1,3 +1,18 @@
+-- Argumentos dos avisos W2xxx: o texto de cada acesso (a, b) e, para quem lê o JSON, o tipo,
+-- o nome e a linha de cada um (kind_a, name_a, line_a...), sem precisar ler o texto (#24).
+function ACCARGS (acc1, acc2, args)
+    args = args or {}
+    for sfx, acc in pairs{ a=acc1 or false, b=acc2 } do
+        if acc then
+            args[sfx] = acc.err
+            args['kind_'..sfx] = acc.kind
+            args['name_'..sfx] = acc.name
+            args['line_'..sfx] = acc.node and acc.node.ln
+        end
+    end
+    return args
+end
+
 _ANA.ana.acc  = 0      -- nd accesses
 _ANA.ana.abrt  = 0      -- nd flows
 _ANA.ana.excpt = 0      -- nd excpt
@@ -97,6 +112,7 @@ F = {
             any = false,
 --            err = 'event `'..e1.evt.id..'´ (line '..me.ln..')'
             err = 'event `'..e1.ext.id..'´ (line '..me.ln..')',
+            node = me, kind = 'event', name = e1.ext.id,
             tag = 'EmitExt'
         }
 --[[
@@ -121,6 +137,7 @@ F = {
             tp  = '_',
             any = false,
             err = 'function `'.. f ..'´ (line '..me.ln..')',
+            node = me, kind = 'function', name = f,
             tag = 'Func'
         }
     end,
@@ -216,6 +233,7 @@ F = {
             tp  = me.var.tp,
             any = false,
             err = 'variable/event `'..me.var.id..'´ (line '..me.ln..')',
+            node = me, kind = (me.var.isEvt and 'internal_event' or 'variable'), name = me.var.id,
         }
     end,
 
@@ -241,6 +259,7 @@ F = {
             id  = top,
             md  = 'esc',
             err = 'escape (line '..me.ln..')',
+            node = me, kind = 'escape',
         }
     end,
     Return = function (me)
@@ -262,6 +281,7 @@ F = {
                     id   = me,--.__par,
                     md   = 'par',
                     err  = 'par enter (line '..me.ln..')',
+                    node = me, kind = 'par_enter',
                 }
             end
         end
@@ -273,6 +293,7 @@ F = {
             id  = me,--_AST.iter(TAG)(),
             md  = 'awk',
             err = 'awake (line '..me.ln..')',
+            node = me, kind = 'awake',
         }
     end,
     AwaitT = 'AwaitExt',
@@ -399,8 +420,8 @@ function CHK_ACC (accs1, accs2, NO_par, NO_emts)
                     if _AST.isChild(acc1.id, acc2.id)
                     or _AST.isChild(acc2.id, acc1.id)
                     then
-                        WRN(false,nil,'abortion : '..
-                                acc1.err..' vs '..acc2.err)
+                        WRN(false,nil,'W2006',ACCARGS(acc1,acc2),
+                                {at=acc1.node,related={acc2.node}})
                         _ANA.ana.abrt = _ANA.ana.abrt + 1
 --[[
 DBG'==============='
@@ -473,24 +494,24 @@ DBG'==============='
                         --if not(acc1.trg=='_') and acc1.trg==acc2.trg then
                             if acc1.md=='cl' and acc1.md==acc2.md  then
                               if not(acc1.trg=='_') and acc1.trg==acc2.trg then
-                                WRN(not _OPTS.wstrong,nil,'nondeterminism (call conflict) : '..acc1.err..' vs '..acc2.err)
+                                WRN(not _OPTS.wstrong,nil,'W2001',ACCARGS(acc1,acc2),{at=acc1.node,related={acc2.node}})
                               else
-                                WRN(not _OPTS.wweak,nil,'nondeterminism (weak call conflict) : '..acc1.err..' vs '..acc2.err)
+                                WRN(not _OPTS.wweak,nil,'W2002',ACCARGS(acc1,acc2),{at=acc1.node,related={acc2.node}})
                               end
                             elseif not(acc1.md=='rd') and acc1.md==acc2.md  then
                               if not(acc1.trg=='_') and acc1.trg==acc2.trg then
-                                WRN(not _OPTS.wstrong,nil,'nondeterminism (write conflict) : '..acc1.err..' vs '..acc2.err)
+                                WRN(not _OPTS.wstrong,nil,'W2003',ACCARGS(acc1,acc2),{at=acc1.node,related={acc2.node}})
                               else
-                                WRN(not _OPTS.wweak,nil,'nondeterminism (weak write conflict) : '..acc1.err..' vs '..acc2.err)
+                                WRN(not _OPTS.wweak,nil,'W2004',ACCARGS(acc1,acc2),{at=acc1.node,related={acc2.node}})
                               end
                             else
-                              WRN(not _OPTS.wweak,nil,'nondeterminism (weak read conflict) : '..acc1.err..' vs '..acc2.err)
+                              WRN(not _OPTS.wweak,nil,'W2005',ACCARGS(acc1,acc2),{at=acc1.node,related={acc2.node}})
                             end
 --                        else
 --                            if not(acc1.md=='rd') and acc1.md==acc2.md then
---                              WRN(not _OPTS.wweak,nil,'nondeterminism (weak write conflict) : '..acc1.err..' vs '..acc2.err)
+--                              WRN(not _OPTS.wweak,nil,'W2004',ACCARGS(acc1,acc2),{at=acc1.node,related={acc2.node}})
 --                            else
---                              WRN(not _OPTS.wweak,nil,'nondeterminism (weak read conflict) : '..acc1.err..' vs '..acc2.err)
+--                              WRN(not _OPTS.wweak,nil,'W2005',ACCARGS(acc1,acc2),{at=acc1.node,related={acc2.node}})
 --                            end
 --                        end
                         _ANA.ana.acc = _ANA.ana.acc + 1
@@ -519,7 +540,7 @@ function CHK_EXCPT (s1, s2, isOR)
                s2.ana.pos[false] --or       -- ~terminates (return/break)
                --s2.ana.pos[true]                 -- terminates tight
             then
-                WRN(false,nil,'exception : line '..s2.ln..' vs '..ana.err)
+                WRN(false,nil,'W2007',ACCARGS(nil,ana,{line=s2.ln}),{at=s2,related={ana.node}})
                 _ANA.ana.excpt = _ANA.ana.excpt + 1
                 ana.node.emtChk = true
             end

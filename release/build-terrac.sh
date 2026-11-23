@@ -57,6 +57,45 @@ while IFS= read -r esperado; do
     fi
 done < "$ROOT/tests/terrac/erros.esperado"
 
+# Diagnósticos (#24): o catálogo cobre tudo o que o terrac pode dizer; o --diag=json dá a saída
+# esperada (tests/terrac/diag/json.esperado), só com linhas JSON e o resumo no fim; o texto e o
+# JSON têm a mesma linha e mensagem; uma falha interna vira E0001.
+if lua5.1 "$ROOT/tests/terrac/catalogo.lua" "$ROOT/terrac" | tee -a "$LOG"; then :; else fail=1; fi
+mkdir -p "$W/d"
+cp "$ROOT"/terrac/samples/*.defs "$ROOT"/tests/terrac/*.terra "$ROOT"/tests/terrac/diag/*.terra \
+   "$ROOT"/tests/terrac/diag/*.h "$W/d/"
+: > "$W/json.obtido"
+for f in "$ROOT"/tests/terrac/*.terra "$ROOT"/tests/terrac/diag/*.terra; do
+    name=$(basename "$f" .terra)
+    (cd "$W/d" && lua5.1 "$D/terrac" "$name.terra" > /dev/null 2> "$name.txt" || true)
+    (cd "$W/d" && lua5.1 "$D/terrac" --diag=json "$name.terra" > /dev/null 2> "$name.json" || true)
+    { echo "== $name"; cat "$W/d/$name.json"; } >> "$W/json.obtido"
+    if ! lua5.1 "$ROOT/tests/terrac/consistencia.lua" "$W/d/$name.txt" "$W/d/$name.json" 2>&1 | tee -a "$LOG"; then
+        fail=1
+    elif [ -s "$W/d/$name.json" ] && command -v python3 > /dev/null &&
+         ! python3 -c 'import json,sys; [json.loads(l) for l in open(sys.argv[1])]' "$W/d/$name.json"; then
+        echo "terrac: $name: JSON inválido" | tee -a "$LOG"; fail=1
+    fi
+done
+if diff -u "$ROOT/tests/terrac/diag/json.esperado" "$W/json.obtido" | tee -a "$LOG"; then
+    echo "terrac: --diag=json: saída esperada" | tee -a "$LOG"
+else
+    echo "terrac: --diag=json: saída DIFERENTE" | tee -a "$LOG"; fail=1
+fi
+mkdir -p "$W/e" && cp "$ROOT/terrac/samples/TerraNet.defs" "$ROOT/terrac/samples/Count2Leds.terra" "$W/e/"
+mkdir "$W/e/Count2Leds.vmx"     # o .vmx não pode ser gravado: o assert do terrac falha
+rc=0; (cd "$W/e" && lua5.1 "$D/terrac" --diag=json Count2Leds.terra > /dev/null 2> err) || rc=$?
+if [ $rc = 1 ] && grep -q '^{"code":"E0001"' "$W/e/err" && tail -1 "$W/e/err" | grep -q '^{"summary":{"ok":false'; then
+    echo "terrac: falha interna: E0001" | tee -a "$LOG"
+else
+    echo "terrac: falha interna sem E0001 (rc $rc)" | tee -a "$LOG"; cat "$W/e/err" >> "$LOG"; fail=1
+fi
+# O catálogo vai na release como anexo (com o sha256 no SHA256SUMS).
+lua5.1 "$D/terrac" --catalog > "$OUT/terrac-errors-$VER.json"
+if command -v python3 > /dev/null && ! python3 -m json.tool "$OUT/terrac-errors-$VER.json" > /dev/null; then
+    echo "terrac: catálogo JSON inválido" | tee -a "$LOG"; fail=1
+fi
+
 tar -C "$W" -czf "$OUT/terrac-$VER.tar.gz" "terrac-$VER"
 rm -rf "$W"
 [ $fail = 0 ] || { echo "FALHOU: terrac"; exit 1; }

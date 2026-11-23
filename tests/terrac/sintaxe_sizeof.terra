@@ -1,0 +1,2 @@
+#include "TerraNet.defs"
+var ubyte x = sizeof<5>;

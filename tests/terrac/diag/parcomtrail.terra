@@ -1,0 +1,7 @@
+#include "TerraNet.defs"
+
+par/or do
+  loop do await 1s; end
+with
+  loop do await 2s; end
+end
