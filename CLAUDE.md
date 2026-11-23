@@ -31,6 +31,10 @@ de lá.
     não congela mais o relógio (mínimo de 1 tick, #19). Teste `tests/wclock`. Oráculo do
     TerraSim: 18 de 20 pares iguais à v1.0.0; os 2 restantes são o efeito esperado
     (`routing_target`, sementes 1 e 3). O TerraSim cria a v1.1.0 em cima dela.
+  - **`v1.1.0` publicada** (tag no `8d84077`, 2026-11-22, a pedido do Prof.): só o `terrac`
+    muda (#21 lpeg 1.x, #23 linhas, #24 códigos e `--diag=json`, anexo novo
+    `terrac-errors-1.1.0.json`). Firmware idêntico ao da v1.0.1; `_TOSSIM.so` com `.text`,
+    `.data` e `.rodata` iguais aos da v1.0.1.
   - Alinhada com a release **tinyos-toolchain `2.1.2-r2`** (decidido pelo Prof. em 2026-11-22;
     antes era a r1, `f42bac7`, digest `7e21b1b9…`). O workflow fixa a imagem
     `2.1.2-resolute-py3-21d8fb1@sha256:4198b12302181edd0e8b20ae06cd3af0a2d483a06355a78c1f83371250de47ec`.
@@ -70,14 +74,14 @@ de lá.
   - #23 número de linha: **fechada** (PR #26). Com `libc6-dev`, o `cpp -C` inclui o
     `stdc-predef.h` e as linhas saíam 42 acima; agora vêm dos marcadores do `cpp` (`_SRCLINE`).
     O `server/terrac_linhas.py` do TerraSim compensava isso e tem de ser desligado na troca
-    (avisado em 2026-11-22). Ainda sem release.
+    (avisado em 2026-11-22). Saiu na v1.1.0.
   - #24 códigos de erro e `--diag=json`: **fechada** (PR #27, `5e8b4d4`). O catálogo fica em
     `terrac/errors.lua` (159 códigos; `terrac --catalog` gera o JSON, anexo
     `terrac-errors-<v>.json` da release). O texto continua igual, salvo as plataformas em ordem
     de nome (comparado com o antigo em 760 programas). Os W2xxx trazem `kind/name/line_{a,b}`,
     pedido do TerraSim, que revisou e aprovou o formato. Formato em `release/README.md`.
     Testes: `tests/terrac/{catalogo,consistencia}.lua` e `diag/json.esperado`. Também corrigiu a
-    queda em `sizeof<5>` (`_V2NAME` incompleto). Os #23 e #24 ainda estão sem release.
+    queda em `sizeof<5>` (`_V2NAME` incompleto). Saíram na v1.1.0.
   - #22 (P1) otimização (`optm.lua`) às vezes quebra a execução na VM. Ligada **por padrão**; o
     TerraSim compila com `--no-opt`. Não reproduzida: os 20 programas Net daqui e do TerraSim se
     comportam igual com e sem `--opt` (VMDBG nó a nó, sem os `executing trail`, e TVIEW). Para
