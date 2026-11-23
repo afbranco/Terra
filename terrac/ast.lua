@@ -582,6 +582,33 @@ function PSE_paror (me)
     return par
 end
 
+-- Os finalizadores ($fin_n) dos blocos 'do ... finally' que estão dentro de 'me', em ordem. Um
+-- break, return ou fim de ramo de par/or só aborta o que está dentro do laço, do bloco ou do
+-- par/or; antes eram emitidos os de todo o programa e um finally de outra trilha (ou de um bloco
+-- que contém o laço) rodava antes da hora (#36).
+local function FINS (me, t)
+    t = t or {}
+    for _, sub in ipairs(me) do
+        if _AST.isNode(sub) then
+            if sub.tag == 'Finally' then
+                t[#t+1] = sub.n
+            end
+            FINS(sub, t)
+        end
+    end
+    return t
+end
+
+local function EMIT_FINS (blk, me)
+    if not me then return end     -- break fora de laço: o erro vem depois
+    local t = FINS(me)
+    table.sort(t)
+    for _, i in ipairs(t) do
+        blk[#blk+1] = node('EmitInt')(blk.ln,
+                        node('Var')(blk.ln, '$fin_'..i))
+    end
+end
+
 F = {
     Block_pre = function (me)
         me.par = _AST.iter'Block'()
@@ -600,11 +627,8 @@ F = {
         local blk = node('BlockN')(me.ln)
         blk[#blk+1] = node('SetExp')(me.ln, EXP(var), e2, set[3])
 
-        -- Finalizer
-        for i=1, FIN do
-            blk[#blk+1] = node('EmitInt')(blk.ln,
-                            node('Var')(blk.ln, '$fin_'..i))
-        end
+        -- Finalizer: só os blocos dentro do SetBlock que o return encerra
+        EMIT_FINS(blk, set)
 
         blk[#blk+1] = node('Return')(me.ln)
         return blk
@@ -724,19 +748,15 @@ F = {
 
     -- Finalizer
     ParOr = function (me)
-        for i, sub in ipairs(me) do
-            for i=1, FIN do
-                sub[#sub+1] = node('EmitInt')(sub.ln,
-                                node('Var')(sub.ln, '$fin_'..i))
-            end
+        local subs = {}
+        for i, sub in ipairs(me) do subs[i] = sub end
+        for _, sub in ipairs(subs) do
+            EMIT_FINS(sub, me)       -- os blocos dentro do par/or
         end
     end,
     Break = function (me)
         local blk = node('BlockN')(me.ln)
-        for i=1, FIN do
-            blk[#blk+1] = node('EmitInt')(blk.ln,
-                            node('Var')(blk.ln, '$fin_'..i))
-        end
+        EMIT_FINS(blk, _AST.iter'Loop'())   -- os blocos dentro do laço que o break encerra
         blk[#blk+1] = me
         return blk
     end,
