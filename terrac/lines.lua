@@ -17,30 +17,7 @@ function MAX (v1, v2)
     return (v1 > v2) and v1 or v2
 end
 
-function WRN (cond, me, msg)
-    local ln = (me and ((type(me)=='number' and me) or me.ln) or 0)
-    if not cond  and _OPTS.warn then
-      if me then
-        DBG('WRN : line '..ln..' : '..msg)
-      else
-        DBG('WRN : '..msg)
-      end
-        _WRN.n_wrns = _WRN.n_wrns + 1;
-    end
-    return cond
-end
-function ASR (cond, me, msg)
-    local ln = (type(me)=='number' and me) or me.ln
-    if _CEU then
-        if not cond then
-            DBG('ERR : line '..ln..' : '..msg)
-            os.exit(1)
-        end
-        return cond
-    else
-        return assert(cond, 'ERR : line '..ln..' : '..msg)
-    end
-end
+-- ASR e WRN estão em errors.lua (códigos de diagnóstico, #24).
 
 _I2L = {}
 

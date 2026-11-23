@@ -1,0 +1,90 @@
+== linhas_brancos
+{"code":"E2020","severity":"error","file":"linhas_brancos.terra","line":16,"col":3,"col_end":4,"msg":"after `=´ : expected expression","args":{"token":"=","where":"after"}}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true}}
+== linhas_comentario
+{"code":"E2001","severity":"error","file":"linhas_comentario.terra","line":11,"col":11,"col_end":12,"msg":"before `+´ : expected `;´","args":{"token":"+","where":"before"}}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true}}
+== semantica_naodeclarada
+{"code":"E3001","severity":"error","file":"semantica_naodeclarada.terra","line":4,"col":1,"msg":"variable/event/function \"y\" is not declared","args":{"name":"y"}}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
+== sintaxe_await
+{"code":"E2022","severity":"error","file":"sintaxe_await.terra","line":4,"col":5,"col_end":10,"msg":"after `await´ : expected event","args":{"token":"await","where":"after"}}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true}}
+== sintaxe_comando
+{"code":"E2021","severity":"error","file":"sintaxe_comando.terra","line":4,"col":5,"col_end":10,"msg":"before `awiat´ : expected statement (not last statement as `return´ or `break´) ","args":{"token":"awiat","where":"before"}}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true}}
+== sintaxe_end
+{"code":"E2021","severity":"error","file":"sintaxe_end.terra","line":5,"col":17,"col_end":18,"msg":"after `;´ : expected statement (not last statement as `return´ or `break´) ","args":{"token":";","where":"after"}}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true}}
+== sintaxe_expressao
+{"code":"E2020","severity":"error","file":"sintaxe_expressao.terra","line":7,"col":7,"col_end":8,"msg":"after `=´ : expected expression","args":{"token":"=","where":"after"}}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true}}
+== sintaxe_parentese
+{"code":"E2001","severity":"error","file":"sintaxe_parentese.terra","line":5,"col":10,"col_end":14,"msg":"after `LED0´ : expected `;´","args":{"token":"LED0","where":"after"}}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true}}
+== sintaxe_pontoevirgula
+{"code":"E2001","severity":"error","file":"sintaxe_pontoevirgula.terra","line":3,"col":15,"col_end":16,"msg":"after `1´ : expected `;´","args":{"token":"1","where":"after"}}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true}}
+== sintaxe_sizeof
+{"code":"E2027","severity":"error","file":"sintaxe_sizeof.terra","line":2,"col":21,"col_end":22,"msg":"after `<´ : expected type","args":{"token":"<","where":"after"}}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true}}
+== sintaxe_then
+{"code":"E2011","severity":"error","file":"sintaxe_then.terra","line":4,"col":9,"col_end":10,"msg":"after `1´ : expected `then´","args":{"token":"1","where":"after"}}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true}}
+== sintaxe_tipo
+{"code":"E2024","severity":"error","file":"sintaxe_tipo.terra","line":3,"col":5,"col_end":6,"msg":"after `x´ : expected a not reserved identifier beginning with lower-case","args":{"token":"x","where":"after"}}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true}}
+== castauto
+{"code":"W1001","severity":"warning","file":"castauto.terra","line":5,"col":1,"msg":"Automatic casting from `ushort´ to `ubyte´. ","args":{"from":"ushort","to":"ubyte"}}
+{"summary":{"ok":true,"errors":0,"warnings":1,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"},"memory":{"total":22,"code":10,"ctl_vars":12,"stack":0,"radio_msgs":1},"platforms":[{"name":"iris_full","max":4224,"fits":true},{"name":"iris_hyb","max":1920,"fits":true},{"name":"mica2","max":1920,"fits":true},{"name":"mica2dot","max":1920,"fits":true},{"name":"micaz","max":1920,"fits":true},{"name":"telosb_full","max":4224,"fits":true},{"name":"telosb_hyb","max":1920,"fits":true},{"name":"tossim","max":1728,"fits":true}]}}
+== cppfalta
+{"code":"E1004","severity":"error","file":"cppfalta.terra","line":2,"col":10,"msg":"fatal error: naoexiste.h: No such file or directory","args":{"msg":"fatal error: naoexiste.h: No such file or directory"}}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true}}
+== cppif
+{"code":"E1004","severity":"error","file":"cppif.terra","line":2,"col":4,"msg":"error: #if with no expression","args":{"msg":"error: #if with no expression"}}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true}}
+== emitpar
+{"code":"W2001","severity":"warning","file":"emitpar.terra","line":4,"col":3,"msg":"nondeterminism (call conflict) : event `LEDS´ (line 4) vs event `LEDS´ (line 6)","args":{"a":"event `LEDS´ (line 4)","b":"event `LEDS´ (line 6)","kind_a":"event","kind_b":"event","line_a":4,"line_b":6,"name_a":"LEDS","name_b":"LEDS"},"related":[{"file":"emitpar.terra","line":6,"col":3}]}
+{"summary":{"ok":true,"errors":0,"warnings":1,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"},"memory":{"total":50,"code":35,"ctl_vars":15,"stack":0,"radio_msgs":3},"platforms":[{"name":"iris_full","max":4224,"fits":true},{"name":"iris_hyb","max":1920,"fits":true},{"name":"mica2","max":1920,"fits":true},{"name":"mica2dot","max":1920,"fits":true},{"name":"micaz","max":1920,"fits":true},{"name":"telosb_full","max":4224,"fits":true},{"name":"telosb_hyb","max":1920,"fits":true},{"name":"tossim","max":1728,"fits":true}]}}
+== esconde
+{"code":"W4001","severity":"warning","file":"esconde.terra","line":5,"col":3,"msg":"declaration of \"x\" hides the one at line 3","args":{"line":3,"name":"x"}}
+{"summary":{"ok":true,"errors":0,"warnings":1,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"},"memory":{"total":19,"code":8,"ctl_vars":11,"stack":0,"radio_msgs":1},"platforms":[{"name":"iris_full","max":4224,"fits":true},{"name":"iris_hyb","max":1920,"fits":true},{"name":"mica2","max":1920,"fits":true},{"name":"mica2dot","max":1920,"fits":true},{"name":"micaz","max":1920,"fits":true},{"name":"telosb_full","max":4224,"fits":true},{"name":"telosb_hyb","max":1920,"fits":true},{"name":"tossim","max":1728,"fits":true}]}}
+== escritapar
+{"code":"W2003","severity":"warning","file":"escritapar.terra","line":5,"col":3,"msg":"nondeterminism (write conflict) : variable/event `x´ (line 5) vs variable/event `x´ (line 7)","args":{"a":"variable/event `x´ (line 5)","b":"variable/event `x´ (line 7)","kind_a":"variable","kind_b":"variable","line_a":5,"line_b":7,"name_a":"x","name_b":"x"},"related":[{"file":"escritapar.terra","line":7,"col":3}]}
+{"summary":{"ok":true,"errors":0,"warnings":1,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"},"memory":{"total":51,"code":35,"ctl_vars":16,"stack":0,"radio_msgs":3},"platforms":[{"name":"iris_full","max":4224,"fits":true},{"name":"iris_hyb","max":1920,"fits":true},{"name":"mica2","max":1920,"fits":true},{"name":"mica2dot","max":1920,"fits":true},{"name":"micaz","max":1920,"fits":true},{"name":"telosb_full","max":4224,"fits":true},{"name":"telosb_hyb","max":1920,"fits":true},{"name":"tossim","max":1728,"fits":true}]}}
+== eventointerno
+{"code":"W2003","severity":"warning","file":"eventointerno.terra","line":5,"col":3,"msg":"nondeterminism (write conflict) : variable/event `e´ (line 5) vs variable/event `e´ (line 7)","args":{"a":"variable/event `e´ (line 5)","b":"variable/event `e´ (line 7)","kind_a":"internal_event","kind_b":"internal_event","line_a":5,"line_b":7,"name_a":"e","name_b":"e"},"related":[{"file":"eventointerno.terra","line":7,"col":3}]}
+{"summary":{"ok":true,"errors":0,"warnings":1,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"},"memory":{"total":106,"code":71,"ctl_vars":35,"stack":0,"radio_msgs":4},"platforms":[{"name":"iris_full","max":4224,"fits":true},{"name":"iris_hyb","max":1920,"fits":true},{"name":"mica2","max":1920,"fits":true},{"name":"mica2dot","max":1920,"fits":true},{"name":"micaz","max":1920,"fits":true},{"name":"telosb_full","max":4224,"fits":true},{"name":"telosb_hyb","max":1920,"fits":true},{"name":"tossim","max":1728,"fits":true}]}}
+== excecao
+{"code":"W2007","severity":"warning","file":"excecao.terra","line":6,"col":3,"msg":"exception : line 6 vs variable/event `e´ (line 11)","args":{"b":"variable/event `e´ (line 11)","kind_b":"internal_event","line":6,"line_b":11,"name_b":"e"},"related":[{"file":"excecao.terra","line":11,"col":3}]}
+{"summary":{"ok":true,"errors":0,"warnings":1,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"},"memory":{"total":86,"code":60,"ctl_vars":26,"stack":0,"radio_msgs":3},"platforms":[{"name":"iris_full","max":4224,"fits":true},{"name":"iris_hyb","max":1920,"fits":true},{"name":"mica2","max":1920,"fits":true},{"name":"mica2dot","max":1920,"fits":true},{"name":"micaz","max":1920,"fits":true},{"name":"telosb_full","max":4224,"fits":true},{"name":"telosb_hyb","max":1920,"fits":true},{"name":"tossim","max":1728,"fits":true}]}}
+== floatgrande
+{"code":"W5001","severity":"warning","file":"floatgrande.terra","line":3,"col":15,"msg":"Float constant out of range, got: \"1e40\", value must range (+/-) 3.4E+38","args":{"value":"1e40"}}
+{"summary":{"ok":true,"errors":0,"warnings":1,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"},"memory":{"total":21,"code":8,"ctl_vars":13,"stack":0,"radio_msgs":1},"platforms":[{"name":"iris_full","max":4224,"fits":true},{"name":"iris_hyb","max":1920,"fits":true},{"name":"mica2","max":1920,"fits":true},{"name":"mica2dot","max":1920,"fits":true},{"name":"micaz","max":1920,"fits":true},{"name":"telosb_full","max":4224,"fits":true},{"name":"telosb_hyb","max":1920,"fits":true},{"name":"tossim","max":1728,"fits":true}]}}
+== funcargs
+{"code":"E4034","severity":"error","file":"funcargs.terra","line":3,"col":16,"msg":"invalid number of arguments for function [getNodeId], received 1 and it was expecting 0","args":{"expected":0,"function":"getNodeId","received":1}}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
+== grande
+{"code":"W5003","severity":"warning","file":"grande.terra","msg":"Please check the maximum program size for each mote type!"}
+{"summary":{"ok":true,"errors":0,"warnings":1,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"},"memory":{"total":2011,"code":2,"ctl_vars":2009,"stack":0,"radio_msgs":1},"platforms":[{"name":"iris_full","max":4224,"fits":true},{"name":"iris_hyb","max":1920,"fits":false},{"name":"mica2","max":1920,"fits":false},{"name":"mica2dot","max":1920,"fits":false},{"name":"micaz","max":1920,"fits":false},{"name":"telosb_full","max":4224,"fits":true},{"name":"telosb_hyb","max":1920,"fits":false},{"name":"tossim","max":1728,"fits":false}]}}
+== incl
+{"code":"E3001","severity":"error","file":"incl.terra","line":2,"msg":"variable/event/function \"zz\" is not declared","args":{"name":"zz"},"include":{"file":"inc_err.h","line":2,"col":15}}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
+== indicefora
+{"code":"E6001","severity":"error","file":"indicefora.terra","line":4,"col":1,"msg":"array index out of range, 0..2.","args":{"max":2}}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
+== naodecl
+{"code":"E3001","severity":"error","file":"naodecl.terra","line":3,"col":15,"msg":"variable/event/function \"y\" is not declared","args":{"name":"y"}}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
+== parcomtrail
+{"code":"W3002","severity":"warning","file":"parcomtrail.terra","line":3,"col":1,"msg":"at least one trail should terminate"}
+{"summary":{"ok":true,"errors":0,"warnings":1,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"},"memory":{"total":74,"code":45,"ctl_vars":29,"stack":0,"radio_msgs":3},"platforms":[{"name":"iris_full","max":4224,"fits":true},{"name":"iris_hyb","max":1920,"fits":true},{"name":"mica2","max":1920,"fits":true},{"name":"mica2dot","max":1920,"fits":true},{"name":"micaz","max":1920,"fits":true},{"name":"telosb_full","max":4224,"fits":true},{"name":"telosb_hyb","max":1920,"fits":true},{"name":"tossim","max":1728,"fits":true}]}}
+== semretorno
+{"code":"W3004","severity":"warning","file":"semretorno.terra","line":3,"col":15,"msg":"missing `return´ statement for the block"}
+{"summary":{"ok":true,"errors":0,"warnings":1,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"},"memory":{"total":35,"code":17,"ctl_vars":18,"stack":0,"radio_msgs":2},"platforms":[{"name":"iris_full","max":4224,"fits":true},{"name":"iris_hyb","max":1920,"fits":true},{"name":"mica2","max":1920,"fits":true},{"name":"mica2dot","max":1920,"fits":true},{"name":"micaz","max":1920,"fits":true},{"name":"telosb_full","max":4224,"fits":true},{"name":"telosb_hyb","max":1920,"fits":true},{"name":"tossim","max":1728,"fits":true}]}}
+== tight
+{"code":"E5001","severity":"error","file":"tight.terra","line":3,"col":1,"msg":"tight loop"}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
+== varrepetida
+{"code":"E3007","severity":"error","file":"varrepetida.terra","line":4,"col":1,"msg":"var \"x\" was defined for same context at line 3","args":{"line":3,"name":"x"}}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}

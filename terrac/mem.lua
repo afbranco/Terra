@@ -241,7 +241,7 @@ F = {
             local tp = _TP.deref(e1.ext.tp, true)
 --print("mem::EmitExtE:",e1.ext.id, e1.ext.tp, e2.tp)
             if tp then
-            ASR(_TP.deref(e2.tp),me,'invalid type. Expecting '..e1.ext.tp..' and received '.. e2.tp)
+            ASR(_TP.deref(e2.tp),me,'E4031',{expected=e1.ext.tp,received=e2.tp})
                 len = _ENV.c[_TP.deref(_TP.deref(e2.tp)) or _TP.deref(e2.tp) or e2.tp].len --'sizeof('.._TP.c(tp)..')'
                 val = e2.val
                 valType = ''
@@ -419,7 +419,7 @@ F = {
 --afb        me.val = me.us
         me.val = _TP.getConstType(me.ms,me.ln)..' '..me.ms   -- uses milli
 --afb        ASR(me.us>0 and me.us<=2000000000, me, 'constant is out of range')
-        ASR(me.ms>0 and me.ms<= (math.pow(2,32))-1, me, 'constant is out of range')
+        ASR(me.ms>0 and me.ms<= (math.pow(2,32))-1, me, 'E6005')
     end,
 
     WCLOCKE = function (me)
@@ -440,7 +440,7 @@ F = {
                     'symbol `'..me[1]..'´ (line '..me.ln..')'} }
     end,
     SIZEOF = function (me)
-      ASR(_ENV.c[_TP.deref(me[1]) or me[1]],me,'invalid type "'.. me[1] ..'"')
+      ASR(_ENV.c[_TP.deref(me[1]) or me[1]],me,'E4032',{type=me[1]})
       local tp = (_TP.deref(me[1]) and 'ushort') or me[1]
 --print("mem::SIZEOF:",_ENV.c[tp].len,_TP.getConstType(_ENV.c[tp].len),me.ln)
 --        me.val = 'sizeof('.._TP.c(me[1])..')'

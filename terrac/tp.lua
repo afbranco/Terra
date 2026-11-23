@@ -166,7 +166,7 @@ function _TP.getConstType(val,me,no_wrn)
   if ((string.find(val,'e') or string.find(val,'E') or string.find(val,'%.')) and tonumber(val)) and not(string.find(val,'x') or string.find(val,'X'))then
     local nval = tonumber(val)
     if (nval < -3.4E+38) or (nval > 3.4E+38)  then
-      WRN(no_wrn,me,'Float constant out of range, got: "'.. val ..'", value must range (+/-) 3.4E+38')
+      WRN(no_wrn,me,'W5001',{value=val})
     end    
     return 'float'
   else
@@ -175,7 +175,7 @@ function _TP.getConstType(val,me,no_wrn)
   	if (nval <= 0xff) then return 'ubyte' end
     if (nval <= 0xffff) then return 'ushort' end
     if (nval <= 0xffffffff) then return 'ulong' end
-    WRN(no_wrn,me,'Integer constant too large, got: "'.. val ..'", max value must be (2^32)-1')
+    WRN(no_wrn,me,'W5002',{value=val})
   	return 'ulong'
   end
 end

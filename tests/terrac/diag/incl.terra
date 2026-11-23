@@ -1,0 +1,3 @@
+#include "TerraNet.defs"
+#include "inc_err.h"
+emit LEDS(1);

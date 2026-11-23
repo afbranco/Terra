@@ -113,7 +113,7 @@ F = {
                 --_ANA.ana.unreachs = _ANA.ana.unreachs + 1
                 me.__unreach = true
                 WRN( INC(me, 'unreachs'),
-                     sub, 'statement is not reachable')
+                     sub, 'W3001')
             end
             -- other subs follow previous
             sub.ana = {
@@ -130,7 +130,7 @@ F = {
         if me.ana.pos[false] then
             --_ANA.ana.unreachs = _ANA.ana.unreachs + 1
             WRN( INC(me, 'unreachs'),
-                 me, 'at least one trail should terminate')
+                 me, 'W3002')
         end
     end,
 
@@ -142,7 +142,7 @@ F = {
                 me.ana.pos = { [false]=true }
                 --_ANA.ana.unreachs = _ANA.ana.unreachs + 1
                 WRN( INC(me, 'unreachs'),
-                     sub, 'trail should terminate')
+                     sub, 'W3003')
                 return
             end
         end
@@ -176,7 +176,7 @@ F = {
             --WRN( INC(me, 'reachs'), me, 'all trails must terminate')
             INC(me, 'reachs')
         end
-        ASR(ok,me,'all trails must terminate')
+        ASR(ok,me,'E5002')
     end,
 
     If = function (me)
@@ -217,7 +217,7 @@ F = {
         then
             --_ANA.ana.reachs = _ANA.ana.reachs + 1
             WRN( INC(me, 'reachs'),
-                 blk, 'missing `return´ statement for the block')
+                 blk, 'W3004')
         end
     end,
 
@@ -235,7 +235,7 @@ F = {
         if me[1].ana.pos[false] then
             --_ANA.ana.unreachs = _ANA.ana.unreachs + 1
             WRN( INC(me, 'unreachs'),
-                 me, '`loop´ iteration is not reachable')
+                 me, 'W3005')
         end
     end,
 

@@ -1,0 +1,7 @@
+#include "TerraNet.defs"
+
+par/and do
+  emit LEDS(1);
+with
+  emit LEDS(2);
+end

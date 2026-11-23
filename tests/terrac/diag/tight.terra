@@ -1,0 +1,5 @@
+#include "TerraNet.defs"
+
+loop do
+  var ubyte a = 1;
+end

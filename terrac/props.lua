@@ -50,10 +50,10 @@ F = {
             MAX_all(me)
         end
         if NO_fin[me.tag] then
-            ASR(not _AST.iter'Finally'(), me, 'not permitted inside `finally´')
+            ASR(not _AST.iter'Finally'(), me, 'E5003')
         end
         if NO_async[me.tag] then
-            ASR(not _AST.iter'Async'(), me,'not permitted inside `async´')
+            ASR(not _AST.iter'Async'(), me,'E5004')
         end
     end,
 
@@ -88,16 +88,16 @@ F = {
     end,
     Break = function (me)
         local loop = _AST.iter'Loop'()
-        ASR(loop, me, 'break without loop')
+        ASR(loop, me, 'E5006')
         loop.brks[me] = true
 
         local fin = _AST.iter'Finally'()
-        ASR(not fin or fin.depth<loop.depth, me, 'not permitted inside `finally´')
+        ASR(not fin or fin.depth<loop.depth, me, 'E5003')
 
         local async = _AST.iter'Async'()
         if async then
             local loop = _AST.iter'Loop'()
-            ASR(loop.depth>async.depth, me, '`break´ without loop')
+            ASR(loop.depth>async.depth, me, 'E5007')
         end
     end,
 
@@ -112,7 +112,7 @@ F = {
         local async = _AST.iter'Async'()    
         if async then
             local setblk = _AST.iter'SetBlock'()
-            ASR(async.depth<=setblk.depth+1, me, '`return´ without block')
+            ASR(async.depth<=setblk.depth+1, me, 'E5008')
         end
     end,
 
@@ -127,16 +127,16 @@ F = {
 
     EmitExtS = function (me)
         if _AST.iter'Async'() then
-            ASR(me[1].ext.pre=='input',  me, 'not permitted inside `async´')
+            ASR(me[1].ext.pre=='input',  me, 'E5004')
         else
-            ASR(me[1].ext.pre=='output', me, 'not permitted outside `async´')
+            ASR(me[1].ext.pre=='output', me, 'E5005')
         end
     end,
     EmitExtE = function (me)
         F.EmitExtS(me)
     end,
     EmitT = function (me)
-        ASR(_AST.iter'Async'(), me,'not permitted outside `async´')
+        ASR(_AST.iter'Async'(), me,'E5005')
     end,
 
     SetExp = function (me)
@@ -144,7 +144,7 @@ F = {
         local async = _AST.iter'Async'()
         if async and (not e1) then
             ASR( async.depth <= _AST.iter'SetBlock'().depth+1,
-                    me, 'invalid access from async')
+                    me, 'E5009')
         end
     end,
 
@@ -156,7 +156,7 @@ F = {
             ASR(_AST.iter'VarList'() or         -- param list
                 me.ret or                       -- var assigned on return
                 async.depth < me.var.blk.depth, -- var is declared inside
-                    me, 'invalid access from async')
+                    me, 'E5009')
         end
     end,
 }

@@ -1,0 +1,8 @@
+#include "TerraNet.defs"
+
+var ubyte x;
+do
+  var ubyte x;
+  x = 1;
+end
+x=2;

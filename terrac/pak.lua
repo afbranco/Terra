@@ -10,6 +10,7 @@ function subst (name)
           string.sub(fin, (e+1))
 end
 
+subst 'errors.lua'
 subst 'tp.lua'
 subst 'lines.lua'
 subst 'parser.lua'
