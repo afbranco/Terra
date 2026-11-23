@@ -1,0 +1,45 @@
+#include "TerraNet.defs"
+
+// Issue #37: ao sair de um par/or, o terrac limpava os gates do evento externo sempre a partir
+// do gate 0, e não do primeiro gate do bloco. A trilha viva perdia o await e a abortada acordava.
+// Nos LEDs do nó, em ordem: 1 (PHOTO acorda a trilha viva), 2, 3 (SEND_DONE(1), evento com
+// argumento, acorda a trilha viva) e 7. Com o bug: 5 no lugar de 1 e 6 no lugar de 3.
+pktype msg from radioMsg with
+  var ubyte d;
+end
+var msg m;
+m.type = 1;
+m.target = BROADCAST;
+par/and do
+  await PHOTO;                  // gate 0 de PHOTO: fica vivo
+  emit LEDS(1);
+with
+  par/or do
+    await PHOTO;                // gate 1: abortado
+    emit LEDS(4);
+  with
+    await PHOTO;                // gate 2: abortado
+    emit LEDS(5);
+  with
+    await 300ms;
+  end
+  await 1s;
+  emit REQ_PHOTO();
+  await 2s;
+  emit LEDS(2);
+end
+par/and do
+  await SEND_DONE(1);           // gate 0 de SEND_DONE(ubyte): fica vivo
+  emit LEDS(3);
+with
+  par/or do
+    await SEND_DONE(1);         // gate 1: abortado
+    emit LEDS(6);
+  with
+    await 300ms;
+  end
+  await 1s;
+  emit SEND(m);
+  await 2s;
+  emit LEDS(7);
+end

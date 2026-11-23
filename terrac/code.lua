@@ -120,7 +120,10 @@ function BLOCK_GATES (me)
 --                LINE(me, '//> memset(PTR_EXT(IN_'..ext.id..','..t[1]..'), 0, '
 --                    ..n..'*sizeof(tceu_nlbl));')
 		        codeB = LINE(me, 'clear EXT gates for '..ext.id,nil,'// stop awaiting inner externals') 
-		        BYTECODE(me,codeB,'op_memclr', n*_ENV.c.tceu_nlbl.len, _MEM.gtes[ext.n]+2)
+		        -- a faixa começa no primeiro gate do bloco (t[1]); com argumento (auxId), cada gate tem
+		        -- 3 bytes: idAux e o rótulo (ver AwaitExt). Antes limpava sempre a partir do gate 0 (#37).
+		        local len = _ENV.c.tceu_nlbl.len + (ext.inArg and 1 or 0)
+		        BYTECODE(me,codeB,'op_memclr', n*len, _MEM.gtes[ext.n]+2+t[1]*len)
             end
         end
     end
