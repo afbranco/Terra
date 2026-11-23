@@ -1,0 +1,29 @@
+#include "TerraNet.defs"
+
+// Issue #34: gravação de float na memória da VM (setMVal). Cada conferência aparece nos LEDs do
+// nó, uma por segundo: 1 se o float gravado é exatamente o esperado, 2 se não.
+var float a = 100.25;       // constante
+var float b = 2.5;
+var float g = 1000.5;       // fora da faixa de int8
+var ulong u = 100000;
+var long  s = 7;
+var float c;
+var float d;
+var float e;
+var float h;
+var float k;
+var float[3] v;
+c = a;                      // cópia de variável
+d = b * 4.0;                // resultado de conta
+v[1] = a;                   // elemento de array
+e = b - 6.25;               // negativo (-3.75)
+h = u;                      // de inteiro sem sinal
+k = 0 - s;                  // de inteiro com sinal (-7)
+await 1s; if a == 100.25   then emit LEDS(1); else emit LEDS(2); end
+await 1s; if c == 100.25   then emit LEDS(1); else emit LEDS(2); end
+await 1s; if d == 10.0     then emit LEDS(1); else emit LEDS(2); end
+await 1s; if v[1] == 100.25 then emit LEDS(1); else emit LEDS(2); end
+await 1s; if e + 3.75 == 0.0 then emit LEDS(1); else emit LEDS(2); end
+await 1s; if g == 1000.5   then emit LEDS(1); else emit LEDS(2); end
+await 1s; if h == 100000.0 then emit LEDS(1); else emit LEDS(2); end
+await 1s; if k + 7.0 == 0.0 then emit LEDS(1); else emit LEDS(2); end

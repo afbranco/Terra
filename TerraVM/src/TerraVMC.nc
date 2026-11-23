@@ -264,7 +264,7 @@ void setMVal(uint32_t buffer, uint16_t Maddr, uint8_t fromTp, uint8_t toTp){
 				case U8  : *(nx_uint8_t*)(MEM+Maddr) = (uint8_t)value; return;
 				case U16 : *(nx_uint16_t*)(MEM+Maddr) = (uint16_t)value; return;
 				case U32 : *(nx_uint32_t*)(MEM+Maddr) = (uint32_t)value; return;
-				case F32 : *(nx_float*)(MEM+Maddr) = (float)value;
+				case F32 : *(nx_float*)(MEM+Maddr) = (float)value; return;   // sem o return, caía no S8 e regravava o 1º byte (#34)
 				case S8  : *(nx_int8_t*)(MEM+Maddr) = (int8_t)value; return;
 				case S16 : *(nx_int16_t*)(MEM+Maddr) = (int16_t)value; return;
 				case S32 : *(nx_int32_t*)(MEM+Maddr) = (int32_t)value; return;
@@ -276,7 +276,7 @@ void setMVal(uint32_t buffer, uint16_t Maddr, uint8_t fromTp, uint8_t toTp){
 				case U8  : *(nx_uint8_t*)(MEM+Maddr) = (uint8_t)value; return;
 				case U16 : *(nx_uint16_t*)(MEM+Maddr) = (uint16_t)value; return;
 				case U32 : *(nx_uint32_t*)(MEM+Maddr) = (uint32_t)value; return;
-				case F32 : *(nx_float*)(MEM+Maddr) = (float)value;
+				case F32 : *(nx_float*)(MEM+Maddr) = (float)value; return;   // sem o return, caía no S8 e regravava o 1º byte (#34)
 				case S8  : *(nx_int8_t*)(MEM+Maddr) = (int8_t)value; return;
 				case S16 : *(nx_int16_t*)(MEM+Maddr) = (int16_t)value; return;
 				case S32 : *(nx_int32_t*)(MEM+Maddr) = (int32_t)value; return;
@@ -287,7 +287,7 @@ void setMVal(uint32_t buffer, uint16_t Maddr, uint8_t fromTp, uint8_t toTp){
 				case U8  : *(nx_uint8_t*)(MEM+Maddr) = (uint8_t)value; return;
 				case U16 : *(nx_uint16_t*)(MEM+Maddr) = (uint16_t)value; return;
 				case U32 : *(nx_uint32_t*)(MEM+Maddr) = (uint32_t)value; return;
-				case F32 : *(nx_float*)(MEM+Maddr) = (float)value;
+				case F32 : *(nx_float*)(MEM+Maddr) = (float)value; return;   // sem o return, caía no S8 e regravava o 1º byte (#34)
 				case S8  : *(nx_int8_t*)(MEM+Maddr) = (int8_t)value; return;
 				case S16 : *(nx_int16_t*)(MEM+Maddr) = (int16_t)value; return;
 				case S32 : *(nx_int32_t*)(MEM+Maddr) = (int32_t)value; return;
