@@ -140,6 +140,29 @@ function visit_aux (me, F)
     return me
 end
 
+-- Dobra de constantes (#38): valor numérico de um CONST (o caractere 'a' vale o código), se é
+-- float (mesma regra de _TP.getConstType), divisão inteira como em C, e o texto do resultado
+-- (um float continua com ponto, para não virar inteiro).
+local function CONSTVAL (v)
+    return tonumber(v) or string.byte(v, 2)
+end
+local function ISFLOAT (v)
+    v = tostring(v)
+    return (string.find(v,'[eE%.]') and tonumber(v) and not string.find(v,'[xX]')) and true or false
+end
+local function TRUNC (x)
+    return (x >= 0) and math.floor(x) or math.ceil(x)
+end
+local function CONSTSTR (v, flt)
+    if not flt then
+        return string.format('%d', v)
+    end
+    local s = string.format('%.14g', v)                 -- curto, se não perde valor
+    if tonumber(s) ~= v then s = string.format('%.17g', v) end
+    if not string.find(s, '[eE%.]') then s = s .. '.0' end
+    return s
+end
+
 local C; C = {
     [1] = function (ln, spc, ...) -- spc=CK''
         local blk = node('Block')(ln)
@@ -404,24 +427,39 @@ local C; C = {
             -- v1=e1, v2=op, v3=e2, v4=?
             if v1.tag=='CONST' and v3.tag=='CONST' then
               local boolT = {}; boolT[true]=1; boolT[false]=0;
+              -- Valores numéricos (caractere 'a' vira o código) e se a conta é de float. Entre
+              -- inteiros, '/' e '%' seguem a VM (C: trunca em direção a zero, resto com o sinal
+              -- do dividendo); antes a divisão do Lua dava 7/2 = 3.5 (#38).
+              local a, b = CONSTVAL(v1[1]), CONSTVAL(v3[1])
+              local flt = ISFLOAT(v1[1]) or ISFLOAT(v3[1])
               if (v2=='+' or v2=='-' or v2=='/' or v2=='*' or v2 == '%') then
-                if (v2=='/' or v2=='%') and (v3[1]*1)==0 then
+                if (v2=='/' or v2=='%') and b==0 then
                   ASR(false,v3,'E4029')
-                else
-                  loadstring('newConst = '..v1[1]..' '..v2..' '..v3[1])()
+                elseif v2=='+' then newConst = a + b
+                elseif v2=='-' then newConst = a - b
+                elseif v2=='*' then newConst = a * b
+                elseif v2=='/' then newConst = flt and a / b or TRUNC(a / b)
+                elseif flt     then newConst = a % b
+                else                newConst = math.fmod(a, b)
                 end
                 return C._Exp(ln,
-                        node('CONST')(ln, newConst),select(4,...)
+                        node('CONST')(ln, CONSTSTR(newConst, flt)),select(4,...)
                   )
               elseif (v2=='==' or v2=='!=' or v2=='>' or v2=='<' or v2 == '>=' or v2 == '<=') then
-                local relat_op = string.gsub(v2,'!','~')
-                loadstring('relat_result = '..v1[1]..' '.. relat_op ..' '..v3[1])()
+                local relat_result
+                if     v2=='==' then relat_result = (a == b)
+                elseif v2=='!=' then relat_result = (a ~= b)
+                elseif v2=='>'  then relat_result = (a >  b)
+                elseif v2=='<'  then relat_result = (a <  b)
+                elseif v2=='>=' then relat_result = (a >= b)
+                else                 relat_result = (a <= b)
+                end
                 return C._Exp(ln,
                         node('CONST')(ln, boolT[relat_result]),select(4,...)
                   )
               elseif (v2=='<<') then
                   if (v1[2]=='float' or v3[2]=='float') then ASR(false,v3,'E4030'); end
-                  loadstring('newConst = '.. v1[1].. ' * math.pow( 2,'..v3[1] ..')')()
+                  newConst = a * math.pow(2, b)
                   local newConst2 = tonumber(string.format("0x%08x",newConst))
 --print("ast::_Exp: `<<´:",string.format("0x%08x",newConst),tonumber(string.format("0x%08x",newConst)))
                   return C._Exp(ln,
@@ -430,14 +468,14 @@ local C; C = {
                     )
               elseif (v2=='>>') then
                   if (v1[2]=='float' or v3[2]=='float') then ASR(false,v3,'E4030'); end
-                  loadstring('newConst = '.. v1[1].. ' / math.pow( 2,'..v3[1] ..')')()
+                  newConst = math.floor(a / math.pow(2, b))     -- inteiro, como a VM (#38)
                   return C._Exp(ln,
                           node('CONST')(ln, newConst),
                           select(4,...)
                     )
               elseif (v2=='and') then
                   if (v1[2]=='float' or v3[2]=='float') then ASR(false,v3,'E4030'); end
-                  newConst = boolT[tonumber(v1[1])~=0 and tonumber(v3[1])~=0]  
+                  newConst = boolT[a~=0 and b~=0]  
 --print("ast::_Exp: `and´:",tonumber(v1[1]),tonumber(v3[1]),tonumber(v1[1])~=0 and tonumber(v3[1])~=0,newConst)
                   return C._Exp(ln,
                           node('CONST')(ln, math.floor(newConst)),
@@ -445,7 +483,7 @@ local C; C = {
                     )
               elseif (v2=='or') then
                   if (v1[2]=='float' or v3[2]=='float') then ASR(false,v3,'E4030'); end
-                  newConst = boolT[tonumber(v1[1])~=0 or tonumber(v3[1])~=0]  
+                  newConst = boolT[a~=0 or b~=0]  
 --print("ast::_Exp: `or´:",tonumber(v1[1]),tonumber(v3[1]),tonumber(v1[1])~=0 or tonumber(v3[1])~=0,newConst)
                   return C._Exp(ln,
                           node('CONST')(ln, math.floor(newConst)),
