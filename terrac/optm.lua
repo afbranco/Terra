@@ -43,24 +43,26 @@ end
 
 -- build Label2label Table - Label -> Exec operation => LabelExecOper
 _AST.root.label2label={}
+-- labelOpers: todos os rótulos do mesmo endereço. Antes só o último era guardado, e o 'exec'
+-- era removido mesmo assim: quem saltava para os outros caía na instrução seguinte (#22).
 local lblL,lblH;
-local labelOper, labelExec;
+local labelOpers, labelExec = {}, nil;
 for x,op in ipairs(_AST.root.opcode) do
   if (string.sub(op,1,1) == 'L') then 
-    labelOper = tonumber('0x'..string.sub(op,2,5))
+    labelOpers[#labelOpers+1] = tonumber('0x'..string.sub(op,2,5))
   else
-    if labelOper then
+    if #labelOpers > 0 then
       if not labelExec then
         local op_num = tonumber('0x'..op)
         if op_num == opcode.op_exec+1 then -- exec + 1 bit flag
           labelExec = true
         elseif op_num == opcode.op_end then
-           _AST.root.label2label[labelOper]= 0;
+          for _,l in ipairs(labelOpers) do _AST.root.label2label[l]= 0; end
           labelExec = nil
-          labelOper = nil
+          labelOpers = {}
         else
           labelExec = nil
-          labelOper = nil
+          labelOpers = {}
         end
       else  
         if (string.sub(op,1,1) == '.') then
@@ -69,10 +71,10 @@ for x,op in ipairs(_AST.root.opcode) do
           else
             lblL = string.sub(op,2,3)
             local lbl = tonumber(('0x'..lblH))*256 + tonumber('0x'..lblL)
-            _AST.root.label2label[labelOper]= lbl;
+            for _,l in ipairs(labelOpers) do _AST.root.label2label[l]= lbl; end
             lblH = nil
             labelExec = nil
-            labelOper = nil          
+            labelOpers = {}
           end
         end
       end

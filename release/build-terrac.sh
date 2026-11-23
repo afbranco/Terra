@@ -61,6 +61,8 @@ done < "$ROOT/tests/terrac/erros.esperado"
 # esperada (tests/terrac/diag/json.esperado), só com linhas JSON e o resumo no fim; o texto e o
 # JSON têm a mesma linha e mensagem; uma falha interna vira E0001.
 if lua5.1 "$ROOT/tests/terrac/catalogo.lua" "$ROOT/terrac" | tee -a "$LOG"; then :; else fail=1; fi
+# Otimizador (#22): todo rótulo leva à mesma instrução antes e depois do optm.lua.
+if lua5.1 "$ROOT/tests/terrac/optm_rotulos.lua" "$ROOT/terrac" | tee -a "$LOG"; then :; else fail=1; fi
 mkdir -p "$W/d"
 cp "$ROOT"/terrac/samples/*.defs "$ROOT"/tests/terrac/*.terra "$ROOT"/tests/terrac/diag/*.terra \
    "$ROOT"/tests/terrac/diag/*.h "$W/d/"
