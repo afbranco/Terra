@@ -4,6 +4,8 @@
 == linhas_comentario
 {"code":"E2001","severity":"error","file":"linhas_comentario.terra","line":11,"col":11,"col_end":12,"msg":"before `+´ : expected `;´","args":{"token":"+","where":"before"}}
 {"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true}}
+== palavras
+{"summary":{"ok":true,"errors":0,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"},"memory":{"total":124,"code":75,"ctl_vars":21,"stack":28,"radio_msgs":4},"platforms":[{"name":"iris_full","max":4224,"fits":true},{"name":"iris_hyb","max":1920,"fits":true},{"name":"mica2","max":1920,"fits":true},{"name":"mica2dot","max":1920,"fits":true},{"name":"micaz","max":1920,"fits":true},{"name":"telosb_full","max":4224,"fits":true},{"name":"telosb_hyb","max":1920,"fits":true},{"name":"tossim","max":1728,"fits":true}]}}
 == semantica_naodeclarada
 {"code":"E3001","severity":"error","file":"semantica_naodeclarada.terra","line":4,"col":1,"msg":"variable/event/function \"y\" is not declared","args":{"name":"y"}}
 {"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}

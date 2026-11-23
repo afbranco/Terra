@@ -260,8 +260,10 @@ _GG = {
     , LExp     = V'_Exp'
     , Exp     = V'_Exp'
     , _Exp    = V'_1'
-    , _1      = V'_2'  * (CK'or'  * V'_2')^0
-    , _2      = V'_3'  * (CK'and' * V'_3')^0
+    -- `or`, `and` e `not` com CKEY: conferem o fim da palavra. Com CK, `nota` era lido como
+    -- `not a` e `b orx` como `b or x` (#32).
+    , _1      = V'_2'  * (CKEY'or'  * V'_2')^0
+    , _2      = V'_3'  * (CKEY'and' * V'_3')^0
     , _3      = V'_4'  * ((CK'|'-'||') * V'_4')^0
     , _4      = V'_5'  * (CK'^' * V'_5')^0
     , _5      = V'_6'  * (CK'&' * V'_6')^0
@@ -270,7 +272,7 @@ _GG = {
     , _8      = V'_9'  * ((CK'>>'+CK'<<') * V'_9')^0
     , _9      = V'_10' * ((CK'+'+(CK'-'-'->')) * V'_10')^0
     , _10     = V'_11' * ((CK'*'+(CK'/'-'//'-'/*')+CK'%') * V'_11')^0
-    , _11     = ( Cc(true) * ( CK'not' + CK'&' + CK'-' + CK'~' -- + CK'*' -- + CK'+' 
+    , _11     = ( Cc(true) * ( CKEY'not' + CK'&' + CK'-' + CK'~' -- + CK'*' -- + CK'+' 
                              + (K'<'*EV'ID_btype'*K'>') )
                 )^0 * V'_12'
     , _12     = V'_13' *
@@ -380,7 +382,7 @@ _GG = {
 
     , ID_ext  = -KEYS * CK(m.R'AZ'*ALPHANUM^0)
  
-    , ID_var  = -KEYS * -K'void'* CK(m.R'az'*(Alphanum+'?')^0)
+    , ID_var  = -KEYS * -KEY'void'* CK(m.R'az'*(Alphanum+'?')^0)
                     / function(id) return (string.gsub(id,'%?','_')) end
     , ID_int  = V'ID_var'
     , ID_c    = V'ID_var' --CK(  P'_' *Alphanum^0)
