@@ -98,6 +98,23 @@ de lá.
     um programa que quebre.
   - #28 erro do cpp sem coluna (`#if` sem `#endif`) saía como E1005: **fechada** (PR #29,
     `56e4edb`), relatado pelo TerraSim. Saiu na v1.1.1.
+- Depois da v1.1.1 (2026-11-23), no `master`, para a próxima release:
+  - #17 comparação de float empilhava 1.0f: **fechada** (PR #31). Teste `tests/floatcmp`;
+  - #32 `nota` lido como `not a` (e `and`/`or`/`void`): **fechada** (PR #33).
+    Teste `tests/terrac/palavras.terra`.
+- **Revisão de 2026-11-23** (pedido do Prof.): três agentes de leitura (parser/tipos, geração
+  de código, VM). Viraram as issues #34 a #49 (P1: #34 a #41). As P1 têm **verificação
+  dobrada**: reproduzir com programa próprio antes de corrigir; o que o agente disse pode
+  estar errado (ex.: na #34 o efeito no micaz é o mesmo do TOSSIM, não pior). Corrigidas:
+  - #34 gravação de float (`setMVal` sem `return`): PR #50, teste `tests/floatset`;
+  - #35 otimizador apagava o `end` depois do `chkret` do par/and: PR #51 (`Refs #22`), teste
+    `tests/parand`. Primeiro programa que quebra só com `--opt`; aparece em ~4% do corpus;
+  - #37 fim de par/or limpava o gate externo errado: PR #52, teste `tests/parorgate`. Muda o
+    `.vmx` do `routing_tree` (o do oráculo do TerraSim) e de outros programas de rádio:
+    avisar o TerraSim na release;
+  - #36 break/return/par-or disparavam todos os finally: PR #53 (aberto).
+  Os testes de VM (`tests/*/test_*.py`) carregam o `.vmx` no nó 11 e leem os LEDs (3 bits)
+  no TVIEW. Corpus de comparação dos compiladores (1.173 programas) no scratchpad da sessão.
 - Imagens locais de teste do terrac: `localhost/terrac-lpeg:0.10.2`, `:1.0.2` (ambas com
   `libc6-dev`) e `:semlibc` (1.0.2 sem `libc6-dev`); Containerfiles no scratchpad da sessão.
 - Correções vindas de outras sessões (ex.: TerraSim) entram como issue aqui antes do código.
@@ -242,6 +259,10 @@ e `.rodata` iguais aos do `459a2091`), refazer o oráculo e criar a TerraSim v1.
 ## Como trabalhar (mesmas regras do tinyos-toolchain)
 
 - Testar antes de publicar; teste novo só vale depois de reprovar com a mudança desfeita.
+- **Painel de status** em `STATUS.md` na raiz (fora do git, em `.git/info/exclude`; o repositório
+  é público). É lido pela sessão de acompanhamento do Prof. (`~/admin`). Ao concluir uma tarefa
+  que muda o estado do projeto (release, PR, bug corrigido, decisão) e antes de encerrar,
+  atualizar o painel, no formato que já está lá (até ~8 pendências, "com:" diz quem age).
 - A máquina é a do Prof.: builds pesados com `nice -n 19`, e avisar antes de carga grande. A
   sessão TerraSim pode pedir pausa de CPU para gravar vídeo (congelar por PID com SIGSTOP,
   retomar com SIGCONT e avisar). Disco apertado (cerca de 10 GB livres em 2026-11-22).
