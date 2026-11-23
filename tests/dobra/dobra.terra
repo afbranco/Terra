@@ -1,0 +1,29 @@
+#include "TerraNet.defs"
+
+// Issue #38: dobra de constantes no terrac. Contas só com constantes são feitas pelo compilador;
+// a divisão saía real (7/2 = 3.5) e o negativo era gravado com 1 byte sem sinal (3 - 5 = 254).
+// Cada conferência é feita em tempo de execução e aparece nos LEDs, uma por segundo: 1 se o
+// valor dobrado é o esperado, 2 se não.
+var long   y = 3 - 5;           // -2
+var short  s = 0 - 300;         // -300
+var ulong  u = 0 - 1;           // 0xFFFFFFFF
+var ushort h = 7 / 2;           // 3 (divisão inteira)
+var short  d = (0 - 7) / 2;     // -3 (trunca em direção a zero, como a VM)
+var short  r = (0 - 7) % 2;     // -1 (o resto tem o sinal do dividendo, como a VM)
+var ushort k = 5 >> 1;          // 2
+var ubyte  c = 'a' + 1;         // 98
+var ubyte  e = (97 == 'a');     // 1
+var ushort x = 10;
+var ushort m = x * (10 / 4);    // 20
+var float  g = 1.5 * 2.0;       // 3.0 (continua float)
+await 1s; if y + 2 == 0     then emit LEDS(1); else emit LEDS(2); end
+await 1s; if s + 300 == 0   then emit LEDS(1); else emit LEDS(2); end
+await 1s; if u + 1 == 0     then emit LEDS(1); else emit LEDS(2); end
+await 1s; if h == 3         then emit LEDS(1); else emit LEDS(2); end
+await 1s; if d + 3 == 0     then emit LEDS(1); else emit LEDS(2); end
+await 1s; if r + 1 == 0     then emit LEDS(1); else emit LEDS(2); end
+await 1s; if k == 2         then emit LEDS(1); else emit LEDS(2); end
+await 1s; if c == 98        then emit LEDS(1); else emit LEDS(2); end
+await 1s; if e == 1         then emit LEDS(1); else emit LEDS(2); end
+await 1s; if m == 20        then emit LEDS(1); else emit LEDS(2); end
+await 1s; if g * 2.0 == 6.0 then emit LEDS(1); else emit LEDS(2); end
