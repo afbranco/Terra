@@ -83,10 +83,18 @@ de lá.
     Testes: `tests/terrac/{catalogo,consistencia}.lua` e `diag/json.esperado`. Também corrigiu a
     queda em `sizeof<5>` (`_V2NAME` incompleto). Saíram na v1.1.0.
   - #22 (P1) otimização (`optm.lua`) às vezes quebra a execução na VM. Ligada **por padrão**; o
-    TerraSim compila com `--no-opt`. Não reproduzida: os 20 programas Net daqui e do TerraSim se
-    comportam igual com e sem `--opt` (VMDBG nó a nó, sem os `executing trail`, e TVIEW). Para
-    comparar, completar o `.vmx` otimizado com `end` até o tamanho do outro: senão o deploy
-    muda de tamanho e o rádio diverge sem bug. Falta um programa que mostre o erro, e a VM Grp.
+    TerraSim compila com `--no-opt`. Não reproduzida:
+    - Net: 20 programas com e sem `--opt`, comparados pelo VMDBG nó a nó (sem os
+      `executing trail`) e pelo TVIEW;
+    - Grp: 19 programas, com o `_TOSSIM.so` Grp da v1.1.0 montado na imagem do TerraSim;
+    - todos se comportam igual.
+    Para comparar, completar o `.vmx` otimizado com `end` até o tamanho do outro: senão o deploy
+    muda de tamanho e o rádio diverge sem bug. Achado e corrigido (PR #30, `6544e3f`, `Refs #22`): rótulos
+    no mesmo endereço antes de `exec` perdiam o redirecionamento. O padrão não aparece em 876
+    programas otimizados. `tests/terrac/optm_rotulos.lua` confere o destino de cada rótulo. Falta
+    um programa que quebre.
+  - #28 erro do cpp sem coluna (`#if` sem `#endif`) saía como E1005: **fechada** (PR #29,
+    `56e4edb`), relatado pelo TerraSim. Ainda sem release.
 - Imagens locais de teste do terrac: `localhost/terrac-lpeg:0.10.2`, `:1.0.2` (ambas com
   `libc6-dev`) e `:semlibc` (1.0.2 sem `libc6-dev`); Containerfiles no scratchpad da sessão.
 - Correções vindas de outras sessões (ex.: TerraSim) entram como issue aqui antes do código.
