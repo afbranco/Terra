@@ -1,0 +1,5 @@
+#include "TerraNet.defs"
+// Issue #45: % com float operava nos bits (a VM não tem resto de float).
+var float f = 3.0;
+f = f % 2.0;
+await FOREVER;

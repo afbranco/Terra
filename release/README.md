@@ -96,6 +96,11 @@ podman run --rm -v "$PWD:/terra:ro,Z" -v "$PWD/dist:/out:Z" -w /terra \
 release/build-terrac.sh dev dist     # com Lua 5.1 e o lpeg instalados
 ```
 
+O build do `build-tinyos.sh` é reproduzível (issue #18): com o mesmo commit, a mesma imagem
+(pelo digest, ver `BUILDINFO`) e a mesma versão no lugar de `dev` (ex.: `1.2.0`, que entra no
+nome dos anexos), os `tar.gz`, o firmware e o jar saem com o sha256 do `SHA256SUMS` da release (as releases geradas depois desta mudança).
+`release/compare-builds.sh <saída 1> <saída 2>` compara dois builds.
+
 ## Testes no Avrora (micaz emulado)
 
 O `release/test-avrora.sh` roda os testes da VM (`tests/*/`) no Avrora, que emula o ATmega128 e

@@ -148,6 +148,10 @@ local alphanum = m.R'az' + '_' + m.R'09'
 
 NUM = CK(m.R'09'^1) / tonumber
 PNUM = -K'-'*CK(m.R'09'^1) / tonumber + EM'a positive integer number'
+-- dimensão de array: decimal ou hexadecimal (`#define N 0x10´ dava mensagem enganosa) (#48)
+local HEXNUM = CK(m.P'0' * m.S'xX' * (m.R'09'+m.R'AF'+m.R'af')^1) / tonumber
+DNUM = HEXNUM + NUM
+PDNUM = -K'-'*(HEXNUM + CK(m.R'09'^1) / tonumber) + EM'a positive integer number'
 
 _GG = { 
       [1] = CK'' * V'Prog' * P(-1)-- + EM'expected EOF')
@@ -352,17 +356,17 @@ _GG = {
 
 --    , _Dcl_var  = CKEY'var' * EV'ID_type' * (K'['*NUM*K']'+Cc(false)) *
 --                    V'__Dcl_var' * (K','*V'__Dcl_var')^0
-    , _Dcl_var  = CKEY'var' * ( (EV'ID_btype' * (K'['*NUM*K']')) + (EV'ID_typenp' * Cc(false))  ) *
+    , _Dcl_var  = CKEY'var' * ( (EV'ID_btype' * (K'['*DNUM*K']')) + (EV'ID_typenp' * Cc(false))  ) *
                     V'__Dcl_var' * (K','*V'__Dcl_var')^0
     , __Dcl_var = EV'ID_var' * (V'_Sets' + Cc(false)*Cc(false)*Cc(false))
 
     , _Dcl_field  = CKEY'var' * EV'ID_field_type' 
-                    *  (K'['*PNUM*K']' + Cc(false))
+                    *  (K'['*PDNUM*K']' + Cc(false))
                     *    (V'ID_var' + EM'a valid identifier')  
                     * (K','*V'ID_var')^0
                         
     , _Dcl_payfield  = CKEY'var' * EV'ID_pay_type' 
-                    *  K'['*PNUM*K']'
+                    *  K'['*PDNUM*K']'
                     *    (V'ID_var' + EM'a valid identifier')  
                         
     , _Dcl_regt   = KEY'regtype' * EV'ID_var' * EKEY'with' * (V'_Dcl_field' * (EK';'*K';'^0))^0 * EKEY'end'
