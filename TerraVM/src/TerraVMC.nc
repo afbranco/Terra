@@ -841,13 +841,27 @@ void f_add(uint8_t Modifier){
 	push(v1+v2);
  }
 
+// Divisão e resto sem trap (#42): divisor 0 dá 0 (e o f_div/f_mod geram E_DIVZERO); INT32_MIN / -1
+// transborda (indefinido em C, SIGFPE no x86, o TOSSIM morria e levava todos os nós): dá INT32_MIN,
+// como no complemento de dois, e o resto 0. Os dbg usam o valor já calculado (são sempre avaliados).
+int32_t div_s32(int32_t a, int32_t b){
+	if (b == 0) return 0;
+	if (b == -1) return (int32_t)(0UL - (uint32_t)a);
+	return a / b;
+}
+int32_t mod_s32(int32_t a, int32_t b){
+	if (b == 0 || b == -1) return 0;
+	return a % b;
+}
+
 void f_mod(uint8_t Modifier){ 
-	int32_t v1,v2;
+	int32_t v1,v2,r;
 	v1 = pop();
 	v2 = pop();
-	dbg(APPNAME,"VM::f_mod(%02x): v1=%d, v2=%d, mod=%d\n",Modifier,v1,v2,v1%v2);
-	dbg("VMDBG","VM:: mod operation: (%d %% %d) = %d \n",v1,v2,v1%v2);
-	push((v2==0)?0:v1%v2);
+	r = mod_s32(v1,v2);
+	dbg(APPNAME,"VM::f_mod(%02x): v1=%d, v2=%d, mod=%d\n",Modifier,v1,v2,r);
+	dbg("VMDBG","VM:: mod operation: (%d %% %d) = %d \n",v1,v2,r);
+	push(r);
 	if (v2==0) evtError(E_DIVZERO);
  }
  
@@ -861,12 +875,13 @@ void f_mult(uint8_t Modifier){
  }
 
 void f_div(uint8_t Modifier){ 
-	int32_t v1,v2;
+	int32_t v1,v2,r;
 	v1 = pop();
 	v2 = pop();
-	dbg(APPNAME,"VM::f_div(%02x): v1=%d, v2=%d, div=%d\n",Modifier,v1,v2,(v2==0)?0:v1/v2);
-	dbg("VMDBG","VM:: div operation: (%d / %d) = %d \n",v1,v2,(v2==0)?0:v1/v2);
-	push((v2==0)?0:v1/v2);
+	r = div_s32(v1,v2);
+	dbg(APPNAME,"VM::f_div(%02x): v1=%d, v2=%d, div=%d\n",Modifier,v1,v2,r);
+	dbg("VMDBG","VM:: div operation: (%d / %d) = %d \n",v1,v2,r);
+	push(r);
 	if (v2==0) evtError(E_DIVZERO);
  }
  
@@ -1259,9 +1274,10 @@ void f_poparr_v(uint8_t Modifier){
 	Maddr = getPar16(p1_1len);
  	Vidx  = getPar16(p2_1len);
 	Max   = getPar16(p3_1len);
-	if (getMVal(Vidx,tp2) >= Max) 
+	if (getMVal(Vidx,tp2) >= Max) {
 		evtError(E_IDXOVF);
-	else {
+		pop();	// descarta o valor: sem isso a pilha desandava (#43)
+	} else {
 		if (tp1 == F32){ // Source/Target are float
 			float v2 = popf();
 			dbg(APPNAME,"VM::f_poparr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, Value=%f, IDX OVERFLOW=%s idx=%d\n",
@@ -1294,9 +1310,10 @@ void f_pusharr_v(uint8_t Modifier){
  	Vidx  = getPar16(p2_1len);
 	Max   = getPar16(p3_1len);
 
-	if (getMVal(Vidx,tp2) >= Max) 
+	if (getMVal(Vidx,tp2) >= Max) {
 		evtError(E_IDXOVF);
-	else {
+		push(Maddr);	// o endereço de a[0]: sem isso a pilha desandava (#43)
+	} else {
 		dbg(APPNAME,"VM::f_pusharr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, IDX OVERFLOW=%s idx=%d, v1_len=%d\n",Modifier,Maddr,Vidx,Max,
 			_TFstr(getMVal(Vidx,tp2) > Max),getMVal(Vidx,v2_len),v1_len);
 		push(Maddr+((getMVal(Vidx,tp2)%Max)*v1_len));
