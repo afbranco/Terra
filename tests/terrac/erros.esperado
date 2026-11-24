@@ -16,6 +16,7 @@ sintaxe_tipo: line 3 : after `x´ : expected a not reserved identifier beginning
 atrib_array: line 5 : invalid attribution: not a value
 atrib_cast: line 4 : invalid attribution: not a value
 atrib_funcao: line 4 : invalid attribution: not a value
+await_max: line 4 : await time 2160000000 ms is above the maximum of 2147483646 ms (about 24.8 days)
 atrib_negativo: line 4 : invalid attribution: not a value
 atrib_sizeof: line 4 : invalid attribution: not a value
 atrib_soma: line 4 : invalid attribution: not a value

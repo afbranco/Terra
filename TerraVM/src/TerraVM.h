@@ -107,6 +107,15 @@ enum {
 	F_U32 = 2,
 	F_S32 = 3, 
 	
+	// Modificador do op_uop (operações sem sinal, #66)
+	UOP_GT = 0,
+	UOP_LT = 1,
+	UOP_GTE = 2,
+	UOP_LTE = 3,
+	UOP_DIV = 4,
+	UOP_MOD = 5,
+	UOP_RSHFT = 6,
+
 	// OpCodes
 	op_nop=0,
 	op_end=1,
@@ -175,6 +184,7 @@ enum {
 	op_set_e=104,
 	op_deref=112,
 	op_memcpy=120,
+	op_uop=128,	// operação sem sinal, para ulong; o modificador (3 bits) escolhe qual (#66)
 
 	op_tkins_max=136,
 	op_push_v=144,

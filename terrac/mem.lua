@@ -420,6 +420,8 @@ F = {
         me.val = _TP.getConstType(me.ms,me.ln)..' '..me.ms   -- uses milli
 --afb        ASR(me.us>0 and me.us<=2000000000, me, 'constant is out of range')
         ASR(me.ms>0 and me.ms<= (math.pow(2,32))-1, me, 'E6005')
+        -- o timer da VM é s32 e 0x7FFFFFFF marca "sem timer": acima disso disparava na hora (#47)
+        ASR(me.ms <= 2147483646, me, 'E6007', {ms=string.format('%.0f',me.ms), max='2147483646'})
     end,
 
     WCLOCKE = function (me)
