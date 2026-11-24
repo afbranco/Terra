@@ -589,6 +589,9 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
     SetExp = function (me)
         local e1, e2, no_fin = unpack(me)
         e1 = e1 or _AST.iter'SetBlock'()[1]
+        -- o lado esquerdo tem de ser uma variável (como no SetAwait); `x+1 = 3´, `-x = 3´,
+        -- `f() = 3´ derrubavam o compilador mais adiante (acc.lua) (#46)
+          ASR(e1.lval, me, 'E4016')
 --print('env::SetExp:',e1.tag,e2.tag, e1[1].tag, e2[1].tag, e1.lval,e1.tp,e2.tp,e1[1].arr,e2[1].arr,no_fin)
 --        WRN(e1.lval and _TP.contains(e1.tp,e2.tp,true),me, 'invalid attribution: ['.. e1.tp ..'] can not contain [' .. e2.tp ..']')
           ASR(not (e1[1].tag=='CONST'),me,'E4018')
@@ -862,7 +865,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
     SIZEOF = function (me)
 --print("env::SIZEOF")
         me.tp   = 'ushort'
-        me.lval = true
+        me.lval = false     -- é uma constante: `sizeof<ubyte> = 3´ derrubava o compilador (#46)
     end,
 
     STRING = function (me)

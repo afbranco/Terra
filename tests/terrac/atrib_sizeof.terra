@@ -1,0 +1,5 @@
+#include "TerraNet.defs"
+// Issue #46: lado esquerdo que não é variável dava E4016 só no await; aqui derrubava o compilador.
+var ushort x;
+sizeof<ubyte> = 3;
+await FOREVER;
