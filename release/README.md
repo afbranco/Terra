@@ -95,3 +95,20 @@ podman run --rm -v "$PWD:/terra:ro,Z" -v "$PWD/dist:/out:Z" -w /terra \
   ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-21d8fb1 release/build-tinyos.sh dev /out
 release/build-terrac.sh dev dist     # com Lua 5.1 e o lpeg instalados
 ```
+
+## Testes no Avrora (micaz emulado)
+
+O `release/test-avrora.sh` roda os testes da VM (`tests/*/`) no Avrora, que emula o ATmega128 e
+o rádio CC2420, com o firmware micaz gerado acima. Pega o que o TOSSIM (x86) não mostra, como o
+tamanho de struct da #41. A montagem é a do laboratório, com o mínimo de nós: a estação base, os
+motes que o teste usa e o SerialForwarder do TinyOS ligado na serial da BS. Cada teste leva cerca
+de 1 minuto, por isso no CI só roda na tag de release e quando o workflow é disparado à mão
+(Actions > release > Run workflow).
+
+```bash
+podman run --rm -v "$PWD:/terra:ro,Z" -v "$PWD/dist:/fw:ro,Z" -v "$PWD/avrora:/out:Z" -w /terra \
+  ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-21d8fb1 release/test-avrora.sh /fw /out
+```
+
+Não substitui o teste com o micaz real (#16): não passa pelo avrdude, pela MIB520, pelo rádio
+físico nem pelos sensores.

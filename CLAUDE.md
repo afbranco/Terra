@@ -112,9 +112,24 @@ de lá.
   - #37 fim de par/or limpava o gate externo errado: PR #52, teste `tests/parorgate`. Muda o
     `.vmx` do `routing_tree` (o do oráculo do TerraSim) e de outros programas de rádio:
     avisar o TerraSim na release;
-  - #36 break/return/par-or disparavam todos os finally: PR #53 (aberto).
+  - #36 break/return/par-or disparavam todos os finally: PR #53, teste `tests/finally`;
+  - #38 dobra de constantes (divisão inteira, negativos): PR #54, teste `tests/dobra`. Muda
+    `.vmx` de dois programas do TerraSim (mesmo valor, código menor);
+  - #39 fila de entrada da BS (`inQ.get` duplo): PR #56 (aberto), teste `tests/inq`;
+  - #41 `tceu_wclock` tinha 6 bytes no AVR e o `terrac` conta 8: o `memclr` do par/or apagava
+    outros timers no micaz. PR #58: `u16 pad` e checagem de tamanho na compilação. Teste
+    `tests/wclocksize`, que só reprova no AVR (no Avrora).
+  - #55: o CI não roda no push para o `master` (só em PR e tag).
   Os testes de VM (`tests/*/test_*.py`) carregam o `.vmx` no nó 11 e leem os LEDs (3 bits)
   no TVIEW. Corpus de comparação dos compiladores (1.173 programas) no scratchpad da sessão.
+- **Avrora** (micaz emulado, #57, PR #58, 2026-11-23): `tests/avrora/avrora_vmx.py` roda um teste
+  de `tests/*/` com o firmware micaz BS e NOBS (Net ou Grp, `VM = "grp"` no teste), o mínimo
+  de nós (BS + motes do `ESPERADO`) e o SerialForwarder do TinyOS na serial da BS; responde aos
+  pedidos de bloco como o TerraControl; monitor `real-time` (sem ele, no CI a simulação acabava
+  antes do deploy). `release/test-avrora.sh` roda todos; o job `avrora` do workflow só roda na
+  tag `v*` e na execução manual (decidido pelo Prof.: é lento, ~4 min no CI). Testes novos
+  `tests/radio` (Net, 3 nós) e `tests/grpbs` (Grp, `SEND_BS` até a serial). O Avrora só mostra
+  mudança de LED (valores repetidos seguidos viram um). Não substitui o micaz real (#16).
 - Imagens locais de teste do terrac: `localhost/terrac-lpeg:0.10.2`, `:1.0.2` (ambas com
   `libc6-dev`) e `:semlibc` (1.0.2 sem `libc6-dev`); Containerfiles no scratchpad da sessão.
 - Correções vindas de outras sessões (ex.: TerraSim) entram como issue aqui antes do código.
