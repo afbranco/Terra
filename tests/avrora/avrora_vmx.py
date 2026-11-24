@@ -175,8 +175,16 @@ def envia(am, payload):
         s.sendall(bytes([len(pac)]) + pac)
 
 
+def fim_do_boot(n):
+    """O padrão de LEDs do boot muda os 3 LEDs em poucos ciclos: conta até 0,1 s depois da
+    primeira mudança do nó. (Um corte fixo em 1,5 s perdia o reset de um programa que chega cedo:
+    o pedido de versão do boot já é respondido.)"""
+    return leds[n][0][0] + CPU_HZ // 10 if leds[n] else None
+
+
 def depois_do_boot(n):
-    return [v for c, v in leds[n] if c >= 1.5 * CPU_HZ]
+    fim = fim_do_boot(n)
+    return [v for c, v in leds[n] if fim is not None and c >= fim]
 
 
 espera(lambda: all(len(leds[n]) >= 2 for n in MOTES), 120)   # padrão de LEDs do boot
@@ -215,13 +223,15 @@ def obtido():
     """LEDs de cada mote depois do boot, um valor por emit, sem repetições seguidas."""
     r = {}
     for n in MOTES:
-        # Um emit LEDS(n) muda até 3 LEDs, um de cada vez, a poucos ciclos um do outro: junta as
-        # mudanças a menos de 1000 ciclos. Ignora o primeiro segundo e meio (boot).
+        # Um emit LEDS(n) muda até 3 LEDs, um de cada vez, a uns 10 ciclos um do outro: junta as
+        # mudanças a menos de 100 ciclos (com 1000, o reset e um LEDS logo no começo do programa,
+        # a 827 ciclos, viravam um só). Ignora o padrão de LEDs do boot.
         grupos = []
+        fim = fim_do_boot(n)
         for c, v in list(leds[n]):
-            if c < 1.5 * CPU_HZ:
+            if c < fim:
                 continue
-            if grupos and c - grupos[-1][0] < 1000:
+            if grupos and c - grupos[-1][0] < 100:
                 grupos[-1] = (c, v)
             else:
                 grupos.append((c, v))
