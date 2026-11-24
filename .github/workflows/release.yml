@@ -1,6 +1,6 @@
 # Compila e testa os artefatos de release do Terra e, numa tag v*, cria a release como
 # rascunho (o Prof. revisa as notas e publica).
-# - pull request e execução manual: compila, testa e guarda os artefatos no Actions;
+# - pull request, push no master e execução manual: compila, testa e guarda os artefatos no Actions;
 # - tag v*: o mesmo, os testes no Avrora e depois a release em rascunho com os anexos,
 #   SHA256SUMS e BUILDINFO. Os testes no Avrora também rodam na execução manual.
 # A imagem do toolchain é fixa (tag com commit e digest), da release tinyos-toolchain 2.1.2-r2.
@@ -9,6 +9,8 @@ name: release
 on:
   pull_request:
   push:
+    # master: o mesmo do PR, na combinação já mesclada (#55: dois PRs certos podem dar errado juntos)
+    branches: [master]
     tags: ['v*']
   workflow_dispatch:
 
