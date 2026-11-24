@@ -1,0 +1,7 @@
+#include "TerraNet.defs"
+// Issue #48: inc/dec aceitavam o contador somente-leitura do `loop i, N´ (virava laço sem fim).
+loop i, 10 do
+  dec i;
+  await 1s;
+end
+await FOREVER;

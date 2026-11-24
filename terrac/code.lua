@@ -413,6 +413,21 @@ function Op1_any(me,mnemonic)
     BYTECODE(me,codeB,'op1_any',mnemonic)
 end
 
+-- Conversão entre inteiro e float quando os tipos (numéricos, não ponteiro) diferem nisso.
+-- Sem ela, emit, await e argumentos de evento de saída levavam os bits do valor (#45).
+local NUMERICOS = {ubyte=true,ushort=true,ulong=true,byte=true,short=true,long=true,float=true}
+function NEEDCONV(fromTp,toTp)
+  if not (NUMERICOS[fromTp] and NUMERICOS[toTp]) then return false end
+  return (fromTp=='float') ~= (toTp=='float')
+end
+function FLOATCONV(me,fromTp,toTp)
+  if NEEDCONV(fromTp,toTp) then
+    local f, t = _TP.getCastType(fromTp), _TP.getCastType(toTp)
+    codeB = LINE(me,'cast '..f..' '..t,nil,'// cast <type> ')
+    BYTECODE(me,codeB,'op_cast',f,t)
+  end
+end
+
 function Op2_any(me,mnemonic)
     local op, e1, e2 = unpack(me)
 --print("code::Op2_any:",op,e1.tag,e1.tp,e2.tag,e2.tp,e1.arr,e2.arr,_TP.max(e1.tp,e2.tp))
@@ -993,7 +1008,12 @@ F = {
 
           local x1 = getAuxValues(e2);
 
-          if(e2[1].tag=='CONST') then
+          if NEEDCONV(e2[1].tp,e1.ext.tp) then
+            CONC(me,me[2])
+            FLOATCONV(me,e2[1].tp,e1.ext.tp)
+            codeB = LINE(me,'emit '..e1.ext.id,nil,'// EmitExtS::')
+            BYTECODE(me,codeB,'op_outevt_e',e1.ext.idx)
+          elseif(e2[1].tag=='CONST') then
             codeB = LINE(me,'emit '..e1.ext.id..' len='..par_len..' const='..e2[1].val,nil,'// EmitExtS:: const ')
             local auxval = (e2[1].tp=='float' and _TP.float2hex(tonumber(e2[1].val))) or e2[1].val
             BYTECODE(me,codeB,'op_outevt_c',e1.ext.idx,auxval)
@@ -1081,7 +1101,12 @@ F = {
     if exp then
 --print("code::EmitInt:",int.fst.id,exp[1].tag,typelen[int.tp], typelen[exp.tp])      
       --afb  		ATTR(me, int, exp)
-      if (exp[1].tag == "CONST") then
+      if NEEDCONV(exp.tp,int.tp) then
+          CONC(me,exp)
+          FLOATCONV(me,exp.tp,int.tp)
+          codeB = LINE(me,'emit '..int.fst.id..' from stack',nil,'// EmitInt:: pop to ')
+          BYTECODE(me,codeB,'op_pop',int.tp,int.val)
+      elseif (exp[1].tag == "CONST") then
         if (typelen[int.tp] >= typelen[exp.tp]) then
           codeB = LINE(me,'emit '..int.var.id..'('..exp.val..')',nil,'// EmitInt:: Const')
           local auxval = (exp.tp=='float' and _TP.float2hex(tonumber(exp.val))) or exp.val
@@ -1192,7 +1217,13 @@ F = {
 			BYTECODE(me,codeB,'op_clken_c',me.gte,exp.ms,me.lbl.n)
 		else
 --print("code::AwaitT:",exp.tag,unpack(exp[1][1]))
-			if (exp[1][1].tag=='Var') then
+			if (exp[1].tp=='float') then
+        -- tempo float: convertido para inteiro (truncado) antes de multiplicar pela unidade (#45)
+        CONC(me,exp[1])
+        FLOATCONV(me,'float','ulong')
+        codeB = LINE(me, 'clock enable '..me.lbl.id..' '.. '(stack)' .. exp[2],nil,'// AwaitT ')
+        BYTECODE(me,codeB,'op_clken_e',me.gte,_MEM.t2idx[exp[2]],me.lbl.n)
+			elseif (exp[1][1].tag=='Var') then
        	codeB = LINE(me, 'clock enable '..me.lbl.id..' ('.. exp[1][1][1]..':'..exp[1].tp ..')' .. exp[2],nil,'// AwaitT ')
 				BYTECODE(me,codeB,'op_clken_v',me.gte,_MEM.t2idx[exp[2]],exp[1].tp,exp[1].val,me.lbl.n)
 			else
@@ -1321,10 +1352,31 @@ F = {
     local toTp = ((tp=='ubyte' or tp=='ushort' or tp=='ulong') and 'ulong') or ((tp=='byte' or tp=='short' or tp=='long') and 'long') or 'float'  
     codeB = LINE(me,'cast '..fromTp..' '..toTp,nil,'// cast <type> ')
 --print("code::Op1_cast:",tp,exp.tp,fromTp,toTp)
+    local efetivo = false
     if (fromTp~=toTp and (fromTp=='float' or toTp=='float')) then
       BYTECODE(me,codeB,'op_cast',fromTp,toTp)
-    else
-      WRN(false,me, 'W1002',{from=fromTp,to=toTp})    
+      efetivo = true
+    end
+    -- Cast para inteiro mais estreito: a pilha da VM tem 32 bits, então o valor é cortado aqui
+    -- (máscara; com sinal, também a extensão do bit de sinal). Antes o cast era descartado e
+    -- `<ubyte>300 == 44´ dava falso (#46). Só operações comutativas: a ordem da pilha não pesa.
+    local corte = { ubyte={0xFF}, ushort={0xFFFF}, byte={0xFF,0x80,0xFFFFFF80}, short={0xFFFF,0x8000,0xFFFF8000} }
+    local cabe  = { ubyte={ubyte=true}, ushort={ubyte=true,ushort=true}, byte={byte=true}, short={byte=true,short=true} }
+    local c = corte[tp]
+    if c and not cabe[tp][exp.tp] then
+      local ops = { {c[1],'band'}, {c[2],'bxor'}, {c[3],'add'} }
+      for _, o in ipairs(ops) do
+        if o[1] then
+          codeB = LINE(me,'push '..o[1],nil,'// cast <'..tp..'> ')
+          BYTECODE(me,codeB,'op_push_c',o[1])
+          codeB = LINE(me,o[2],nil,'// cast <'..tp..'> ')
+          BYTECODE(me,codeB,'op2_any',o[2])
+        end
+      end
+      efetivo = true
+    end
+    if not efetivo then
+      WRN(false,me, 'W1002',{from=exp.tp,to=tp})
     end
   end,
   ['SIZEOF'] = function (me)
@@ -1413,7 +1465,11 @@ F = {
       ASR(not error ,me,'E4033',{n=k,['function']=me.ext.id,expected=arg..'/'..len1,received=(me[2][k].supertp or me[2][k].tp)..'/'..len2})
       WRN(not cast,me, 'W1003',{left=arg..'/'..len1,right=me[2][k].tp..'/'..len2})
     end
-    CONC(me,me[2]);
+    -- cada argumento, convertido entre inteiro e float se o parâmetro pede (#45)
+    for k,arg in ipairs(me.ext.args) do
+      CONC(me,me[2][k]);
+      FLOATCONV(me,me[2][k].tp,arg)
+    end
     codeB = LINE(me,'func '..me.ext.id,nil,'')
     BYTECODE(me,codeB,'op_func',me.ext.idx)
   end,

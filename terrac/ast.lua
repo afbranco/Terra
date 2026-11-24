@@ -264,6 +264,7 @@ local C; C = {
 --                                node('CONST')(ln,'1'))))
 
         local nxt_i = node('Op_var')(ln, 'inc', node('Var')(ln, _i))
+        nxt_i.loop_inc = true     -- o inc do próprio laço pode mexer no contador (#48)
 
 
         if not _j then
@@ -271,7 +272,10 @@ local C; C = {
                                     node('Loop')(ln,node('BlockN')(ln, blk, nxt_i)))
         end
 
-        local j_name = '__'.._i..'_'.. string.sub(tostring(blk),8)
+        -- nome do limite por contador: com o endereço da tabela (tostring(blk)) o .vmx mudava a cada
+        -- compilação (#48)
+        _AST.n_limites = (_AST.n_limites or 0) + 1
+        local j_name = '__'.._i..'_'.._AST.n_limites
         local j = function() return EXP(node('Var')(ln, j_name)) end
         local dcl_j = node('Dcl_var')(ln, 'var', ctype, false, j_name)
         local set_j = node('SetExp')(ln, j(), _j)
@@ -284,6 +288,8 @@ local C; C = {
                 node('BlockN')(ln, blk, nxt_i)))
         loop.isBounded = true
         loop[1].isBounded = true    -- remind that the If is "artificial"
+        -- N constante (ou false): com N variável o laço pode não executar nenhuma vez (#48)
+        loop.boundConst = (_j[1].tag=='CONST') and tonumber(_j[1][1]) or false
         loop.isFor = true
         loop[1][1].isFor = true
 

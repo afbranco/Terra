@@ -1,0 +1,5 @@
+#include "TerraNet.defs"
+// Issue #45: inc/dec de float somavam 1 aos bits.
+var float f = 3.0;
+inc f;
+await FOREVER;

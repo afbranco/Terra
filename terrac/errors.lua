@@ -194,6 +194,7 @@ _DIAG.CATALOG = {
     { 'W3003', 'warning', 'trail should terminate' },
     { 'W3004', 'warning', 'missing `return´ statement for the block' },
     { 'W3005', 'warning', '`loop´ iteration is not reachable' },
+    { 'W3006', 'warning', 'tight loop if an inner `loop´ with a variable count runs zero times' },
     -- W4 declarações
     { 'W4001', 'warning', 'declaration of "{name}" hides the one at line {line}' },
     { 'W4002', 'warning', 'event "{name}" without any await.' },
