@@ -1,0 +1,15 @@
+#include "TerraNet.defs"
+
+// Issue #49: blockId vindo do rádio sem validação. O teste manda ao nó 11 um newProgBlock com
+// blockId fora da memória; sem a correção, o nó 11 grava os 24 bytes do bloco na memória do
+// nó 12 (no TOSSIM, a memória dos nós é um vetor só) e o buf[20] do 12 vira 5. Nos LEDs do 12: 1.
+var ubyte[40] buf;
+var ubyte ultimo = 0;
+buf[20] = 1;
+loop do
+  if buf[20] != ultimo then
+    ultimo = buf[20];
+    emit LEDS(ultimo);
+  end
+  await 1s;
+end

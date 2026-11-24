@@ -15,7 +15,8 @@ interface VMCustom{
 	command void reset();
 	event  uint32_t pop();
 	event  void push(uint32_t val);
-	event void queueEvt(uint8_t evtId, uint8_t auxId,void* data);
+	event bool queueEvt(uint8_t evtId, uint8_t auxId,void* data);	// TRUE se o evento entrou na fila
+	command void evtDone(void* data);	// a VM terminou (ou descartou) o evento com esses dados (#49)
 	event int32_t getMVal(uint16_t Maddr, uint8_t tp);
 	event void setMVal(uint32_t value,uint16_t Maddr, uint8_t fromTp, uint8_t tpTp);
 	event void* getRealAddr(uint16_t Maddr);

@@ -414,6 +414,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 #endif
 	}
 
+	command void VM.evtDone(void* data){}	// sem buffers a liberar (#49)
 	command void VM.reset(){
 #ifndef ONLY_BSTATION
 		// reset Grp and Agg control vars
@@ -766,7 +767,9 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		CurrAggData.value = 0;
 		
 		// Set AggTotal with big positive number in MIN aggregation
-		AggTotal = (CurrAggData.function==AO_MIN)?0x7fff:0;
+		// O maior valor do tipo (hoje sempre S32, ver getAggDefValue): com 0x7fff, leituras acima
+		// de 32767 davam MIN 32767 (#49). Sem leitura (count 0), o agMinP2 devolve 0.
+		AggTotal = (CurrAggData.function==AO_MIN)?((CurrAggData.vType <= U32)?0xffffffff:0x7fffffff):0;
 		
 		// Populate reqData struct
 		reqData.reqMote= TOS_NODE_ID;
@@ -1223,7 +1226,8 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 	}
 	void agMinP2(){
 		dbg(APPNAME,"VM::agMinP2():\n");
-		CurrAggData.value = AggTotal;
+		// sem leitura nenhuma, 0, como o AVG e o MAX (decidido pelo Prof., #49)
+		CurrAggData.value = (CurrAggData.count>0) ? AggTotal : 0;
 	}
 
 
