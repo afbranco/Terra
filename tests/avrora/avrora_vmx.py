@@ -6,7 +6,9 @@ o código do avr-gcc, o rádio CC2420 e a serial da estação base.
 
 Montagem, como no laboratório: o nó 0 do Avrora é a estação base (firmware BS, TOS_NODE_ID 1) e os
 seguintes são os motes (NOBS) com os IDs das chaves do ESPERADO do test_<nome>.py (uma lista vale
-para o nó 11). O mínimo de nós: a CPU é emulada e cada nó custa. A serial da BS fica num socket
+para o nó 11). O mínimo de nós: a CPU é emulada e cada nó custa. O monitor real-time segura a simulação
+no ritmo do relógio: numa máquina rápida ela andaria à frente e acabaria antes de o programa chegar
+pela serial (aconteceu no CI). A serial da BS fica num socket
 (monitor serial do Avrora); nele se liga o SerialForwarder do TinyOS (net.tinyos.sf, o mesmo que o
 TerraControl usa com a MIB520), e este script fala com o SerialForwarder: manda o <nome>.vmx nos
 pacotes do TerraControl e lê o que a BS manda para a serial. Os LEDs vêm do monitor de LEDs.
@@ -89,7 +91,7 @@ def deploy(vmx, version_id=1):
 
 cmd = ["java", "-jar", "/opt/avrora.jar", "-simulation=sensor-network", "-platform=micaz",
        "-input=elf", "-nodecount=" + ",".join(["1"] * len(exes)), "-update-node-id=false",
-       "-colors=false", "-monitors=leds,serial,packet", "-ports=0:0:%d" % PORTA_AVRORA,
+       "-colors=false", "-monitors=leds,serial,packet,real-time", "-ports=0:0:%d" % PORTA_AVRORA,
        "-seconds=%d" % (SEGUNDOS + 15)] + exes
 av = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
 
