@@ -1,0 +1,35 @@
+#include "TerraNet.defs"
+
+// Rádio entre dois motes. O 11 manda v = 5 ao 12 (tipo 1), de segundo em segundo, até receber a
+// resposta; o 12 mostra o que recebeu e devolve v + 1 (tipo 2). Nos LEDs: 6 no 11 e 5 no 12.
+pktype msg from radioMsg with
+  var ubyte v;
+end
+var msg m;
+var msg r;
+if getNodeId() == 11 then
+  par/or do
+    loop do
+      m.type = 1;
+      m.target = 12;
+      m.v = 5;
+      emit SEND(m);
+      await SEND_DONE(1);
+      await 1s;
+    end
+  with
+    r = await RECEIVE(2);
+  end
+  emit LEDS(r.v);
+else
+  loop do
+    r = await RECEIVE(1);
+    emit LEDS(r.v);
+    r.type = 2;
+    r.target = 11;
+    r.v = r.v + 1;
+    emit SEND(r);
+    await SEND_DONE(2);
+  end
+end
+await FOREVER;

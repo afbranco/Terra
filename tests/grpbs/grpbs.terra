@@ -1,0 +1,18 @@
+#include "TerraGrp.defs"
+
+// TerraGrp: o mote manda uma mensagem à estação base (SEND_BS, pela árvore do CTP); a BS a passa
+// para a serial (AM 150). Nos LEDs do mote: 1 ao começar e 2 no SENDBS_DONE.
+pktype msgBS from msgBS_t with
+  var ubyte a;
+  var ubyte b;
+end
+var msgBS d;
+d.msgId = 7;
+d.a = 90;
+d.b = 165;
+emit LEDS(1);
+await 1s;
+emit SEND_BS(d);
+await SENDBS_DONE();
+emit LEDS(2);
+await FOREVER;
