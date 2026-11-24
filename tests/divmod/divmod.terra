@@ -1,0 +1,36 @@
+#include "TerraNet.defs"
+
+// Issue #42: o f_mod calculava v1 % v2 nos dbg antes de conferir v2 == 0; no TOSSIM o processo
+// morria com SIGFPE e levava todos os nós. INT32_MIN / -1 e INT32_MIN % -1 também dão SIGFPE no
+// x86. Agora: divisor 0 dá 0 e o evento ERROR(E_DIVZERO); INT32_MIN / -1 dá INT32_MIN e o resto 0.
+// Nos LEDs: 1, 2 (depois do %0), 3 (depois do /0), 4 (INT32_MIN / -1), 5 (resto 0) e 7 (dois ERROR).
+var long a = 7;
+var long z = 0;
+var long m = 1;
+var long n = -1;
+var long c;
+var ubyte erros = 0;
+m = m << 31;
+par do
+  loop do
+    await ERROR(E_DIVZERO);
+    inc erros;
+  end
+with
+  emit LEDS(1);
+  await 1s;
+  c = a % z;
+  emit LEDS(2);
+  await 1s;
+  c = a / z;
+  emit LEDS(3);
+  await 1s;
+  c = m / n;
+  if c == m then emit LEDS(4); else emit LEDS(6); end
+  await 1s;
+  c = m % n;
+  if c == 0 then emit LEDS(5); else emit LEDS(6); end
+  await 1s;
+  if erros == 2 then emit LEDS(7); else emit LEDS(6); end
+  await FOREVER;
+end

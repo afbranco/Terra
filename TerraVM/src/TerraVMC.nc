@@ -841,13 +841,27 @@ void f_add(uint8_t Modifier){
 	push(v1+v2);
  }
 
+// Divisão e resto sem trap (#42): divisor 0 dá 0 (e o f_div/f_mod geram E_DIVZERO); INT32_MIN / -1
+// transborda (indefinido em C, SIGFPE no x86, o TOSSIM morria e levava todos os nós): dá INT32_MIN,
+// como no complemento de dois, e o resto 0. Os dbg usam o valor já calculado (são sempre avaliados).
+int32_t div_s32(int32_t a, int32_t b){
+	if (b == 0) return 0;
+	if (b == -1) return (int32_t)(0UL - (uint32_t)a);
+	return a / b;
+}
+int32_t mod_s32(int32_t a, int32_t b){
+	if (b == 0 || b == -1) return 0;
+	return a % b;
+}
+
 void f_mod(uint8_t Modifier){ 
-	int32_t v1,v2;
+	int32_t v1,v2,r;
 	v1 = pop();
 	v2 = pop();
-	dbg(APPNAME,"VM::f_mod(%02x): v1=%d, v2=%d, mod=%d\n",Modifier,v1,v2,v1%v2);
-	dbg("VMDBG","VM:: mod operation: (%d %% %d) = %d \n",v1,v2,v1%v2);
-	push((v2==0)?0:v1%v2);
+	r = mod_s32(v1,v2);
+	dbg(APPNAME,"VM::f_mod(%02x): v1=%d, v2=%d, mod=%d\n",Modifier,v1,v2,r);
+	dbg("VMDBG","VM:: mod operation: (%d %% %d) = %d \n",v1,v2,r);
+	push(r);
 	if (v2==0) evtError(E_DIVZERO);
  }
  
@@ -861,12 +875,13 @@ void f_mult(uint8_t Modifier){
  }
 
 void f_div(uint8_t Modifier){ 
-	int32_t v1,v2;
+	int32_t v1,v2,r;
 	v1 = pop();
 	v2 = pop();
-	dbg(APPNAME,"VM::f_div(%02x): v1=%d, v2=%d, div=%d\n",Modifier,v1,v2,(v2==0)?0:v1/v2);
-	dbg("VMDBG","VM:: div operation: (%d / %d) = %d \n",v1,v2,(v2==0)?0:v1/v2);
-	push((v2==0)?0:v1/v2);
+	r = div_s32(v1,v2);
+	dbg(APPNAME,"VM::f_div(%02x): v1=%d, v2=%d, div=%d\n",Modifier,v1,v2,r);
+	dbg("VMDBG","VM:: div operation: (%d / %d) = %d \n",v1,v2,r);
+	push(r);
 	if (v2==0) evtError(E_DIVZERO);
  }
  
