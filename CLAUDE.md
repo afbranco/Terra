@@ -115,11 +115,25 @@ de lá.
   - #36 break/return/par-or disparavam todos os finally: PR #53, teste `tests/finally`;
   - #38 dobra de constantes (divisão inteira, negativos): PR #54, teste `tests/dobra`. Muda
     `.vmx` de dois programas do TerraSim (mesmo valor, código menor);
-  - #39 fila de entrada da BS (`inQ.get` duplo): PR #56 (aberto), teste `tests/inq`;
+  - #39 fila de entrada da BS (`inQ.get` duplo): PR #56, teste `tests/inq`;
+  - #40 timer criado depois de evento externo contava a partir de agora, e os outros a partir
+    do último disparo: o `await` seguinte saía com 1 tick. PR #59, teste `tests/wclockext`.
+    Muda o tempo de programas com `await` depois de `RECEIVE` (oráculo do TerraSim);
   - #41 `tceu_wclock` tinha 6 bytes no AVR e o `terrac` conta 8: o `memclr` do par/or apagava
     outros timers no micaz. PR #58: `u16 pad` e checagem de tamanho na compilação. Teste
     `tests/wclocksize`, que só reprova no AVR (no Avrora).
-  - #55: o CI não roda no push para o `master` (só em PR e tag).
+  - #55 CI também no push para o `master`: PR #60.
+  Depois das P1, a pedido do Prof. (2026-11-23, "sem esperar confirmação"), P2 que afetam a
+  sala de aula:
+  - #42 `x % 0` e `INT32_MIN / -1` matavam o TOSSIM (SIGFPE): PR #61, teste `tests/divmod`;
+  - #43 índice de array fora do limite desandava a pilha: PR #62, teste `tests/arridx`;
+  - #44 nó parava de pedir blocos (`blockStart >= blockLen`): PR #63, teste `tests/reqblock`,
+    que faz o papel do TerraControl na serial da BS (`SerialForwarder` do TOSSIM; a BS é só
+    ponte, quem responde aos pedidos de bloco é o TerraControl);
+  - #46, só a parte que derrubava o compilador (`x+1 = 3`, `sizeof<ubyte> = 3`): PR #64,
+    E4016, testes `tests/terrac/atrib_*`. A issue segue aberta (cast e arrays como lado esquerdo).
+  - O `gh pr merge` não acusa branch desatualizada (o repositório não exige): conferir com
+    `git merge-base --is-ancestor origin/master <head>` e atualizar antes do merge.
   Os testes de VM (`tests/*/test_*.py`) carregam o `.vmx` no nó 11 e leem os LEDs (3 bits)
   no TVIEW. Corpus de comparação dos compiladores (1.173 programas) no scratchpad da sessão.
 - **Avrora** (micaz emulado, #57, PR #58, 2026-11-23): `tests/avrora/avrora_vmx.py` roda um teste
