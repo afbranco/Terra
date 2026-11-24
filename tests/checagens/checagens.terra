@@ -1,0 +1,29 @@
+#include "TerraNet.defs"
+
+// Issue #48. Três conferências, um bit cada nos LEDs (esperado 7):
+//  1: nome de evento interno com escopo: `e´ evento dentro do do-end e `e´ variável depois (dava E3006);
+//  2: dimensão de array em hexadecimal (`#define N 0x10´ dava erro de sintaxe);
+//  4: constante float arredondada como no C: 0.1 == 1.0/10.0 (o terrac truncava: 0x3DCCCCCC).
+#define N 0x10
+var ubyte r = 0;
+var ubyte[N] a;
+var float um = 1.0;
+var float dez = 10.0;
+var float q;
+do
+  event ubyte e;
+  par/and do
+    var ubyte v = await e;
+    if v == 1 then r = r + 1; end
+  with
+    emit e(1);
+  end
+end
+var ubyte e = 2;
+a[0] = 1;
+a[15] = 15;
+if a[15] == 15 and e == 2 then r = r + 2; end
+q = um / dez;
+if q == 0.1 then r = r + 4; end
+emit LEDS(r);
+await FOREVER;

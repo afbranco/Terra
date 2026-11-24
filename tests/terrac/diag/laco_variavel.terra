@@ -1,0 +1,8 @@
+#include "TerraNet.defs"
+// Issue #48: com n = 0 o laço interno não executa e o externo fica sem await (W3006).
+var ubyte n = 0;
+loop do
+  loop i, n do
+    await 1s;
+  end
+end
