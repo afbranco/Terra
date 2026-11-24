@@ -1274,9 +1274,10 @@ void f_poparr_v(uint8_t Modifier){
 	Maddr = getPar16(p1_1len);
  	Vidx  = getPar16(p2_1len);
 	Max   = getPar16(p3_1len);
-	if (getMVal(Vidx,tp2) >= Max) 
+	if (getMVal(Vidx,tp2) >= Max) {
 		evtError(E_IDXOVF);
-	else {
+		pop();	// descarta o valor: sem isso a pilha desandava (#43)
+	} else {
 		if (tp1 == F32){ // Source/Target are float
 			float v2 = popf();
 			dbg(APPNAME,"VM::f_poparr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, Value=%f, IDX OVERFLOW=%s idx=%d\n",
@@ -1309,9 +1310,10 @@ void f_pusharr_v(uint8_t Modifier){
  	Vidx  = getPar16(p2_1len);
 	Max   = getPar16(p3_1len);
 
-	if (getMVal(Vidx,tp2) >= Max) 
+	if (getMVal(Vidx,tp2) >= Max) {
 		evtError(E_IDXOVF);
-	else {
+		push(Maddr);	// o endereço de a[0]: sem isso a pilha desandava (#43)
+	} else {
 		dbg(APPNAME,"VM::f_pusharr_v(%02x):Maddr=%d, Vidx=%d, Max=%d, IDX OVERFLOW=%s idx=%d, v1_len=%d\n",Modifier,Maddr,Vidx,Max,
 			_TFstr(getMVal(Vidx,tp2) > Max),getMVal(Vidx,v2_len),v1_len);
 		push(Maddr+((getMVal(Vidx,tp2)%Max)*v1_len));

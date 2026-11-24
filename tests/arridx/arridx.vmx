@@ -1,0 +1,142 @@
+30 141 1 1 0 0 8 0 8
+00 | 00000 0 track 0
+00 | 00001 0
+00 | 00002 0
+00 | 00003 0
+00 | 00004 0 track 1
+00 | 00005 0
+00 | 00006 0
+00 | 00007 0
+00 | 00008 0000 wClock 0
+00 | 00009 0001
+00 | 00010 0002
+00 | 00011 0003
+00 | 00012 0004
+00 | 00013 0005
+00 | 00014 0006
+00 | 00015 0007
+00 | 00016 0008 $ret:1, 
+00 | 00017 0009 a:6, 
+00 | 00018 0010 
+00 | 00019 0011 
+00 | 00020 0012 
+00 | 00021 0013 
+00 | 00022 0014 
+00 | 00023 0015 i:1, 
+00 | 00024 0016 n:2, 
+00 | 00025 0017 
+00 | 00026 0018 y:2, 
+00 | 00027 0019 
+00 | 00028 0020 k:2, 
+00 | 00029 0021 
+c0 | 00030 c0 set_c ubyte 15 5              | i = 5
+0f | 00031 0f 
+05 | 00032 05 
+c1 | 00033 c1 set_c ushort 16 7             | n = 7
+10 | 00034 10 
+07 | 00035 07 
+c1 | 00036 c1 set_c ushort 18 0             | y = 0
+12 | 00037 12 
+00 | 00038 00 
+c1 | 00039 c1 set_c ushort 20 0             | k = 0
+14 | 00040 14 
+00 | 00041 00 
+c1 | 00042 c1 set_c ushort 9 9              | a[0] = 9
+09 | 00043 09 
+09 | 00044 09 
+58 | 00045 58 outevt_c 5 1                  | emit LEDS len=1 const=1
+05 | 00046 05 
+01 | 00047 01 
+40 | 00048 40 push_c 1                      | push 1
+01 | 00049 01 
+91 | 00050 91 push_v ushort 16              | push n:ushort
+10 | 00051 10 
+06 | 00052 06 add                           | add
+30 | 00053 30 poparr_v ushort 9 ubyte 15 3  | pop to a[i]
+10 | 00054 10 
+09 | 00055 09 
+0f | 00056 0f 
+03 | 00057 03 
+40 | 00058 40 push_c 0                      | push 0
+00 | 00059 00 
+32 | 00060 32 pusharr_v ushort 9 ubyte 15 3 | pusharr_v &a[i]
+10 | 00061 10 
+09 | 00062 09 
+0f | 00063 0f 
+03 | 00064 03 
+71 | 00065 71 deref ushort                  | deref ushort
+06 | 00066 06 add                           | add
+a1 | 00067 a1 pop ushort 18                 | pop y
+12 | 00068 12 
+40 | 00069 40 push_c 20                     | push &k
+14 | 00070 14 
+61 | 00071 61 inc ushort                    | inc ushort
+41 | 00072 41 push_c 1000                   | push 1000
+03 | 00073 03 
+e8 | 00074 e8 
+91 | 00075 91 push_v ushort 20              | push k:ushort
+14 | 00076 14 
+0f | 00077 0f eq                            | eq
+4f | 00078 4f ifelse 18 19                  | ifelse True_18 EndIf_19
+00 | 00079 .00 addr:83
+53 | 00080 .12 
+00 | 00081 .00 addr:91
+5b | 00082 .13 
+3d | 00083 3d tkins_z 1 5 13                | insert track Loop_out_13 tree 5
+85 | 00084 85 
+00 | 00085 .00 addr:98
+62 | 00086 .0d 
+01 | 00087 01 end                           | end
+39 | 00088 39 exec 19                       | goto  19
+00 | 00089 .00 addr:91
+5b | 00090 .13 
+29 | 00091 29 clken_c 0 1 20                | clock enable Awake_1_20 1msec
+01 | 00092 01 
+00 | 00093 00 
+01 | 00094 01 
+00 | 00095 .00 addr:48
+30 | 00096 .0b 
+01 | 00097 01 end                           | end
+48 | 00098 48 memclr 0 8                    | clear WClocks gates from 0 to 1
+00 | 00099 00 
+08 | 00100 08 
+40 | 00101 40 push_c 9                      | push 9
+09 | 00102 09 
+91 | 00103 91 push_v ushort 18              | push y:ushort
+12 | 00104 12 
+0f | 00105 0f eq                            | eq
+40 | 00106 40 push_c 0                      | push 0
+00 | 00107 00 
+91 | 00108 91 push_v ushort 13                     | push_v ushort &a[2] [Optm:: push_c addr + deref]
+0d | 00109 0d 
+0f | 00110 0f eq                            | eq
+40 | 00111 40 push_c 0                      | push 0
+00 | 00112 00 
+91 | 00113 91 push_v ushort 11                     | push_v ushort &a[1] [Optm:: push_c addr + deref]
+0b | 00114 0b 
+0f | 00115 0f eq                            | eq
+40 | 00116 40 push_c 9                      | push 9
+09 | 00117 09 
+91 | 00118 91 push_v ushort 9                      | push_v ushort &a[0] [Optm:: push_c addr + deref]
+09 | 00119 09 
+0f | 00120 0f eq                            | eq
+16 | 00121 16 land                          | land
+16 | 00122 16 land                          | land
+16 | 00123 16 land                          | land
+4f | 00124 4f ifelse 29 30                  | ifelse True_29 False_30
+00 | 00125 .00 addr:129
+81 | 00126 .1d 
+00 | 00127 .00 addr:133
+85 | 00128 .1e 
+58 | 00129 58 outevt_c 5 2                  | emit LEDS len=1 const=2
+05 | 00130 05 
+02 | 00131 02 
+01 | 00132 01 end                           | end
+58 | 00133 58 outevt_c 5 6                  | emit LEDS len=1 const=6
+05 | 00134 05 
+06 | 00135 06 
+01 | 00136 01 end                           | end
+48 | 00137 48 memclr 0 8                    | clear WClocks gates from 0 to 1
+00 | 00138 00 
+08 | 00139 08 
+01 | 00140 01 end                           | end
