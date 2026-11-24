@@ -137,6 +137,29 @@ de lá.
     ponte, quem responde aos pedidos de bloco é o TerraControl);
   - #46, só a parte que derrubava o compilador (`x+1 = 3`, `sizeof<ubyte> = 3`): PR #64,
     E4016, testes `tests/terrac/atrib_*`. A issue segue aberta (cast e arrays como lado esquerdo).
+  Em 2026-11-24, a pedido do Prof. ("fechar o que já foi feito, ainda sem a release"), entraram
+  no `master`, nesta ordem:
+  - #46 resto (PR #67): cast e array como lado esquerdo; cast para inteiro menor corta o valor.
+    Teste `tests/castint`;
+  - #48 (PR #68): checagens menores e o aviso **W3006** (laço cujo único await está num
+    `loop i,N` com N variável; aviso, não erro, decidido com o Prof.). Também o nome do limite
+    do `loop i,N`, que usava um endereço de tabela Lua e mudava o `.vmx` a cada compilação.
+    Teste `tests/checagens`;
+  - #45 (PR #69): float convertido em `emit`, `await` e argumento; `%`, `~`, `inc` e índice
+    com float dão E4030. A parte F_S32 no AVR não se reproduziu no Avrora (a VM não mudou).
+    Teste `tests/floatconv`;
+  - #18 (PR #70): build reproduzível (`-fdebug-prefix-map`, tar e jar determinísticos,
+    `release/compare-builds.sh`);
+  - #66 e #47 (PR #71): `op_uop` (opcode 128) para `ulong` sem sinal; deslocamento >= 32 dá 0
+    (-1 no `>>` de negativo); `await` constante acima de 2147483646 ms é **E6007**, e variável
+    ou expressão que estoura fica no máximo e gera `ERROR(E_TIMEOVF)` (12, nos `.defs`).
+    Corpus: nenhum `.vmx` mudou. Testes `tests/{ulongop,awaitmax}`;
+  - #49 (PR #72): MIN vazio dá 0 (decisão do Prof.), `blockId` do rádio validado, **dois
+    buffers de RECEIVE** com contador de eventos pendentes (`VMCustom.evtDone`). Provado no
+    Avrora: com um buffer, uma mensagem chegando com a VM ocupada sobrescrevia a anterior.
+    Testes `tests/{aggmin,blockid,rxbuf}` (o `rxbuf` só reprova no Avrora).
+  Catálogo: 161 códigos (W3006, E6007). A próxima release muda VM e catálogo: avisar o TerraSim.
+  TerraControl no backlog (#73). Próximo: revisão da disseminação e do Grp.
   - O `gh pr merge` não acusa branch desatualizada (o repositório não exige): conferir com
     `git merge-base --is-ancestor origin/master <head>` e atualizar antes do merge.
   Os testes de VM (`tests/*/test_*.py`) carregam o `.vmx` no nó 11 e leem os LEDs (3 bits)
