@@ -172,6 +172,7 @@ _DIAG.CATALOG = {
     { 'E6004', 'error', ' function event numeric id must be less than 255' },
     { 'E6005', 'error', 'constant is out of range' },
     { 'E6006', 'error', 'subtype size {size} is  greater than payload size {max}' },
+    { 'E6007', 'error', 'await time {ms} ms is above the maximum of {max} ms (about 24.8 days)' },
     -- E9 não implementado
     { 'E9001', 'error', 'Emit INPUT_EVENT inside Async is not implemented.' },
     { 'E9002', 'error', '"EmitT" is not implemented.' },
@@ -194,6 +195,7 @@ _DIAG.CATALOG = {
     { 'W3003', 'warning', 'trail should terminate' },
     { 'W3004', 'warning', 'missing `return´ statement for the block' },
     { 'W3005', 'warning', '`loop´ iteration is not reachable' },
+    { 'W3006', 'warning', 'tight loop if an inner `loop´ with a variable count runs zero times' },
     -- W4 declarações
     { 'W4001', 'warning', 'declaration of "{name}" hides the one at line {line}' },
     { 'W4002', 'warning', 'event "{name}" without any await.' },

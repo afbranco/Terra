@@ -1,0 +1,6 @@
+#include "TerraNet.defs"
+// Issue #46: `a = b´ entre arrays não copia o array (gravaria o endereço de b em a[0..1]).
+var ubyte[3] a;
+var ubyte[3] b;
+a = b;
+await FOREVER;

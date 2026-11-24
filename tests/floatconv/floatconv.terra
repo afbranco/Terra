@@ -1,0 +1,47 @@
+#include "TerraNet.defs"
+
+// Issue #45: conversão entre inteiro e float. O terrac avisava "Automatic casting" mas não
+// gerava o cast, e a VM recebia os bits do valor. LEDs esperados:
+//  7: emit de evento float com inteiro (bit 1), de evento ulong com float (bit 2) e argumento
+//     float de função com parâmetro inteiro, getMem (bit 4);
+//  5: depois de `await (t)s´ com t float (antes: os bits de 1.0 como tempo, uns 12 dias),
+//     emit LEDS(f + 2.0) com f = 3.0 (antes: os bits de 5.0, LEDs 0);
+//  1: cast de float negativo para inteiro com sinal (a VM converte por u32, indefinido em C;
+//     no TOSSIM e no Avrora dá -3, fica como proteção).
+event float ef;
+event ulong eu;
+var ubyte r = 0;
+var float f = 3.0;
+var float t = 1.0;
+var float g = -3.0;
+var long n;
+var ushort i = 1;
+var float x;
+var ubyte dif = 0;
+par/and do
+  var float v = await ef;
+  if v == 2.0 then r = r + 1; end
+with
+  emit ef(2);
+end
+par/and do
+  var ulong w = await eu;
+  if w == 2 then r = r + 2; end
+with
+  emit eu(2.5);
+end
+loop do
+  x = i;
+  if getMem(i) != getMem(x) then dif = 1; end
+  i = i + 1;
+  if i > 60 then break; end
+  await 1ms;
+end
+if dif == 0 then r = r + 4; end
+emit LEDS(r);
+await (t)s;
+emit LEDS(f + 2.0);
+await 1s;
+n = <long>g;
+if n == -3 then emit LEDS(1); else emit LEDS(2); end
+await FOREVER;

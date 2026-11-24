@@ -1,0 +1,435 @@
+93 434 3 3 0 0 32 0 24
+00 | 00000 0 track 0
+00 | 00001 0
+00 | 00002 0
+00 | 00003 0
+00 | 00004 0 track 1
+00 | 00005 0
+00 | 00006 0
+00 | 00007 0
+00 | 00008 0 track 2
+00 | 00009 0
+00 | 00010 0
+00 | 00011 0
+00 | 00012 0 track 3
+00 | 00013 0
+00 | 00014 0
+00 | 00015 0
+00 | 00016 0000 wClock 0
+00 | 00017 0001
+00 | 00018 0002
+00 | 00019 0003
+00 | 00020 0004
+00 | 00021 0005
+00 | 00022 0006
+00 | 00023 0007
+00 | 00024 0008 wClock 1
+00 | 00025 0009
+00 | 00026 0010
+00 | 00027 0011
+00 | 00028 0012
+00 | 00029 0013
+00 | 00030 0014
+00 | 00031 0015
+00 | 00032 0016 wClock 2
+00 | 00033 0017
+00 | 00034 0018
+00 | 00035 0019
+00 | 00036 0020
+00 | 00037 0021
+00 | 00038 0022
+00 | 00039 0023
+00 | 00040 0024 emits 0
+00 | 00041 0025
+00 | 00042 0026 emits 1
+00 | 00043 0027
+00 | 00044 0028 emits 2
+00 | 00045 0029
+00 | 00046 0030 emits 3
+00 | 00047 0031
+00 | 00048 0032 $ret:1, 
+00 | 00049 0033 ef:4, 
+00 | 00050 0034 
+00 | 00051 0035 
+00 | 00052 0036 
+00 | 00053 0037 ef_awt0, 
+00 | 00054 0038 ef_waits[1], 
+00 | 00055 0039 
+00 | 00056 0040 eu:4, 
+00 | 00057 0041 
+00 | 00058 0042 
+00 | 00059 0043 
+00 | 00060 0044 eu_awt0, 
+00 | 00061 0045 eu_waits[1], 
+00 | 00062 0046 
+00 | 00063 0047 r:1, 
+00 | 00064 0048 f:4, 
+00 | 00065 0049 
+00 | 00066 0050 
+00 | 00067 0051 
+00 | 00068 0052 t:4, 
+00 | 00069 0053 
+00 | 00070 0054 
+00 | 00071 0055 
+00 | 00072 0056 g:4, 
+00 | 00073 0057 
+00 | 00074 0058 
+00 | 00075 0059 
+00 | 00076 0060 n:4, 
+00 | 00077 0061 
+00 | 00078 0062 
+00 | 00079 0063 
+00 | 00080 0064 i:2, 
+00 | 00081 0065 
+00 | 00082 0066 x:4, 
+00 | 00083 0067 
+00 | 00084 0068 
+00 | 00085 0069 
+00 | 00086 0070 dif:1, 
+00 | 00087 0071 ParAnd_flag[2], ParAnd_flag[2], 
+00 | 00088 0072 
+00 | 00089 0073 v:4, w:4, 
+00 | 00090 0074 
+00 | 00091 0075 
+00 | 00092 0076 
+c0 | 00093 c0 set_c ubyte 37 1              | event ef = 1 gates
+25 | 00094 25 
+01 | 00095 01 
+48 | 00096 48 memclr 38 2                   | clear ef 1 wait(s) 
+26 | 00097 26 
+02 | 00098 02 
+c0 | 00099 c0 set_c ubyte 44 1              | event eu = 1 gates
+2c | 00100 2c 
+01 | 00101 01 
+48 | 00102 48 memclr 45 2                   | clear eu 1 wait(s) 
+2d | 00103 2d 
+02 | 00104 02 
+c0 | 00105 c0 set_c ubyte 47 0              | r = 0
+2f | 00106 2f 
+00 | 00107 00 
+f3 | 00108 f3 set_c float 48 1077936128     | f = 3.0
+30 | 00109 30 
+40 | 00110 40 
+40 | 00111 40 
+00 | 00112 00 
+00 | 00113 00 
+f3 | 00114 f3 set_c float 52 1065353216     | t = 1.0
+34 | 00115 34 
+3f | 00116 3f 
+80 | 00117 80 
+00 | 00118 00 
+00 | 00119 00 
+43 | 00120 43 push_c 1077936128             | push 3.0
+40 | 00121 40 
+40 | 00122 40 
+00 | 00123 00 
+00 | 00124 00 
+19 | 00125 19 neg_f                         | neg_f
+a3 | 00126 a3 pop float 56                  | pop g
+38 | 00127 38 
+c1 | 00128 c1 set_c ushort 64 1             | i = 1
+40 | 00129 40 
+01 | 00130 01 
+c0 | 00131 c0 set_c ubyte 70 0              | dif = 0
+46 | 00132 46 
+00 | 00133 00 
+48 | 00134 48 memclr 71 2                   | clear gates from addr 71 to addr 72
+47 | 00135 47 
+02 | 00136 02 
+89 | 00137 89 tkins_max 0 11                | insert track ParAnd_sub_1_11
+00 | 00138 .00 addr:144
+90 | 00139 .0b 
+89 | 00140 89 tkins_max 0 12                | insert track ParAnd_sub_2_12
+00 | 00141 .00 addr:186
+ba | 00142 .0c 
+01 | 00143 01 end                           | end
+89 | 00144 89 tkins_max 0 17                | insert track Await_ef_17
+00 | 00145 .00 addr:148
+94 | 00146 .11 
+01 | 00147 01 end                           | end
+d1 | 00148 d1 set_c ushort 38 18            | await Awake_ef_18
+26 | 00149 26 
+00 | 00150 .00 addr:153
+99 | 00151 .12 
+01 | 00152 01 end                           | end
+2a | 00153 2a set_v float 73 float 33       | v = ef
+33 | 00154 33 
+49 | 00155 49 
+21 | 00156 21 
+43 | 00157 43 push_c 1073741824             | push 2.0
+40 | 00158 40 
+00 | 00159 00 
+00 | 00160 00 
+00 | 00161 00 
+93 | 00162 93 push_v float 73               | push v:float
+49 | 00163 49 
+1e | 00164 1e eq_f                          | eq_f
+4f | 00165 4f ifelse 21 22                  | ifelse True_21 EndIf_22
+00 | 00166 .00 addr:170
+aa | 00167 .15 
+00 | 00168 .00 addr:180
+b4 | 00169 .16 
+40 | 00170 40 push_c 1                      | push 1
+01 | 00171 01 
+90 | 00172 90 push_v ubyte 47               | push r:ubyte
+2f | 00173 2f 
+06 | 00174 06 add                           | add
+a0 | 00175 a0 pop ubyte 47                  | pop r
+2f | 00176 2f 
+39 | 00177 39 exec 22                       | goto  22
+00 | 00178 .00 addr:180
+b4 | 00179 .16 
+c0 | 00180 c0 set_c ubyte 71 1              | open gate 1
+47 | 00181 47 
+01 | 00182 01 
+39 | 00183 39 exec 13                       | goto  13
+00 | 00184 .00 addr:207
+cf | 00185 .0d 
+40 | 00186 40 push_c 2                      | push 2
+02 | 00187 02 
+44 | 00188 44 cast ulong float (0)          | cast ulong float
+a3 | 00189 a3 pop float 33                  | emit ef from stack
+21 | 00190 21 
+8d | 00191 8d tkins_max 2 24                | insert track Emit_mch_ef_24
+00 | 00192 .00 addr:198
+c6 | 00193 .18 
+8b | 00194 8b tkins_max 1 25                | insert track Emit_cnt_ef_25
+00 | 00195 .00 addr:201
+c9 | 00196 .1a 
+01 | 00197 01 end                           | end
+36 | 00198 36 trg 37                        | trigger ef
+25 | 00199 25 
+01 | 00200 01 end                           | end
+c0 | 00201 c0 set_c ubyte 72 1              | open gate 2
+48 | 00202 48 
+01 | 00203 01 
+39 | 00204 39 exec 13                       | goto  13
+00 | 00205 .00 addr:207
+cf | 00206 .0d 
+3a | 00207 3a chkret 71                     | ParAnd_out_14 -- if (gate 0 == 0) PC=PC+1
+47 | 00208 47 
+01 | 00209 01 end                           | end
+3a | 00210 3a chkret 72                     | ParAnd_out_14 -- if (gate 1 == 0) PC=PC+1
+48 | 00211 48 
+01 | 00212 01 end                           | end
+48 | 00213 48 memclr 71 2                   | clear gates from addr 71 to addr 72
+47 | 00214 47 
+02 | 00215 02 
+89 | 00216 89 tkins_max 0 27                | insert track ParAnd_sub_1_27
+00 | 00217 .00 addr:223
+df | 00218 .1b 
+89 | 00219 89 tkins_max 0 28                | insert track ParAnd_sub_2_28
+01 | 00220 .00 addr:262
+06 | 00221 .1c 
+01 | 00222 01 end                           | end
+89 | 00223 89 tkins_max 0 33                | insert track Await_eu_33
+00 | 00224 .00 addr:227
+e3 | 00225 .21 
+01 | 00226 01 end                           | end
+d1 | 00227 d1 set_c ushort 45 34            | await Awake_eu_34
+2d | 00228 2d 
+00 | 00229 .00 addr:232
+e8 | 00230 .22 
+01 | 00231 01 end                           | end
+2a | 00232 2a set_v ulong 73 ulong 40       | w = eu
+22 | 00233 22 
+49 | 00234 49 
+28 | 00235 28 
+40 | 00236 40 push_c 2                      | push 2
+02 | 00237 02 
+92 | 00238 92 push_v ulong 73               | push w:ulong
+49 | 00239 49 
+0f | 00240 0f eq                            | eq
+4f | 00241 4f ifelse 37 38                  | ifelse True_37 EndIf_38
+00 | 00242 .00 addr:246
+f6 | 00243 .25 
+01 | 00244 .00 addr:256
+00 | 00245 .26 
+40 | 00246 40 push_c 2                      | push 2
+02 | 00247 02 
+90 | 00248 90 push_v ubyte 47               | push r:ubyte
+2f | 00249 2f 
+06 | 00250 06 add                           | add
+a0 | 00251 a0 pop ubyte 47                  | pop r
+2f | 00252 2f 
+39 | 00253 39 exec 38                       | goto  38
+01 | 00254 .00 addr:256
+00 | 00255 .26 
+c0 | 00256 c0 set_c ubyte 71 1              | open gate 1
+47 | 00257 47 
+01 | 00258 01 
+39 | 00259 39 exec 29                       | goto  29
+01 | 00260 .00 addr:286
+1e | 00261 .1d 
+43 | 00262 43 push_c 1075838976             | push 2.5
+40 | 00263 40 
+20 | 00264 20 
+00 | 00265 00 
+00 | 00266 00 
+46 | 00267 46 cast float ulong (2)          | cast float ulong
+a2 | 00268 a2 pop ulong 40                  | emit eu from stack
+28 | 00269 28 
+8d | 00270 8d tkins_max 2 40                | insert track Emit_mch_eu_40
+01 | 00271 .00 addr:277
+15 | 00272 .28 
+8b | 00273 8b tkins_max 1 41                | insert track Emit_cnt_eu_41
+01 | 00274 .00 addr:280
+18 | 00275 .2a 
+01 | 00276 01 end                           | end
+36 | 00277 36 trg 44                        | trigger eu
+2c | 00278 2c 
+01 | 00279 01 end                           | end
+c0 | 00280 c0 set_c ubyte 72 1              | open gate 2
+48 | 00281 48 
+01 | 00282 01 
+39 | 00283 39 exec 29                       | goto  29
+01 | 00284 .00 addr:286
+1e | 00285 .1d 
+3a | 00286 3a chkret 71                     | ParAnd_out_30 -- if (gate 0 == 0) PC=PC+1
+47 | 00287 47 
+01 | 00288 01 end                           | end
+3a | 00289 3a chkret 72                     | ParAnd_out_30 -- if (gate 1 == 0) PC=PC+1
+48 | 00290 48 
+01 | 00291 01 end                           | end
+91 | 00292 91 push_v ushort 64              | push i:ushort
+40 | 00293 40 
+44 | 00294 44 cast ulong float (0)          | cast ulong float
+40 | 00295 40 push_c 66                     | push_c &x:float
+42 | 00296 42 
+6b | 00297 6b set_e float                   | set (float)*(pop1) = pop2
+93 | 00298 93 push_v float 66               | push x:float
+42 | 00299 42 
+46 | 00300 46 cast float ulong (2)          | cast float ulong
+24 | 00301 24 func 2                        | func getMem
+02 | 00302 02 
+91 | 00303 91 push_v ushort 64              | push i:ushort
+40 | 00304 40 
+24 | 00305 24 func 2                        | func getMem
+02 | 00306 02 
+10 | 00307 10 neq                           | neq
+4f | 00308 4f ifelse 47 48                  | ifelse True_47 EndIf_48
+01 | 00309 .00 addr:313
+39 | 00310 .2f 
+01 | 00311 .00 addr:319
+3f | 00312 .30 
+c0 | 00313 c0 set_c ubyte 70 1              | dif = 1
+46 | 00314 46 
+01 | 00315 01 
+39 | 00316 39 exec 48                       | goto  48
+01 | 00317 .00 addr:319
+3f | 00318 .30 
+40 | 00319 40 push_c 1                      | push 1
+01 | 00320 01 
+91 | 00321 91 push_v ushort 64              | push i:ushort
+40 | 00322 40 
+06 | 00323 06 add                           | add
+a1 | 00324 a1 pop ushort 64                 | pop i
+40 | 00325 40 
+40 | 00326 40 push_c 60                     | push 60
+3c | 00327 3c 
+91 | 00328 91 push_v ushort 64              | push i:ushort
+40 | 00329 40 
+13 | 00330 13 gt                            | gt
+4f | 00331 4f ifelse 51 52                  | ifelse True_51 EndIf_52
+01 | 00332 .00 addr:336
+50 | 00333 .33 
+01 | 00334 .00 addr:344
+58 | 00335 .34 
+3d | 00336 3d tkins_z 1 5 45                | insert track Loop_out_45 tree 5
+85 | 00337 85 
+01 | 00338 .00 addr:351
+5f | 00339 .2d 
+01 | 00340 01 end                           | end
+39 | 00341 39 exec 52                       | goto  52
+01 | 00342 .00 addr:344
+58 | 00343 .34 
+29 | 00344 29 clken_c 0 1 53                | clock enable Awake_1_53 1msec
+01 | 00345 01 
+00 | 00346 00 
+01 | 00347 01 
+01 | 00348 .00 addr:292
+24 | 00349 .2b 
+01 | 00350 01 end                           | end
+48 | 00351 48 memclr 0 8                    | clear WClocks gates from 0 to 1
+00 | 00352 00 
+08 | 00353 08 
+40 | 00354 40 push_c 0                      | push 0
+00 | 00355 00 
+90 | 00356 90 push_v ubyte 70               | push dif:ubyte
+46 | 00357 46 
+0f | 00358 0f eq                            | eq
+4f | 00359 4f ifelse 56 57                  | ifelse True_56 EndIf_57
+01 | 00360 .00 addr:364
+6c | 00361 .38 
+01 | 00362 .00 addr:374
+76 | 00363 .39 
+40 | 00364 40 push_c 4                      | push 4
+04 | 00365 04 
+90 | 00366 90 push_v ubyte 47               | push r:ubyte
+2f | 00367 2f 
+06 | 00368 06 add                           | add
+a0 | 00369 a0 pop ubyte 47                  | pop r
+2f | 00370 2f 
+39 | 00371 39 exec 57                       | goto  57
+01 | 00372 .00 addr:374
+76 | 00373 .39 
+90 | 00374 90 push_v ubyte 47               | push r:ubyte
+2f | 00375 2f 
+25 | 00376 25 outevt_e 5                    | emit LEDS
+05 | 00377 05 
+93 | 00378 93 push_v float 52               | push t:float
+34 | 00379 34 
+46 | 00380 46 cast float ulong (2)          | cast float ulong
+27 | 00381 27 clken_e 1 1 62                | clock enable Awake_t_62 (stack)s
+11 | 00382 11 
+01 | 00383 01 
+01 | 00384 .00 addr:387
+83 | 00385 .3e 
+01 | 00386 01 end                           | end
+43 | 00387 43 push_c 1073741824             | push 2.0
+40 | 00388 40 
+00 | 00389 00 
+00 | 00390 00 
+00 | 00391 00 
+93 | 00392 93 push_v float 48               | push f:float
+30 | 00393 30 
+1b | 00394 1b add_f                         | add_f
+46 | 00395 46 cast float ulong (2)          | cast float ulong
+25 | 00396 25 outevt_e 5                    | emit LEDS
+05 | 00397 05 
+29 | 00398 29 clken_c 2 1000 66             | clock enable Awake_1000_66 1000msec
+03 | 00399 03 
+02 | 00400 02 
+03 | 00401 03 
+e8 | 00402 e8 
+01 | 00403 .00 addr:406
+96 | 00404 .42 
+01 | 00405 01 end                           | end
+93 | 00406 93 push_v float 56               | push g:float
+38 | 00407 38 
+47 | 00408 47 cast float long (3)           | cast float long
+a6 | 00409 a6 pop long 60                   | pop n
+3c | 00410 3c 
+40 | 00411 40 push_c 3                      | push 3
+03 | 00412 03 
+04 | 00413 04 neg                           | neg
+96 | 00414 96 push_v long 60                | push n:long
+3c | 00415 3c 
+0f | 00416 0f eq                            | eq
+4f | 00417 4f ifelse 73 74                  | ifelse True_73 False_74
+01 | 00418 .00 addr:422
+a6 | 00419 .49 
+01 | 00420 .00 addr:426
+aa | 00421 .4a 
+58 | 00422 58 outevt_c 5 1                  | emit LEDS len=1 const=1
+05 | 00423 05 
+01 | 00424 01 
+01 | 00425 01 end                           | end
+58 | 00426 58 outevt_c 5 2                  | emit LEDS len=1 const=2
+05 | 00427 05 
+02 | 00428 02 
+01 | 00429 01 end                           | end
+48 | 00430 48 memclr 0 24                   | clear WClocks gates from 0 to 3
+00 | 00431 00 
+18 | 00432 18 
+01 | 00433 01 end                           | end

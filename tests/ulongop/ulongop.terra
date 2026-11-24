@@ -1,0 +1,41 @@
+#include "TerraNet.defs"
+
+// Issue #66 (desenho da #47): a pilha da VM é int32 e um ulong acima de 2^31 parecia negativo, então
+// comparação, divisão, resto e >> davam errado (3000000000 > 5 era falso). Agora o terrac usa a
+// instrução sem sinal. E o deslocamento por 32 ou mais dá 0 (no >> de um negativo, -1); antes, no x86,
+// a contagem era tomada módulo 32 (1 << 33 dava 2).
+// Nos LEDs, um por verificação: 1 se certo, 6 se errado. No fim, 7.
+var ulong a = 3000000000;
+var ulong b = 5;
+var ulong um = 1;
+var long neg = -8;
+var ubyte s = 33;
+var ulong r;
+var long q;
+emit LEDS(1);
+await 1s;
+if a > b then emit LEDS(1); else emit LEDS(6); end
+await 1s;
+if b < a then emit LEDS(1); else emit LEDS(6); end
+await 1s;
+if a >= 2999999999 then emit LEDS(1); else emit LEDS(6); end
+await 1s;
+if a <= 5 then emit LEDS(6); else emit LEDS(1); end
+await 1s;
+r = a / 2;
+if r == 1500000000 then emit LEDS(1); else emit LEDS(6); end
+await 1s;
+r = a % 7;
+if r == 4 then emit LEDS(1); else emit LEDS(6); end
+await 1s;
+r = a >> 4;
+if r == 187500000 then emit LEDS(1); else emit LEDS(6); end
+await 1s;
+r = um << s;
+if r == 0 then emit LEDS(1); else emit LEDS(6); end
+await 1s;
+q = neg >> s;
+if q == -1 then emit LEDS(1); else emit LEDS(6); end
+await 1s;
+emit LEDS(7);
+await FOREVER;

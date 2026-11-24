@@ -10,13 +10,24 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 W=$(mktemp -d)
 mkdir -p "$OUT/logs"
 
+# Build reproduzível (issue #18): dois builds do mesmo commit na mesma imagem dão os mesmos
+# bytes. A cópia fica numa pasta aleatória ($W), e o caminho entraria no DWARF do _TOSSIM.so
+# (comp_dir e nomes de arquivo) e, por ele, no build-id. O -fdebug-prefix-map troca esse
+# caminho por /terra/TerraVM/src (onde o fonte está no contêiner do workflow) só na
+# informação de depuração, que continua lá; o código e o __FILE__ não mudam. Vai pelo
+# ambiente: o Makefile acrescenta ao CFLAGS (+=), e o CFLAGS chega ao nesC e ao g++.
+# Os nomes arg_0x<endereço> do nesC são tratados no release/nesc-gcc.sh (GCC= do sim).
+# Datas dos tar.gz e do jar: fixas, as do commit (SOURCE_DATE_EPOCH) ou, sem ele, 1980-01-02.
+SDE=${SOURCE_DATE_EPOCH:-315619200}
+
 # Compila TerraVM/src numa cópia limpa. Uso: vm <nome do log> <argumentos do make>
 vm() {
     local name=$1; shift
     rm -rf "$W/src"
     cp -a "$ROOT/TerraVM/src" "$W/src"
     echo "== make $*" | tee "$OUT/logs/$name.log"
-    if ! (cd "$W/src" && make "$@") >> "$OUT/logs/$name.log" 2>&1; then
+    if ! (cd "$W/src" && CFLAGS="-fdebug-prefix-map=$W/src=/terra/TerraVM/src" make "$@") \
+            >> "$OUT/logs/$name.log" 2>&1; then
         tail -40 "$OUT/logs/$name.log"
         echo "FALHOU: make $*"
         exit 1
@@ -29,11 +40,12 @@ for v in net grp; do
         net) args="VM=NET MOD=MSGQ TYPE=ALL" ;;
         grp) args="VM=GRP TYPE=ALL" ;;
     esac
-    vm "tossim-$v" micaz sim-sf $args
+    vm "tossim-$v" micaz sim-sf $args GCC="$ROOT/release/nesc-gcc.sh"
     d="$W/terra-$VER-$v-tossim-py3-x86_64"
     rm -rf "$d"; mkdir -p "$d"
     cp "$W/src/_TOSSIM.so" "$W/src/TOSSIM.py" "$d/"
-    tar -C "$W" -czf "$OUT/$(basename "$d").tar.gz" "$(basename "$d")"
+    tar -C "$W" --sort=name --mtime="@$SDE" --owner=0 --group=0 --numeric-owner \
+        -cf - "$(basename "$d")" | gzip -n > "$OUT/$(basename "$d").tar.gz"
     # Roda numa pasta gravável: a VM cria ali o sensors.bin e, se não conseguir, sai com
     # exit(0). Por isso o teste exige a linha "OK" e não confia só no código de saída.
     mkdir -p "$W/run-$v"
@@ -80,7 +92,10 @@ for f in "$J"/deps/*.jar; do
 done
 rm -rf "$J/classes/META-INF"
 printf 'Main-Class: app.ControlForm\n' > "$J/manifest"
-jar cfm "$OUT/TerraVMControl-$VER.jar" "$J/manifest" -C "$J/classes" .
+# Entradas em ordem de nome e com data fixa, para o jar sair igual a cada build.
+(cd "$J/classes" && find . -type f | LC_ALL=C sort | sed 's|^\./||') > "$J/lista"
+(cd "$J/classes" && jar --create --file "$OUT/TerraVMControl-$VER.jar" --manifest "$J/manifest" \
+    --date="$(date -u -d "@$SDE" +%Y-%m-%dT%H:%M:%SZ)" @"$J/lista")
 # Teste: a classe principal carrega com todas as dependências resolvidas.
 java -cp "$OUT/TerraVMControl-$VER.jar" -Djava.awt.headless=true \
     "$ROOT/release/LoadCheck.java" app.ControlForm net.tinyos.message.MoteIF \
