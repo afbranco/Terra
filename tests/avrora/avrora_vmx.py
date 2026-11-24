@@ -92,7 +92,7 @@ def deploy(vmx, version_id=1):
 cmd = ["java", "-jar", "/opt/avrora.jar", "-simulation=sensor-network", "-platform=micaz",
        "-input=elf", "-nodecount=" + ",".join(["1"] * len(exes)), "-update-node-id=false",
        "-colors=false", "-monitors=leds,serial,packet,real-time", "-ports=0:0:%d" % PORTA_AVRORA,
-       "-seconds=%d" % (SEGUNDOS + 15)] + exes
+       "-seconds=%d" % (SEGUNDOS + 45)] + exes
 av = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
 
 # Lê a saída do Avrora numa thread: LEDs de cada mote e quantos pacotes a BS (nó 0) já mandou pelo
@@ -138,6 +138,7 @@ for _ in range(300):
 s.sendall(b"U ")
 assert s.recv(2) == b"U ", "SerialForwarder não respondeu"
 recebidos = []
+pedidos = []
 
 
 def le_sf():
@@ -151,17 +152,27 @@ def le_sf():
             return
         buf += d
         while buf and len(buf) > buf[0]:
-            recebidos.append(buf[1:1 + buf[0]])
+            p = buf[1:1 + buf[0]]
+            recebidos.append(p)
             buf = buf[1 + buf[0]:]
+            # Pedido de bloco de um mote (reqProgBlock: reqOper, versionId, blockId), que a BS
+            # passa para a serial. O TerraControl responde com o bloco (ou com a versão, se o
+            # versionId é 0); aqui também (ControlCore.messageReceived).
+            if len(p) >= 13 and p[0] == 0 and p[7] == 0xA2:
+                pedidos.append(struct.unpack(">BHH", p[8:13]))
 
 
 threading.Thread(target=le_sf, daemon=True).start()
 
 
+trava = threading.Lock()
+
+
 def envia(am, payload):
     """Pacote AM da serial (despacho 0, destino 1, origem 0, tamanho, grupo 0x22, tipo)."""
     pac = bytes([0]) + struct.pack(">HHBBB", 1, 0, len(payload), 0x22, am) + payload
-    s.sendall(bytes([len(pac)]) + pac)
+    with trava:
+        s.sendall(bytes([len(pac)]) + pac)
 
 
 def depois_do_boot(n):
@@ -169,17 +180,33 @@ def depois_do_boot(n):
 
 
 espera(lambda: all(len(leds[n]) >= 2 for n in MOTES), 120)   # padrão de LEDs do boot
-# Rodadas, como o TerraControl repete o anúncio, até todos os motes receberem o programa (o
-# VM.reset apaga os LEDs). Um pacote que a BS não repassou pelo rádio vai de novo.
+pacotes = deploy(os.path.join(pasta, nome + ".vmx"))
+blocos = {struct.unpack(">HH", d[:4])[1]: (am, d) for am, d in pacotes[1:]}
+
+
+def responde():
+    """Atende os pedidos dos motes, como o TerraControl: o bloco pedido, ou a versão."""
+    while av.poll() is None:
+        if not pedidos:
+            time.sleep(0.05)
+            continue
+        oper, versao, bloco = pedidos.pop(0)
+        if versao == 0:
+            envia(*pacotes[0])
+        elif bloco in blocos:
+            envia(*blocos[bloco])
+        time.sleep(0.1)
+
+
+threading.Thread(target=responde, daemon=True).start()
+# Anuncia a versão e manda os blocos, um depois que a BS repassou o anterior pelo rádio. O que se
+# perder, o mote pede; se ninguém recebeu o programa, repete o anúncio (como o TerraControl).
 for rodada in range(5):
-    for am, dados in deploy(os.path.join(pasta, nome + ".vmx")):
-        for tentativa in range(3):
-            antes = estado["bs_tx"]
-            envia(am, dados)
-            espera(lambda: estado["bs_tx"] > antes, 5)
-            if estado["bs_tx"] > antes:
-                break
-    espera(lambda: all(depois_do_boot(n) for n in MOTES), 10)
+    for am, dados in pacotes:
+        antes = estado["bs_tx"]
+        envia(am, dados)
+        espera(lambda: estado["bs_tx"] > antes, 2)
+    espera(lambda: all(depois_do_boot(n) for n in MOTES), 15)
     if all(depois_do_boot(n) for n in MOTES) or av.poll() is not None:
         break
 
