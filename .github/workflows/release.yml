@@ -1,7 +1,8 @@
 # Compila e testa os artefatos de release do Terra e, numa tag v*, cria a release como
 # rascunho (o Prof. revisa as notas e publica).
 # - pull request e execução manual: compila, testa e guarda os artefatos no Actions;
-# - tag v*: o mesmo e depois a release em rascunho com os anexos, SHA256SUMS e BUILDINFO.
+# - tag v*: o mesmo, os testes no Avrora e depois a release em rascunho com os anexos,
+#   SHA256SUMS e BUILDINFO. Os testes no Avrora também rodam na execução manual.
 # A imagem do toolchain é fixa (tag com commit e digest), da release tinyos-toolchain 2.1.2-r2.
 name: release
 
@@ -71,10 +72,36 @@ jobs:
           name: terrac
           path: dist/
 
+  avrora:
+    # Os testes da VM no micaz emulado (release/test-avrora.sh). Lento: só na tag de release e
+    # quando o workflow é disparado à mão (Actions > release > Run workflow), não em todo PR.
+    name: Avrora (micaz emulado)
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    needs: tinyos
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          name: tinyos
+          path: fw
+      - name: Testes no Avrora
+        run: |
+          mkdir -p avrora
+          podman pull -q "$TOOLCHAIN_IMAGE"
+          podman run --rm -v "$PWD:/terra:ro,Z" -v "$PWD/avrora:/out:Z" -w /terra \
+            "$TOOLCHAIN_IMAGE" release/test-avrora.sh /terra/fw /out
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: avrora-logs
+          path: avrora/
+
   release:
     name: Release (rascunho)
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [tinyos, terrac]
+    needs: [tinyos, terrac, avrora]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
