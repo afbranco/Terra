@@ -1,0 +1,35 @@
+#include "TerraNet.defs"
+
+// Issue #40: timer criado depois de um evento externo. A VM conta os timers a partir do último
+// disparo de timer, mas o timer novo recebia o tempo a partir de agora; no disparo, todo o tempo
+// desde o último disparo virava atraso e o await seguinte saía com 1 tick.
+// O 12 manda a mensagem 1 aos 5 s e a 2 aos 6,5 s. No 11, depois da 1: dois await de 1 s e LEDS(2),
+// em paralelo com a mensagem 2 e LEDS(1). Certo: 1 (aos 6,5 s) e depois 2 (aos 7 s). Com o bug, o
+// segundo await sai na hora e o 2 vem antes do 1. O 12 mostra 3 ao terminar.
+pktype msg from radioMsg with
+  var ubyte v;
+end
+var msg m;
+if getNodeId() == 11 then
+  m = await RECEIVE(1);
+  par/and do
+    await 1s;
+    await 1s;
+    emit LEDS(2);
+  with
+    m = await RECEIVE(2);
+    emit LEDS(1);
+  end
+else
+  await 5s;
+  m.type = 1;
+  m.target = 11;
+  emit SEND(m);
+  await SEND_DONE(1);
+  await 1500ms;
+  m.type = 2;
+  emit SEND(m);
+  await SEND_DONE(2);
+  emit LEDS(3);
+end
+await FOREVER;

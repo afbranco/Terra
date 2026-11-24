@@ -27,7 +27,8 @@ module TerraVMC @safe()
 }
 implementation
 {
-    u32 old;
+    u32 old;          // instante do último disparo do timer da VM: os togo contam a partir dele
+    bool emWclock = FALSE;   // reagindo a um disparo de timer (ceu_go_wclock)
 	// Mote Identifier
 	nx_uint16_t MoteID;					
 	// VM scrip memory
@@ -79,7 +80,13 @@ implementation
 	}
 
 // Ceu intrinsic functions
-	void ceu_out_wclock(uint32_t ms){ if (ms != CEU_WCLOCK_NONE ) {call BSTimerVM.startOneShot(ms);}}
+	// ms conta a partir de old (o último disparo): arma o timer com o que falta a partir de agora (#40)
+	void ceu_out_wclock(uint32_t ms){
+		if (ms != CEU_WCLOCK_NONE ) {
+			u32 passou = (u32)call BSTimerVM.getNow() - old;
+			call BSTimerVM.startOneShot((ms > passou) ? ms - passou : 0);
+		}
+	}
 
 
 
@@ -553,6 +560,10 @@ void ceu_wclock_enable (int gte, s32 us, tceu_nlbl lbl) {
 
     dbg(APPNAME,"CEU::ceu_wclock_enable(): gate=%d, time=%d, lbl=%d, dt=%ld, wClock0=%d\n",gte,us,lbl,dt,wClock0);
 //printf("[%d/%d] (%ld - %d) = %ld",gte,lbl,us,CEU->wclk_late,dt);printfflush();
+    // Os togo contam a partir de old. Na reação a um disparo de timer, o tempo lógico é o do
+    // disparo (descontado o atraso, acima); em outra reação (evento externo, async), é agora: soma
+    // o que já passou desde old. Sem isso, o disparo seguinte tomava esse tempo como atraso (#40).
+    if (!emWclock) dt += (s32)((u32)call BSTimerVM.getNow() - old);
     tmr->togo = dt;
     *(nx_uint16_t*)&(tmr->lbl)  = lbl;
 
@@ -688,7 +699,10 @@ int ceu_go_wclock (int* ret, s32 dt, s32* nxt)
 
 //    dbg(APPNAME,"CEU::ceu_go_wclock(): 1 \n",*(uint8_t*)(CEU->p_mem+4));
 
-    {int s = ceu_go(ret);
+    {int s;
+    emWclock = TRUE;
+    s = ceu_go(ret);
+    emWclock = FALSE;
     if (nxt)
         *nxt = (CEU->wclk_cur ? CEU->wclk_cur->togo : CEU_WCLOCK_NONE);
     CEU->wclk_late = 0;
