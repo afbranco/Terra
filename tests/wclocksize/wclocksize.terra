@@ -1,0 +1,21 @@
+#include "TerraNet.defs"
+
+// Issue #41: o terrac reserva 8 bytes por timer (tceu_wclock) e limpa 8 bytes por timer ao sair
+// de um par/or; no micaz a struct tinha 6 bytes e a VM anda de 6 em 6. O memclr do par/or apagava
+// também o timer da outra trilha (await 3s). Nos LEDs do nó: 2 (par/or termina pelo 1 s),
+// 1 (o await 3s da outra trilha) e 3 (fim do par/and).
+par/and do
+  par/or do                 // timers 0, 1 e 2
+    await 10s;
+  with
+    await 20s;
+  with
+    await 1s;
+  end
+  emit LEDS(2);
+with
+  await 3s;                 // timer 3: no micaz, bytes 18 a 23, dentro dos 24 que o par/or limpa
+  emit LEDS(1);
+end
+emit LEDS(3);
+await FOREVER;

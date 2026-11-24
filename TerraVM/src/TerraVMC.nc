@@ -356,7 +356,10 @@ typedef u16 tceu_nlbl;
 typedef struct {
     s32 togo;
     tceu_nlbl lbl;
+    u16 pad;      // 8 bytes em toda plataforma, como o terrac reserva e limpa (env.lua); sem ele,
+                  // no AVR a struct tinha 6 e o memclr de um par/or apagava outros timers (#41)
 } tceu_wclock;
+typedef char tceu_wclock_tem_8_bytes[(sizeof(tceu_wclock) == 8) ? 1 : -1];
 
 typedef struct {
     u8 stack;
