@@ -933,7 +933,9 @@ call Leds.led1On();
 		 	case RO_DATA_FULL:
 		 		// timeout on full data request, retry for the next block
 		 		nextBlock = getNextEmptyBlock();
-			 	if (nextBlock < ProgBlockLen){
+			 	// nextBlock é o índice absoluto: compara com o fim do programa, não com a quantidade
+			 	// de blocos. Com blockStart >= blockLen o nó parava de pedir (#44).
+			 	if (nextBlock < ProgBlockStart + ProgBlockLen){
 				 	Data.reqOper=RO_DATA_FULL;
 					ReqState = RO_DATA_FULL;
 					Data.versionId = ProgVersion;

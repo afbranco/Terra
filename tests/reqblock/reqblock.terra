@@ -1,0 +1,10 @@
+#include "TerraNet.defs"
+
+// Issue #44: programa com mais variáveis que código (blockStart >= blockLen). O nó recebe a versão,
+// mas não recebe a resposta ao primeiro pedido de bloco. No timeout do pedido, o nó comparava o índice
+// absoluto do bloco com a quantidade de blocos, caía no else sem religar o timer e parava de pedir.
+// Agora continua pedindo e carrega o programa quando a BS o tem. Nos LEDs: 5.
+var ubyte[80] buf;
+buf[0] = 1;
+emit LEDS(5);
+await FOREVER;
