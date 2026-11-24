@@ -1,0 +1,21 @@
+#include "TerraNet.defs"
+
+// Issue #39: a fila de entrada do nó descartava uma mensagem a cada uma processada. O teste
+// entrega pelo rádio a versão e, logo depois, todos os blocos deste programa no mesmo instante; se um bloco se
+// perde, a VM não começa. Nos LEDs do nó: 1, 2, 3, 4 e 5, um por segundo.
+var ubyte  a = 1;
+var ushort b = 2;
+var ulong  c = 3;
+var ubyte  d = 4;
+var ushort e = 5;
+await 1s;
+emit LEDS(a);
+await 1s;
+emit LEDS(b);
+await 1s;
+emit LEDS(c);
+await 1s;
+emit LEDS(d);
+await 1s;
+emit LEDS(e);
+await FOREVER;

@@ -1151,7 +1151,8 @@ call Leds.led1On();
 					}
 #ifndef ONLY_BSTATION
 					dbg(APPNAME, "BS::procInputEvent(): nextMessage.\n");
-					call inQ.get(&tempOutputInQ);
+					// a mensagem já saiu da fila no get logo depois do read; um segundo get
+					// descartava a seguinte (#39)
 					post procInputEvent();
 #endif
 				}
