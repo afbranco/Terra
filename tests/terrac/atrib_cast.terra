@@ -1,0 +1,5 @@
+#include "TerraNet.defs"
+// Issue #46: o cast copiava o lval da expressão e `<ushort>x = ...´ gravava no endereço igual ao valor de x.
+var ushort x;
+<ushort>x = 3;
+await FOREVER;

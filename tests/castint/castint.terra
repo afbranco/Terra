@@ -1,0 +1,24 @@
+#include "TerraNet.defs"
+
+// Issue #46: o cast para inteiro mais estreito era descartado ("ineffective cast") e o valor
+// seguia inteiro na pilha de 32 bits: `<ubyte>300 == 44´ dava falso. Agora o terrac corta o valor
+// (máscara e, com sinal, extensão do bit de sinal). Nos LEDs: 7 e 7 (cada bit é uma conferência).
+var ushort v = 300;
+var short s = 200;
+var long g = -1;
+var ubyte r = 0;
+var ushort u;
+var short k;
+u = <ubyte>v;
+if u == 44 then r = r + 1; end
+k = <byte>s;
+if k == -56 then r = r + 2; end
+if <ushort>g == 65535 then r = r + 4; end
+emit LEDS(r);
+await 1s;
+r = 0;
+if <ubyte>300 == 44 then r = r + 1; end
+if <short>70000 == 4464 then r = r + 2; end
+if <ulong>(<byte>s) == 0xFFFFFFC8 then r = r + 4; end
+emit LEDS(r);
+await FOREVER;

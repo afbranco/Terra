@@ -1321,10 +1321,31 @@ F = {
     local toTp = ((tp=='ubyte' or tp=='ushort' or tp=='ulong') and 'ulong') or ((tp=='byte' or tp=='short' or tp=='long') and 'long') or 'float'  
     codeB = LINE(me,'cast '..fromTp..' '..toTp,nil,'// cast <type> ')
 --print("code::Op1_cast:",tp,exp.tp,fromTp,toTp)
+    local efetivo = false
     if (fromTp~=toTp and (fromTp=='float' or toTp=='float')) then
       BYTECODE(me,codeB,'op_cast',fromTp,toTp)
-    else
-      WRN(false,me, 'W1002',{from=fromTp,to=toTp})    
+      efetivo = true
+    end
+    -- Cast para inteiro mais estreito: a pilha da VM tem 32 bits, então o valor é cortado aqui
+    -- (máscara; com sinal, também a extensão do bit de sinal). Antes o cast era descartado e
+    -- `<ubyte>300 == 44´ dava falso (#46). Só operações comutativas: a ordem da pilha não pesa.
+    local corte = { ubyte={0xFF}, ushort={0xFFFF}, byte={0xFF,0x80,0xFFFFFF80}, short={0xFFFF,0x8000,0xFFFF8000} }
+    local cabe  = { ubyte={ubyte=true}, ushort={ubyte=true,ushort=true}, byte={byte=true}, short={byte=true,short=true} }
+    local c = corte[tp]
+    if c and not cabe[tp][exp.tp] then
+      local ops = { {c[1],'band'}, {c[2],'bxor'}, {c[3],'add'} }
+      for _, o in ipairs(ops) do
+        if o[1] then
+          codeB = LINE(me,'push '..o[1],nil,'// cast <'..tp..'> ')
+          BYTECODE(me,codeB,'op_push_c',o[1])
+          codeB = LINE(me,o[2],nil,'// cast <'..tp..'> ')
+          BYTECODE(me,codeB,'op2_any',o[2])
+        end
+      end
+      efetivo = true
+    end
+    if not efetivo then
+      WRN(false,me, 'W1002',{from=exp.tp,to=tp})
     end
   end,
   ['SIZEOF'] = function (me)

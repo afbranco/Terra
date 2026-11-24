@@ -839,7 +839,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
         ASR(not _TP.deref(exp.tp),me,'E4025')
         ASR(_TP.isBasicType(exp.tp),me,'E4026')
         me.tp   = tp
-        me.lval = exp.lval
+        me.lval = false     -- `<ushort>x = 1´ gravava no endereço igual ao valor de x (#46)
         me.fst  = exp.fst
         me.ref = exp.ref
      end,
