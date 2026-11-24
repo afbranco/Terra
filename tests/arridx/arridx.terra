@@ -1,0 +1,29 @@
+#include "TerraNet.defs"
+
+// Issue #43: com índice fora do limite, o poparr_v (gravar a[i] = expressão) não desempilhava o
+// valor e o pusharr_v (ler a[i] numa expressão) não empilhava o endereço: a pilha desandava e a
+// VM reiniciava depois de umas 400 iterações. Agora gera E_IDXOVF e mantém a pilha: a gravação é
+// descartada e a leitura dá a[0]. Nos LEDs: 1 no começo e 2 se, depois de 1000 voltas, a[] não
+// mudou e a leitura deu a[0] (6 se não).
+var ushort[3] a;
+var ubyte i = 5;
+var ushort n = 7;
+var ushort y = 0;
+var ushort k = 0;
+a[0] = 9;
+emit LEDS(1);
+loop do
+  a[i] = n + 1;
+  y = a[i] + 0;
+  inc k;
+  if k == 1000 then
+    break;
+  end
+  await 1ms;
+end
+if a[0] == 9 and a[1] == 0 and a[2] == 0 and y == 9 then
+  emit LEDS(2);
+else
+  emit LEDS(6);
+end
+await FOREVER;
