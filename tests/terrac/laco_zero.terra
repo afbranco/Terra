@@ -1,0 +1,7 @@
+#include "TerraNet.defs"
+// Issue #48: `loop i, 0´ nunca executa, então não conta como espera do laço externo.
+loop do
+  loop i, 0 do
+    await 1s;
+  end
+end

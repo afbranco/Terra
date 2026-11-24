@@ -1,6 +1,8 @@
 # Primeira linha de saída de cada tests/terrac/*.terra (sem o "ERR : "): linha e mensagem.
 linhas_brancos: line 16 : after `=´ : expected expression
 linhas_comentario: line 11 : before `+´ : expected `;´
+laco_zero: line 3 : tight loop
+loop_dec: line 4 : `i´ is a read only variable
 semantica_naodeclarada: line 4 : variable/event/function "y" is not declared
 sintaxe_await: line 4 : after `await´ : expected event
 sintaxe_comando: line 4 : before `awiat´ : expected statement (not last statement as `return´ or `break´)

@@ -269,6 +269,13 @@ function _TP.float2hex (n)
     else
         expo = expo + 0x7E
         mant = (mant * 2.0 - 1.0) * math.ldexp(0.5, 24)
+        -- arredonda para o mais próximo (empate para par), como o C; antes truncava e 0.1 saía
+        -- 0x3DCCCCCC em vez de 0x3DCCCCCD (#48)
+        local int = math.floor(mant)
+        local resto = mant - int
+        if resto > 0.5 or (resto == 0.5 and int % 2 == 1) then int = int + 1 end
+        mant = int
+        if mant == 0x800000 then mant = 0; expo = expo + 1 end
         hext[#hext+1] = string.char(sign + math.floor(expo / 0x2),
                                     (expo % 0x2) * 0x80 + math.floor(mant / 0x10000),
                                     math.floor(mant / 0x100) % 0x100,
