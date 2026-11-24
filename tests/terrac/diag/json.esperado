@@ -1,3 +1,9 @@
+== atrib_array
+{"code":"E4016","severity":"error","file":"atrib_array.terra","line":5,"col":1,"msg":"invalid attribution: not a value"}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
+== atrib_cast
+{"code":"E4016","severity":"error","file":"atrib_cast.terra","line":4,"col":1,"msg":"invalid attribution: not a value"}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
 == atrib_funcao
 {"code":"E4016","severity":"error","file":"atrib_funcao.terra","line":4,"col":1,"msg":"invalid attribution: not a value"}
 {"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}

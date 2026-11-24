@@ -1,0 +1,255 @@
+30 254 1 1 0 0 8 0 8
+00 | 00000 0 track 0
+00 | 00001 0
+00 | 00002 0
+00 | 00003 0
+00 | 00004 0 track 1
+00 | 00005 0
+00 | 00006 0
+00 | 00007 0
+00 | 00008 0000 wClock 0
+00 | 00009 0001
+00 | 00010 0002
+00 | 00011 0003
+00 | 00012 0004
+00 | 00013 0005
+00 | 00014 0006
+00 | 00015 0007
+00 | 00016 0008 $ret:1, 
+00 | 00017 0009 v:2, 
+00 | 00018 0010 
+00 | 00019 0011 s:2, 
+00 | 00020 0012 
+00 | 00021 0013 g:4, 
+00 | 00022 0014 
+00 | 00023 0015 
+00 | 00024 0016 
+00 | 00025 0017 r:1, 
+00 | 00026 0018 u:2, 
+00 | 00027 0019 
+00 | 00028 0020 k:2, 
+00 | 00029 0021 
+d1 | 00030 d1 set_c ushort 9 300            | v = 300
+09 | 00031 09 
+01 | 00032 01 
+2c | 00033 2c 
+c5 | 00034 c5 set_c short 11 200            | s = 200
+0b | 00035 0b 
+c8 | 00036 c8 
+40 | 00037 40 push_c 1                      | push 1
+01 | 00038 01 
+04 | 00039 04 neg                           | neg
+a6 | 00040 a6 pop long 13                   | pop g
+0d | 00041 0d 
+c0 | 00042 c0 set_c ubyte 17 0              | r = 0
+11 | 00043 11 
+00 | 00044 00 
+91 | 00045 91 push_v ushort 9               | push v:ushort
+09 | 00046 09 
+40 | 00047 40 push_c 255                    | push 255
+ff | 00048 ff 
+0b | 00049 0b band                          | band
+a1 | 00050 a1 pop ushort 18                 | pop u
+12 | 00051 12 
+40 | 00052 40 push_c 44                     | push 44
+2c | 00053 2c 
+91 | 00054 91 push_v ushort 18              | push u:ushort
+12 | 00055 12 
+0f | 00056 0f eq                            | eq
+4f | 00057 4f ifelse 12 13                  | ifelse True_12 EndIf_13
+00 | 00058 .00 addr:62
+3e | 00059 .0c 
+00 | 00060 .00 addr:72
+48 | 00061 .0d 
+40 | 00062 40 push_c 1                      | push 1
+01 | 00063 01 
+90 | 00064 90 push_v ubyte 17               | push r:ubyte
+11 | 00065 11 
+06 | 00066 06 add                           | add
+a0 | 00067 a0 pop ubyte 17                  | pop r
+11 | 00068 11 
+39 | 00069 39 exec 13                       | goto  13
+00 | 00070 .00 addr:72
+48 | 00071 .0d 
+95 | 00072 95 push_v short 11               | push s:short
+0b | 00073 0b 
+40 | 00074 40 push_c 255                    | push 255
+ff | 00075 ff 
+0b | 00076 0b band                          | band
+40 | 00077 40 push_c 128                    | push 128
+80 | 00078 80 
+0e | 00079 0e bxor                          | bxor
+43 | 00080 43 push_c 4294967168             | push 4294967168
+ff | 00081 ff 
+ff | 00082 ff 
+ff | 00083 ff 
+80 | 00084 80 
+06 | 00085 06 add                           | add
+a5 | 00086 a5 pop short 20                  | pop k
+14 | 00087 14 
+40 | 00088 40 push_c 56                     | push 56
+38 | 00089 38 
+04 | 00090 04 neg                           | neg
+95 | 00091 95 push_v short 20               | push k:short
+14 | 00092 14 
+0f | 00093 0f eq                            | eq
+4f | 00094 4f ifelse 17 18                  | ifelse True_17 EndIf_18
+00 | 00095 .00 addr:99
+63 | 00096 .11 
+00 | 00097 .00 addr:109
+6d | 00098 .12 
+40 | 00099 40 push_c 2                      | push 2
+02 | 00100 02 
+90 | 00101 90 push_v ubyte 17               | push r:ubyte
+11 | 00102 11 
+06 | 00103 06 add                           | add
+a0 | 00104 a0 pop ubyte 17                  | pop r
+11 | 00105 11 
+39 | 00106 39 exec 18                       | goto  18
+00 | 00107 .00 addr:109
+6d | 00108 .12 
+41 | 00109 41 push_c 65535                  | push 65535
+ff | 00110 ff 
+ff | 00111 ff 
+96 | 00112 96 push_v long 13                | push g:long
+0d | 00113 0d 
+41 | 00114 41 push_c 65535                  | push 65535
+ff | 00115 ff 
+ff | 00116 ff 
+0b | 00117 0b band                          | band
+0f | 00118 0f eq                            | eq
+4f | 00119 4f ifelse 21 22                  | ifelse True_21 EndIf_22
+00 | 00120 .00 addr:124
+7c | 00121 .15 
+00 | 00122 .00 addr:134
+86 | 00123 .16 
+40 | 00124 40 push_c 4                      | push 4
+04 | 00125 04 
+90 | 00126 90 push_v ubyte 17               | push r:ubyte
+11 | 00127 11 
+06 | 00128 06 add                           | add
+a0 | 00129 a0 pop ubyte 17                  | pop r
+11 | 00130 11 
+39 | 00131 39 exec 22                       | goto  22
+00 | 00132 .00 addr:134
+86 | 00133 .16 
+90 | 00134 90 push_v ubyte 17               | push r:ubyte
+11 | 00135 11 
+25 | 00136 25 outevt_e 5                    | emit LEDS
+05 | 00137 05 
+29 | 00138 29 clken_c 0 1000 26             | clock enable Awake_1000_26 1000msec
+03 | 00139 03 
+00 | 00140 00 
+03 | 00141 03 
+e8 | 00142 e8 
+00 | 00143 .00 addr:146
+92 | 00144 .1a 
+01 | 00145 01 end                           | end
+c0 | 00146 c0 set_c ubyte 17 0              | r = 0
+11 | 00147 11 
+00 | 00148 00 
+40 | 00149 40 push_c 44                     | push 44
+2c | 00150 2c 
+41 | 00151 41 push_c 300                    | push 300
+01 | 00152 01 
+2c | 00153 2c 
+40 | 00154 40 push_c 255                    | push 255
+ff | 00155 ff 
+0b | 00156 0b band                          | band
+0f | 00157 0f eq                            | eq
+4f | 00158 4f ifelse 28 29                  | ifelse True_28 EndIf_29
+00 | 00159 .00 addr:163
+a3 | 00160 .1c 
+00 | 00161 .00 addr:173
+ad | 00162 .1d 
+40 | 00163 40 push_c 1                      | push 1
+01 | 00164 01 
+90 | 00165 90 push_v ubyte 17               | push r:ubyte
+11 | 00166 11 
+06 | 00167 06 add                           | add
+a0 | 00168 a0 pop ubyte 17                  | pop r
+11 | 00169 11 
+39 | 00170 39 exec 29                       | goto  29
+00 | 00171 .00 addr:173
+ad | 00172 .1d 
+41 | 00173 41 push_c 4464                   | push 4464
+11 | 00174 11 
+70 | 00175 70 
+42 | 00176 42 push_c 70000                  | push 70000
+01 | 00177 01 
+11 | 00178 11 
+70 | 00179 70 
+41 | 00180 41 push_c 65535                  | push 65535
+ff | 00181 ff 
+ff | 00182 ff 
+0b | 00183 0b band                          | band
+41 | 00184 41 push_c 32768                  | push 32768
+80 | 00185 80 
+00 | 00186 00 
+0e | 00187 0e bxor                          | bxor
+43 | 00188 43 push_c 4294934528             | push 4294934528
+ff | 00189 ff 
+ff | 00190 ff 
+80 | 00191 80 
+00 | 00192 00 
+06 | 00193 06 add                           | add
+0f | 00194 0f eq                            | eq
+4f | 00195 4f ifelse 31 32                  | ifelse True_31 EndIf_32
+00 | 00196 .00 addr:200
+c8 | 00197 .1f 
+00 | 00198 .00 addr:210
+d2 | 00199 .20 
+40 | 00200 40 push_c 2                      | push 2
+02 | 00201 02 
+90 | 00202 90 push_v ubyte 17               | push r:ubyte
+11 | 00203 11 
+06 | 00204 06 add                           | add
+a0 | 00205 a0 pop ubyte 17                  | pop r
+11 | 00206 11 
+39 | 00207 39 exec 32                       | goto  32
+00 | 00208 .00 addr:210
+d2 | 00209 .20 
+43 | 00210 43 push_c 0xFFFFFFC8             | push 0xFFFFFFC8
+ff | 00211 ff 
+ff | 00212 ff 
+ff | 00213 ff 
+c8 | 00214 c8 
+95 | 00215 95 push_v short 11               | push s:short
+0b | 00216 0b 
+40 | 00217 40 push_c 255                    | push 255
+ff | 00218 ff 
+0b | 00219 0b band                          | band
+40 | 00220 40 push_c 128                    | push 128
+80 | 00221 80 
+0e | 00222 0e bxor                          | bxor
+43 | 00223 43 push_c 4294967168             | push 4294967168
+ff | 00224 ff 
+ff | 00225 ff 
+ff | 00226 ff 
+80 | 00227 80 
+06 | 00228 06 add                           | add
+0f | 00229 0f eq                            | eq
+4f | 00230 4f ifelse 35 36                  | ifelse True_35 EndIf_36
+00 | 00231 .00 addr:235
+eb | 00232 .23 
+00 | 00233 .00 addr:245
+f5 | 00234 .24 
+40 | 00235 40 push_c 4                      | push 4
+04 | 00236 04 
+90 | 00237 90 push_v ubyte 17               | push r:ubyte
+11 | 00238 11 
+06 | 00239 06 add                           | add
+a0 | 00240 a0 pop ubyte 17                  | pop r
+11 | 00241 11 
+39 | 00242 39 exec 36                       | goto  36
+00 | 00243 .00 addr:245
+f5 | 00244 .24 
+90 | 00245 90 push_v ubyte 17               | push r:ubyte
+11 | 00246 11 
+25 | 00247 25 outevt_e 5                    | emit LEDS
+05 | 00248 05 
+01 | 00249 01 end                           | end
+48 | 00250 48 memclr 0 8                    | clear WClocks gates from 0 to 1
+00 | 00251 00 
+08 | 00252 08 
+01 | 00253 01 end                           | end
