@@ -13,6 +13,8 @@ sintaxe_pontoevirgula: line 3 : after `1´ : expected `;´
 sintaxe_sizeof: line 2 : after `<´ : expected type
 sintaxe_then: line 4 : after `1´ : expected `then´
 sintaxe_tipo: line 3 : after `x´ : expected a not reserved identifier beginning with lower-case
+atrib_array: line 5 : invalid attribution: not a value
+atrib_cast: line 4 : invalid attribution: not a value
 atrib_funcao: line 4 : invalid attribution: not a value
 atrib_negativo: line 4 : invalid attribution: not a value
 atrib_sizeof: line 4 : invalid attribution: not a value
