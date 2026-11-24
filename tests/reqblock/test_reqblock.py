@@ -127,9 +127,13 @@ def roda(ate):
 
 roda(SEGUNDOS * tps)
 log.close()
+cli.close()
 
 leds = [int(m.group(1)) for m in (re.search(r"<<: leds 11 3 (\d+) :>>", l) for l in open("tview.txt")) if m]
 ok = leds == ESPERADO
 print("test_reqblock: %d pedidos de bloco (o 1º sem resposta); LEDs do nó 11: %s (esperado %s): %s"
       % (pedidos, leds, ESPERADO, "OK" if ok else "FALHOU"))
-sys.exit(0 if ok else 1)
+# O SerialForwarder do TOSSIM imprime uma estatística ao terminar, depois do resultado (e o
+# build-tinyos.sh olha a última linha): sai sem passar pelo fim normal do processo.
+sys.stdout.flush()
+os._exit(0 if ok else 1)
