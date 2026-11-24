@@ -31,11 +31,19 @@ jobs:
       - name: Versão
         run: echo "VER=$(case "$GITHUB_REF" in refs/tags/v*) echo "${GITHUB_REF_NAME#v}";; *) echo "dev-${GITHUB_SHA::7}";; esac)" >> "$GITHUB_ENV"
       - name: Build e testes
+        # Dois builds ao mesmo tempo (o make é serial e o runner tem 4 núcleos): o segundo só
+        # serve para conferir que os anexos saem iguais bit a bit (issue #18).
         run: |
-          mkdir -p dist
+          mkdir -p dist "$RUNNER_TEMP/dist2"
           podman pull -q "$TOOLCHAIN_IMAGE"
+          podman run --rm -v "$PWD:/terra:ro,Z" -v "$RUNNER_TEMP/dist2:/out:Z" -w /terra \
+            "$TOOLCHAIN_IMAGE" release/build-tinyos.sh "$VER" /out > "$RUNNER_TEMP/build2.log" 2>&1 &
+          pid2=$!
           podman run --rm -v "$PWD:/terra:ro,Z" -v "$PWD/dist:/out:Z" -w /terra \
             "$TOOLCHAIN_IMAGE" release/build-tinyos.sh "$VER" /out
+          wait $pid2 || { tail -60 "$RUNNER_TEMP/build2.log"; echo "FALHOU: segundo build"; exit 1; }
+      - name: Build reproduzível (dois builds, mesmo sha256)
+        run: release/compare-builds.sh dist "$RUNNER_TEMP/dist2"
       - uses: actions/upload-artifact@v4
         with:
           name: tinyos
