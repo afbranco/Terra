@@ -19,3 +19,6 @@ atrib_funcao: line 4 : invalid attribution: not a value
 atrib_negativo: line 4 : invalid attribution: not a value
 atrib_sizeof: line 4 : invalid attribution: not a value
 atrib_soma: line 4 : invalid attribution: not a value
+float_inc: line 4 : Invalid float operation.
+float_indice: line 5 : Invalid float operation.
+float_resto: line 4 : Invalid float operation.

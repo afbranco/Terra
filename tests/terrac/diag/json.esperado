@@ -16,6 +16,15 @@
 == atrib_soma
 {"code":"E4016","severity":"error","file":"atrib_soma.terra","line":4,"col":1,"msg":"invalid attribution: not a value"}
 {"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
+== float_inc
+{"code":"E4030","severity":"error","file":"float_inc.terra","line":4,"col":1,"msg":"Invalid float operation."}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
+== float_indice
+{"code":"E4030","severity":"error","file":"float_indice.terra","line":5,"col":1,"msg":"Invalid float operation."}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
+== float_resto
+{"code":"E4030","severity":"error","file":"float_resto.terra","line":4,"col":5,"msg":"Invalid float operation."}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
 == laco_zero
 {"code":"E5001","severity":"error","file":"laco_zero.terra","line":3,"col":1,"msg":"tight loop"}
 {"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
