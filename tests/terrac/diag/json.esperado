@@ -1,3 +1,9 @@
+== atrib_array
+{"code":"E4016","severity":"error","file":"atrib_array.terra","line":5,"col":1,"msg":"invalid attribution: not a value"}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
+== atrib_cast
+{"code":"E4016","severity":"error","file":"atrib_cast.terra","line":4,"col":1,"msg":"invalid attribution: not a value"}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
 == atrib_funcao
 {"code":"E4016","severity":"error","file":"atrib_funcao.terra","line":4,"col":1,"msg":"invalid attribution: not a value"}
 {"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
@@ -19,12 +25,18 @@
 == float_resto
 {"code":"E4030","severity":"error","file":"float_resto.terra","line":4,"col":5,"msg":"Invalid float operation."}
 {"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
+== laco_zero
+{"code":"E5001","severity":"error","file":"laco_zero.terra","line":3,"col":1,"msg":"tight loop"}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
 == linhas_brancos
 {"code":"E2020","severity":"error","file":"linhas_brancos.terra","line":16,"col":3,"col_end":4,"msg":"after `=´ : expected expression","args":{"token":"=","where":"after"}}
 {"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true}}
 == linhas_comentario
 {"code":"E2001","severity":"error","file":"linhas_comentario.terra","line":11,"col":11,"col_end":12,"msg":"before `+´ : expected `;´","args":{"token":"+","where":"before"}}
 {"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true}}
+== loop_dec
+{"code":"E4020","severity":"error","file":"loop_dec.terra","line":4,"col":3,"msg":"`i´ is a read only variable","args":{"name":"i"}}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
 == palavras
 {"summary":{"ok":true,"errors":0,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"},"memory":{"total":124,"code":75,"ctl_vars":21,"stack":28,"radio_msgs":4},"platforms":[{"name":"iris_full","max":4224,"fits":true},{"name":"iris_hyb","max":1920,"fits":true},{"name":"mica2","max":1920,"fits":true},{"name":"mica2dot","max":1920,"fits":true},{"name":"micaz","max":1920,"fits":true},{"name":"telosb_full","max":4224,"fits":true},{"name":"telosb_hyb","max":1920,"fits":true},{"name":"tossim","max":1728,"fits":true}]}}
 == semantica_naodeclarada
@@ -99,6 +111,9 @@
 == indicefora
 {"code":"E6001","severity":"error","file":"indicefora.terra","line":4,"col":1,"msg":"array index out of range, 0..2.","args":{"max":2}}
 {"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
+== laco_variavel
+{"code":"W3006","severity":"warning","file":"laco_variavel.terra","line":4,"col":1,"msg":"tight loop if an inner `loop´ with a variable count runs zero times"}
+{"summary":{"ok":true,"errors":0,"warnings":1,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"},"memory":{"total":90,"code":56,"ctl_vars":26,"stack":8,"radio_msgs":3},"platforms":[{"name":"iris_full","max":4224,"fits":true},{"name":"iris_hyb","max":1920,"fits":true},{"name":"mica2","max":1920,"fits":true},{"name":"mica2dot","max":1920,"fits":true},{"name":"micaz","max":1920,"fits":true},{"name":"telosb_full","max":4224,"fits":true},{"name":"telosb_hyb","max":1920,"fits":true},{"name":"tossim","max":1728,"fits":true}]}}
 == naodecl
 {"code":"E3001","severity":"error","file":"naodecl.terra","line":3,"col":15,"msg":"variable/event/function \"y\" is not declared","args":{"name":"y"}}
 {"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}

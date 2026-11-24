@@ -56,17 +56,15 @@ INT_SO = { ['%']=true, ['<<']=true, ['>>']=true, ['&']=true, ['|']=true, ['^']=t
 
 function newvar (me, blk, pre, tp, dim, id, read_only)
 
-    -- Cheks if name is used by internal event
-    for k,evt in ipairs(_ENV.ints) do
---print("env::newvar():",k,evt.id,evt.ln)
-      ASR(not(evt.id==id), me,'E3006',{name=id,line=evt.ln})
-    end
     -- Cheks for context definitions
     for stmt in _AST.iter() do
         if stmt.tag == 'Async' then
             break
         elseif stmt.tag == 'Block' then
             for _, var in ipairs(stmt.vars) do
+                -- nome de evento interno visível neste ponto (antes era checado contra todos os
+                -- eventos do programa, sem escopo: `do event ubyte e; end var ubyte e;´ dava erro) (#48)
+                ASR(not(var.isEvt and var.id==id), me,'E3006',{name=id,line=var.ln})
                 ASR(not(var.id==id and blk==stmt ), me,'E3007',{name=id,line=var.ln})
                 WRN(var.id~=id, me,'W4001',{name=id,line=var.ln})
             end
@@ -503,7 +501,7 @@ F = {
         local e1, e2 = unpack(me)
         ASR(e1.var.isEvt, me, 'E3002',{name=e1.var.id})
         if (e2) then
-print("env::EmitInt:",e1.var.tp,e2.tp)
+--print("env::EmitInt:",e1.var.tp,e2.tp)
           err, cast,_,_, len1, len2 = _TP.tpCompat(e1.var.tp,e2.tp)
           ASR(not err,me,'E4013',{left=e1.var.tp..'/'..len1,right=e2.tp..'/'..len2})
           WRN(not cast,me, 'W1001',{from=e2.tp,to=e1.var.tp})
@@ -834,6 +832,8 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
         local op, exp = unpack(me)
 --print("env::Op_var:", op,exp[1].tag,exp[1].tp, exp[1].tag,exp[1].lval,exp[1].fst,_TP.isNumeric(exp.tp),_TP.deref(exp.tp))
         ASR((exp.tag=='Var' or exp.tag=='Op2_idx' or exp.tag=='Op2_.') and _TP.isBasicType(exp.tp), me, 'E4024',{tag=exp.tag,type=exp.tp})
+        -- o contador do `loop i, N´ é somente leitura também para inc/dec (`dec i´ virava laço sem fim) (#48)
+        ASR(me.loop_inc or not exp.read_only, me, 'E4020', {name=exp[1]})
         ASR(exp.tp ~= 'float', me, 'E4030')     -- inc/dec somavam 1 aos bits do float (#45)
         me.tp   = exp.tp
         me.lval = exp.lval
@@ -847,7 +847,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
         ASR(not _TP.deref(exp.tp),me,'E4025')
         ASR(_TP.isBasicType(exp.tp),me,'E4026')
         me.tp   = tp
-        me.lval = exp.lval
+        me.lval = false     -- `<ushort>x = 1´ gravava no endereço igual ao valor de x (#46)
         me.fst  = exp.fst
         me.ref = exp.ref
      end,
