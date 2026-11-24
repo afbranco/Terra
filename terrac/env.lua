@@ -51,6 +51,9 @@ for k, v in pairs(_ENV.c) do
     _ENV.c[k] = { tag='type', id=k, len=v }
 end
 
+-- operadores binários só de inteiros (#45)
+INT_SO = { ['%']=true, ['<<']=true, ['>>']=true, ['&']=true, ['|']=true, ['^']=true }
+
 function newvar (me, blk, pre, tp, dim, id, read_only)
 
     -- Cheks if name is used by internal event
@@ -709,6 +712,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
         local _, arr, idx = unpack(me)
 --print("env::Op2_idx:",arr.tp)
         ASR(arr.arr, me, 'E4021')
+        ASR(idx.tp ~= 'float', me, 'E4030')     -- índice float (`a[1.5]´) (#45)
         local _arr = ASR(_TP.deref(arr.tp,true), me, 'E4021')
 --        ASR(_arr and _TP.isNumeric(idx.tp,true), me, 'invalid array index')
         --me.tp   = _TP.deref(me[2].tp)
@@ -722,6 +726,8 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
         local op, e1, e2 = unpack(me)
 --print("env::Op2_int_int:",e2.tag,e2[1])
         ASR(_TP.isNumeric(e1.tp,true) and _TP.isNumeric(e2.tp,true),me, 'E4022',{op=op})
+        -- %, <<, >>, &, |, ^ só para inteiros: com float a VM operava nos bits (#45)
+        ASR(not (INT_SO[op] and (e1.tp=='float' or e2.tp=='float')), me, 'E4030')
 --        ASR((e2.tag=='CONST' and tonumber(e2[1])>0) or (e2.tag~='CONST'),me, 'division by zero')
         me.tp  = _TP.max(e1.tp,e2.tp,true)
     end,
@@ -740,6 +746,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
         local op, e1 = unpack(me)
         ASR(_TP.isNumeric(e1.tp,true),
                 me, 'E4023',{op=op})
+        ASR(not (op=='~' and e1.tp=='float'), me, 'E4030')     -- `~´ nos bits do float (#45)
         me.tp  = (op=='not' and 'ubyte')  or e1.tp
     end,
     ['Op1_~']  = 'Op1_int',
@@ -827,6 +834,7 @@ print("env::EmitInt:",e1.var.tp,e2.tp)
         local op, exp = unpack(me)
 --print("env::Op_var:", op,exp[1].tag,exp[1].tp, exp[1].tag,exp[1].lval,exp[1].fst,_TP.isNumeric(exp.tp),_TP.deref(exp.tp))
         ASR((exp.tag=='Var' or exp.tag=='Op2_idx' or exp.tag=='Op2_.') and _TP.isBasicType(exp.tp), me, 'E4024',{tag=exp.tag,type=exp.tp})
+        ASR(exp.tp ~= 'float', me, 'E4030')     -- inc/dec somavam 1 aos bits do float (#45)
         me.tp   = exp.tp
         me.lval = exp.lval
         me.fst  = exp.fst

@@ -10,6 +10,15 @@
 == atrib_soma
 {"code":"E4016","severity":"error","file":"atrib_soma.terra","line":4,"col":1,"msg":"invalid attribution: not a value"}
 {"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
+== float_inc
+{"code":"E4030","severity":"error","file":"float_inc.terra","line":4,"col":1,"msg":"Invalid float operation."}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
+== float_indice
+{"code":"E4030","severity":"error","file":"float_indice.terra","line":5,"col":1,"msg":"Invalid float operation."}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
+== float_resto
+{"code":"E4030","severity":"error","file":"float_resto.terra","line":4,"col":5,"msg":"Invalid float operation."}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
 == linhas_brancos
 {"code":"E2020","severity":"error","file":"linhas_brancos.terra","line":16,"col":3,"col_end":4,"msg":"after `=´ : expected expression","args":{"token":"=","where":"after"}}
 {"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true}}
