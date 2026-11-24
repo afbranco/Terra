@@ -38,6 +38,11 @@ de lá.
   - **`v1.1.1` publicada** (tag no `0980c2c`, 2026-11-22, a pedido do Prof.): correções no
     `terrac` (#28 cpp sem coluna; PR #30, otimizador, `Refs #22`). Firmware, catálogo e código
     dos `_TOSSIM.so` iguais aos da v1.1.0. TerraSim avisado.
+  - **`v1.2.0` publicada** (tag no `73bc84e`, 2026-11-24, a pedido do Prof.): as correções da
+    revisão de 2026-11-23 (#34 a #44, #46 parte, #55), primeira com o job do Avrora. Muda
+    `.vmx` (#37: `routing_tree`, `routing_tree_ack`, `count2radio`, `tdma_slotted`; #38:
+    `routing_target`, `aluno_hash_offset`, dos 14 programas do TerraSim) e o tempo (#40).
+    Catálogo igual ao da v1.1.1. TerraSim avisado (refazer o oráculo).
   - Alinhada com a release **tinyos-toolchain `2.1.2-r2`** (decidido pelo Prof. em 2026-11-22;
     antes era a r1, `f42bac7`, digest `7e21b1b9…`). O workflow fixa a imagem
     `2.1.2-resolute-py3-21d8fb1@sha256:4198b12302181edd0e8b20ae06cd3af0a2d483a06355a78c1f83371250de47ec`.
