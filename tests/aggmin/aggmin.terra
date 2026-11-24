@@ -1,0 +1,31 @@
+#include "TerraGrp.defs"
+
+// Issue #49: a agregação MIN começava em 0x7fff; com leituras acima de 32767 dava 32767. O teste
+// grava 40000 como temperatura do nó. Nos LEDs: 1 se o MIN dá 40000 (2 se dá 32767, 4 outro valor,
+// 7 sem leitura) e depois o mesmo para o MAX (controle).
+var group_t grp1;
+var aggreg_t agMin;
+var aggreg_t agMax;
+var aggDone_t done;
+var ubyte stat;
+agMin.agId = 0;
+agMax.agId = 1;
+stat = groupInit(grp1, 1, 1, 1, TRUE, eOFF, 11);
+stat = aggregInit(agMin, grp1, SID_TEMP, fMIN, opGT, 0);
+stat = aggregInit(agMax, grp1, SID_TEMP, fMAX, opGT, 0);
+await 2s;
+emit AGGREG(agMin);
+done = await AGGREG_DONE();
+if done.count == 0 then emit LEDS(7);
+else/if done.value == 40000 then emit LEDS(1);
+else/if done.value == 32767 then emit LEDS(2);
+else emit LEDS(4);
+end
+await 1s;
+emit AGGREG(agMax);
+done = await AGGREG_DONE();
+if done.count == 0 then emit LEDS(7);
+else/if done.value == 40000 then emit LEDS(1);
+else emit LEDS(4);
+end
+await FOREVER;

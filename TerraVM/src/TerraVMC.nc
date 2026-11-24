@@ -1769,9 +1769,10 @@ void f_set_c(uint8_t Modifier){
 	/**
 	 * Inserts an event in the event queue
 	 */
-	event void VMCustom.queueEvt(uint8_t evtId, uint8_t auxId, void *data){
+	event bool VMCustom.queueEvt(uint8_t evtId, uint8_t auxId, void *data){
 #ifndef ONLY_BSTATION
 		evtData_t evtData;
+		bool ok;
 		dbg(APPNAME,"VM::VMCustom.queueEvt(): queueing evtId=%d, auxId=%d. procFlag=%s\n",evtId,auxId,(procFlag)?"TRUE":"FALSE");
 
 {
@@ -1784,8 +1785,14 @@ void f_set_c(uint8_t Modifier){
 		evtData.evtId = evtId;
 		evtData.auxId = auxId;
 		evtData.data = data;
-		call evtQ.enqueue(evtData);
+		// Fila cheia: o evento se perde (comportamento de projeto); fica registrado no dbg (#49).
+		ok = (call evtQ.enqueue(evtData) == SUCCESS);
+		if (!ok)
+			dbg(APPNAME,"VM::VMCustom.queueEvt(): evtQ cheia, evento descartado: evtId=%d, auxId=%d\n",evtId,auxId);
 		if (procFlag==FALSE) post procEvent();		
+		return ok;
+#else
+		return FALSE;
 #endif
 	}
 	
@@ -1804,7 +1811,10 @@ void f_set_c(uint8_t Modifier){
 }
 		if (haltedFlag == TRUE) {
 			//logS("-",1);
-			call evtQ.dequeue(); 
+			if (call evtQ.size() > 0) {
+				evtData = call evtQ.dequeue();
+				call VMCustom.evtDone(evtData.data);
+			}
 			return;
 		} else {
 			//logS(">",1);			
@@ -1824,9 +1834,12 @@ void f_set_c(uint8_t Modifier){
 }
 			if (ceuId==0) {
 				dbg(APPNAME,"VM::procEvent(): Discarding event %d\n",evtData.evtId);
+				call VMCustom.evtDone(evtData.data);
 				post procEvent(); // Try next event
 			} else {
 				ceu_go_event(NULL,ceuId,evtData.auxId,evtData.data);
+				// os dados do evento já foram lidos pelo programa: o buffer pode ser reusado (#49)
+				call VMCustom.evtDone(evtData.data);
 			}
 		}
 		dbg(APPNAME,"VM::procEvent()...\n");

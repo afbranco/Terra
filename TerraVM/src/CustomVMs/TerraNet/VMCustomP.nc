@@ -33,7 +33,13 @@ implementation{
 // Keeps last data value for events (ExtDataxxx must be nx_ type. Because it is copied direct to VM memory.)
 nx_uint8_t ExtDataSysError;				// last system error code
 nx_uint8_t ExtDataCustomA;				// last request custom event (internal loop-back)
-usrMsg_t ExtDataRadioReceived;	// last radio received msg
+// Mensagens de rádio recebidas: dois buffers, revezados (#49). Com um só, uma mensagem que chegava
+// enquanto a VM estava ocupada sobrescrevia a anterior antes de o programa ler: no micaz (Avrora) o
+// programa recebia a segunda duas vezes e perdia a primeira. rxPend conta os eventos na fila que
+// apontam para cada buffer; com os dois ocupados, a mensagem nova é descartada (nunca dado trocado).
+usrMsg_t ExtDataRadioReceived[2];
+uint8_t rxProx = 0;		// bit: o próximo buffer a usar
+uint8_t rxPend[2] = {0, 0};
 nx_uint8_t ExtDataSendDoneError;
 nx_uint8_t ExtDataWasAcked;
 nx_uint8_t ExtDataQReady;			// last queue ready - queue size 
@@ -527,18 +533,30 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 	command void VM.reset(){
 		// Reset leds
 		call SA.setActuator(AID_LEDS, 0);
+		// a fila de eventos foi esvaziada: nenhum buffer de rádio está em uso
+		rxPend[0] = 0; rxPend[1] = 0; rxProx = 0;
 	}
 
-	task void BCRadio_receive(){
-		signal VM.queueEvt(I_RECEIVE_ID, ExtDataRadioReceived.type, &ExtDataRadioReceived);	
-		signal VM.queueEvt(I_RECEIVE   ,                         0, &ExtDataRadioReceived);	
+	command void VM.evtDone(void* data){
+		uint8_t b;
+		for (b = 0; b < 2; b++)
+			if (data == &ExtDataRadioReceived[b] && rxPend[b] > 0) rxPend[b]--;
 	}
 
 	event void BSRadio.receive(uint8_t am_id, message_t* msg, void* payload, uint8_t len){
+		uint8_t b;
 		dbg(APPNAME,"Custom::BSRadio.receive(): AM_ID = %d\n",am_id);
 		if (am_id == AM_USRMSG){
-			memcpy(&ExtDataRadioReceived,payload,sizeof(usrMsg_t));
-			post BCRadio_receive();
+			b = rxProx;
+			if (rxPend[b] > 0) b = b ^ 1;
+			if (rxPend[b] > 0) {
+				dbg(APPNAME,"Custom::BSRadio.receive(): os dois buffers esperam a VM, mensagem descartada\n");
+				return;
+			}
+			rxProx = b ^ 1;
+			memcpy(&ExtDataRadioReceived[b],payload,sizeof(usrMsg_t));
+			if (signal VM.queueEvt(I_RECEIVE_ID, ExtDataRadioReceived[b].type, &ExtDataRadioReceived[b])) rxPend[b]++;
+			if (signal VM.queueEvt(I_RECEIVE   ,                            0, &ExtDataRadioReceived[b])) rxPend[b]++;
 		} else {
 			dbg(APPNAME,"Custom::BSRadio.receive(): Discarting AM_ID = %d\n",am_id);
 		}

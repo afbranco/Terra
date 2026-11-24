@@ -285,6 +285,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		}
 	}
 
+	command void VM.evtDone(void* data){}	// sem buffers a liberar (#49)
 	command void VM.reset(){
 		// Reset leds
 //		call SA.setActuator(AID_LEDS, 0);

@@ -463,6 +463,15 @@ call Leds.led1On();
 		return CURRENT_MAX_BLOCKS;
 	}
 
+	// blockId, blockStart e blockLen vêm do rádio ou da serial: fora da memória da VM, o bloco era
+	// gravado (e lido) além do CEU_data e o mapa de blocos além do m_bits. Descartar (#49).
+	bool validBlock(uint16_t blockId){
+		return blockId < CURRENT_MAX_BLOCKS;
+	}
+	bool validRange(uint16_t blockStart, uint16_t blockLen){
+		return blockLen > 0 && (uint32_t)blockStart + blockLen <= CURRENT_MAX_BLOCKS;
+	}
+
 /*
 	void printBM(){
 		uint16_t BMidx,Stridx=0;
@@ -518,6 +527,7 @@ call Leds.led1On();
 		tempInputInQ.DataSize = sizeof(newProgVersion_t);
 		// Discard duplicated message
 		if ((xmsg->versionId <= ProgVersion) || (xmsg->versionId == lastRecNewProgVersion)) { dbg(APPNAME, "BS::recNewProgVersionNet_receive(): Discarding duplicated message!\n"); return;}
+		if (!validRange(xmsg->blockStart, xmsg->blockLen)) { dbg(APPNAME, "BS::recNewProgVersionNet_receive(): Discarding invalid block range!\n"); return;}
 		// put the message in inQueue
 		if (call inQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recNewProgVersionNet_receive(): inQueue is full! Losting a message.\n");
 		// get source mote.
@@ -545,6 +555,7 @@ call Leds.led1On();
 		tempInputInQ.DataSize = sizeof(newProgBlock_t);
 		// Discard duplicated/Old message
 		dbg(APPNAME, "BS::recNewProgBlockNet_receive(): (xmsg->versionId=%d,ProgVersion=%d, xmsg->blockId=%d, ProgBlockStart=%d\n",xmsg->versionId,ProgVersion,xmsg->blockId,ProgBlockStart);
+		if (!validBlock(xmsg->blockId)) { dbg(APPNAME, "BS::recNewProgBlockNet_receive(): Discarding invalid blockId!\n"); return;}
 		if (xmsg->versionId == ProgVersion) {
 			if (!call BM.get(xmsg->blockId)){
 				if (xmsg->blockId == ProgBlockStart){
@@ -752,6 +763,7 @@ call Leds.led1On();
  	 */ 
  	void procNewProgVersion(newProgVersion_t* Data){
 		dbg(APPNAME, "BS::procNewProgVersion().\n");
+		if (!validRange(Data->blockStart, Data->blockLen)) { dbg(APPNAME, "BS::procNewProgVersion(): Discarding invalid block range!\n"); return;}
 //		call Leds.set(7);
 		// Stop the VM
  		signal BSUpload.stop();
@@ -798,6 +810,7 @@ call Leds.led1On();
 		 uint16_t i;
 		 uint16_t Addr=0;
 		 dbg(APPNAME, "BS::procNewProgBlock(). version=%hhu, blockId=%hhu, ReqState=%d\n",Data->versionId,Data->blockId,ReqState);
+		 if (!validBlock(Data->blockId)) { dbg(APPNAME, "BS::procNewProgBlock(): Discarding invalid blockId!\n"); return;}
 //		 call Leds.led0Toggle();		 
 //		printf("prc_nb%d.",Data->blockId);printfflush();
 		 call ProgReqTimer.stop();
@@ -887,7 +900,7 @@ call Leds.led1On();
 				 }
 				break;
 			case RO_DATA_SINGLE:
-				 if ((ProgVersion == Data->versionId) && (ProgVersion > 0) && call BM.get(Data->blockId)){
+				 if ((ProgVersion == Data->versionId) && (ProgVersion > 0) && validBlock(Data->blockId) && call BM.get(Data->blockId)){
 					  xBlock.versionId = ProgVersion;
 					  xBlock.blockId = Data->blockId;
 					  mem = signal BSUpload.getSection((Data->blockId * BLOCK_SIZE));
@@ -895,7 +908,7 @@ call Leds.led1On();
 			 	 	  ReqState=ST_WAIT_PROG_BLK;
 					  sendNewProgBlock(&xBlock);
 				  } else {
-					  dbg(APPNAME, "BS::procRecReqProgBlock(). Request RO_DATA_SINGLE discarted! Block=%hhu\n",call BM.get(Data->blockId));
+					  dbg(APPNAME, "BS::procRecReqProgBlock(). Request RO_DATA_SINGLE discarted! blockId=%d\n",Data->blockId);
 				  }
 				  break;
 		}

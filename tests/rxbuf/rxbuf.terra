@@ -1,0 +1,47 @@
+#include "TerraNet.defs"
+
+// Buffer de RECEIVE (#49): o nó 11 manda um ping em broadcast e entra numa reação longa; os nós
+// 12 e 13 respondem na hora (v = 1 e v = 2). As respostas chegam enquanto a VM do 11 está ocupada.
+// LEDs do 11: quantas mensagens recebeu e a soma dos v (esperado 2 e 3). Com um buffer só, a segunda
+// sobrescrevia a primeira antes de o programa ler: no Avrora, soma 2 (a do 12 duas vezes). No TOSSIM
+// a VM roda em tempo zero e o teste passa mesmo sem a correção: quem reprova é o Avrora.
+pktype msg from radioMsg with
+  var ubyte v;
+end
+var msg m;
+var msg r;
+var ulong x = 0;
+var ubyte soma = 0;
+var ubyte n = 0;
+if getNodeId() == 11 then
+  await 5s;
+  par/or do
+    loop do
+      r = await RECEIVE(2);
+      soma = soma + r.v;
+      n = n + 1;
+      if n == 2 then break; end
+    end
+  with
+    m.type = 1;
+    m.target = BROADCAST;
+    m.v = 0;
+    emit SEND(m);
+    await SEND_DONE(1);
+    loop i, 2000 do
+      x = x + i;
+    end
+    await 5s;
+  end
+  emit LEDS(n);
+  await 1s;
+  emit LEDS(soma);
+else
+  r = await RECEIVE(1);
+  r.type = 2;
+  r.target = 11;
+  r.v = getNodeId() - 11;
+  emit SEND(r);
+  await SEND_DONE(2);
+end
+await FOREVER;
