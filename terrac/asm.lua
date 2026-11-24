@@ -71,6 +71,7 @@ op_dec=100,
 op_set_e=104,
 op_deref=112,
 op_memcpy=120,
+op_uop=128,
 
 op_tkins_max=136,
 op_push_v=144,
@@ -520,6 +521,13 @@ op_lt_f= function (me,codeB,arg) end,
 		local bytecode = string.format('%02x',(opcode['op_'..oper]))
 		local codeA = oper
 		OPCODE(me,bytecode,codeA,codeB)
+	end,
+
+	-- operação sem sinal (#66): o modificador de 3 bits escolhe a operação
+	op_uop = function (me,codeB,oper,mod)
+		local bytecode = string.format('%02x',opcode['op_uop'] + mod)
+		local codeA = 'uop '..oper
+		OPCODE(me,bytecode,codeA,codeB,-1)
 	end,
 
  	-- arg={oper}

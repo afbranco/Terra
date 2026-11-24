@@ -172,6 +172,7 @@ _DIAG.CATALOG = {
     { 'E6004', 'error', ' function event numeric id must be less than 255' },
     { 'E6005', 'error', 'constant is out of range' },
     { 'E6006', 'error', 'subtype size {size} is  greater than payload size {max}' },
+    { 'E6007', 'error', 'await time {ms} ms is above the maximum of {max} ms (about 24.8 days)' },
     -- E9 não implementado
     { 'E9001', 'error', 'Emit INPUT_EVENT inside Async is not implemented.' },
     { 'E9002', 'error', '"EmitT" is not implemented.' },

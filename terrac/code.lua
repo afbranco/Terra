@@ -413,6 +413,24 @@ function Op1_any(me,mnemonic)
     BYTECODE(me,codeB,'op1_any',mnemonic)
 end
 
+-- Operações sem sinal (#66): a pilha da VM é int32 e um ulong acima de 2^31 parece negativo. Usa
+-- op_uop quando os operandos são sem sinal e um deles pode passar de 2^31 (ulong que não é constante
+-- pequena). Nos outros casos o resultado é o mesmo com sinal, e o .vmx não muda. No >> só conta o
+-- valor deslocado.
+local UOP = { gt=0, lt=1, gte=2, lte=3, div=4, mod=5, rshft=6 }
+local function PASSA31(e)
+  if e.tp ~= 'ulong' then return false end
+  if e.tag == 'CONST' and tonumber(e[1]) and tonumber(e[1]) < 2^31 then return false end
+  return true
+end
+function USAR_UOP(mnemonic,e1,e2)
+  if not UOP[mnemonic] then return false end
+  local u1 = _TP.getCastType(e1.tp)=='ulong'
+  local u2 = _TP.getCastType(e2.tp)=='ulong'
+  if mnemonic == 'rshft' then return u1 and PASSA31(e1) end
+  return u1 and u2 and (PASSA31(e1) or PASSA31(e2))
+end
+
 function Op2_any(me,mnemonic)
     local op, e1, e2 = unpack(me)
 --print("code::Op2_any:",op,e1.tag,e1.tp,e2.tag,e2.tp,e1.arr,e2.arr,_TP.max(e1.tp,e2.tp))
@@ -443,6 +461,11 @@ function Op2_any(me,mnemonic)
     BYTECODE(me,codeB,'op_cast',from1Tp,toTp)
   end
   -- operation
+  if toTp ~= 'float' and USAR_UOP(mnemonic,e1,e2) then
+    codeB = LINE(me,'uop '..mnemonic,nil,'// stack0 = stack0 '..mnemonic..' stack1 (unsigned)')
+    BYTECODE(me,codeB,'op_uop',mnemonic,UOP[mnemonic])
+    return
+  end
 	codeB = LINE(me,mnemonic,nil,'// stack0 = stack0 '..mnemonic..' stack1')
   BYTECODE(me,codeB,'op2_any',mnemonic)
 end

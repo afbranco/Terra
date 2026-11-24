@@ -1,0 +1,34 @@
+#include "TerraNet.defs"
+
+// Issue #47: a VM multiplicava o tempo do await pela unidade em 32 bits. 600 h dá 2,16e9 ms, acima
+// de 2^31: virava negativo e o await disparava na hora. Agora o tempo fica no máximo (cerca de
+// 24,8 dias) e a VM gera ERROR(E_TIMEOVF). Vale para variável (await (t)h) e expressão.
+// Nos LEDs: 1, 2 (o await de 600 h não disparou), 3 (a expressão também não), 4 (dois ERROR).
+var ushort t = 600;
+var ubyte erros = 0;
+par do
+  loop do
+    await ERROR(E_TIMEOVF);
+    inc erros;
+  end
+with
+  emit LEDS(1);
+  par/or do
+    await (t)h;
+    emit LEDS(6);
+  with
+    await 2s;
+    emit LEDS(2);
+  end
+  await 1s;
+  par/or do
+    await (t*2)h;
+    emit LEDS(6);
+  with
+    await 2s;
+    emit LEDS(3);
+  end
+  await 1s;
+  if erros == 2 then emit LEDS(4); else emit LEDS(5); end
+  await FOREVER;
+end

@@ -11,6 +11,7 @@ enum {
 
 	E_DIVZERO 	= 10, // Division by zero
 	E_IDXOVF 	= 11, // Array index overflow
+	E_TIMEOVF 	= 12, // await time above the maximum (about 24.8 days), clamped (#47)
 	E_STKOVF 	= 20, // Stack overflow
 	E_NOSETUP 	= 21, // Missing operation setup
 

@@ -50,6 +50,7 @@ do
 // VM Error codes
 #define E_DIVZERO 10 // Division by zero
 #define E_IDXOVF  11 // Array index overflow
+#define E_TIMEOVF 12 // await time above the maximum (about 24.8 days), clamped
 #define E_STKOVF  20 // Stack overflow -- fatal
 
 /*

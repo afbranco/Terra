@@ -1,0 +1,5 @@
+#include "TerraNet.defs"
+
+// #47: o timer da VM é s32; acima de 2147483646 ms o await disparava na hora
+await 600h;
+emit LEDS(1);

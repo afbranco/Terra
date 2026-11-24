@@ -10,6 +10,9 @@
 == atrib_soma
 {"code":"E4016","severity":"error","file":"atrib_soma.terra","line":4,"col":1,"msg":"invalid attribution: not a value"}
 {"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
+== await_max
+{"code":"E6007","severity":"error","file":"await_max.terra","line":4,"col":7,"msg":"await time 2160000000 ms is above the maximum of 2147483646 ms (about 24.8 days)","args":{"max":"2147483646","ms":"2160000000"}}
+{"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
 == linhas_brancos
 {"code":"E2020","severity":"error","file":"linhas_brancos.terra","line":16,"col":3,"col_end":4,"msg":"after `=´ : expected expression","args":{"token":"=","where":"after"}}
 {"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true}}

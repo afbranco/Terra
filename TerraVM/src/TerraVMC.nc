@@ -202,14 +202,24 @@ uint8_t getBits(uint8_t data, uint8_t stBit, uint8_t endBit){
 uint8_t getBitsPow(uint8_t data, uint8_t stBit, uint8_t endBit){return (1 << getBits(data,stBit,endBit));}
 
 
+// Tempo do await em ms. O timer da VM é s32 e CEU_WCLOCK_NONE marca "sem timer": o máximo é um
+// abaixo (cerca de 24,8 dias). Acima disso, ou se a conta com a unidade estourar os 32 bits, o tempo
+// fica no máximo e a VM gera ERROR(E_TIMEOVF). Antes o valor virava negativo e disparava na hora, ou
+// dava a volta e esperava um tempo errado sem aviso (#47). Confere antes de multiplicar.
+#define TEMPO_MAX ((uint32_t)CEU_WCLOCK_NONE - 1)
 uint32_t unit2val(uint32_t val, uint8_t unit){
+	uint32_t fator;
 	switch (unit){  // result in 'ms'
-		case 0: return (uint32_t)(val);				// ms
-		case 1: return (uint32_t)(val*1000L);		// seg
-		case 2: return (uint32_t)(val*60L*1000L);		// min
-		case 3: return (uint32_t)(val*60L*60L*1000L);	// h
+		case 1:  fator = 1000UL; break;			// seg
+		case 2:  fator = 60UL*1000UL; break;		// min
+		case 3:  fator = 60UL*60UL*1000UL; break;	// h
+		default: fator = 1UL; break;			// ms
 	}
-	return val;
+	if (val > TEMPO_MAX / fator) {
+		evtError(E_TIMEOVF);
+		return TEMPO_MAX;
+	}
+	return val * fator;
 }
 
 void push(uint32_t value){
@@ -885,6 +895,45 @@ void f_div(uint8_t Modifier){
 	if (v2==0) evtError(E_DIVZERO);
  }
  
+// Deslocamento por 32 ou mais (ou contagem negativa) é indefinido em C: no x86 a contagem é tomada
+// módulo 32 (1 << 33 dava 2) e no AVR não. Agora: 0, e no >> de um negativo, -1 (todos os bits do
+// sinal). Deslocamento à esquerda em unsigned, sem estouro de sinal (#66).
+int32_t shl32(int32_t a, int32_t n){
+	if ((uint32_t)n >= 32) return 0;
+	return (int32_t)((uint32_t)a << n);
+}
+int32_t shr32(int32_t a, int32_t n){
+	if ((uint32_t)n >= 32) return (a < 0) ? -1 : 0;
+	return a >> n;
+}
+uint32_t shr32u(uint32_t a, uint32_t n){
+	if (n >= 32) return 0;
+	return a >> n;
+}
+
+// Operações sem sinal, para ulong (#66). A pilha é int32_t e um ulong acima de 2^31 parecia negativo:
+// comparação, divisão, resto e >> saíam errados (3000000000 > 5 dava falso). O terrac emite esta
+// instrução quando um operando é ulong; o modificador escolhe a operação (UOP_*, TerraVM.h).
+void f_uop(uint8_t Modifier){
+	uint32_t v1,v2,r;
+	v1 = (uint32_t)pop();
+	v2 = (uint32_t)pop();
+	switch (Modifier){
+		case UOP_GT:  r = (v1 >  v2); break;
+		case UOP_LT:  r = (v1 <  v2); break;
+		case UOP_GTE: r = (v1 >= v2); break;
+		case UOP_LTE: r = (v1 <= v2); break;
+		case UOP_DIV: r = (v2 == 0) ? 0 : v1 / v2; break;
+		case UOP_MOD: r = (v2 == 0) ? 0 : v1 % v2; break;
+		case UOP_RSHFT: r = shr32u(v1,v2); break;
+		default: r = 0; break;
+	}
+	dbg(APPNAME,"VM::f_uop(%02x): v1=%u, v2=%u, r=%u\n",Modifier,v1,v2,r);
+	dbg("VMDBG","VM:: unsigned operation %d: (%u, %u) = %u \n",Modifier,v1,v2,r);
+	push(r);
+	if (v2 == 0 && (Modifier == UOP_DIV || Modifier == UOP_MOD)) evtError(E_DIVZERO);
+ }
+
 void f_bor(uint8_t Modifier){ 
 	int32_t v1,v2;
 	v1 = pop();
@@ -902,20 +951,22 @@ void f_band(uint8_t Modifier){
 	push(v1 & v2);
  }
 void f_lshft(uint8_t Modifier){ 
-	int32_t v1,v2;
+	int32_t v1,v2,r;
 	v1 = pop();
 	v2 = pop();
-	dbg(APPNAME,"VM::f_lshft(%02x): (v1=%d << v2=%d) = %d\n",Modifier,v1,v2,v1 << v2);
-	dbg("VMDBG","VM:: left shift operation: (0x%x << %d) = 0x%x \n",v1,v2,v1<<v2);
-	push(v1 << v2);
+	r = shl32(v1,v2);
+	dbg(APPNAME,"VM::f_lshft(%02x): (v1=%d << v2=%d) = %d\n",Modifier,v1,v2,r);
+	dbg("VMDBG","VM:: left shift operation: (0x%x << %d) = 0x%x \n",v1,v2,r);
+	push(r);
  }
 void f_rshft(uint8_t Modifier){ 
-	int32_t v1,v2;
+	int32_t v1,v2,r;
 	v1 = pop();
 	v2 = pop();
-	dbg(APPNAME,"VM::f_rshft(%02x): (v1=%d >> v2=%d) = %d\n",Modifier,v1,v2,v1 >> v2);
-	dbg("VMDBG","VM:: right shift operation: (0x%x >> %d) = 0x%x \n",v1,v2,v1>>v2);
-	push(v1 >> v2);
+	r = shr32(v1,v2);
+	dbg(APPNAME,"VM::f_rshft(%02x): (v1=%d >> v2=%d) = %d\n",Modifier,v1,v2,r);
+	dbg("VMDBG","VM:: right shift operation: (0x%x >> %d) = 0x%x \n",v1,v2,r);
+	push(r);
  }
 void f_bxor(uint8_t Modifier){ 
 	int32_t v1,v2;
@@ -1119,8 +1170,9 @@ void f_clken_e(uint8_t Modifier){
 	Time = pop();
 	dbg(APPNAME,"VM::f_clken_e(%02x): p1_1len=%d, p2_1len=%d, gate=%d, unit=%d, Time=%d, lbl=%d\n",
 		Modifier,p1_1len,p2_1len,gate,unit,Time,lbl);
-	dbg("VMDBG","VM:: await timer %ld for label %d\n",(s32)unit2val(Time,unit), lbl);
-	ceu_wclock_enable(gate, (s32)unit2val(Time,unit), lbl);		
+	Time = unit2val(Time,unit);	// uma vez só: pode gerar ERROR (#47)
+	dbg("VMDBG","VM:: await timer %ld for label %d\n",(s32)Time, lbl);
+	ceu_wclock_enable(gate, (s32)Time, lbl);		
 }
 void f_clken_v(uint8_t Modifier){
 	uint8_t p1_1len,p2_1len,p3_1len,unit,timeTp;
@@ -1136,10 +1188,11 @@ void f_clken_v(uint8_t Modifier){
 	VtimeAddr = getPar16(p2_1len);
 	lbl = getPar16(p3_1len);
 	Time = getMVal(VtimeAddr,timeTp); 
-	dbg(APPNAME,"VM::f_clken_v(%02x): p1_1len=%d, type=%d, gate=%d, unit=%d, VtimeAddr=%d, Time=%d, lbl=%d, Time(ms)=%d\n",
-		Modifier,p1_1len,timeTp,gate,unit,VtimeAddr, Time,lbl,(s32)unit2val(Time,unit));
-	dbg("VMDBG","VM:: await timer %ld for label %d\n",(s32)unit2val(Time,unit), lbl);
-	ceu_wclock_enable(gate, (s32)unit2val(Time,unit), lbl);
+	dbg(APPNAME,"VM::f_clken_v(%02x): p1_1len=%d, type=%d, gate=%d, unit=%d, VtimeAddr=%d, Time=%d, lbl=%d\n",
+		Modifier,p1_1len,timeTp,gate,unit,VtimeAddr, Time,lbl);
+	Time = unit2val(Time,unit);	// uma vez só: pode gerar ERROR (#47)
+	dbg("VMDBG","VM:: await timer %ld for label %d\n",(s32)Time, lbl);
+	ceu_wclock_enable(gate, (s32)Time, lbl);
 }
 
 void f_clken_c(uint8_t Modifier){
@@ -1154,6 +1207,7 @@ void f_clken_c(uint8_t Modifier){
 	Ctime = getPar32(p2_len);
 	lbl = getPar16(p3_1len);
 	dbg(APPNAME,"VM::f_clken_c(%02x): p1_1len=%d, p2_len=%d, p3_1len=%d, gate=%d, Ctime=%d, lbl=%d\n",Modifier,p1_1len,p2_len,p3_1len,gate,Ctime,lbl);
+	Ctime = unit2val(Ctime,0);	// o terrac recusa constante acima do máximo; .vmx antigo fica no máximo (#47)
 	dbg("VMDBG","VM:: await timer %ld for label %d\n",(s32)Ctime, lbl);
 	ceu_wclock_enable(gate, (s32)Ctime, lbl);
 
@@ -1695,6 +1749,7 @@ void f_set_c(uint8_t Modifier){
 			case op_set_e : f_set_e(Modifier); break;
 			case op_deref : f_deref(Modifier); break;
 			case op_memcpy : f_memcpy(Modifier); break;
+			case op_uop : f_uop(Modifier); break;
 
 			case op_tkins_max : f_tkins_max(Modifier); break;
 			case op_push_v : f_push_v(Modifier); break;
