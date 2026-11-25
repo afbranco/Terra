@@ -1,0 +1,31 @@
+#include "TerraNet.defs"
+// Issue #74: a BS tirava duas mensagens da fila de saída a cada envio (a segunda nunca saía). Três
+// motes mandam para a BS quase juntos: o 11 manda um ping em broadcast (v = 0) e uma mensagem à BS
+// (v = 11); o 12 e o 13 respondem à BS na hora (v = 12, 13). A BS tem de passar as quatro à serial;
+// sem a correção passavam duas. LEDs: 1 depois do SEND_DONE.
+pktype msg from radioMsg with
+  var ubyte v;
+end
+var msg m;
+var msg r;
+if getNodeId() == 11 then
+  await 5s;
+  m.type = 1;
+  m.target = BROADCAST;
+  emit SEND(m);
+  await SEND_DONE(1);
+  m.type = 2;
+  m.target = 1;
+  m.v = 11;
+  emit SEND(m);
+  await SEND_DONE(2);
+else
+  r = await RECEIVE(1);
+  r.type = 2;
+  r.target = 1;
+  r.v = getNodeId();
+  emit SEND(r);
+  await SEND_DONE(2);
+end
+emit LEDS(1);
+await FOREVER;
