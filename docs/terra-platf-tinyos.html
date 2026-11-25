@@ -48,7 +48,7 @@ git clone https://github.com/afbranco/Terra
 cd Terra
 podman run --rm -v $PWD:/terra:Z -w /terra/TerraVM/src \
     ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3 \
-    make micaz VM=NET TYPE=ALL
+    make micaz VM=NET MOD=MSGQ TYPE=ALL
 </pre>
 <p><code>docker</code> can be used instead of <code>podman</code>.
 In this image the TOSSIM module is built for Python 3 (<code>_TOSSIM.so</code>).</p>
@@ -62,7 +62,7 @@ The follow command is an example of Terra compilation and installation for a Mic
 with node identifier 2, using a MIB520 programmer:</p>
 <pre>
 cd TerraVM/src
-make micaz VM=NET TYPE=NOBS install.2 mib520,/dev/ttyUSB0
+make micaz VM=NET MOD=MSGQ TYPE=NOBS install.2 mib520,/dev/ttyUSB0
 </pre>
 
 <h3>Attention points</h3>
@@ -139,7 +139,7 @@ The TOSSIM simulator is used to run a Terra firmware and a simple visual interfa
 to represent, as possible, the simulation execution.
 The simulator module is built with</p>
 <pre>
-make micaz sim-sf VM=NET TYPE=ALL
+make micaz sim-sf VM=NET MOD=MSGQ TYPE=ALL
 </pre>
 <p>The simulation is started using two scripts: <code>TerraSim.py</code> and
 <code>TerraViewer.py</code> (in <code>TerraVM/src</code> and in

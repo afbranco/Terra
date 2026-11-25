@@ -64,9 +64,12 @@ for v in net grp; do
 done
 
 # Firmware micaz. O ID do nó é gravado na instalação (ver release/README.md).
+# O Net leva a fila de mensagens (MOD=MSGQ), como o TOSSIM e a produção de 2016: o TerraNet.defs
+# declara qPut/qGet/qSize/qClear. Até a v1.3.0 saía sem ela (#99).
 for v in net grp; do
+    mod=""; [ "$v" = net ] && mod="MOD=MSGQ"
     for t in nobs bs; do
-        vm "micaz-$v-$t" micaz VM=${v^^} TYPE=${t^^}
+        vm "micaz-$v-$t" micaz VM=${v^^} $mod TYPE=${t^^}
         grep -E 'bytes in (ROM|RAM)' "$OUT/logs/micaz-$v-$t.log"
         rom=$(awk '/bytes in ROM/{print $1}' "$OUT/logs/micaz-$v-$t.log")
         ram=$(awk '/bytes in RAM/{print $1}' "$OUT/logs/micaz-$v-$t.log")
