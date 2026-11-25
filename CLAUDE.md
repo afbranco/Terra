@@ -180,7 +180,7 @@ de lá.
     e do `SEND_DONE()` (Net) com 2 bytes: antes vinha status*256 + byte vizinho (PR #96, #83);
     fila local de agregação do Grp lida em 2 bytes e reacionada depois de cada leitura (PR #97);
     **firmware micaz do Net com `MOD=MSGQ`** (até a v1.3.0 saía sem a fila que o `.defs` declara;
-    memória para programa 1920 B, PR #101, #99);
+    memória para programa 1920 B, PR #101, #99; só o micaz, o TOSSIM já tinha a fila);
   - terrac: catálogo com W3006 e E6007 (161 códigos); `.vmx` com `loop i,N` com nomes de limite
     novos (#48); cast para inteiro menor corta o valor (#46); float convertido em `emit`, `await`
     e argumento, e E4030 nos casos inválidos (#45);
