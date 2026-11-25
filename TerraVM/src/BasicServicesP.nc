@@ -713,12 +713,16 @@ call Leds.led1On();
 				case AM_REQPROGBLOCK :
 					recReqProgBlockNet_receive(msg,payload,len);
 					break;	
+#ifdef MODE_SETDATA
+				// Sem MODE_SETDATA (o padrão) não há como repassar o SETDATAND: ele ficava na cabeça da
+				// outQ, sem envio, e o mote não transmitia mais nada (#81). Cai no default (descarta).
 				case AM_SETDATAND :
 					recSetDataNDNet_receive(msg,payload,len);
 					break;	
 				case AM_REQDATA :
 					recReqDataNet_receive(msg,payload,len);
 					break;	
+#endif
 				default:
 					if (id >= AM_CUSTOM_START && id <= AM_CUSTOM_END) { // AM_CUSTOM Range
 						if (loadingProgramFlag == FALSE){
