@@ -1,0 +1,18 @@
+#include "TerraGrp.defs"
+
+// Versão 1 do tests/aggreset (#83): o 11 põe três agregações na fila (agId 1), cada uma com 20
+// saltos (timeout de 4 s). A versão 2 chega com uma em curso e duas na fila.
+var group_t grp1;
+var aggreg_t agA;
+var ubyte stat;
+agA.agId = 1;
+stat = groupInit(grp1, 1, 0, 20, TRUE, eOFF, 0);
+stat = aggregInit(agA, grp1, SID_TEMP, fMAX, opGT, 0);
+emit LEDS(1);
+if getNodeId() == 11 then
+  await 500ms;
+  emit AGGREG(agA);
+  emit AGGREG(agA);
+  emit AGGREG(agA);
+end
+await FOREVER;

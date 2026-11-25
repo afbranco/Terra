@@ -454,6 +454,11 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		call renewTmr.stop();
 		call ElectionTmr.stop();
 		call AggTmr.stop();
+		// Filas de agregação: o que ficou do programa anterior era atendido pelo novo (o primeiro
+		// AGGREG_DONE da versão nova podia ser de uma agregação da antiga) (#83).
+		while (!call aggQ.empty()) call aggQ.dequeue();
+		call aggReqQ.clearAll();
+		call aggLocalReqQ.clearAll();
 		call GrCtl.init();
 		// Reset leds
 		call SA.setActuator(AID_LEDS, 0);
