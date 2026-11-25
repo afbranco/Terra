@@ -170,7 +170,24 @@ de lá.
     novos (#48); cast para inteiro menor corta o valor (#46); float convertido em `emit`, `await`
     e argumento, e E4030 nos casos inválidos (#45);
   - o oráculo do TerraSim tem de ser refeito (tempo e mensagens na serial mudam com a #74).
-  TerraControl no backlog (#73). Próximo: revisão da disseminação e do Grp.
+  TerraControl no backlog (#73).
+- **Revisão da disseminação e do Grp** (2026-11-24, a pedido do Prof.; dois agentes de leitura,
+  verificação dobrada). Reproduzidos e corrigidos, no `master`:
+  - #74 (PR #77): a BS tirava duas mensagens da `outQ` por envio (chegavam à serial 2 de 4). A
+    mensagem sai só no `sendDone`; o `send()` recusado na BS tenta até `MAX_SEND_RETRIES` e
+    descarta (`sendFailed`; sem isso o SEND_BS do Grp, AM 150 sem envio pelo rádio, travava a
+    fila: o `grpbs` reprovou no Avrora). Teste `tests/bsqueue`; o `avrora_vmx.py` ganhou o
+    `SERIAL_USR`;
+  - #75 (PR #78): agregação comparava as respostas com o `AggSeq` do último AGGREG. Teste
+    `tests/aggseq`;
+  - #76 (PR #79): `AGGREG_DONE` com `agId | 0xE0` (resto dos bits `TID_*`). O Prof. confirmou
+    que o 224 não era intencional; docs e exemplos não o usam. Teste `tests/aggdoneid`.
+  Não reproduzido: buffer único do REC_GR (TOSSIM e Avrora, com e sem parâmetro): a cópia e o
+  `queueEvt` são da mesma tarefa. Documentação dos parâmetros dos eventos do Grp: #80.
+  Faltam verificar os achados P2/P3 da revisão (disseminação: nó vizinho da BS parado, mistura
+  de `ReqState`, potência de RF que fica, `SETDATAND` trava a fila; Grp: sensor não atendido
+  trava a agregação, grupo/agregação inexistente com lixo, reset sem limpar filas, tipos de
+  `SENDBS_DONE`/`SENDGR_DONE`; SensAct: `PORT_A`/`PORT_B`/`INT_A` lidos com tamanho errado).
   - O `gh pr merge` não acusa branch desatualizada (o repositório não exige): conferir com
     `git merge-base --is-ancestor origin/master <head>` e atualizar antes do merge.
   Os testes de VM (`tests/*/test_*.py`) carregam o `.vmx` no nó 11 e leem os LEDs (3 bits)
