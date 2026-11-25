@@ -40,7 +40,8 @@ nx_uint8_t ExtDataCustomA;				// last request custom event (internal loop-back)
 usrMsg_t ExtDataRadioReceived[2];
 uint8_t rxProx = 0;		// bit: o próximo buffer a usar
 uint8_t rxPend[2] = {0, 0};
-nx_uint8_t ExtDataSendDoneError;
+nx_uint8_t ExtDataSendDoneError;		// SEND_DONE(id): ubyte no .defs
+nx_uint16_t ExtDataSendDoneError16;	// SEND_DONE(): ushort no .defs (o await lê 2 bytes)
 nx_uint8_t ExtDataWasAcked;
 nx_uint8_t ExtDataQReady;			// last queue ready - queue size 
 nx_uint32_t ExtDataTimeStamp;		// last SLPL_FIRED - timestamp 
@@ -566,8 +567,9 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		dbg(APPNAME,"Custom::BSRadio.sendDone(): AM_ID = %d, error=%d\n",am_id,error);
 		if (am_id == AM_USRMSG){
 			ExtDataSendDoneError = (uint8_t)error;
+			ExtDataSendDoneError16 = (uint16_t)error;
 			signal VM.queueEvt(I_SEND_DONE_ID, ((usrMsg_t*)dataMsg)->type, &ExtDataSendDoneError);
-			signal VM.queueEvt(I_SEND_DONE   ,                          0, &ExtDataSendDoneError);
+			signal VM.queueEvt(I_SEND_DONE   ,                          0, &ExtDataSendDoneError16);
 		} else {
 			dbg(APPNAME,"Custom::BSRadio.sendDone(): Discarting sendDone AM_ID = %d\n",am_id);
 		}
