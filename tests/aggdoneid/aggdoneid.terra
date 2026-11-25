@@ -1,0 +1,26 @@
+#include "TerraGrp.defs"
+
+// Issue #76: o AGGREG_DONE saía com agId | 0xE0 (TID_AGGREG): `await AGGREG_DONE(1)´ nunca
+// disparava e done.agId vinha 225. LEDs do nó 11: 1 se o await AGGREG_DONE(1) dispara (4 se não,
+// em 5 s) e 2 se done.agId é 1 (6 se não).
+var group_t grp1;
+var aggreg_t agA;
+var aggDone_t done;
+var ubyte stat;
+agA.agId = 1;
+stat = groupInit(grp1, 1, 1, 1, TRUE, eOFF, 11);
+stat = aggregInit(agA, grp1, SID_TEMP, fMAX, opGT, 0);
+await 3s;
+emit AGGREG(agA);
+par/or do
+  await AGGREG_DONE(1);
+  emit LEDS(1);
+with
+  await 5s;
+  emit LEDS(4);
+end
+await 1s;
+emit AGGREG(agA);
+done = await AGGREG_DONE();
+if done.agId == 1 then emit LEDS(2); else emit LEDS(6); end
+await FOREVER;

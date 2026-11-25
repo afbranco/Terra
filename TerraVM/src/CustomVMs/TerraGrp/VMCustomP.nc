@@ -815,13 +815,15 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 			dbg(APPNAME,"VM::AggTmr.fired() CurrAggStructAddr=%d\n",CurrAggStructAddr);
 			dbg(APPNAME,"VM::AggTmr.fired() count=%d, value=%d\n",CurrAggData.count,CurrAggData.value);
 			// Save data value to a temp global 'ext_data'
-			ExtDataAggDone.agId = EvtId;
+			// O agId do programa: com o EvtId (agId | 0xE0), `await AGGREG_DONE(id)´ nunca disparava
+			// e done.agId vinha 224 + agId (#76).
+			ExtDataAggDone.agId = CurrentAggreg;
 			ExtDataAggDone.count = CurrAggData.count;
 			ExtDataAggDone.countTrue = CurrAggData.countTrue;
 			ExtDataAggDone.countFalse = CurrAggData.countFalse;
 			ExtDataAggDone.value = CurrAggData.value;
  			// Queue the message event
-			signal VM.queueEvt(I_AGGREG_DONE_ID, EvtId, &ExtDataAggDone);
+			signal VM.queueEvt(I_AGGREG_DONE_ID, CurrentAggreg, &ExtDataAggDone);
 			signal VM.queueEvt(I_AGGREG_DONE   ,     0, &ExtDataAggDone);
 			// Try next aggregation
 			post procAggreg();
