@@ -172,7 +172,9 @@ de lá.
     tentativas, a que o `send` recusa (#74); agregação do Grp com as respostas certas com dois
     AGGREG seguidos (#75) e `AGGREG_DONE(id)`/`done.agId` com o agId do programa (#76);
     `SETDATAND`/`REQDATA` descartados sem `MODE_SETDATA` (#81); `reqSensor` responde na hora
-    (valor 0) a sensor sem leitura (#82);
+    (valor 0) a sensor sem leitura (#82); depois da v1.3.0, Grp: requisitante fora do grupo
+    recebe as respostas dos membros e não conta a própria leitura (#87); eleição em mais de 3
+    grupos (fila trocada por máscaras, +2 B de RAM, #88);
   - terrac: catálogo com W3006 e E6007 (161 códigos); `.vmx` com `loop i,N` com nomes de limite
     novos (#48); cast para inteiro menor corta o valor (#46); float convertido em `emit`, `await`
     e argumento, e E4030 nos casos inválidos (#45);
@@ -203,6 +205,13 @@ de lá.
     passam. Só TOSSIM (`AVRORA = False`, que o `test-avrora.sh` pula).
   - O resto (confirmados só na leitura, a decidir, só no hardware, não reproduzidos, TerraControl)
     ficou na #83 (backlog, P3).
+  - Decisões da #83 (2026-11-25, com o Prof.): #87 (PR #89), requisitante de AGGREG fora do grupo
+    descartava as respostas no `isSameGroup`; agora recebe só dos membros (decisão do Prof.).
+    Teste `tests/aggmembro`. #88 (PR #90): com 4 ou mais grupos eletivos a fila de eleição
+    (3 com `QUEUE=SHORT`) enchia e os excedentes nunca elegiam; virou `elctPend`/`elctInit` com
+    rodízio (+2 B de RAM, +420 B de flash no Grp NOBS). Teste `tests/elect4`. O `currVote`
+    sobrescrito por eleições simultâneas não se reproduziu (1, 2 e 4 grupos, até 8 sementes):
+    só documentado, sem gastar RAM. Ainda não estão em release.
   - O `gh pr merge` não acusa branch desatualizada (o repositório não exige): conferir com
     `git merge-base --is-ancestor origin/master <head>` e atualizar antes do merge.
   Os testes de VM (`tests/*/test_*.py`) carregam o `.vmx` no nó 11 e leem os LEDs (3 bits)
