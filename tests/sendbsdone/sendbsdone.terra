@@ -1,0 +1,31 @@
+#include "TerraGrp.defs"
+
+// Status do SENDBS_DONE (#83): o .defs declara ushort e a VM guardava o status em 1 byte. O
+// await lia 2 bytes: status*256 + o byte vizinho na memória. O 11 manda 20 SEND_BS seguidos; a
+// fila de saída enche e alguns voltam com EBUSY (5 no TinyOS).
+// LEDs do 11: bit 0, algum status 0; bit 1, algum status 5 (EBUSY); bit 2, algum outro valor.
+// Esperado 3. Sem a correção, o EBUSY chega como 1280 ou mais (bit 2).
+pktype msgBS from msgBS_t with
+  var ubyte a;
+end
+var msgBS m;
+var ushort v;
+var ubyte flags = 0;
+var ubyte i;
+m.msgId = 7;
+await 3s;
+if getNodeId() == 11 then
+  loop i, 20 do
+    emit SEND_BS(m);
+    v = await SENDBS_DONE();
+    if v == 0 then
+      flags = flags | 1;
+    else/if v == 5 then
+      flags = flags | 2;
+    else
+      flags = flags | 4;
+    end
+  end
+  emit LEDS(flags);
+end
+await FOREVER;
