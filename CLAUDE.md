@@ -43,6 +43,11 @@ de lá.
     `.vmx` (#37: `routing_tree`, `routing_tree_ack`, `count2radio`, `tdma_slotted`; #38:
     `routing_target`, `aluno_hash_offset`, dos 14 programas do TerraSim) e o tempo (#40).
     Catálogo igual ao da v1.1.1. TerraSim avisado (refazer o oráculo).
+  - **`v1.3.0` publicada** (tag no `0a0314f`, 2026-11-24, a pedido do Prof.): PRs #67 a #72, #77
+    a #79 e #84 a #86 (lista "Para aplicar no TerraSim"). Muda VM (`op_uop`, #74 na BS...) e
+    catálogo (161 códigos: W3006, E6007). `_TOSSIM.so` Net `8ea40f6b…`, Grp `ce415913…`. Dos 14
+    programas do TerraSim só o `count2radio` muda (3 bytes, cast `<ubyte>`, #46). TerraSim
+    avisado com a lista e o passo a passo (trocar anexos, refazer o oráculo, catálogo, release).
   - Alinhada com a release **tinyos-toolchain `2.1.2-r2`** (decidido pelo Prof. em 2026-11-22;
     antes era a r1, `f42bac7`, digest `7e21b1b9…`). O workflow fixa a imagem
     `2.1.2-resolute-py3-21d8fb1@sha256:4198b12302181edd0e8b20ae06cd3af0a2d483a06355a78c1f83371250de47ec`.
@@ -158,7 +163,7 @@ de lá.
     buffers de RECEIVE** com contador de eventos pendentes (`VMCustom.evtDone`). Provado no
     Avrora: com um buffer, uma mensagem chegando com a VM ocupada sobrescrevia a anterior.
     Testes `tests/{aggmin,blockid,rxbuf}` (o `rxbuf` só reprova no Avrora).
-  Catálogo: 161 códigos (W3006, E6007). A próxima release muda VM e catálogo: avisar o TerraSim.
+  Catálogo: 161 códigos (W3006, E6007). Saíram na v1.3.0.
 - **Para aplicar no TerraSim** (pedido do Prof., 2026-11-24: as mudanças também têm de ser
   aplicadas lá; avisar na release, com esta lista):
   - VM: `op_uop` (um `.vmx` com ele não roda em VM antiga), deslocamento >= 32, limite do tempo do
@@ -166,6 +171,8 @@ de lá.
     RECEIVE no Net (#49); a BS não perde mais mensagens a caminho da serial e descarta, depois de 5
     tentativas, a que o `send` recusa (#74); agregação do Grp com as respostas certas com dois
     AGGREG seguidos (#75) e `AGGREG_DONE(id)`/`done.agId` com o agId do programa (#76);
+    `SETDATAND`/`REQDATA` descartados sem `MODE_SETDATA` (#81); `reqSensor` responde na hora
+    (valor 0) a sensor sem leitura (#82);
   - terrac: catálogo com W3006 e E6007 (161 códigos); `.vmx` com `loop i,N` com nomes de limite
     novos (#48); cast para inteiro menor corta o valor (#46); float convertido em `emit`, `await`
     e argumento, e E4030 nos casos inválidos (#45);
@@ -184,10 +191,18 @@ de lá.
     que o 224 não era intencional; docs e exemplos não o usam. Teste `tests/aggdoneid`.
   Não reproduzido: buffer único do REC_GR (TOSSIM e Avrora, com e sem parâmetro): a cópia e o
   `queueEvt` são da mesma tarefa. Documentação dos parâmetros dos eventos do Grp: #80.
-  Faltam verificar os achados P2/P3 da revisão (disseminação: nó vizinho da BS parado, mistura
-  de `ReqState`, potência de RF que fica, `SETDATAND` trava a fila; Grp: sensor não atendido
-  trava a agregação, grupo/agregação inexistente com lixo, reset sem limpar filas, tipos de
-  `SENDBS_DONE`/`SENDGR_DONE`; SensAct: `PORT_A`/`PORT_B`/`INT_A` lidos com tamanho errado).
+  Verificação dos P2/P3 (2026-11-24):
+  - #81 (PR #84): `SETDATAND` (o *New Set Value* do TerraControl) ficava na cabeça da `outQ` do
+    mote, sem `case` no envio, e o mote não transmitia mais nada. Sem `MODE_SETDATA` (o padrão),
+    `SETDATAND`/`REQDATA` caem no `default` (descarte). Teste `tests/setdatand`; o
+    `avrora_vmx.py` ganhou o `SERIAL_EXTRA`;
+  - #82 (PR #85): `SA.reqSensor` sem `default`: um sensor sem leitura (`SID_INT_A`) na agregação
+    nunca sinalizava `Ready` e travava as agregações seguintes. Teste `tests/aggsensor`;
+  - PR #86, só teste: `tests/versao2` (versão nova no meio da disseminação, linha 1-11-12-13). Na
+    v1.2.0 os nós ficavam na versão 1 (efeito da #74, não do `ReqState`); no `master` 30 de 30
+    passam. Só TOSSIM (`AVRORA = False`, que o `test-avrora.sh` pula).
+  - O resto (confirmados só na leitura, a decidir, só no hardware, não reproduzidos, TerraControl)
+    ficou na #83 (backlog, P3).
   - O `gh pr merge` não acusa branch desatualizada (o repositório não exige): conferir com
     `git merge-base --is-ancestor origin/master <head>` e atualizar antes do merge.
   Os testes de VM (`tests/*/test_*.py`) carregam o `.vmx` no nó 11 e leem os LEDs (3 bits)
