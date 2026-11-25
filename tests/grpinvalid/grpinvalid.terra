@@ -1,0 +1,54 @@
+#include "TerraGrp.defs"
+
+// Grupo e agregação inválidos (#83). No 11:
+// bit 0: groupInit com id 33 (o grupo tem 5 bits) devolve erro; antes SUCCESS, e o grupo nunca
+//        era achado;
+// bit 1: aggregInit com agId 9 (3 bits) devolve erro; antes SUCCESS;
+// bit 2: SEND_GR para o grupo 2, que o 11 não declarou, volta com erro no SENDGR_DONE e não sai;
+//        antes saía com o parâmetro e os saltos lidos de variáveis sem valor.
+// Esperado no 11: 7. O 12 e o 13 estão no grupo 2 e acendem 4 + as mensagens recebidas: esperado 4.
+pktype msgG from msgGR_t with
+  var ubyte a;
+end
+var group_t grp1;
+var group_t grp2;
+var group_t grpX;
+var aggreg_t agA;
+var msgG m;
+var msgG r;
+var ubyte stat;
+var ushort v;
+var ubyte flags = 0;
+var ubyte n = 0;
+if getNodeId() == 11 then
+  stat = groupInit(grp1, 1, 0, 1, TRUE, eOFF, 0);
+  if groupInit(grpX, 33, 0, 1, TRUE, eOFF, 0) != SUCCESS then
+    flags = flags | 1;
+  end
+  agA.agId = 9;
+  if aggregInit(agA, grp1, SID_TEMP, fMAX, opGT, 0) != SUCCESS then
+    flags = flags | 2;
+  end
+  await 3s;
+  m.grId = 2;
+  m.node = BROADCAST;
+  m.msgId = 1;
+  emit SEND_GR(m);
+  v = await SENDGR_DONE();
+  if v != SUCCESS then
+    flags = flags | 4;
+  end
+  emit LEDS(flags);
+else
+  stat = groupInit(grp2, 2, 0, 1, TRUE, eOFF, 0);
+  par/or do
+    loop do
+      r = await REC_GR();
+      n = n + 1;
+    end
+  with
+    await 10s;
+  end
+  emit LEDS(4 + n);
+end
+await FOREVER;

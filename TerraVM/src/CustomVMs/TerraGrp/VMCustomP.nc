@@ -215,8 +215,12 @@ void  proc_send_gr(uint16_t id, uint32_t addr){
 	uint8_t stat;
 	usrMsg = (usrSendGR_t*)signal VM.getRealAddr((nx_uint16_t)addr);
 	dbg(APPNAME,"Custom::proc_send_gr(): evt id=%d, addr=%d\n",id,addr);
-	getGrpDefValue(usrMsg->grId, &inGrp, &electionFlag, &grParam, &maxHops);
-	stat = call GrCtl.sendGR(usrMsg->grId, grParam, maxHops, usrMsg->node, usrMsg->evtId, SEND_DATA_SIZE, (uint8_t*)usrMsg->Data);	
+	// Grupo não declarado (sem groupInit): não envia. Antes saía com o parâmetro e os saltos lidos de
+	// variáveis sem valor (#83).
+	if (getGrpDefValue(usrMsg->grId, &inGrp, &electionFlag, &grParam, &maxHops))
+		stat = call GrCtl.sendGR(usrMsg->grId, grParam, maxHops, usrMsg->node, usrMsg->evtId, SEND_DATA_SIZE, (uint8_t*)usrMsg->Data);	
+	else
+		stat = EINVAL;
 	// Queue a SENDGR_DONE event
 	ExtDataSendGRStatus = stat;
 	signal VM.queueEvt(I_SENDGR_DONE_ID, usrMsg->grId, &ExtDataSendGRStatus);	
@@ -295,6 +299,12 @@ void func_groupInit(uint16_t id){
 	grId = (uint8_t)signal VM.pop();
 	value = (uint16_t)signal VM.pop();
 	grCtl = (groupCtl_t*)signal VM.getRealAddr(value);
+	// O id do grupo tem 5 bits (findGroupAddr e as mensagens usam grId & 0x1F): acima de 31 o grupo
+	// nunca era achado (#83).
+	if (grId > 0x1F){
+		signal VM.push(EINVAL);
+		return;
+	}
 	// set struct
 	grCtl->leader = leader;
 	grCtl->elFlag = elFlag;
@@ -342,7 +352,8 @@ void func_aggregInit(uint16_t id){
 	agCtl->sensorId = sensorId;
 	agCtl->grId = grCtl->grId;
 
-	if (isGrpAddrInitated(grCtl)==FALSE){
+	// O agId tem 3 bits (findAggregAddr usa agId & 0x07): acima de 7 a agregação nunca era achada (#83).
+	if (isGrpAddrInitated(grCtl)==FALSE || agCtl->agId > 0x07){
 		signal VM.push(EINVAL); // EINVAL 6 -- An invalid parameter was passed 
 		dbg(APPNAME,"ERROR Custom::func_aggregInit(): Group not initiated!\n",id);
 		return;
@@ -757,7 +768,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 	
 	task void procAggreg(){
 		uint8_t grId=0;
-		bool inGrp,readLocal;
+		bool inGrp,readLocal,aggOk;
 		uint8_t maxHops,grParam,electionFlag;
 		uint32_t aggCtl;
 		aggReqData_t reqData;
@@ -774,7 +785,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		CurrentAggreg = (uint8_t)(aggCtl & 0x000000ff);
 		// Populate CurrAggData global structure
 		CurrAggData.aggSeq = (uint16_t)(aggCtl >> 16);
-		getAggDefValue(CurrentAggreg,CurrAggData.aggSeq,&grId, &CurrAggStructAddr,&CurrAggData.vType,&CurrAggData.function,&CurrAggData.sensorId,&CurrAggData.compOper,&CurrAggData.refValue);
+		aggOk = getAggDefValue(CurrentAggreg,CurrAggData.aggSeq,&grId, &CurrAggStructAddr,&CurrAggData.vType,&CurrAggData.function,&CurrAggData.sensorId,&CurrAggData.compOper,&CurrAggData.refValue);
 		CurrAggData.count=0;
 		CurrAggData.countTrue=0;
 		CurrAggData.countFalse=0;
@@ -798,7 +809,16 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		dbg(APPNAME,"VM::procAggreg(): aggId=%d, grId=%d, structAddr=%d, vType=%d\n",CurrentAggreg,grId,CurrAggStructAddr,CurrAggData.vType);
 		// A leitura local só entra se este nó é membro do grupo (status do groupInit), como as
 		// respostas dos outros nós (isSameGroup) (#87).
-		readLocal = getGrpDefValue(grId, &inGrp, &electionFlag, &grParam, &maxHops) && inGrp;
+		aggOk = aggOk && getGrpDefValue(grId, &inGrp, &electionFlag, &grParam, &maxHops);
+		// Agregação sem aggregInit (ou com o grupo sem groupInit): termina na hora com count 0. Antes
+		// seguia com o grupo, o sensor e os saltos de variáveis sem valor (#83).
+		if (!aggOk){
+			CurrAggData.function = AO_SUM;
+			AggTotal = 0;
+			call AggTmr.startOneShot(0);
+			return;
+		}
+		readLocal = inGrp;
 		dbg(APPNAME,"VM::procAggreg() GR: grId=%d, grParam=%d\n",grId, grParam);
 		call GrCtl.aggreg(grId, grParam, maxHops, CurrentAggreg, &reqData);
 		// start Aggreg Timeout timer
