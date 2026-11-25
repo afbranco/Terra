@@ -1254,6 +1254,19 @@ call Leds.led1On();
 #endif
 		}
 
+	// O send() recusou a mensagem (ocupado, ou um AM sem envio, como o SEND_BS no Grp). Na BS: tenta
+	// de novo com o mesmo limite do sendDone e depois descarta; sem isso a mensagem travava a fila.
+	// Antes a BS não chegava aqui, porque tirava a mensagem da fila logo depois do send e assim
+	// perdia a seguinte (#74). No mote, tenta sem limite, como antes (o programa espera o SEND_DONE).
+	void sendFailed(){
+		if (MoteID == BStation && sendCounter >= MAX_SEND_RETRIES) {
+			dbg(APPNAME,"BS::sendFailed(): discarding message AM=%hhu\n",tempOutputOutQ.AM_ID);
+			call outQ.get(&tempOutputOutQ);
+			sendCounter=0;
+		}
+		call sendTimer.startOneShot(reSendDelay);
+	}
+
 	void sendRadioN(){
 		error_t err;
 		dbg(APPNAME,"BS::sendRadioN(): AM=%hhu to %d, reqAck=%s\n",tempOutputOutQ.AM_ID, tempOutputOutQ.sendToMote, _TFstr((tempOutputOutQ.reqAck & (1<<REQ_ACK_BIT)) > 0));
@@ -1283,7 +1296,7 @@ call Leds.led1On();
 		err = RadioSender_send(tempOutputOutQ.AM_ID,tempOutputOutQ.sendToMote, &sendBuff, tempOutputOutQ.DataSize);
 		if (err != SUCCESS) {
 			dbg(APPNAME,"BS::sendRadioN(): Error %hhu in sending Message AM=%hhu to node=%d via radio\n",err,tempOutputOutQ.AM_ID, tempOutputOutQ.sendToMote);
-			call sendTimer.startOneShot(reSendDelay);
+			sendFailed();
 		} else {
 			TViewer("radio",tempOutputOutQ.sendToMote,0);
 			}		
@@ -1297,7 +1310,7 @@ call Leds.led1On();
 		err = call SerialSender.send[tempOutputOutQ.AM_ID]( (tempOutputOutQ.sendToMote & 0x7fff), &sendBuff, tempOutputOutQ.DataSize);
 		if ( err != SUCCESS) {
 			dbg(APPNAME,"BS::sendSerialN(): Error %hhu in sending Message AM=%hhu via UART\n",err,tempOutputOutQ.AM_ID);
-			call sendTimer.startOneShot(reSendDelay);	
+			sendFailed();
 		} else {
 			TViewer("serial",0,0);
 		}
@@ -1325,7 +1338,8 @@ call Leds.led1On();
 				}
 				sendRadioN();
 			}						
-			call outQ.get(&tempOutputOutQ);  // Remove message from buffer
+			// A mensagem sai da fila no sendDone (serial ou rádio), ou no sendFailed se o send() a recusa.
+			// Tirar aqui também dobrava a retirada: a seguinte nunca era enviada (#74).
 		} else {
 
 			switch (tempOutputOutQ.AM_ID) {

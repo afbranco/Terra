@@ -52,6 +52,7 @@ if isinstance(ESPERADO, list):
     ESPERADO = {11: ESPERADO}
 SEGUNDOS = constante("SEGUNDOS")
 SERIAL_ESPERADO = constante("SERIAL_ESPERADO")   # (AM, Sender, bytes que aparecem nos dados)
+SERIAL_USR = constante("SERIAL_USR")   # (AM, posição do byte, todos os valores em ordem) (#74)
 VM = constante("VM") or "net"
 MOTES = sorted(ESPERADO)
 esperado = {n: [v for i, v in enumerate(e) if i == 0 or v != e[i - 1]] for n, e in ESPERADO.items()}
@@ -239,8 +240,17 @@ def obtido():
     return r
 
 
+def serial_usr():
+    """Os valores do byte indicado nas mensagens com o AM do SERIAL_USR, em ordem."""
+    am, pos, _ = SERIAL_USR
+    return sorted(p[8 + pos] for p in list(recebidos) if len(p) > 8 + pos and p[0] == 0 and p[7] == am)
+
+
 def serial_ok():
-    """A BS passou para a serial a mensagem esperada (AM, Sender nos 2 primeiros bytes, dados)."""
+    """A BS passou para a serial a mensagem esperada (AM, Sender nos 2 primeiros bytes, dados)
+    e, com SERIAL_USR, exatamente as mensagens esperadas (nenhuma a menos)."""
+    if SERIAL_USR is not None and serial_usr() != SERIAL_USR[2]:
+        return False
     if SERIAL_ESPERADO is None:
         return True
     am, sender, dados = SERIAL_ESPERADO
@@ -267,6 +277,8 @@ extra = ""
 if SERIAL_ESPERADO is not None:
     extra = "; serial da BS: %s" % ("mensagem esperada" if serial_ok() else
                                      "SEM a mensagem (%d pacotes)" % len(recebidos))
+if SERIAL_USR is not None:
+    extra += "; serial da BS: %s (esperado %s)" % (serial_usr(), SERIAL_USR[2])
 print("avrora %s (%s, %d nós): LEDs: %s (esperado %s)%s: %s"
       % (nome, VM, len(exes), res, esperado, extra, "OK" if ok else "FALHOU"))
 sys.exit(0 if ok else 1)
