@@ -45,8 +45,6 @@ implementation{
 	custom.aggReqQ -> aggReqQ;
 	components new dataQueueC(uint16_t,AGGREQ_QUEUE_SIZE,2) as  aggLocalReqQ;
 	custom.aggLocalReqQ -> aggLocalReqQ;
-	components new QueueC(uint8_t,ELCT_QUEUE_SIZE) as  electionQ;
-	custom.electionQ -> electionQ;
 #endif
 
 }

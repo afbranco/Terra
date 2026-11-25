@@ -1,0 +1,23 @@
+#include "TerraGrp.defs"
+
+// Issue #88: com QUEUE=SHORT a fila de eleição tinha 3 posições; com 4 grupos com eleição, o
+// quarto nunca elegia líder (nem na renovação). Nós 11 a 14 nos grupos 1 a 4, todos eACTIVE e com a
+// mesma tensão: o líder de cada grupo é o de maior id, o 14. LEDs de cada nó: quantos grupos têm o
+// 14 como líder aos 40 s. Esperado 4; sem a correção, 3.
+var group_t g1;
+var group_t g2;
+var group_t g3;
+var group_t g4;
+var ubyte stat;
+var ubyte n = 0;
+stat = groupInit(g1, 1, 1, 2, TRUE, eACTIVE, 0);
+stat = groupInit(g2, 2, 1, 2, TRUE, eACTIVE, 0);
+stat = groupInit(g3, 3, 1, 2, TRUE, eACTIVE, 0);
+stat = groupInit(g4, 4, 1, 2, TRUE, eACTIVE, 0);
+await 40s;
+if g1.leader == 14 then n = n + 1; end
+if g2.leader == 14 then n = n + 1; end
+if g3.leader == 14 then n = n + 1; end
+if g4.leader == 14 then n = n + 1; end
+emit LEDS(n);
+await FOREVER;
