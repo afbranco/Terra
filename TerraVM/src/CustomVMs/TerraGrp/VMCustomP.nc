@@ -790,7 +790,9 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		
 		grId = (uint8_t)(grId | 1<<AGGREG_BIT);
 		dbg(APPNAME,"VM::procAggreg(): aggId=%d, grId=%d, structAddr=%d, vType=%d\n",CurrentAggreg,grId,CurrAggStructAddr,CurrAggData.vType);
-		readLocal = getGrpDefValue(grId, &inGrp, &electionFlag, &grParam, &maxHops);
+		// A leitura local só entra se este nó é membro do grupo (status do groupInit), como as
+		// respostas dos outros nós (isSameGroup) (#87).
+		readLocal = getGrpDefValue(grId, &inGrp, &electionFlag, &grParam, &maxHops) && inGrp;
 		dbg(APPNAME,"VM::procAggreg() GR: grId=%d, grParam=%d\n",grId, grParam);
 		call GrCtl.aggreg(grId, grParam, maxHops, CurrentAggreg, &reqData);
 		// start Aggreg Timeout timer

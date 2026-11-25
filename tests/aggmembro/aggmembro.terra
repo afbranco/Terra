@@ -1,0 +1,24 @@
+#include "TerraGrp.defs"
+
+// Issue #87, requisitante fora do grupo: o 11 declara o grupo com status FALSE (não é membro) e
+// pede a agregação. Só os membros (12 e 13) entram na conta. Sem a correção, o 11 descartava as
+// respostas (o isSameGroup exigia que ele fosse membro) e somava a própria leitura: count 1.
+// LEDs do 11: o count do AGGREG_DONE. Esperado 2.
+var group_t grp1;
+var aggreg_t agA;
+var aggDone_t done;
+var ubyte stat;
+var ubyte membro = TRUE;
+if getNodeId() == 11 then
+  membro = FALSE;
+end
+agA.agId = 0;
+stat = groupInit(grp1, 1, 1, 1, membro, eOFF, 11);
+stat = aggregInit(agA, grp1, SID_TEMP, fMAX, opGT, 0);
+await 3s;
+if getNodeId() == 11 then
+  emit AGGREG(agA);
+  done = await AGGREG_DONE();
+  emit LEDS(done.count);
+end
+await FOREVER;

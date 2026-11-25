@@ -294,7 +294,10 @@ implementation{
 			 */
 
 			// Not to me! Discard it.
-			if (!(signal GrCtl.isSameGroup((uint8_t)Data->grId,(uint8_t)Data->grParam))) return;
+			// A resposta de agregação endereçada a mim passa mesmo se não sou membro: quem pede pode
+			// estar fora do grupo (o aggNewValue confere agId e aggSeq) (#87).
+			if (!(((Data->grId & (1<<AGGREG_BIT)) > 0) && ((Data->grId & (1<<GRND_BIT)) > 0) && (Data->TargetMote == MoteID)) &&
+			    !(signal GrCtl.isSameGroup((uint8_t)Data->grId,(uint8_t)Data->grParam))) return;
 			// test if it is an aggregation or a common event or an election single Msg
 			if ((Data->grId & (1<<AGGREG_BIT)) > 0) { // Aggregation event
 				aggReqData_t *aggData = (aggReqData_t*)(Data->Data);
