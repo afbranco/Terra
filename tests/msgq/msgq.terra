@@ -1,0 +1,38 @@
+#include "TerraNet.defs"
+
+// Fila de mensagens do Net (#99): o firmware micaz das releases v1.0.0 a v1.3.0 saía sem
+// MOD=MSGQ, e qPut/qGet/qSize não existiam no mote (o programa compilava e a pilha desalinhava).
+// O 11 põe 3 mensagens na fila (v = 1, 2, 3), confere o tamanho e tira as 3 em ordem.
+// LEDs do 11: 1 + 2 + 4 se cada etapa der certo (esperado 7).
+pktype msg from radioMsg with
+  var ubyte v;
+end
+var msg m;
+var msg r;
+var ubyte ok = 0;
+var ubyte s = 0;
+var ubyte soma = 0;
+if getNodeId() == 11 then
+  await 1s;
+  loop i, 3 do
+    m.v = i + 1;
+    s = s + qPut(m);
+  end
+  if s == SUCCESS and qSize() == 3 then
+    ok = ok | 1;
+  end
+  loop i, 3 do
+    s = qGet(r);
+    if s == SUCCESS and r.v == i + 1 then
+      soma = soma + 1;
+    end
+  end
+  if soma == 3 then
+    ok = ok | 2;
+  end
+  if qSize() == 0 and qGet(r) != SUCCESS then
+    ok = ok | 4;
+  end
+  emit LEDS(ok);
+end
+await FOREVER;
