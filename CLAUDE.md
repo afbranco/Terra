@@ -181,6 +181,9 @@ de lá.
     fila local de agregação do Grp lida em 2 bytes e reacionada depois de cada leitura (PR #97);
     **firmware micaz do Net com `MOD=MSGQ`** (até a v1.3.0 saía sem a fila que o `.defs` declara;
     memória para programa 1920 B, PR #101, #99; só o micaz, o TOSSIM já tinha a fila);
+    Grp: `groupInit` com id > 31 e `aggregInit` com `agId` > 7 dão `EINVAL`, `SEND_GR` a grupo não
+    declarado não sai (`SENDGR_DONE` com `EINVAL`), `AGGREG` sem `aggregInit` termina com `count` 0
+    (PR #102); o `VM.reset` esvazia as filas de agregação (PR #103);
   - terrac: catálogo com W3006 e E6007 (161 códigos); `.vmx` com `loop i,N` com nomes de limite
     novos (#48); cast para inteiro menor corta o valor (#46); float convertido em `emit`, `await`
     e argumento, e E4030 nos casos inválidos (#45);
@@ -235,6 +238,13 @@ de lá.
     acompanha o build (princípio do Prof.: só declara o que o mote tem); variantes geradas pelo
     build na #100. No Grp, `REQ_MIC`/`MIC`/`setupMic`/`BEEP` estão no `.defs` desde 2015-06
     (`841aa59`) e nunca foram implementados; no Net dependem da MTS300 (`SBOARD=300`, `167a54e`).
+  - PR #102 (#83): grupo e agregação inválidos. Teste `tests/grpinvalid`. Muda o comportamento:
+    enviar a um grupo não declarado dá erro (coerente com a #87). A parte do `AGGREG` sem
+    `aggregInit` entrou sem teste que reprove (antes também acabava em 0).
+  - PR #103 (#83): o `VM.reset` não limpava `aggQ`/`aggReqQ`/`aggLocalReqQ`; a versão nova recebia
+    o `AGGREG_DONE` de uma agregação da antiga. Teste `tests/aggreset` (só TOSSIM, duas versões).
+  - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
+    teste.
   - O `gh pr merge` não acusa branch desatualizada (o repositório não exige): conferir com
     `git merge-base --is-ancestor origin/master <head>` e atualizar antes do merge.
   Os testes de VM (`tests/*/test_*.py`) carregam o `.vmx` no nó 11 e leem os LEDs (3 bits)
