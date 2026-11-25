@@ -179,6 +179,8 @@ de lá.
     grupos (fila trocada por máscaras, +2 B de RAM, #88); status do `SENDBS_DONE`/`SENDGR_DONE` (Grp)
     e do `SEND_DONE()` (Net) com 2 bytes: antes vinha status*256 + byte vizinho (PR #96, #83);
     fila local de agregação do Grp lida em 2 bytes e reacionada depois de cada leitura (PR #97);
+    **firmware micaz do Net com `MOD=MSGQ`** (até a v1.3.0 saía sem a fila que o `.defs` declara;
+    memória para programa 1920 B, PR #101, #99);
   - terrac: catálogo com W3006 e E6007 (161 códigos); `.vmx` com `loop i,N` com nomes de limite
     novos (#48); cast para inteiro menor corta o valor (#46); float convertido em `emit`, `await`
     e argumento, e E4030 nos casos inválidos (#45);
@@ -227,6 +229,12 @@ de lá.
     sair de vazia). Sem teste que reprove (decisão do Prof.): a fila não chegou a ter dois pedidos.
     `nhops = 0` no `groupInit` dá timeout 0 e `count` sempre 0: decidido documentar (#91), sem
     aviso no `terrac`. O `tests/grpbs` é instável no Avrora, também sem a mudança (#98).
+  - PR #101 (#99): o firmware micaz do Net das releases v1.0.0 a v1.3.0 saía sem `MOD=MSGQ` (o
+    TOSSIM e a produção de 2016 tinham): `qPut`/`qGet`/`qSize`/`qClear` não existiam no mote e a
+    pilha desalinhava. Teste `tests/msgq` (reprova só no Avrora). Causa geral: o `.defs` não
+    acompanha o build (princípio do Prof.: só declara o que o mote tem); variantes geradas pelo
+    build na #100. No Grp, `REQ_MIC`/`MIC`/`setupMic`/`BEEP` estão no `.defs` desde 2015-06
+    (`841aa59`) e nunca foram implementados; no Net dependem da MTS300 (`SBOARD=300`, `167a54e`).
   - O `gh pr merge` não acusa branch desatualizada (o repositório não exige): conferir com
     `git merge-base --is-ancestor origin/master <head>` e atualizar antes do merge.
   Os testes de VM (`tests/*/test_*.py`) carregam o `.vmx` no nó 11 e leem os LEDs (3 bits)
