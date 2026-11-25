@@ -19,7 +19,6 @@ module VMCustomP{
 	uses interface Queue<uint32_t> as aggQ;
 	uses interface dataQueue as aggReqQ;
 	uses interface dataQueue as aggLocalReqQ;
-	uses interface Queue<uint8_t> as electionQ;
 	uses interface Timer<TMilli> as AggTmr;
 	uses interface Timer<TMilli> as ElectionTmr;
 	uses interface Timer<TMilli> as renewTmr;
@@ -47,6 +46,11 @@ aggregCtl_t* firstAgg = NULL;
 aggregCtl_t* lastAgg  = NULL;
 uint8_t countAgg = 0;
 uint8_t firstElectionPend = TRUE;
+// Eleições pendentes, um bit por grupo (grId & 0x1f), e se a pendente é a primeira (initLeader) ou
+// renovação. Substituem a electionQ: com QUEUE=SHORT ela tinha 3 posições e, com mais grupos, os
+// excedentes nunca elegiam líder (#88).
+uint32_t elctPend = 0;
+uint32_t elctInit = 0;
 
 
 // Aggregation Processing Flag and ...
@@ -432,6 +436,8 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		AggTotal=0;
 		AggSeq=0;
 		firstElectionPend = TRUE;
+		elctPend = 0;
+		elctInit = 0;
 		call renewTmr.stop();
 		call ElectionTmr.stop();
 		call AggTmr.stop();
@@ -837,16 +843,17 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 #ifndef ONLY_BSTATION
 
 	void removeElectionQ(uint8_t grId){
-		uint8_t i, qSize, grIdAux;
-		qSize = call electionQ.size();
-		dbg(APPNAME,"VM::removeElectionQ: grId=%d, QSize before:%d\n",grId,qSize);
-		for (i=0; i < qSize; i++){
-			grIdAux = call electionQ.dequeue();
-			dbg(APPNAME,"VM::removeElectionQ: grIdAux=%d\n",grIdAux);
-			if ((grIdAux & 0x1f) != (grId & 0x1f)) call electionQ.enqueue(grIdAux);
-		}
-		qSize = call electionQ.size();
-		dbg(APPNAME,"VM::removeElectionQ: grId=%d, QSize after:%d\n",grId,qSize);
+		uint32_t bit = ((uint32_t)1) << (grId & 0x1f);
+		elctPend &= ~bit;
+		elctInit &= ~bit;
+		dbg(APPNAME,"VM::removeElectionQ: grId=%d, pend=%lx\n",grId,(unsigned long)elctPend);
+	}
+	// Marca a eleição do grupo como pendente; com o ELCT_INIT_BIT, é a primeira (initLeader) (#88).
+	void addElectionQ(uint8_t grId){
+		uint32_t bit = ((uint32_t)1) << (grId & 0x1f);
+		elctPend |= bit;
+		if ((grId & (1<<ELCT_INIT_BIT)) > 0) elctInit |= bit; else elctInit &= ~bit;
+		dbg(APPNAME,"VM::addElectionQ: grId=%d, pend=%lx\n",grId,(unsigned long)elctPend);
 	}
 
 	void setCurrMaxVote(uint16_t vote,uint16_t mote){
@@ -917,12 +924,19 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 
 	
 	task void procLeaderQ(){
-		uint8_t grId;
+		uint8_t grId = 0;
+		uint8_t i;
 		uint32_t delay;
 		dbg(APPNAME,"VM::procLeaderQ:\n");
-		if (call electionQ.size()<=0) return;
-		// Dequeue grId
-		grId = call electionQ.dequeue();
+		if (elctPend == 0) return;
+		// Próximo grupo pendente depois do atual, em rodízio: um grupo que falha sempre não segura os
+		// outros (com a fila, ele voltava para o fim) (#88).
+		for (i=1; i <= 32; i++){
+			grId = (uint8_t)((currElection.grId + i) & 0x1f);
+			if ((elctPend & (((uint32_t)1) << grId)) != 0) break;
+		}
+		if ((elctInit & (((uint32_t)1) << grId)) != 0) grId = (uint8_t)(grId | (1<<ELCT_INIT_BIT));
+		removeElectionQ(grId);
 		// Set global current election data
 		currElection.grId = (uint8_t)(grId & 0x1f);
 		currElection.maxVote = 0; currElection.moteVote=0;
@@ -962,8 +976,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 			getGrpElctState(next_->grId, &electionFlag, &electionState);
 			dbg(APPNAME,"VM::queueLeaderProc(): n=%d of %d, Id=%d, bitValue=%d, electionFlag=%d\n",n,countGrp,next_->grId,bitValue,electionFlag);
 			if (electionFlag!=ELCT_OFF){
-				removeElectionQ(next_->grId);
-				call electionQ.enqueue((uint8_t)(next_->grId | (bitValue<<ELCT_INIT_BIT)));
+				addElectionQ((uint8_t)(next_->grId | (bitValue<<ELCT_INIT_BIT)));
 			}
 			next_ = (void*)signal VM.getRealAddr(next_->nextGrp);
 		}
@@ -994,8 +1007,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 					call ElectionTmr.startOneShot(getElectionTimeOut(currElection.grId));						
 					break;
 				case EST_REQUESTED : 
-					removeElectionQ(currElection.grId);
-					call electionQ.enqueue((uint8_t)(currElection.grId));
+					addElectionQ((uint8_t)(currElection.grId));
 					post procLeaderQ();
 					break;
 				case EST_ELECTING : 
