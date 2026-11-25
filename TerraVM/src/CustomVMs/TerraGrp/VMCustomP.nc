@@ -623,10 +623,11 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		call SA.reqSensor(REQ_SOURCE2, reqData.sensorId);		
 	}
 	task void procNextAggLocalReq(){
-		uint8_t sensorId;
-		call aggLocalReqQ.read(&sensorId);
-		sensorId = (uint8_t)(sensorId & 0x00ff);
-		call SA.reqSensor(REQ_SOURCE3, sensorId);	
+		// O elemento da fila tem 2 bytes (sensorId e, no byte alto, o aggId): ler num uint8_t
+		// escrevia um byte além da variável, na pilha (#83).
+		uint16_t qData;
+		if (call aggLocalReqQ.read(&qData) != SUCCESS) return;
+		call SA.reqSensor(REQ_SOURCE3, (uint8_t)(qData & 0x00ff));	
 	}
 
 	event void aggReqQ.dataReady(){
@@ -684,6 +685,9 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 			}			// Try next request
 			if (call aggReqQ.isFree()==FALSE) post procNextAggReq();
 		}
+		// Próximo pedido local. A fila só avisa (dataReady) quando sai de vazia: sem isto, um segundo
+		// pedido local ficava parado para sempre e o nó não entrava mais com a própria leitura (#83).
+		if (call aggLocalReqQ.isFree()==FALSE) post procNextAggLocalReq();
 	}
 
 
