@@ -178,6 +178,7 @@ de lá.
     recebe as respostas dos membros e não conta a própria leitura (#87); eleição em mais de 3
     grupos (fila trocada por máscaras, +2 B de RAM, #88); status do `SENDBS_DONE`/`SENDGR_DONE` (Grp)
     e do `SEND_DONE()` (Net) com 2 bytes: antes vinha status*256 + byte vizinho (PR #96, #83);
+    fila local de agregação do Grp lida em 2 bytes e reacionada depois de cada leitura (PR #97);
   - terrac: catálogo com W3006 e E6007 (161 códigos); `.vmx` com `loop i,N` com nomes de limite
     novos (#48); cast para inteiro menor corta o valor (#46); float convertido em `emit`, `await`
     e argumento, e E4030 nos casos inválidos (#45);
@@ -221,6 +222,11 @@ de lá.
     Teste `tests/sendbsdone` (EBUSY é 5 no TinyOS). A parte do Net entrou sem teste que reprove
     (decisão do Prof.): no Avrora não se conseguiu um RECEIVE pendente na hora do SEND_DONE,
     porque a VM não cede a CPU no meio de uma reação. O `SEND_DONE_ACK` já estava certo.
+  - PR #97 (#83): fila local de agregação do Grp. O `procNextAggLocalReq` lia 2 bytes num
+    `uint8_t` e, depois da leitura local, a fila local não era reacionada (a `dataQueue` só avisa ao
+    sair de vazia). Sem teste que reprove (decisão do Prof.): a fila não chegou a ter dois pedidos.
+    `nhops = 0` no `groupInit` dá timeout 0 e `count` sempre 0: decidido documentar (#91), sem
+    aviso no `terrac`. O `tests/grpbs` é instável no Avrora, também sem a mudança (#98).
   - O `gh pr merge` não acusa branch desatualizada (o repositório não exige): conferir com
     `git merge-base --is-ancestor origin/master <head>` e atualizar antes do merge.
   Os testes de VM (`tests/*/test_*.py`) carregam o `.vmx` no nó 11 e leem os LEDs (3 bits)
