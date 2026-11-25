@@ -131,6 +131,9 @@ implementation{
 			case SID_VOLT: call S_VOLT.read(); insertSReq(reqSource,id);  TViewer("sensor",SID_VOLT,0); break;
 			case SID_IN1: dIn1 = (getPinX(SID_IN1)==TRUE)?1:0; signal SA.Ready(reqSource, TID_SENSOR_DONE | SID_IN1); break;
 			case SID_IN2: dIn2 = (getPinX(SID_IN2)==TRUE)?1:0; signal SA.Ready(reqSource, TID_SENSOR_DONE | SID_IN2); break;
+			// Sensor sem leitura (ex.: SID_INT_A numa agregação): responde na hora, e o readSensor dá 0.
+			// Sem o Ready, o pedido ficava pendurado e travava a fila de agregação do Grp (#82).
+			default: signal SA.Ready(reqSource, TID_SENSOR_DONE | id); break;
 		}
 #endif
 	}
