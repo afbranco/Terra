@@ -967,7 +967,9 @@ call Leds.led1On();
 					 // fill data has finished
 					 if ( call BM.isAllBitSet()) {
 						 // Start the VM
-						 ReqState = RO_IDLE;
+						 // ST_IDLE, como no fim pelo procNewProgBlock: RO_IDLE (4) não tem caso no ProgReqTimerTask e o
+						 // nó não pedia mais a versão nova ao receber um bloco dela (#83).
+						 ReqState = ST_IDLE;
 						 TViewer("vmstart",0,0);
 						 signal BSUpload.start(TRUE);
 					 }				 	
@@ -988,7 +990,9 @@ call Leds.led1On();
 				 	// fill data has finished
 					 if ( call BM.isAllBitSet()) {
 					 	// Start the VM
-				 		ReqState = RO_IDLE;
+				 		// ST_IDLE, como no fim pelo procNewProgBlock: RO_IDLE (4) não tem caso no ProgReqTimerTask e o
+				 		// nó não pedia mais a versão nova ao receber um bloco dela (#83).
+				 		ReqState = ST_IDLE;
 				 		TViewer("vmstart",0,0);
 						signal BSUpload.start(TRUE);
 					 }				 	
