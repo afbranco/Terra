@@ -176,7 +176,8 @@ de lá.
     `SETDATAND`/`REQDATA` descartados sem `MODE_SETDATA` (#81); `reqSensor` responde na hora
     (valor 0) a sensor sem leitura (#82); depois da v1.3.0, Grp: requisitante fora do grupo
     recebe as respostas dos membros e não conta a própria leitura (#87); eleição em mais de 3
-    grupos (fila trocada por máscaras, +2 B de RAM, #88);
+    grupos (fila trocada por máscaras, +2 B de RAM, #88); status do `SENDBS_DONE`/`SENDGR_DONE` (Grp)
+    e do `SEND_DONE()` (Net) com 2 bytes: antes vinha status*256 + byte vizinho (PR #96, #83);
   - terrac: catálogo com W3006 e E6007 (161 códigos); `.vmx` com `loop i,N` com nomes de limite
     novos (#48); cast para inteiro menor corta o valor (#46); float convertido em `emit`, `await`
     e argumento, e E4030 nos casos inválidos (#45);
@@ -214,6 +215,12 @@ de lá.
     rodízio (+2 B de RAM, +420 B de flash no Grp NOBS). Teste `tests/elect4`. O `currVote`
     sobrescrito por eleições simultâneas não se reproduziu (1, 2 e 4 grupos, até 8 sementes):
     só documentado, sem gastar RAM. Ainda não estão em release.
+  - PR #96 (#83): o `.defs` declara `SENDBS_DONE`, `SENDGR_DONE` e o `SEND_DONE()` do Net como
+    `ushort` e a VM guardava o status em 1 byte; o `await` lia status*256 + o byte vizinho (no
+    micaz do Net, o `rxPend` da #49). Buffers de 2 bytes, `.defs` e `.vmx` iguais, +2 B de RAM.
+    Teste `tests/sendbsdone` (EBUSY é 5 no TinyOS). A parte do Net entrou sem teste que reprove
+    (decisão do Prof.): no Avrora não se conseguiu um RECEIVE pendente na hora do SEND_DONE,
+    porque a VM não cede a CPU no meio de uma reação. O `SEND_DONE_ACK` já estava certo.
   - O `gh pr merge` não acusa branch desatualizada (o repositório não exige): conferir com
     `git merge-base --is-ancestor origin/master <head>` e atualizar antes do merge.
   Os testes de VM (`tests/*/test_*.py`) carregam o `.vmx` no nó 11 e leem os LEDs (3 bits)
