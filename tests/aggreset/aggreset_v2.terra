@@ -1,0 +1,19 @@
+#include "TerraGrp.defs"
+
+// Versão 2 do tests/aggreset (#83): o VM.reset tem de esvaziar a fila de agregações da versão 1.
+// O 11 faz uma agregação (agId 2) e acende o agId do primeiro AGGREG_DONE: esperado 2. Sem limpar
+// a fila, o primeiro era o de uma agregação da versão 1 (agId 1).
+var group_t grp1;
+var aggreg_t agB;
+var aggDone_t done;
+var ubyte stat;
+agB.agId = 2;
+stat = groupInit(grp1, 1, 0, 1, TRUE, eOFF, 0);
+stat = aggregInit(agB, grp1, SID_TEMP, fMAX, opGT, 0);
+if getNodeId() == 11 then
+  await 2s;
+  emit AGGREG(agB);
+  done = await AGGREG_DONE();
+  emit LEDS(4 + done.agId);
+end
+await FOREVER;
