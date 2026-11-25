@@ -1,0 +1,18 @@
+#include "TerraNet.defs"
+
+// Issue #81: sem MODE_SETDATA (o padrão), um SETDATAND (AM 131, o "New Set Value" do TerraControl)
+// ficava na cabeça da fila de saída do mote, sem envio, e o mote não transmitia mais nada. O teste
+// manda um SETDATAND pela serial da BS antes de o nó 11 mandar uma mensagem à BS.
+// LEDs: 1 depois do SEND_DONE (sem a correção, nunca).
+pktype msg from radioMsg with
+  var ubyte v;
+end
+var msg m;
+await 25s;
+m.type = 2;
+m.target = 1;
+m.v = getNodeId();
+emit SEND(m);
+await SEND_DONE(2);
+emit LEDS(1);
+await FOREVER;

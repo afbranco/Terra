@@ -53,6 +53,7 @@ if isinstance(ESPERADO, list):
 SEGUNDOS = constante("SEGUNDOS")
 SERIAL_ESPERADO = constante("SERIAL_ESPERADO")   # (AM, Sender, bytes que aparecem nos dados)
 SERIAL_USR = constante("SERIAL_USR")   # (AM, posição do byte, todos os valores em ordem) (#74)
+SERIAL_EXTRA = constante("SERIAL_EXTRA") or []   # [(AM, payload hexa, s depois do deploy)] (#81)
 VM = constante("VM") or "net"
 MOTES = sorted(ESPERADO)
 esperado = {n: [v for i, v in enumerate(e) if i == 0 or v != e[i - 1]] for n, e in ESPERADO.items()}
@@ -218,6 +219,17 @@ for rodada in range(5):
     espera(lambda: all(depois_do_boot(n) for n in MOTES), 15)
     if all(depois_do_boot(n) for n in MOTES) or av.poll() is not None:
         break
+
+
+def extras():
+    """Pacotes extras na serial da BS, contados a partir do fim do deploy (SERIAL_EXTRA)."""
+    t0 = time.time()
+    for am, hx, seg in SERIAL_EXTRA:
+        time.sleep(max(0, t0 + seg - time.time()))
+        envia(am, bytes.fromhex(hx))
+
+
+threading.Thread(target=extras, daemon=True).start()
 
 
 def obtido():
