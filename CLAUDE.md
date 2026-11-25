@@ -159,6 +159,17 @@ de lá.
     Avrora: com um buffer, uma mensagem chegando com a VM ocupada sobrescrevia a anterior.
     Testes `tests/{aggmin,blockid,rxbuf}` (o `rxbuf` só reprova no Avrora).
   Catálogo: 161 códigos (W3006, E6007). A próxima release muda VM e catálogo: avisar o TerraSim.
+- **Para aplicar no TerraSim** (pedido do Prof., 2026-11-24: as mudanças também têm de ser
+  aplicadas lá; avisar na release, com esta lista):
+  - VM: `op_uop` (um `.vmx` com ele não roda em VM antiga), deslocamento >= 32, limite do tempo do
+    `await` com `ERROR(E_TIMEOVF)` = 12 nos `.defs` (#66, #47); MIN vazio dá 0, dois buffers de
+    RECEIVE no Net (#49); a BS não perde mais mensagens a caminho da serial e descarta, depois de 5
+    tentativas, a que o `send` recusa (#74); agregação do Grp com as respostas certas com dois
+    AGGREG seguidos (#75) e `AGGREG_DONE(id)`/`done.agId` com o agId do programa (#76);
+  - terrac: catálogo com W3006 e E6007 (161 códigos); `.vmx` com `loop i,N` com nomes de limite
+    novos (#48); cast para inteiro menor corta o valor (#46); float convertido em `emit`, `await`
+    e argumento, e E4030 nos casos inválidos (#45);
+  - o oráculo do TerraSim tem de ser refeito (tempo e mensagens na serial mudam com a #74).
   TerraControl no backlog (#73). Próximo: revisão da disseminação e do Grp.
   - O `gh pr merge` não acusa branch desatualizada (o repositório não exige): conferir com
     `git merge-base --is-ancestor origin/master <head>` e atualizar antes do merge.
