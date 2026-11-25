@@ -1,0 +1,27 @@
+#include "TerraGrp.defs"
+
+// Issue #82: o reqSensor não respondia a um sensor sem leitura (ex.: SID_INT_A) e a fila de pedidos
+// de agregação do nó ficava ocupada para sempre. Grupo com os nós 11, 12 e 13; o 11 agrega SID_INT_A
+// e depois SID_TEMP. LEDs do 11: o count de cada AGGREG_DONE (o segundo mais 4). Esperado 3 e 7;
+// sem a correção, 0 e 4.
+var group_t grp1;
+var aggreg_t agA;
+var aggreg_t agB;
+var aggDone_t done;
+var ubyte stat;
+agA.agId = 0;
+agB.agId = 1;
+stat = groupInit(grp1, 1, 1, 1, TRUE, eOFF, 11);
+stat = aggregInit(agA, grp1, SID_INT_A, fMAX, opGT, 0);
+stat = aggregInit(agB, grp1, SID_TEMP, fMAX, opGT, 0);
+await 3s;
+if getNodeId() == 11 then
+  emit AGGREG(agA);
+  done = await AGGREG_DONE();
+  emit LEDS(done.count);
+  await 2s;
+  emit AGGREG(agB);
+  done = await AGGREG_DONE();
+  emit LEDS(done.count + 4);
+end
+await FOREVER;
