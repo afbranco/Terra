@@ -18,6 +18,7 @@ LOG="$OUT/logs/avrora.log"
 fail=0
 for t in "$ROOT"/tests/*/test_*.py; do
     grep -q '^ESPERADO' "$t" && grep -q 'setDestination(1)' "$t" || continue
+    grep -q '^AVRORA = False' "$t" && continue   # topologia que o Avrora não monta (ex.: versao2)
     n=$(basename "$(dirname "$t")")
     mkdir -p "$W/$n"
     (cd "$W/$n" && python3 "$ROOT/tests/avrora/avrora_vmx.py" "$FW" "$ROOT/tests/$n") 2>&1 | tee -a "$LOG" || true
