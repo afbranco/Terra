@@ -47,7 +47,9 @@ de lá.
     a #79 e #84 a #86 (lista "Para aplicar no TerraSim"). Muda VM (`op_uop`, #74 na BS...) e
     catálogo (161 códigos: W3006, E6007). `_TOSSIM.so` Net `8ea40f6b…`, Grp `ce415913…`. Dos 14
     programas do TerraSim só o `count2radio` muda (3 bytes, cast `<ubyte>`, #46). TerraSim
-    avisado com a lista e o passo a passo (trocar anexos, refazer o oráculo, catálogo, release).
+    avisado com a lista e o passo a passo (trocar anexos, refazer o oráculo, catálogo, release). A TerraSim
+    v1.3.0 entrou em produção com ela em 2026-11-25 (oráculo diverge na BS pela #74, avaliador
+    dentro do ruído).
   - Alinhada com a release **tinyos-toolchain `2.1.2-r2`** (decidido pelo Prof. em 2026-11-22;
     antes era a r1, `f42bac7`, digest `7e21b1b9…`). O workflow fixa a imagem
     `2.1.2-resolute-py3-21d8fb1@sha256:4198b12302181edd0e8b20ae06cd3af0a2d483a06355a78c1f83371250de47ec`.
