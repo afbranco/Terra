@@ -1,0 +1,26 @@
+#include "TerraGrp.defs"
+
+// Issue #75: o aggNewValue comparava a resposta com o AggSeq do último `emit AGGREG´, não com o da
+// rodada em curso. Com dois AGGREG seguidos, as respostas da primeira eram descartadas e ela
+// terminava só com a leitura local. Grupo com os nós 11, 12 e 13; o 11 faz os dois AGGREG.
+// LEDs do 11: o count do primeiro AGGREG_DONE (3; sem a correção, 1) e o do segundo mais 4 (7).
+var group_t grp1;
+var aggreg_t agA;
+var aggreg_t agB;
+var aggDone_t done;
+var ubyte stat;
+agA.agId = 0;
+agB.agId = 1;
+stat = groupInit(grp1, 1, 1, 1, TRUE, eOFF, 11);
+stat = aggregInit(agA, grp1, SID_TEMP, fMAX, opGT, 0);
+stat = aggregInit(agB, grp1, SID_TEMP, fMAX, opGT, 0);
+await 3s;
+if getNodeId() == 11 then
+  emit AGGREG(agA);
+  emit AGGREG(agB);
+  done = await AGGREG_DONE();
+  emit LEDS(done.count);
+  done = await AGGREG_DONE();
+  emit LEDS(done.count + 4);
+end
+await FOREVER;

@@ -592,8 +592,10 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 #ifndef ONLY_BSTATION
 		dbg(APPNAME,"VM::GrCtl.aggNewValue(): aggId=%d,value=%d\n",retData->aggId,retData->value);
 		dbg(APPNAME,"VM::GrCtl.aggNewValue(): retData->aggId(%d)==CurrentAggreg(%d)) && (AggSeq(%d)==retData->aggSeq(%d) , CurrAggData.function(%d)\n",
-			retData->aggId,CurrentAggreg,AggSeq,retData->aggSeq,CurrAggData.function);
-		if ((retData->aggId==CurrentAggreg) && (AggSeq==retData->aggSeq)){
+			retData->aggId,CurrentAggreg,CurrAggData.aggSeq,retData->aggSeq,CurrAggData.function);
+		// Compara com a rodada em curso. O AggSeq é o do último `emit AGGREG´: com outro na fila, as
+		// respostas desta rodada eram descartadas e ela terminava só com a leitura local (#75).
+		if ((retData->aggId==CurrentAggreg) && (CurrAggData.aggSeq==retData->aggSeq)){
 			switch (CurrAggData.function){
 				case AO_AVG: 	agAvgP1(	retData->value); break;
 				case AO_SUM: 	agSumP1(	retData->value); break;
