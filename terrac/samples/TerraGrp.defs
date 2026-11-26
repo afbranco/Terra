@@ -180,7 +180,7 @@ do
 	function nohold ubyte aggregInit(aggreg_t, group_t,    ubyte,  ubyte,  ubyte,  ulong)	11;
 	//
 	function ubyte setRFPower(ubyte)			17;
-	function ubyte getParent()			18;
+	function ushort getParent()			18;
 
 // Request/await macros
 #define getTemp(var)  emit REQ_TEMP();  var=await TEMP 
