@@ -1,0 +1,22 @@
+#include "TerraGrp.defs"
+
+// Issue #104: operador unário direto em campo de registro ou elemento de array operava sobre o
+// endereço. LEDs do nó 11: bit 0 se <ubyte>d.count e <ubyte>v[1] estão certos, bit 1 se -d.count e
+// ~v[1] estão certos, bit 2 se not d.countTrue e not v[2] estão certos. Esperado 7; sem a correção, 0.
+var aggDone_t d;
+var ushort[3] v;
+var long a;
+var long b;
+var ubyte r = 0;
+d.count = 1;
+d.countTrue = 0;
+v[1] = 2;
+v[2] = 0;
+await 2s;
+if <ubyte>d.count == 1 and <ubyte>v[1] == 2 then r = r + 1; end
+a = -d.count;
+b = ~v[1];
+if a == -1 and b == -3 then r = r + 2; end
+if not d.countTrue and not v[2] then r = r + 4; end
+emit LEDS(r);
+await FOREVER;
