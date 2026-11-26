@@ -207,6 +207,8 @@ de lá.
     temporário do tamanho do evento, só instruções antigas; nenhum `.vmx` do corpus muda);
   - terrac, depois da v1.4.0: sem `summary.platforms` no `--diag=json` e W5003 com os números
     (PR #123, #122);
+  - anexo novo `terra-docs-<v>.json` (PR #124, #91), para trocar o `terraDocs.js` e o
+    `TERRA_LANGUAGE.md` mantidos à mão; formato no `release/README.md`;
   - terrac: catálogo com W3006 e E6007 (161 códigos); `.vmx` com `loop i,N` com nomes de limite
     novos (#48); cast para inteiro menor corta o valor (#46); float convertido em `emit`, `await`
     e argumento, e E4030 nos casos inválidos (#45); depois da v1.3.0, cast, `-`, `~` e `not` direto
@@ -307,6 +309,11 @@ de lá.
     memória; sai o `summary.platforms` do `--diag=json` (o TerraSim aprovou: chave ausente vira
     lista vazia). O W5003 fica, contra a memória da plataforma do `.defs`, com `size`, `platform` e
     `max` na mensagem e em `args`. Catálogo com 161 códigos (só o texto do W5003 muda).
+  - PR #124 (#91, primeira parte; decisões do Prof. de 2026-11-26 sobre os pontos 7, 8, 12 e 14):
+    `TerraVM/src/defs/gendocs.py` gera o anexo `terra-docs-<v>.json` dos `.defs.in`, do
+    `descricoes.toml` (texto em inglês, 111 nomes) e dos `.defs` gerados no build; reprova se
+    faltar/sobrar descrição ou o `.defs` não bater com o modelo. Teste `release/test-gendocs.py`.
+    127 entradas (o Grp sem `unsafe` duplica 16, #116). Faltam as páginas do `docs/`.
   - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
     `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
