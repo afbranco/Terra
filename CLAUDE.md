@@ -314,6 +314,8 @@ de lá.
     `descricoes.toml` (texto em inglês, 111 nomes) e dos `.defs` gerados no build; reprova se
     faltar/sobrar descrição ou o `.defs` não bater com o modelo. Teste `release/test-gendocs.py`.
     127 entradas (o Grp sem `unsafe` duplica 16, #116). Faltam as páginas do `docs/`.
+    PR #125: campo `group` obrigatório (leds, sensors, radio...), pedido do TerraSim para as
+    tabelas da Help; o leitor deles já funciona com o JSON (testado no `terra-docs-dev.json`).
   - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
     `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
