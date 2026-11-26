@@ -112,6 +112,10 @@ python3 "$ROOT/TerraVM/src/defs/gendocs.py" --version "$VER" \
     --build grp:tossim:"$W/terra-$VER-grp-tossim-py3-x86_64/TerraGrp.defs" \
     --build net:micaz:"$OUT/terra-$VER-net-micaz-nobs.defs" \
     --build grp:micaz:"$OUT/terra-$VER-grp-micaz-nobs.defs" | tee -a "$OUT/logs/docs.log"
+# As tabelas do site (docs/_includes/generated) têm de ser as geradas deste JSON.
+python3 "$ROOT/docs/_tools/genpages.py" --docs "$OUT/terra-docs-$VER.json" \
+    --check "$ROOT/docs/_includes/generated" | tee -a "$OUT/logs/docs.log"
+tail -1 "$OUT/logs/docs.log" | grep -q ': OK$' || { echo "FALHOU: docs/_includes/generated desatualizado"; exit 1; }
 
 # TerraVMControl.jar: compilado do fonte, num jar único. As bibliotecas (tinyos.jar inclusive)
 # vêm do jar da TerraDist v0.3.0: são idênticas às do jar de produção de 2016 (.ova).

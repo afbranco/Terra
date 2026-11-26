@@ -98,6 +98,20 @@ if command -v python3 > /dev/null && ! python3 -m json.tool "$OUT/terrac-errors-
     echo "terrac: catálogo JSON inválido" | tee -a "$LOG"; fail=1
 fi
 
+# Site (#91): a tabela dos códigos tem de ser a gerada deste catálogo, e os exemplos das páginas
+# (blocos ```terra com <!-- check: ... -->) têm de compilar como dizem. No CI o python3 é
+# obrigatório; fora dele (imagem local sem python3) a conferência da tabela é pulada.
+if command -v python3 > /dev/null; then
+    if python3 "$ROOT/docs/_tools/genpages.py" --catalog "$OUT/terrac-errors-$VER.json" \
+            --check "$ROOT/docs/_includes/generated" | tee -a "$LOG" | grep -q ': OK$'; then :; else fail=1; fi
+elif [ -n "${CI:-}" ]; then
+    echo "terrac: sem python3 no CI para conferir docs/_includes/generated/codes.md" | tee -a "$LOG"; fail=1
+else
+    echo "terrac: sem python3, docs/_includes/generated/codes.md não conferido" | tee -a "$LOG"
+fi
+if lua5.1 "$ROOT/docs/_tools/checkexamples.lua" "$D/terrac" "$ROOT/terrac/samples" \
+        "$ROOT"/docs/*.md "$ROOT"/docs/_includes/generated/*.md 2>&1 | tee -a "$LOG" | tail -1 | grep -q ': OK$'; then :; else fail=1; fi
+
 tar -C "$W" -czf "$OUT/terrac-$VER.tar.gz" "terrac-$VER"
 rm -rf "$W"
 [ $fail = 0 ] || { echo "FALHOU: terrac"; exit 1; }
