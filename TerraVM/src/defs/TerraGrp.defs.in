@@ -182,16 +182,16 @@ do
 	// TerraGrp input events
 	input msgGR_t 		REC_GR		ubyte 	40;
 	input msgGR_t 		REC_GR			void 	41;
-	input ushort 		SENDBS_DONE 	ubyte 	42;
-	input ushort 		SENDBS_DONE 	void 	43;
+	input ubyte 		SENDBS_DONE 	ubyte 	42;
+	input ubyte 		SENDBS_DONE 	void 	43;
 	input aggDone_t 	AGGREG_DONE	ubyte 	44;
 	input aggDone_t 	AGGREG_DONE		void 	45;
 	input ushort 		LEADER_NEW 	ubyte 	46;
 	input ushort 		LEADER_NEW 	void 	47;
 	input ushort 		LEADER_LOST 	ubyte 	48;
 	input ushort 		LEADER_LOST 	void 	49;
-	input ushort 		SENDGR_DONE 	ubyte 	50;
-	input ushort 		SENDGR_DONE 	void 	51;
+	input ubyte 		SENDGR_DONE 	ubyte 	50;
+	input ubyte 		SENDGR_DONE 	void 	51;
 
 
 	// Terra basic functions

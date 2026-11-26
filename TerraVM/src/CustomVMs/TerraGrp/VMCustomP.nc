@@ -44,10 +44,9 @@ uint8_t MIC_gain;				// Mic Sensor gain adjust
 nx_uint8_t  ExtDataQReady;			// last queue ready - queue size 
 uint8_t 	ExtDataError;			// last error event
 nx_uint16_t	ExtDataLeader;			// last leader identifier
-// SENDBS_DONE e SENDGR_DONE são ushort no .defs: o await lê 2 bytes (com 1, o status saía *256
-// mais o byte vizinho).
-nx_uint16_t	ExtDataSendBSStatus;	// last SENDBS_DONE Status
-nx_uint16_t	ExtDataSendGRStatus;	// last SENDGR_DONE Status
+// SENDBS_DONE e SENDGR_DONE: ubyte no .defs, como o error_t (#113).
+nx_uint8_t	ExtDataSendBSStatus;	// last SENDBS_DONE Status
+nx_uint8_t	ExtDataSendGRStatus;	// last SENDGR_DONE Status
 
 // Maintain pointer to first and last Group/Aggreg Control
 groupCtl_t* firstGrp = NULL;
