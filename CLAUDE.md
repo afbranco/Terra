@@ -360,6 +360,14 @@ de lá.
     do Python 3.14: no uso, rodar na imagem do toolchain (lá não há `terrac`: `--types`, não `--terra`).
     Teste `tests/terractlsim` (3x3, mesma saída com a mesma semente). A saída do `terractl` é em
     português e o site em inglês: a decidir com o Prof.
+  - #93 (PR #140): extensão do VSCode em `vscode/` (TypeScript), anexo `terra-vscode-<v>.vsix` com o
+    `terractl` e o `terra-docs.json` dentro (interface em inglês). Gramática, trechos, hover e
+    complemento pela variante do `#include`, Problems pelo `--diag=json`, comandos Load/Messages/
+    Simulate (na imagem do toolchain)/Flash num terminal. Job novo "Extensão do VSCode"
+    (`release/build-vscode.sh`): `node --test` e a integração num VSCode 1.85.2 com `xvfb-run`
+    (só no CI; a máquina do Prof. não tem `xvfb`). Versão da extensão: a da release, ou 0.0.0 fora
+    de tag. Marketplace/Open VSX depois (conta do Prof.). Falhas de `apt` (403 da Microsoft) no CI
+    são do runner: `gh run rerun --failed`.
   - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
     `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
