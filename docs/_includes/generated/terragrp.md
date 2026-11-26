@@ -110,11 +110,11 @@ end
 | `await INT_B` → `ushort` | Interrupt B happened (configured with CFG\_INT\_B). | micaz |
 | `await PORT_A` → `ushort` | Level of digital port A, after REQ\_PORT\_A. | micaz |
 | `await PORT_B` → `ushort` | Level of digital port B, after REQ\_PORT\_B. | micaz |
-| `DISABLE = 2` | Interrupt disabled, for CFG\_INT\_A and CFG\_INT\_B. | TOSSIM, micaz |
-| `FALLING = 0` | Interrupt on the falling edge, for CFG\_INT\_A and CFG\_INT\_B. | TOSSIM, micaz |
-| `pIN = 0` | Port configured as input, for CFG\_PORT\_A and CFG\_PORT\_B. | TOSSIM, micaz |
-| `pOUT = 1` | Port configured as output, for CFG\_PORT\_A and CFG\_PORT\_B. | TOSSIM, micaz |
-| `RISING = 1` | Interrupt on the rising edge, for CFG\_INT\_A and CFG\_INT\_B. | TOSSIM, micaz |
+| `DISABLE = 2` | Interrupt disabled, for CFG\_INT\_A and CFG\_INT\_B. | micaz |
+| `FALLING = 0` | Interrupt on the falling edge, for CFG\_INT\_A and CFG\_INT\_B. | micaz |
+| `pIN = 0` | Port configured as input, for CFG\_PORT\_A and CFG\_PORT\_B. | micaz |
+| `pOUT = 1` | Port configured as output, for CFG\_PORT\_A and CFG\_PORT\_B. | micaz |
+| `RISING = 1` | Interrupt on the rising edge, for CFG\_INT\_A and CFG\_INT\_B. | micaz |
 
 ### Microphone and buzzer (MTS300 sensor board)
 
@@ -137,7 +137,7 @@ end
 | `await LEADER_LOST` or `await LEADER_LOST(ubyte x)` → `ushort` | A group lost its leader; the value is 0. With `(x)`: only when x is the group id. | TOSSIM, micaz |
 | `await LEADER_NEW` or `await LEADER_NEW(ubyte x)` → `ushort` | A group elected a new leader; the value is its node id. With `(x)`: only when x is the group id. | TOSSIM, micaz |
 | `await REC_GR` or `await REC_GR(ubyte x)` → `msgGR_t` | A msgGR\_t arrived from a member of a group of this node; msg.node is the sender. With `(x)`: only when x is the group id. | TOSSIM, micaz |
-| `await SENDGR_DONE` or `await SENDGR_DONE(ubyte x)` → `ubyte` | SEND\_GR was queued (or refused); the value is the status, EINVAL for a group not declared. With `(x)`: only when x is the group id. | TOSSIM, micaz |
+| `await SENDGR_DONE` or `await SENDGR_DONE(ubyte x)` → `ubyte` | SEND\_GR was queued (or refused); the value is the status: SUCCESS, or non-zero (EINVAL, 6) for a group not declared. With `(x)`: only when x is the group id. | TOSSIM, micaz |
 | `ubyte groupInit(group_t group, ubyte id, ubyte param, ubyte nhops, ubyte status, ubyte elFlag, ushort leader)` (nohold) | Declare a group: id (0 to 31), param, nhops (at least 1), membership, election flag and initial leader. | TOSSIM, micaz |
 | `eACTIVE = 1` | Election flag: the node votes and can be elected leader. | TOSSIM, micaz |
 | `eOFF = 3` | Election flag: the node does not take part in the election. | TOSSIM, micaz |
@@ -165,9 +165,9 @@ end
 | `msgId` | `ubyte` | message id, chosen by the program |
 | `data` | `payload[SEND_DATA_SIZE]` | SEND\_DATA\_SIZE (16) bytes of payload, replaced by the fields of a pktype |
 
-**SEND_GR**: The message goes as far as the nhops of the group. A group not declared with groupInit is not sent: SENDGR_DONE comes with EINVAL.
+**SEND_GR**: The message goes as far as the nhops of the group. A group not declared with groupInit is not sent: SENDGR_DONE comes with a status other than SUCCESS (EINVAL, 6).
 
-**groupInit**: Returns SUCCESS, or EINVAL for an id above 31. Nodes are in the same group when they use the same id and param; status says whether this node is a member.
+**groupInit**: Returns SUCCESS, or a non-zero value (EINVAL, 6) for an id above 31. Nodes are in the same group when they use the same id and param; status says whether this node is a member.
 
 <!-- check: ok grp -->
 ```terra
@@ -240,7 +240,7 @@ emit AGGREG(a);
 var aggDone_t r = await AGGREG_DONE(1);
 ```
 
-**aggregInit**: Set agg.agId (0 to 7) before. Returns SUCCESS, or EINVAL for an agId above 7 or a group not declared with groupInit.
+**aggregInit**: Set agg.agId (0 to 7) before. Returns SUCCESS, or a non-zero value (EINVAL, 6) for an agId above 7 or a group not declared with groupInit.
 
 ### Runtime errors
 

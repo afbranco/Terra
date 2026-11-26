@@ -1,0 +1,4 @@
+#include "TerraNet.defs"
+// Issue #133: o .defs do simulador não tem portas nem interrupções (#100), e as constantes
+// delas (pIN, pOUT, RISING, FALLING, DISABLE) também saíram. Usar uma dá erro de nome.
+var ubyte cfg = pIN;

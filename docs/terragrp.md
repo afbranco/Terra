@@ -46,7 +46,7 @@ var group_t g;
 var ubyte stat = groupInit(g, 1, 0, 2, TRUE, eACTIVE, 0);
 ```
 
-- **id**: 0 to 31 (above, `groupInit` returns `EINVAL`).
+- **id**: 0 to 31 (above, `groupInit` returns a value other than `SUCCESS`: `EINVAL`, 6).
 - **param**: two nodes are in the same group only if they use the same id and param.
 - **nhops**: how far, in radio hops, the messages of the group go. Use at least 1: with 0 the
   messages do not leave the node, and an aggregation ends with `count` 0.
@@ -59,7 +59,7 @@ var ubyte stat = groupInit(g, 1, 0, 2, TRUE, eACTIVE, 0);
 `SEND_GR` sends a `msgGR_t` to the members of the group `msg.grId` (to all of them with
 `msg.node = BROADCAST`, or to one node). `REC_GR` receives it, with the sender in `msg.node`.
 `await REC_GR(g)` waits only for messages of group g. Sending to a group that the node did not
-declare does not send anything: `SENDGR_DONE` arrives with `EINVAL`. Like `SENDBS_DONE`,
+declare does not send anything: `SENDGR_DONE` arrives with a status other than `SUCCESS` (`EINVAL`, 6). Like `SENDBS_DONE`,
 `SENDGR_DONE` comes in the same reaction and does not confirm the delivery.
 
 <!-- check: ok grp -->
@@ -142,8 +142,8 @@ end
 ```
 
 - `agId` (0 to 7) is a field of the `aggreg_t` that the program sets **before** `aggregInit`.
-  `AGGREG_DONE(x)` waits for the aggregation with that id. `aggregInit` returns `EINVAL` for an
-  id above 7 or for a group not declared.
+  `AGGREG_DONE(x)` waits for the aggregation with that id. `aggregInit` returns a value other
+  than `SUCCESS` (`EINVAL`, 6) for an id above 7 or for a group not declared.
 - The sensor is one of the `SID_*` constants. A sensor without a reading (the interrupts, or the
   ports on the simulator) counts as 0.
 - The function (`fAVG`, `fSUM`, `fMAX`, `fMIN`) gives `value`. `fMIN` with no answer gives 0.

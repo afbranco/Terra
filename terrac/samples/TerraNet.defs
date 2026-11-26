@@ -30,16 +30,8 @@ do
 #define ON 1
 #define OFF 0
 #define TOGGLE 2
-// Interrupt config
-#define RISING 1
-#define FALLING 0
-#define DISABLE 2
-// Port Cfg
-#define pIN 0
-#define pOUT 1
 // Message
 #define BROADCAST 0xffff
-#define SEND_DATA_SIZE 16
 // VM Error codes
 #define E_DIVZERO 10 // Division by zero
 #define E_IDXOVF  11 // Array index overflow

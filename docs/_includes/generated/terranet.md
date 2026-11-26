@@ -85,7 +85,6 @@ end
 | `await SEND_DONE_ACK` or `await SEND_DONE_ACK(ubyte x)` → `ubyte` | The radio finished a SEND\_ACK; the value is TRUE if the target acknowledged. With `(x)`: only when x is the type of the message sent. | TOSSIM, micaz |
 | `ubyte setRFPower(ubyte level)` | Radio power of the program's messages, from 0 to 7; returns SUCCESS. | TOSSIM, micaz |
 | `BROADCAST = 0xFFFF` | Destination address of a message to every node in range (0xFFFF). | TOSSIM, micaz |
-| `SEND_DATA_SIZE = 16` | Size in bytes of the data field of msgBS\_t and msgGR\_t (16). | TOSSIM, micaz |
 
 **radioMsg**: A packet is abstract: derive a type from it with `pktype`, whose fields take the place of `data`, and declare variables of that type.
 
@@ -131,8 +130,8 @@ emit LEDS(<ubyte>msg.source);
 |---|---|---|
 | `await Q_READY` → `ubyte` | The message queue (qPut) went from empty to not empty; the value is its size. | TOSSIM, micaz |
 | `ubyte qClear()` (pure) | Empty the message queue; returns SUCCESS. | TOSSIM, micaz |
-| `ubyte qGet(radioMsg msg)` (nohold) | Take the oldest radioMsg from the message queue; SUCCESS, or FAIL if the queue is empty. | TOSSIM, micaz |
-| `ubyte qPut(radioMsg msg)` (nohold) | Put a radioMsg in the message queue; SUCCESS, or FAIL if the queue is full. | TOSSIM, micaz |
+| `ubyte qGet(radioMsg msg)` (nohold) | Take the oldest radioMsg from the message queue; SUCCESS (0), or a non-zero value if the queue is empty. | TOSSIM, micaz |
+| `ubyte qPut(radioMsg msg)` (nohold) | Put a radioMsg in the message queue; SUCCESS (0), or a non-zero value if the queue is full. | TOSSIM, micaz |
 | `ubyte qSize()` (pure) | Number of messages in the message queue. | TOSSIM, micaz |
 
 ### Digital ports and interrupts
@@ -151,11 +150,11 @@ emit LEDS(<ubyte>msg.source);
 | `await INT_B` → `ushort` | Interrupt B happened (configured with CFG\_INT\_B). | micaz |
 | `await PORT_A` → `ushort` | Level of digital port A, after REQ\_PORT\_A. | micaz |
 | `await PORT_B` → `ushort` | Level of digital port B, after REQ\_PORT\_B. | micaz |
-| `DISABLE = 2` | Interrupt disabled, for CFG\_INT\_A and CFG\_INT\_B. | TOSSIM, micaz |
-| `FALLING = 0` | Interrupt on the falling edge, for CFG\_INT\_A and CFG\_INT\_B. | TOSSIM, micaz |
-| `pIN = 0` | Port configured as input, for CFG\_PORT\_A and CFG\_PORT\_B. | TOSSIM, micaz |
-| `pOUT = 1` | Port configured as output, for CFG\_PORT\_A and CFG\_PORT\_B. | TOSSIM, micaz |
-| `RISING = 1` | Interrupt on the rising edge, for CFG\_INT\_A and CFG\_INT\_B. | TOSSIM, micaz |
+| `DISABLE = 2` | Interrupt disabled, for CFG\_INT\_A and CFG\_INT\_B. | micaz |
+| `FALLING = 0` | Interrupt on the falling edge, for CFG\_INT\_A and CFG\_INT\_B. | micaz |
+| `pIN = 0` | Port configured as input, for CFG\_PORT\_A and CFG\_PORT\_B. | micaz |
+| `pOUT = 1` | Port configured as output, for CFG\_PORT\_A and CFG\_PORT\_B. | micaz |
+| `RISING = 1` | Interrupt on the rising edge, for CFG\_INT\_A and CFG\_INT\_B. | micaz |
 
 ### Microphone and buzzer (MTS300 sensor board)
 

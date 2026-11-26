@@ -379,7 +379,7 @@ short = "Send a msgBS_t to the base station, through the routing tree; SENDBS_DO
 [SEND_GR]
 group = "group"
 short = "Send a msgGR_t to the members of the group msg.grId; SENDGR_DONE arrives in the same reaction."
-long = "The message goes as far as the nhops of the group. A group not declared with groupInit is not sent: SENDGR_DONE comes with EINVAL."
+long = "The message goes as far as the nhops of the group. A group not declared with groupInit is not sent: SENDGR_DONE comes with a status other than SUCCESS (EINVAL, 6)."
 
 [AGGREG]
 group = "aggregation"
@@ -484,7 +484,7 @@ filter = "the msgId of the message"
 
 [SENDGR_DONE]
 group = "group"
-short = "SEND_GR was queued (or refused); the value is the status, EINVAL for a group not declared."
+short = "SEND_GR was queued (or refused); the value is the status: SUCCESS, or non-zero (EINVAL, 6) for a group not declared."
 filter = "the group id"
 
 [AGGREG_DONE]
@@ -525,12 +525,12 @@ long = "The unit is 1/1024 s, not decimal milliseconds: the difference of two ge
 
 [qPut]
 group = "queue"
-short = "Put a radioMsg in the message queue; SUCCESS, or FAIL if the queue is full."
+short = "Put a radioMsg in the message queue; SUCCESS (0), or a non-zero value if the queue is full."
 params = ["msg"]
 
 [qGet]
 group = "queue"
-short = "Take the oldest radioMsg from the message queue; SUCCESS, or FAIL if the queue is empty."
+short = "Take the oldest radioMsg from the message queue; SUCCESS (0), or a non-zero value if the queue is empty."
 params = ["msg"]
 
 [qSize]
@@ -565,7 +565,7 @@ params = ["level"]
 [groupInit]
 group = "group"
 short = "Declare a group: id (0 to 31), param, nhops (at least 1), membership, election flag and initial leader."
-long = "Returns SUCCESS, or EINVAL for an id above 31. Nodes are in the same group when they use the same id and param; status says whether this node is a member."
+long = "Returns SUCCESS, or a non-zero value (EINVAL, 6) for an id above 31. Nodes are in the same group when they use the same id and param; status says whether this node is a member."
 params = ["group", "id", "param", "nhops", "status", "elFlag", "leader"]
 example = """
 var group_t g;
@@ -575,7 +575,7 @@ var ubyte stat = groupInit(g, 1, 0, 2, TRUE, eACTIVE, 0);
 [aggregInit]
 group = "aggregation"
 short = "Declare an aggregation over a group: sensor, function, comparison and reference value."
-long = "Set agg.agId (0 to 7) before. Returns SUCCESS, or EINVAL for an agId above 7 or a group not declared with groupInit."
+long = "Set agg.agId (0 to 7) before. Returns SUCCESS, or a non-zero value (EINVAL, 6) for an agId above 7 or a group not declared with groupInit."
 params = ["agg", "group", "sensorId", "agOper", "agComp", "refVal"]
 
 [getParent]

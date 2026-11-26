@@ -27,13 +27,6 @@ do
 #define ON 1
 #define OFF 0
 #define TOGGLE 2
-// Interrupt config
-#define RISING 1
-#define FALLING 0
-#define DISABLE 2
-// Port Cfg
-#define pIN 0
-#define pOUT 1
 // Message
 #define BROADCAST 0xffff
 #define SEND_DATA_SIZE 16
@@ -65,9 +58,6 @@ do
 #define SID_PORT_B	6
 #define SID_INT_A	7
 #define SID_INT_B	8
-// Port Cfg
-#define	pIN	0
-#define	pOUT	1
 
 // Group Election Status
 #define eACTIVE 1

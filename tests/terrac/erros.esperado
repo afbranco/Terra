@@ -24,3 +24,4 @@ float_inc: line 4 : Invalid float operation.
 float_indice: line 5 : Invalid float operation.
 float_resto: line 4 : Invalid float operation.
 getparent16: WRN : line 3 : Automatic casting from `ushort´ to `ubyte´.
+portas_tossim: line 4 : variable/event/function "pIN" is not declared

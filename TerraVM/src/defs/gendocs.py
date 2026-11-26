@@ -26,6 +26,7 @@ import tomllib
 
 TIPOS_BASICOS = {"void", "ubyte", "byte", "ushort", "short", "ulong", "long", "float"}
 # Tabelas da ajuda (pedido do TerraSim): o "group" de cada descrição tem de ser um destes.
+NAO_DECLARADOS = {"LED", "FFT", "MTS300", "TOSSIM"}
 GROUPS = ("leds", "sensors", "custom", "radio", "queue", "ports", "mic", "fft", "group",
           "aggregation", "errors", "misc")
 
@@ -280,6 +281,21 @@ def main():
     sem_grupo = sorted(n for n in nomes if desc[n].get("group") not in GROUPS)
     if sem_grupo:
         erro("descrições sem group válido (%s): %s" % ("/".join(GROUPS), sem_grupo))
+    # Nome em maiúsculas citado no texto e não declarado no .defs (#132): o aluno que o usa no
+    # programa recebe erro de nome. Ficam de fora os nomes de hardware, os códigos do terrac e
+    # um nome do TinyOS seguido do valor, como "(EINVAL, 6)".
+    fora = set()
+    for n in nomes:
+        for campo in ("short", "long"):
+            txt = desc[n].get(campo, "")
+            for m in re.finditer(r"\b[A-Z][A-Z0-9_]{2,}\b", txt):
+                w = m.group()
+                if re.match(r", \d", txt[m.end():]):
+                    continue
+                if w not in nomes and w not in NAO_DECLARADOS and not re.fullmatch(r"[EW]\d{4}", w):
+                    fora.add("%s (%s)" % (w, n))
+    if fora:
+        erro("descrições citam nomes que o .defs não declara: %s" % sorted(fora))
 
     simbolos = []
     for nome in sorted(nomes, key=lambda n: (n.lower(), n)):
