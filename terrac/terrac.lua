@@ -533,22 +533,20 @@ print('--   Total =  Code + Ctl/Vars + Stack           |    Radio Msgs    --')
 print(string.format('--    %4d    %4d     %4d     %4d            |      %4d        --',
                     TotalMem,CodeSize,CtlVars,Stack,RadioMsgs))
 print('---------------------------------------------------------------------')
-print('--   Target platforms x Max program size                           --')
 _DIAG.memory = { total=TotalMem, code=CodeSize, ctl_vars=CtlVars, stack=Stack, radio_msgs=RadioMsgs }
-_DIAG.platforms = {}
+-- Só o uso de memória do programa (#122): a lista de plataformas saiu. O .defs de cada build traz
+-- a plataforma e a memória para programa do firmware dele (#100); passando dela, o W5003.
+local lowMote
 local motes = {}
 for k in pairs(_ENV.motes_max_size) do motes[#motes+1] = k end
-table.sort(motes)   -- antes saía na ordem do pairs(), que varia
+table.sort(motes)
 for _,k in ipairs(motes) do
   local v = _ENV.motes_max_size[k]
-  print(string.format('--   %16s = %4s bytes %1s                               --',k,v,(TotalMem>v and '?')or ' '))
-  lowMaxMem = ( v < lowMaxMem  and v) or lowMaxMem 
-  table.insert(_DIAG.platforms, _DIAG.OBJ{ {'name', k}, {'max', v}, {'fits', not (TotalMem > v)} })
+  if v < lowMaxMem then lowMaxMem, lowMote = v, k end
 end
-print('---------------------------------------------------------------------')
 
 if (TotalMem > lowMaxMem) then
-  WRN(false,_AST.root,'W5003',nil,{loc={}})   -- o programa todo: no JSON, sem linha
+  WRN(false,_AST.root,'W5003',{size=TotalMem,platform=lowMote,max=lowMaxMem},{loc={}})   -- o programa todo: no JSON, sem linha
 end
 
 if _WRN.n_wrns > 0 then

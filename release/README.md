@@ -83,7 +83,7 @@ linhas JSON, um diagnóstico por linha, e termina sempre com uma linha de resumo
 
 ```json
 {"code":"W2003","severity":"warning","file":"p.terra","line":5,"col":3,"msg":"nondeterminism (write conflict) : variable/event `x´ (line 5) vs variable/event `x´ (line 7)","args":{"a":"variable/event `x´ (line 5)","b":"variable/event `x´ (line 7)"},"related":[{"file":"p.terra","line":7,"col":3}]}
-{"summary":{"ok":true,"errors":0,"warnings":1,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"},"memory":{"total":51,"code":35,"ctl_vars":16,"stack":0,"radio_msgs":3},"platforms":[{"name":"iris_full","max":4224,"fits":true},...]}}
+{"summary":{"ok":true,"errors":0,"warnings":1,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"},"memory":{"total":51,"code":35,"ctl_vars":16,"stack":0,"radio_msgs":3}}}
 ```
 
 - `line` e `msg` são os mesmos do modo texto; `args` traz os valores que entram na mensagem.
@@ -97,8 +97,9 @@ linhas JSON, um diagnóstico por linha, e termina sempre com uma linha de resumo
   nome e a linha, para não depender do texto de `a` e `b`.
 - Erros do `cpp` saem como `E1004` (avisos, `W6001`), com o arquivo, a linha e a coluna dele.
 - `E0001`: falha interna, com a mensagem do Lua em `args.lua`. É bug do `terrac`: favor relatar.
-- O resumo traz `memory` e `platforms` (em ordem de nome) só quando não há erro. Um diagnóstico
-  do programa todo (o `W5003`, de tamanho) vem sem `line`.
+- O resumo traz `memory` só quando não há erro. Até a v1.4.0 trazia também `platforms`, a lista
+  das plataformas do `config` do `.defs` (saiu na #122). Um diagnóstico do programa todo (o
+  `W5003`: o programa passa da memória para programa da plataforma do `.defs`) vem sem `line`.
 
 ## TerraControl
 
