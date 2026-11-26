@@ -1733,6 +1733,9 @@ call Leds.led1On();
 		recBS_last_seq = xData->seq;		
 		tempInputInQ.AM_ID = AM_SENDBS;
 		tempInputInQ.DataSize = sizeof(sendBS_t);
+		// Destino: a serial (mote | 0x8000), como no RadioReceiver. Sem isso valia o que sobrou no
+		// buffer: depois de um pacote da serial (AM_BROADCAST_ADDR) a mensagem ia para o rádio (#98).
+		tempInputInQ.sendToMote = xData->Sender | 0x8000;
 		// put the message in inQueue
 //		if (call inQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recSendBS.receive(): inQueue is full! Losting a message.\n");
 		if (call outQ.put(&tempInputInQ)!=SUCCESS) dbg(APPNAME, "BS::recSendBS.receive(): outQueue is full! Losting a message.\n");
