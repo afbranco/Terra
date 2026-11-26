@@ -1,0 +1,29 @@
+#include "TerraNet.defs"
+
+// Issue #117: `x = await EVT´ com x de tipo diferente do evento converte o valor. A temperatura do
+// teste é 40000 (0x9C40, TEMP é ushort); o CUSTOM_A é ubyte. Antes a VM copiava o tamanho de x:
+// num ubyte ficava o byte alto (156), num ulong/float os bytes seguintes do buffer, num ushort
+// o valor*256 + o byte vizinho. Nos LEDs: bit 0 ubyte, bit 1 ulong e float, bit 2 ushort e array.
+var ubyte b;
+var ulong l;
+var float f;
+var ushort s;
+var ushort[2] a;
+var ubyte i = 1;
+var ubyte flags = 0;
+await 1s;
+emit REQ_TEMP();
+b = await TEMP;
+if b == 64 then flags = flags | 1; end
+emit REQ_TEMP();
+l = await TEMP;
+emit REQ_TEMP();
+f = await TEMP;
+if l == 40000 and f == 40000.0 then flags = flags | 2; end
+emit REQ_CUSTOM_A(200);
+s = await CUSTOM_A;
+emit REQ_CUSTOM_A(201);
+a[i] = await CUSTOM_A;
+if s == 200 and a[1] == 201 then flags = flags | 4; end
+emit LEDS(flags);
+await FOREVER;

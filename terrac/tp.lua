@@ -28,6 +28,15 @@ function _TP.len (tp)
     return (_ENV.c[tp] and _ENV.c[tp].len) or 0
 end
 
+-- `x = await EVT´ (#117): a VM copia para x tantos bytes quanto o terrac manda. Quando x e o evento
+-- têm tamanhos diferentes (ou um é float), o valor passa por um temporário do tamanho do evento e
+-- é convertido para o tipo de x, como numa atribuição.
+local ESCALARES = {ubyte=true,ushort=true,ulong=true,byte=true,short=true,long=true,float=true}
+function _TP.awaitConv (vtp, etp)
+    if not (ESCALARES[vtp] and ESCALARES[etp]) then return false end
+    return _TP.len(vtp) ~= _TP.len(etp) or ((vtp=='float') ~= (etp=='float'))
+end
+
 function _TP.isNumeric (tp, c)
     return tp~='void' and types[tp] or (c and _TP.ext(tp))
 end

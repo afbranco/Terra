@@ -1,4 +1,4 @@
-125 370 2 2 0 0 16 2 16
+126 375 2 2 0 0 16 2 16
 00 | 00000 0 track 0
 00 | 00001 0
 00 | 00002 0
@@ -124,248 +124,253 @@
 00 | 00122 0110 
 00 | 00123 0111 flags:1, 
 00 | 00124 0112 n:1, 
-d1 | 00125 d1 set_c ushort 16 10497         | config gate REC_GR with 1 await(s) - 0x2901 = 10497
-10 | 00126 10 
-29 | 00127 29 
-01 | 00128 01 
-d1 | 00129 d1 set_c ushort 20 13057         | config gate SENDGR_DONE with 1 await(s) - 0x3301 = 13057
-14 | 00130 14 
-33 | 00131 33 
-01 | 00132 01 
-c0 | 00133 c0 set_c ubyte 111 0             | flags = 0
-6f | 00134 6f 
-00 | 00135 00 
-c0 | 00136 c0 set_c ubyte 112 0             | n = 0
-70 | 00137 70 
-00 | 00138 00 
-40 | 00139 40 push_c 11                     | push 11
-0b | 00140 0b 
-24 | 00141 24 func 0                        | func getNodeId
-00 | 00142 00 
-0f | 00143 0f eq                            | eq
-4f | 00144 4f ifelse 37 38                  | ifelse True_37 False_38
-00 | 00145 .00 addr:149
-95 | 00146 .25 
-01 | 00147 .00 addr:290
-22 | 00148 .26 
-40 | 00149 40 push_c 25                     | push_c &grp1:group_t
-19 | 00150 19 
-40 | 00151 40 push_c 1                      | push 1
-01 | 00152 01 
-40 | 00153 40 push_c 0                      | push 0
-00 | 00154 00 
-40 | 00155 40 push_c 1                      | push 1
-01 | 00156 01 
-40 | 00157 40 push_c 1                      | push 1
-01 | 00158 01 
-40 | 00159 40 push_c 3                      | push 3
-03 | 00160 03 
-40 | 00161 40 push_c 0                      | push 0
-00 | 00162 00 
-24 | 00163 24 func 10                       | func groupInit
-0a | 00164 0a 
-a0 | 00165 a0 pop ubyte 108                 | pop stat
-6c | 00166 6c 
-40 | 00167 40 push_c 0                      | push 0
-00 | 00168 00 
-40 | 00169 40 push_c 45                     | push_c &grpX:group_t
-2d | 00170 2d 
-40 | 00171 40 push_c 33                     | push 33
-21 | 00172 21 
-40 | 00173 40 push_c 0                      | push 0
-00 | 00174 00 
-40 | 00175 40 push_c 1                      | push 1
-01 | 00176 01 
-40 | 00177 40 push_c 1                      | push 1
-01 | 00178 01 
-40 | 00179 40 push_c 3                      | push 3
-03 | 00180 03 
-40 | 00181 40 push_c 0                      | push 0
-00 | 00182 00 
-24 | 00183 24 func 10                       | func groupInit
-0a | 00184 0a 
-10 | 00185 10 neq                           | neq
-4f | 00186 4f ifelse 8 9                    | ifelse True_8 EndIf_9
-00 | 00187 .00 addr:191
-bf | 00188 .08 
-00 | 00189 .00 addr:201
-c9 | 00190 .09 
-40 | 00191 40 push_c 1                      | push 1
-01 | 00192 01 
-90 | 00193 90 push_v ubyte 111              | push flags:ubyte
-6f | 00194 6f 
-0a | 00195 0a bor                           | bor
-a0 | 00196 a0 pop ubyte 111                 | pop flags
-6f | 00197 6f 
-39 | 00198 39 exec 9                        | goto  9
-00 | 00199 .00 addr:201
-c9 | 00200 .09 
-c0 | 00201 c0 set_c ubyte 55 9              | agA.agId = 9
-37 | 00202 37 
-09 | 00203 09 
-40 | 00204 40 push_c 0                      | push 0
-00 | 00205 00 
-40 | 00206 40 push_c 55                     | push_c &agA:aggreg_t
-37 | 00207 37 
-40 | 00208 40 push_c 25                     | push_c &grp1:group_t
-19 | 00209 19 
-40 | 00210 40 push_c 1                      | push 1
-01 | 00211 01 
-40 | 00212 40 push_c 2                      | push 2
-02 | 00213 02 
-40 | 00214 40 push_c 3                      | push 3
-03 | 00215 03 
-40 | 00216 40 push_c 0                      | push 0
-00 | 00217 00 
-24 | 00218 24 func 11                       | func aggregInit
-0b | 00219 0b 
-10 | 00220 10 neq                           | neq
-4f | 00221 4f ifelse 11 12                  | ifelse True_11 EndIf_12
-00 | 00222 .00 addr:226
-e2 | 00223 .0b 
-00 | 00224 .00 addr:236
-ec | 00225 .0c 
-40 | 00226 40 push_c 2                      | push 2
-02 | 00227 02 
-90 | 00228 90 push_v ubyte 111              | push flags:ubyte
-6f | 00229 6f 
-0a | 00230 0a bor                           | bor
-a0 | 00231 a0 pop ubyte 111                 | pop flags
-6f | 00232 6f 
-39 | 00233 39 exec 12                       | goto  12
-00 | 00234 .00 addr:236
-ec | 00235 .0c 
-29 | 00236 29 clken_c 0 3000 13             | clock enable Awake_3000_13 3000msec
-03 | 00237 03 
-00 | 00238 00 
-0b | 00239 0b 
-b8 | 00240 b8 
-00 | 00241 .00 addr:244
-f4 | 00242 .0d 
-01 | 00243 01 end                           | end
-c0 | 00244 c0 set_c ubyte 68 2              | m.grId = 2
-44 | 00245 44 
-02 | 00246 02 
-d1 | 00247 d1 set_c ushort 69 0xffff        | m.node = 0xffff
-45 | 00248 45 
-ff | 00249 ff 
+00 | 00125 0113 $await_SENDGR_DONE:1, 
+d1 | 00126 d1 set_c ushort 16 10497         | config gate REC_GR with 1 await(s) - 0x2901 = 10497
+10 | 00127 10 
+29 | 00128 29 
+01 | 00129 01 
+d1 | 00130 d1 set_c ushort 20 13057         | config gate SENDGR_DONE with 1 await(s) - 0x3301 = 13057
+14 | 00131 14 
+33 | 00132 33 
+01 | 00133 01 
+c0 | 00134 c0 set_c ubyte 111 0             | flags = 0
+6f | 00135 6f 
+00 | 00136 00 
+c0 | 00137 c0 set_c ubyte 112 0             | n = 0
+70 | 00138 70 
+00 | 00139 00 
+40 | 00140 40 push_c 11                     | push 11
+0b | 00141 0b 
+24 | 00142 24 func 0                        | func getNodeId
+00 | 00143 00 
+0f | 00144 0f eq                            | eq
+4f | 00145 4f ifelse 37 38                  | ifelse True_37 False_38
+00 | 00146 .00 addr:150
+96 | 00147 .25 
+01 | 00148 .00 addr:295
+27 | 00149 .26 
+40 | 00150 40 push_c 25                     | push_c &grp1:group_t
+19 | 00151 19 
+40 | 00152 40 push_c 1                      | push 1
+01 | 00153 01 
+40 | 00154 40 push_c 0                      | push 0
+00 | 00155 00 
+40 | 00156 40 push_c 1                      | push 1
+01 | 00157 01 
+40 | 00158 40 push_c 1                      | push 1
+01 | 00159 01 
+40 | 00160 40 push_c 3                      | push 3
+03 | 00161 03 
+40 | 00162 40 push_c 0                      | push 0
+00 | 00163 00 
+24 | 00164 24 func 10                       | func groupInit
+0a | 00165 0a 
+a0 | 00166 a0 pop ubyte 108                 | pop stat
+6c | 00167 6c 
+40 | 00168 40 push_c 0                      | push 0
+00 | 00169 00 
+40 | 00170 40 push_c 45                     | push_c &grpX:group_t
+2d | 00171 2d 
+40 | 00172 40 push_c 33                     | push 33
+21 | 00173 21 
+40 | 00174 40 push_c 0                      | push 0
+00 | 00175 00 
+40 | 00176 40 push_c 1                      | push 1
+01 | 00177 01 
+40 | 00178 40 push_c 1                      | push 1
+01 | 00179 01 
+40 | 00180 40 push_c 3                      | push 3
+03 | 00181 03 
+40 | 00182 40 push_c 0                      | push 0
+00 | 00183 00 
+24 | 00184 24 func 10                       | func groupInit
+0a | 00185 0a 
+10 | 00186 10 neq                           | neq
+4f | 00187 4f ifelse 8 9                    | ifelse True_8 EndIf_9
+00 | 00188 .00 addr:192
+c0 | 00189 .08 
+00 | 00190 .00 addr:202
+ca | 00191 .09 
+40 | 00192 40 push_c 1                      | push 1
+01 | 00193 01 
+90 | 00194 90 push_v ubyte 111              | push flags:ubyte
+6f | 00195 6f 
+0a | 00196 0a bor                           | bor
+a0 | 00197 a0 pop ubyte 111                 | pop flags
+6f | 00198 6f 
+39 | 00199 39 exec 9                        | goto  9
+00 | 00200 .00 addr:202
+ca | 00201 .09 
+c0 | 00202 c0 set_c ubyte 55 9              | agA.agId = 9
+37 | 00203 37 
+09 | 00204 09 
+40 | 00205 40 push_c 0                      | push 0
+00 | 00206 00 
+40 | 00207 40 push_c 55                     | push_c &agA:aggreg_t
+37 | 00208 37 
+40 | 00209 40 push_c 25                     | push_c &grp1:group_t
+19 | 00210 19 
+40 | 00211 40 push_c 1                      | push 1
+01 | 00212 01 
+40 | 00213 40 push_c 2                      | push 2
+02 | 00214 02 
+40 | 00215 40 push_c 3                      | push 3
+03 | 00216 03 
+40 | 00217 40 push_c 0                      | push 0
+00 | 00218 00 
+24 | 00219 24 func 11                       | func aggregInit
+0b | 00220 0b 
+10 | 00221 10 neq                           | neq
+4f | 00222 4f ifelse 11 12                  | ifelse True_11 EndIf_12
+00 | 00223 .00 addr:227
+e3 | 00224 .0b 
+00 | 00225 .00 addr:237
+ed | 00226 .0c 
+40 | 00227 40 push_c 2                      | push 2
+02 | 00228 02 
+90 | 00229 90 push_v ubyte 111              | push flags:ubyte
+6f | 00230 6f 
+0a | 00231 0a bor                           | bor
+a0 | 00232 a0 pop ubyte 111                 | pop flags
+6f | 00233 6f 
+39 | 00234 39 exec 12                       | goto  12
+00 | 00235 .00 addr:237
+ed | 00236 .0c 
+29 | 00237 29 clken_c 0 3000 13             | clock enable Awake_3000_13 3000msec
+03 | 00238 03 
+00 | 00239 00 
+0b | 00240 0b 
+b8 | 00241 b8 
+00 | 00242 .00 addr:245
+f5 | 00243 .0d 
+01 | 00244 01 end                           | end
+c0 | 00245 c0 set_c ubyte 68 2              | m.grId = 2
+44 | 00246 44 
+02 | 00247 02 
+d1 | 00248 d1 set_c ushort 69 0xffff        | m.node = 0xffff
+45 | 00249 45 
 ff | 00250 ff 
-c0 | 00251 c0 set_c ubyte 71 1              | m.msgId = 1
-47 | 00252 47 
-01 | 00253 01 
-b1 | 00254 b1 outevt_v 41 68                | emit SEND_GR len=20 var=m
-29 | 00255 29 
-44 | 00256 44 
-d1 | 00257 d1 set_c ushort 22 17            | await SENDGR_DONE[0]
-16 | 00258 16 
-01 | 00259 .00 addr:262
-06 | 00260 .11 
-01 | 00261 01 end                           | end
-5c | 00262 5c getextdt_v 109 2              | getExtData v 2
-6d | 00263 6d 
-02 | 00264 02 
-40 | 00265 40 push_c 0                      | push 0
-00 | 00266 00 
-91 | 00267 91 push_v ushort 109             | push v:ushort
-6d | 00268 6d 
-10 | 00269 10 neq                           | neq
-4f | 00270 4f ifelse 20 21                  | ifelse True_20 EndIf_21
-01 | 00271 .00 addr:275
-13 | 00272 .14 
-01 | 00273 .00 addr:285
-1d | 00274 .15 
-40 | 00275 40 push_c 4                      | push 4
-04 | 00276 04 
-90 | 00277 90 push_v ubyte 111              | push flags:ubyte
-6f | 00278 6f 
-0a | 00279 0a bor                           | bor
-a0 | 00280 a0 pop ubyte 111                 | pop flags
-6f | 00281 6f 
-39 | 00282 39 exec 21                       | goto  21
-01 | 00283 .00 addr:285
-1d | 00284 .15 
-90 | 00285 90 push_v ubyte 111              | push flags:ubyte
+ff | 00251 ff 
+c0 | 00252 c0 set_c ubyte 71 1              | m.msgId = 1
+47 | 00253 47 
+01 | 00254 01 
+b1 | 00255 b1 outevt_v 41 68                | emit SEND_GR len=20 var=m
+29 | 00256 29 
+44 | 00257 44 
+d1 | 00258 d1 set_c ushort 22 17            | await SENDGR_DONE[0]
+16 | 00259 16 
+01 | 00260 .00 addr:263
+07 | 00261 .11 
+01 | 00262 01 end                           | end
+5c | 00263 5c getextdt_v 113 1              | getExtData $tmp 1
+71 | 00264 71 
+01 | 00265 01 
+90 | 00266 90 push_v ubyte 113              | push $tmp:ubyte
+71 | 00267 71 
+a1 | 00268 a1 pop ushort 109                | pop v
+6d | 00269 6d 
+40 | 00270 40 push_c 0                      | push 0
+00 | 00271 00 
+91 | 00272 91 push_v ushort 109             | push v:ushort
+6d | 00273 6d 
+10 | 00274 10 neq                           | neq
+4f | 00275 4f ifelse 20 21                  | ifelse True_20 EndIf_21
+01 | 00276 .00 addr:280
+18 | 00277 .14 
+01 | 00278 .00 addr:290
+22 | 00279 .15 
+40 | 00280 40 push_c 4                      | push 4
+04 | 00281 04 
+90 | 00282 90 push_v ubyte 111              | push flags:ubyte
+6f | 00283 6f 
+0a | 00284 0a bor                           | bor
+a0 | 00285 a0 pop ubyte 111                 | pop flags
 6f | 00286 6f 
-25 | 00287 25 outevt_e 5                    | emit LEDS
-05 | 00288 05 
-01 | 00289 01 end                           | end
-40 | 00290 40 push_c 35                     | push_c &grp2:group_t
-23 | 00291 23 
-40 | 00292 40 push_c 2                      | push 2
-02 | 00293 02 
-40 | 00294 40 push_c 0                      | push 0
-00 | 00295 00 
-40 | 00296 40 push_c 1                      | push 1
-01 | 00297 01 
-40 | 00298 40 push_c 1                      | push 1
-01 | 00299 01 
-40 | 00300 40 push_c 3                      | push 3
-03 | 00301 03 
-40 | 00302 40 push_c 0                      | push 0
-00 | 00303 00 
-24 | 00304 24 func 10                       | func groupInit
-0a | 00305 0a 
-a0 | 00306 a0 pop ubyte 108                 | pop stat
-6c | 00307 6c 
-89 | 00308 89 tkins_max 0 25                | insert track ParOr_sub_1_25
-01 | 00309 .00 addr:315
-3b | 00310 .19 
-89 | 00311 89 tkins_max 0 26                | insert track ParOr_sub_2_26
-01 | 00312 .00 addr:340
-54 | 00313 .1a 
-01 | 00314 01 end                           | end
-d1 | 00315 d1 set_c ushort 18 31            | await REC_GR[0]
-12 | 00316 12 
-01 | 00317 .00 addr:320
-40 | 00318 .1f 
+39 | 00287 39 exec 21                       | goto  21
+01 | 00288 .00 addr:290
+22 | 00289 .15 
+90 | 00290 90 push_v ubyte 111              | push flags:ubyte
+6f | 00291 6f 
+25 | 00292 25 outevt_e 5                    | emit LEDS
+05 | 00293 05 
+01 | 00294 01 end                           | end
+40 | 00295 40 push_c 35                     | push_c &grp2:group_t
+23 | 00296 23 
+40 | 00297 40 push_c 2                      | push 2
+02 | 00298 02 
+40 | 00299 40 push_c 0                      | push 0
+00 | 00300 00 
+40 | 00301 40 push_c 1                      | push 1
+01 | 00302 01 
+40 | 00303 40 push_c 1                      | push 1
+01 | 00304 01 
+40 | 00305 40 push_c 3                      | push 3
+03 | 00306 03 
+40 | 00307 40 push_c 0                      | push 0
+00 | 00308 00 
+24 | 00309 24 func 10                       | func groupInit
+0a | 00310 0a 
+a0 | 00311 a0 pop ubyte 108                 | pop stat
+6c | 00312 6c 
+89 | 00313 89 tkins_max 0 25                | insert track ParOr_sub_1_25
+01 | 00314 .00 addr:320
+40 | 00315 .19 
+89 | 00316 89 tkins_max 0 26                | insert track ParOr_sub_2_26
+01 | 00317 .00 addr:345
+59 | 00318 .1a 
 01 | 00319 01 end                           | end
-5c | 00320 5c getextdt_v 88 20              | getExtData r 20
-58 | 00321 58 
-14 | 00322 14 
-40 | 00323 40 push_c 1                      | push 1
-01 | 00324 01 
-90 | 00325 90 push_v ubyte 112              | push n:ubyte
-70 | 00326 70 
-06 | 00327 06 add                           | add
-a0 | 00328 a0 pop ubyte 112                 | pop n
-70 | 00329 70 
-39 | 00330 39 exec 28                       | goto  28
-01 | 00331 .00 addr:315
-3b | 00332 .1c 
-48 | 00333 48 memclr 18 2                   | clear EXT gates for REC_GR
-12 | 00334 12 
-02 | 00335 02 
-89 | 00336 89 tkins_max 0 27                | insert track ParOr_out_27
-01 | 00337 .00 addr:352
-60 | 00338 .1b 
-01 | 00339 01 end                           | end
-29 | 00340 29 clken_c 1 10000 33            | clock enable Awake_10000_33 10000msec
-03 | 00341 03 
-01 | 00342 01 
-27 | 00343 27 
-10 | 00344 10 
-01 | 00345 .00 addr:348
-5c | 00346 .21 
-01 | 00347 01 end                           | end
-89 | 00348 89 tkins_max 0 27                | insert track ParOr_out_27
-01 | 00349 .00 addr:352
-60 | 00350 .1b 
-01 | 00351 01 end                           | end
-48 | 00352 48 memclr 8 8                    | clear WClocks gates from 1 to 2
-08 | 00353 08 
-08 | 00354 08 
-48 | 00355 48 memclr 18 2                   | clear EXT gates for REC_GR
-12 | 00356 12 
-02 | 00357 02 
-90 | 00358 90 push_v ubyte 112              | push n:ubyte
-70 | 00359 70 
-40 | 00360 40 push_c 4                      | push 4
-04 | 00361 04 
-06 | 00362 06 add                           | add
-25 | 00363 25 outevt_e 5                    | emit LEDS
-05 | 00364 05 
-01 | 00365 01 end                           | end
-48 | 00366 48 memclr 0 16                   | clear WClocks gates from 0 to 2
-00 | 00367 00 
-10 | 00368 10 
-01 | 00369 01 end                           | end
+d1 | 00320 d1 set_c ushort 18 31            | await REC_GR[0]
+12 | 00321 12 
+01 | 00322 .00 addr:325
+45 | 00323 .1f 
+01 | 00324 01 end                           | end
+5c | 00325 5c getextdt_v 88 20              | getExtData r 20
+58 | 00326 58 
+14 | 00327 14 
+40 | 00328 40 push_c 1                      | push 1
+01 | 00329 01 
+90 | 00330 90 push_v ubyte 112              | push n:ubyte
+70 | 00331 70 
+06 | 00332 06 add                           | add
+a0 | 00333 a0 pop ubyte 112                 | pop n
+70 | 00334 70 
+39 | 00335 39 exec 28                       | goto  28
+01 | 00336 .00 addr:320
+40 | 00337 .1c 
+48 | 00338 48 memclr 18 2                   | clear EXT gates for REC_GR
+12 | 00339 12 
+02 | 00340 02 
+89 | 00341 89 tkins_max 0 27                | insert track ParOr_out_27
+01 | 00342 .00 addr:357
+65 | 00343 .1b 
+01 | 00344 01 end                           | end
+29 | 00345 29 clken_c 1 10000 33            | clock enable Awake_10000_33 10000msec
+03 | 00346 03 
+01 | 00347 01 
+27 | 00348 27 
+10 | 00349 10 
+01 | 00350 .00 addr:353
+61 | 00351 .21 
+01 | 00352 01 end                           | end
+89 | 00353 89 tkins_max 0 27                | insert track ParOr_out_27
+01 | 00354 .00 addr:357
+65 | 00355 .1b 
+01 | 00356 01 end                           | end
+48 | 00357 48 memclr 8 8                    | clear WClocks gates from 1 to 2
+08 | 00358 08 
+08 | 00359 08 
+48 | 00360 48 memclr 18 2                   | clear EXT gates for REC_GR
+12 | 00361 12 
+02 | 00362 02 
+90 | 00363 90 push_v ubyte 112              | push n:ubyte
+70 | 00364 70 
+40 | 00365 40 push_c 4                      | push 4
+04 | 00366 04 
+06 | 00367 06 add                           | add
+25 | 00368 25 outevt_e 5                    | emit LEDS
+05 | 00369 05 
+01 | 00370 01 end                           | end
+48 | 00371 48 memclr 0 16                   | clear WClocks gates from 0 to 2
+00 | 00372 00 
+10 | 00373 10 
+01 | 00374 01 end                           | end

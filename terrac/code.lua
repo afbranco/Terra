@@ -744,6 +744,25 @@ F = {
 
     if (e2.tag =="AwaitInt") then
       SetExp(me)
+    elseif me.convTmp then
+      -- Tipo de e1 diferente do evento (#117): copia o evento para o temporário, empilha com o
+      -- tipo do evento e grava em e1 com o tipo dele (o pop/set_e convertem; float com cast).
+      local etp = (e2.ret or e2)[1].ext.tp
+      CONC(me, e2)
+      codeB = LINE(me,'getExtData $tmp '.._ENV.c[etp].len,nil,'// getExtDt <tmp> <len> (#117)')
+      BYTECODE(me,codeB,'op_getextdt_v',me.convTmp,_ENV.c[etp].len)
+      codeB = LINE(me,'push $tmp:'..etp,nil,'// SetAwait:: push tmp')
+      BYTECODE(me,codeB,'op_push_v',etp,me.convTmp)
+      FLOATCONV(me,etp,e1.tp)
+      if e1[1].tag=='Var' then
+        local x1 = getAuxValues(e1)
+        codeB = LINE(me,'pop '..x1.id,nil,'// SetAwait:: pop to var')
+        BYTECODE(me,codeB,'op_pop',x1.tp,x1.val)
+      else
+        CONC(me,e1)
+        codeB = LINE(me,'set_e '..e1.tp,nil,'// SetAwait:: set <Stack:addr> = <Stack:value>')
+        BYTECODE(me,codeB,'op_set_e',e1.tp)
+      end
     else -- e2.tag == AwaitExt
       CONC(me, e2)
       if e1[1].tag=='Var' then
