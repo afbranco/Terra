@@ -1,0 +1,79 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Terra",
+  "scopeName": "source.terra",
+  "fileTypes": ["terra"],
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#preprocessor" },
+    { "include": "#keywords" },
+    { "include": "#types" },
+    { "include": "#numbers" },
+    { "include": "#identifiers" },
+    { "include": "#operators" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        { "name": "comment.line.double-slash.terra", "match": "//.*$" },
+        { "name": "comment.block.terra", "begin": "/\\*", "end": "\\*/" }
+      ]
+    },
+    "preprocessor": {
+      "patterns": [
+        {
+          "name": "meta.preprocessor.include.terra",
+          "match": "^\\s*(#\\s*include)\\s*(\"[^\"]*\"|<[^>]*>)",
+          "captures": {
+            "1": { "name": "keyword.control.directive.include.terra" },
+            "2": { "name": "string.quoted.other.include.terra" }
+          }
+        },
+        {
+          "name": "meta.preprocessor.terra",
+          "match": "^\\s*(#\\s*(?:define|undef|ifdef|ifndef|if|elif|else|endif|error|warning|line))\\b(?:\\s+([A-Za-z_]\\w*))?",
+          "captures": {
+            "1": { "name": "keyword.control.directive.terra" },
+            "2": { "name": "entity.name.function.preprocessor.terra" }
+          }
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        { "name": "keyword.control.terra", "match": "\\bpar/(?:and|or)\\b|\\belse/if\\b" },
+        { "name": "keyword.control.terra",
+          "match": "\\b(?:par|loop|if|then|else|end|do|with|break|return|await|emit|async|finally)\\b" },
+        { "name": "keyword.other.terra",
+          "match": "\\b(?:var|event|input|output|function|regtype|pktype|from|config|safe|unsafe|pure|nohold|sizeof|inc|dec)\\b" },
+        { "name": "keyword.operator.logical.terra", "match": "\\b(?:and|or|not)\\b" },
+        { "name": "constant.language.terra", "match": "\\b(?:FOREVER|null)\\b" }
+      ]
+    },
+    "types": {
+      "name": "storage.type.terra",
+      "match": "\\b(?:ubyte|ushort|ulong|byte|short|long|float|payload|void)\\b"
+    },
+    "numbers": {
+      "patterns": [
+        { "name": "constant.numeric.time.terra",
+          "match": "\\b\\d+(?:h|min|ms|s)(?:\\d+(?:min|ms|s))*\\b" },
+        { "name": "constant.numeric.hex.terra", "match": "\\b0[xX][0-9A-Fa-f]+\\b" },
+        { "name": "constant.numeric.float.terra", "match": "\\b\\d+\\.\\d*(?:[eE][-+]?\\d+)?\\b|\\B\\.\\d+\\b" },
+        { "name": "constant.numeric.integer.terra", "match": "\\b\\d+\\b" }
+      ]
+    },
+    "identifiers": {
+      "patterns": [
+        { "name": "support.constant.terra", "match": "\\b[A-Z][A-Z0-9_]*\\b" },
+        { "name": "entity.name.function.terra", "match": "\\b[a-z_]\\w*(?=\\s*\\()" },
+        { "name": "variable.other.terra", "match": "\\b[a-z_]\\w*\\b" },
+        { "name": "entity.name.type.terra", "match": "\\b[A-Z]\\w*\\b" }
+      ]
+    },
+    "operators": {
+      "name": "keyword.operator.terra",
+      "match": "==|!=|<=|>=|<<|>>|&&|\\|\\||[-+*/%=<>&|^~!]"
+    }
+  }
+}

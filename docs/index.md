@@ -34,7 +34,8 @@ The [releases](https://github.com/afbranco/Terra/releases) of the
 [repository](https://github.com/afbranco/Terra) have everything ready to use: the compiler
 (`terrac`), the TOSSIM simulator modules (Python 3), the micaz firmware and its `.defs`,
 `terractl` (loads programs, shows the messages of the network, flashes the micaz and runs a local
-simulation), and `terra-docs-<version>.json`, the description of every symbol of the VMs
+simulation), an extension for VS Code (`terra-vscode-<version>.vsix`: highlighting, the documentation
+on hover, the errors of `terrac` in place, and the `terractl` commands), and `terra-docs-<version>.json`, the description of every symbol of the VMs
 for editors.
 
 Supported platform: TinyOS 2.1.2 (micaz and the TOSSIM simulator; the firmware builds also for

@@ -17,6 +17,7 @@ workflow e no `BUILDINFO` de cada release.
 | `terrac-<v>.tar.gz` | Compilador `terrac`, `TerraNet.defs` e `TerraGrp.defs` (os do simulador) e `terra.lang` |
 | `terrac-errors-<v>.json` | Catálogo dos códigos de erro e aviso do `terrac` (o mesmo de `terrac --catalog`) |
 | `terra-docs-<v>.json` | Os símbolos dos `.defs` (eventos, funções, constantes, macros, registros) com descrição, para editores e documentação (ver abaixo) |
+| `terra-vscode-<v>.vsix` | Extensão do VSCode: destaque, hover pelo `terra-docs`, erros do `terrac`, comandos do `terractl` |
 | `terractl-<v>.pyz` | `terractl`: carga de programas, mensagens da BS e gravação com ID (Python 3) |
 | `TerraVMControl-<v>.jar` | TerraControl, com todas as bibliotecas dentro |
 | `BUILDINFO`, `SHA256SUMS`, `logs.tar.gz` | Commit, imagem e logs de compilação e de teste |
@@ -188,6 +189,24 @@ python3 terractl-<v>.pyz flash terra-<v>-grp-micaz-nobs.exe --node 11 --port /de
 - Testes: `release/test-terractl.py` (quadro serial, porta serial simulada, ID contra o
   `tos-set-symbols`, grade do `sim`) e `tests/terractl`, `tests/terractlgrp` (carga e decodificação
   no TOSSIM), `tests/terractlsim` (grade 3x3 com o `sim`).
+
+## Extensão do VSCode
+
+`code --install-extension terra-vscode-<v>.vsix` (ou "Install from VSIX..." no VSCode). Leva dentro
+o `terractl` e o `terra-docs.json` da mesma release (#93). Fonte em `vscode/` (TypeScript):
+
+- `syntaxes/terra.tmLanguage.json` (gramática), `snippets/terra.json`, `language-configuration.json`;
+- `src/diag.ts`: leitura do `--diag=json` (faixa pelo `col`/`col_end`, link do código no site);
+- `src/docs.ts`: hover e complemento pelo `terra-docs.json`, pela variante do `#include`;
+- `src/extension.ts`: compilar ao salvar (Problems), Carregar, Mensagens, Simular (na imagem do
+  toolchain por padrão: `terra.simulation.containerImage`) e Gravar, cada um num terminal com o
+  `terractl`; as mensagens decodificadas pelo `terrac --types` do programa.
+
+Testes (`release/build-vscode.sh`): `node --test` (diag, docs sobre o `terra-docs` da release,
+gramática com o `vscode-textmate`, `package.json` x código) e, com `xvfb-run` (no CI), a integração
+num VSCode 1.85.2 de verdade (idioma, Problems com um `terrac` falso, hover, complemento sem os
+símbolos da outra VM). Sem `xvfb-run` localmente, a integração é pulada. Marketplace e Open VSX
+ficam para depois (conta de publicador do Prof.).
 
 ## TerraControl
 
