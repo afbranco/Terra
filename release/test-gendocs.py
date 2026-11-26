@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Teste do gendocs.py (#91): gera o terra-docs.json com os .defs do TOSSIM de terrac/samples e
 confere que ele reprova quando falta uma descrição, quando sobra uma, quando um .defs de build
-declara algo com outro tipo e quando o marcador de build não bate com as plataformas.
+declara algo com outro tipo e quando o marcador de build não bate com as plataformas e quando o texto cita um nome em
+maiúsculas que o .defs não declara.
 Uso: test-gendocs.py (da raiz do repositório ou de qualquer lugar)."""
 import json, os, subprocess, sys, tempfile
 
@@ -74,6 +75,11 @@ with tempfile.TemporaryDirectory() as t:
     # qSize (MSGQ) fora do build e o resto do MSGQ dentro: marcador e build discordam
     caso("requires", net_txt=defs_net.replace("function pure ubyte qSize()", "//"),
          esperado="requires ['MSGQ']")
+
+    # nome em maiúsculas que o .defs não declara (#132)
+    caso("nome", desc_txt=texto.replace("SUCCESS (0), or a non-zero value if the queue is full.",
+                                        "SUCCESS, or FAIL if the queue is full."),
+         esperado="FAIL (qPut)")
 
 print("test-gendocs: " + ("; ".join(falhas) if falhas else "OK"))
 sys.exit(1 if falhas else 0)
