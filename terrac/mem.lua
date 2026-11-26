@@ -220,7 +220,17 @@ F = {
 
     --------------------------------------------------------------------------
 
-    SetAwait = 'SetExp',
+    SetAwait = function (me)
+        F.SetExp(me)
+        -- Temporário do tamanho do evento para converter o valor (#117). Fica até o fim do bloco:
+        -- liberar logo deixaria uma variável de outra trilha no mesmo endereço.
+        local e1, awt = unpack(me)
+        local ext = (awt.ret or awt)[1].ext
+        if ext and _TP.awaitConv(e1.tp, ext.tp) then
+            me.convTmp = alloc(_ENV.c[ext.tp].len)
+            _MEM.vars[me.convTmp] = (_MEM.vars[me.convTmp] or '')..'$await_'..ext.id..':'.._ENV.c[ext.tp].len..', '
+        end
+    end,
     SetExp = function (me)
         local e1, e2 = unpack(me)
         e1.accs[1][2] = 'wr'
