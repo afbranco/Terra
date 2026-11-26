@@ -12,6 +12,7 @@
 #   params   parameter names, in order (required for functions with parameters)
 #   filter   for an input event with the "await EVT(x)" form: what x selects (required then)
 #   fields   {field = "description"} for a record
+#   group    table of the symbol (required): one of GROUPS in gendocs.py
 #   since    first release with the symbol (default: since_default)
 #   [NAME.net] / [NAME.grp]  keys that differ in one variant
 #
@@ -23,132 +24,173 @@ since_default = "1.0.0"
 # Constants
 
 [SUCCESS]
+group = "misc"
 short = "Status value: the operation succeeded (0). Any other status is a TinyOS error code."
 
 [TRUE]
+group = "misc"
 short = "Boolean true (1)."
 
 [FALSE]
+group = "misc"
 short = "Boolean false (0)."
 
 [ON]
+group = "leds"
 short = "LED on, for LED0, LED1 and LED2."
 
 [OFF]
+group = "leds"
 short = "LED off, for LED0, LED1 and LED2."
 
 [TOGGLE]
+group = "leds"
 short = "Invert the LED, for LED0, LED1 and LED2."
 
 [RISING]
+group = "ports"
 short = "Interrupt on the rising edge, for CFG_INT_A and CFG_INT_B."
 
 [FALLING]
+group = "ports"
 short = "Interrupt on the falling edge, for CFG_INT_A and CFG_INT_B."
 
 [DISABLE]
+group = "ports"
 short = "Interrupt disabled, for CFG_INT_A and CFG_INT_B."
 
 [pIN]
+group = "ports"
 short = "Port configured as input, for CFG_PORT_A and CFG_PORT_B."
 
 [pOUT]
+group = "ports"
 short = "Port configured as output, for CFG_PORT_A and CFG_PORT_B."
 
 [BROADCAST]
+group = "radio"
 short = "Destination address of a message to every node in range (0xFFFF)."
 
 [SEND_DATA_SIZE]
+group = "radio"
 short = "Size in bytes of the data field of msgBS_t and msgGR_t (16)."
 
 [E_DIVZERO]
+group = "errors"
 short = "ERROR code: division or remainder by zero. The result is 0 and the program goes on."
 
 [E_IDXOVF]
+group = "errors"
 short = "ERROR code: array index out of bounds. The write is discarded; a read returns element 0."
 
 [E_TIMEOVF]
+group = "errors"
 short = "ERROR code: await time above the maximum (about 24.8 days); the wait is clamped to it."
 long = "A constant time above the maximum is a compile error (E6007). A variable or expression that goes above it waits the maximum and signals this error."
 since = "1.3.0"
 
 [E_STKOVF]
+group = "errors"
 short = "ERROR code: stack overflow. Fatal: the program stops."
 
 [E_NOSETUP]
+group = "errors"
 short = "ERROR code: REQ_MIC emitted before setupMic."
 since = "1.4.0"
 
 [opLT]
+group = "aggregation"
 short = "Aggregation comparison: value < refVal."
 
 [opLTE]
+group = "aggregation"
 short = "Aggregation comparison: value <= refVal."
 
 [opGT]
+group = "aggregation"
 short = "Aggregation comparison: value > refVal."
 
 [opGTE]
+group = "aggregation"
 short = "Aggregation comparison: value >= refVal."
 
 [opEQ]
+group = "aggregation"
 short = "Aggregation comparison: value == refVal."
 
 [opNEQ]
+group = "aggregation"
 short = "Aggregation comparison: value != refVal."
 
 [fAVG]
+group = "aggregation"
 short = "Aggregation function: average of the readings."
 
 [fSUM]
+group = "aggregation"
 short = "Aggregation function: sum of the readings."
 
 [fMAX]
+group = "aggregation"
 short = "Aggregation function: largest reading."
 
 [fMIN]
+group = "aggregation"
 short = "Aggregation function: smallest reading (0 when no node answers)."
 
 [fRESERV]
+group = "aggregation"
 short = "Aggregation function: resource reservation. Only the answers are counted; the readings are not used."
 
 [SID_TEMP]
+group = "aggregation"
 short = "Aggregation sensor: temperature (the TEMP reading)."
 
 [SID_PHOTO]
+group = "aggregation"
 short = "Aggregation sensor: light (the PHOTO reading)."
 
 [SID_LEDS]
+group = "aggregation"
 short = "Aggregation sensor: the state of the three LEDs."
 
 [SID_VOLT]
+group = "aggregation"
 short = "Aggregation sensor: battery voltage (the VOLTS reading)."
 
 [SID_PORT_A]
+group = "aggregation"
 short = "Aggregation sensor: digital port A. Where the firmware has no ports, the reading is 0."
 
 [SID_PORT_B]
+group = "aggregation"
 short = "Aggregation sensor: digital port B. Where the firmware has no ports, the reading is 0."
 
 [SID_INT_A]
+group = "aggregation"
 short = "Aggregation sensor: interrupt A. It has no reading: the value is always 0."
 
 [SID_INT_B]
+group = "aggregation"
 short = "Aggregation sensor: interrupt B. It has no reading: the value is always 0."
 
 [eACTIVE]
+group = "group"
 short = "Election flag: the node votes and can be elected leader."
 
 [ePASSIVE]
+group = "group"
 short = "Election flag: the node votes but is never elected leader."
 
 [eOFF]
+group = "group"
 short = "Election flag: the node does not take part in the election."
 
 # ---------------------------------------------------------------------------------------------
 # Records
 
 [radioMsg]
+group = "radio"
 short = "TerraNet radio message: type, source, target and 20 bytes of data."
 long = "Declare a variable of this type, fill it and emit SEND or SEND_ACK. The data field is a payload: declare a `pktype` (or use the field as an array) to give it a structure."
 example = """
@@ -165,12 +207,14 @@ target = "destination node, or BROADCAST"
 data = "20 bytes of user data"
 
 [fft_cpx]
+group = "fft"
 short = "Complex value (real and imaginary parts) of the experimental FFT module."
 [fft_cpx.fields]
 r = "real part"
 i = "imaginary part"
 
 [group_t]
+group = "group"
 short = "Group definition. Fill it with groupInit before using the group."
 [group_t.fields]
 grId = "group id (0 to 31)"
@@ -183,6 +227,7 @@ leader = "current leader (0: none)"
 nextGrp = "used by the VM"
 
 [aggreg_t]
+group = "aggregation"
 short = "Aggregation definition. Set agId, then fill the rest with aggregInit."
 [aggreg_t.fields]
 agId = "aggregation id (0 to 7), set by the program before aggregInit; AGGREG_DONE(x) filters by it"
@@ -195,6 +240,7 @@ refVal = "reference value of the comparison"
 nextAgg = "used by the VM"
 
 [aggDone_t]
+group = "aggregation"
 short = "Result of an aggregation, returned by AGGREG_DONE."
 [aggDone_t.fields]
 agId = "aggregation id"
@@ -204,12 +250,14 @@ countFalse = "readings for which the comparison with refVal is false"
 value = "result of the aggregation function"
 
 [msgBS_t]
+group = "radio"
 short = "TerraGrp message to the base station: msgId and SEND_DATA_SIZE bytes of data."
 [msgBS_t.fields]
 msgId = "message id, chosen by the program; SENDBS_DONE(x) filters by it"
 data = "SEND_DATA_SIZE (16) bytes of user data"
 
 [msgGR_t]
+group = "group"
 short = "TerraGrp group message: group, node, msgId and SEND_DATA_SIZE bytes of data."
 [msgGR_t.fields]
 grId = "group id"
@@ -221,19 +269,24 @@ data = "SEND_DATA_SIZE (16) bytes of user data"
 # Output events (emit)
 
 [LEDS]
+group = "leds"
 short = "Set the three LEDs at once: bit 0 is LED0, bit 1 LED1, bit 2 LED2."
 example = "emit LEDS(5);   // LED0 and LED2 on, LED1 off"
 
 [LED0]
+group = "leds"
 short = "Set LED0 (red): ON, OFF or TOGGLE."
 
 [LED1]
+group = "leds"
 short = "Set LED1 (green): ON, OFF or TOGGLE."
 
 [LED2]
+group = "leds"
 short = "Set LED2 (yellow): ON, OFF or TOGGLE."
 
 [REQ_TEMP]
+group = "sensors"
 short = "Request a temperature reading; the value arrives in TEMP."
 example = """
 emit REQ_TEMP();
@@ -241,36 +294,47 @@ var ushort t = await TEMP;
 """
 
 [REQ_PHOTO]
+group = "sensors"
 short = "Request a light reading; the value arrives in PHOTO."
 
 [REQ_VOLTS]
+group = "sensors"
 short = "Request a battery voltage reading; the value arrives in VOLTS."
 
 [SET_PORT_A]
+group = "ports"
 short = "Set the level of digital port A (bit 0 of the argument). Configure it as pOUT first."
 
 [SET_PORT_B]
+group = "ports"
 short = "Set the level of digital port B (bit 0 of the argument). Configure it as pOUT first."
 
 [CFG_PORT_A]
+group = "ports"
 short = "Configure digital port A as input (pIN) or output (pOUT)."
 
 [CFG_PORT_B]
+group = "ports"
 short = "Configure digital port B as input (pIN) or output (pOUT)."
 
 [REQ_PORT_A]
+group = "ports"
 short = "Read digital port A; the value arrives in PORT_A."
 
 [REQ_PORT_B]
+group = "ports"
 short = "Read digital port B; the value arrives in PORT_B."
 
 [CFG_INT_A]
+group = "ports"
 short = "Configure interrupt A: RISING, FALLING or DISABLE. Each interrupt arrives in INT_A."
 
 [CFG_INT_B]
+group = "ports"
 short = "Configure interrupt B: RISING, FALLING or DISABLE. Each interrupt arrives in INT_B."
 
 [REQ_CUSTOM_A]
+group = "custom"
 short = "Loopback event: CUSTOM_A arrives with the same value."
 long = "Useful to signal between trails of the same program. `await CUSTOM_A(x)` waits only for the value x."
 example = """
@@ -283,29 +347,37 @@ end
 """
 
 [REQ_CUSTOM]
+group = "custom"
 short = "Loopback event without a value: CUSTOM arrives (with 0)."
 
 [REQ_MIC]
+group = "mic"
 short = "Start sampling the microphone into the buffer given to setupMic; MIC arrives at the end."
 long = "Without a previous setupMic, the VM signals ERROR with E_NOSETUP. Needs the MTS300 sensor board."
 
 [BEEP]
+group = "mic"
 short = "Sound the buzzer for the given time in ms. Needs the MTS300 sensor board."
 
 [SEND]
+group = "radio"
 short = "Send a radioMsg to msg.target (a node or BROADCAST), in radio range; SEND_DONE arrives at the end."
 
 [SEND_ACK]
+group = "radio"
 short = "Send a radioMsg to msg.target asking for an acknowledgement; SEND_DONE_ACK arrives at the end."
 
 [SEND_BS]
+group = "radio"
 short = "Send a msgBS_t to the base station, through the routing tree; SENDBS_DONE arrives in the same reaction."
 
 [SEND_GR]
+group = "group"
 short = "Send a msgGR_t to the members of the group msg.grId; SENDGR_DONE arrives in the same reaction."
 long = "The message goes as far as the nhops of the group. A group not declared with groupInit is not sent: SENDGR_DONE comes with EINVAL."
 
 [AGGREG]
+group = "aggregation"
 short = "Run the aggregation of an aggreg_t over its group; the result arrives in AGGREG_DONE."
 long = "Without aggregInit, or with the aggregation queue full, AGGREG_DONE arrives at once with count 0. A requester outside the group receives only the members' readings and does not count its own."
 example = """
@@ -322,50 +394,64 @@ var aggDone_t r = await AGGREG_DONE(1);
 # Input events (await)
 
 [ERROR]
+group = "errors"
 short = "A VM error happened; the value is the code (E_DIVZERO, E_IDXOVF, E_TIMEOVF, ...)."
 filter = "the error code"
 
 [TEMP]
+group = "sensors"
 short = "Temperature reading after REQ_TEMP: raw 10-bit A/D value, not a physical unit."
 
 [PHOTO]
+group = "sensors"
 short = "Light reading after REQ_PHOTO: raw 10-bit A/D value."
 
 [VOLTS]
+group = "sensors"
 short = "Battery voltage reading after REQ_VOLTS: raw 10-bit A/D value."
 
 [PORT_A]
+group = "ports"
 short = "Level of digital port A, after REQ_PORT_A."
 
 [PORT_B]
+group = "ports"
 short = "Level of digital port B, after REQ_PORT_B."
 
 [INT_A]
+group = "ports"
 short = "Interrupt A happened (configured with CFG_INT_A)."
 
 [INT_B]
+group = "ports"
 short = "Interrupt B happened (configured with CFG_INT_B)."
 
 [CUSTOM_A]
+group = "custom"
 short = "Loopback event emitted by REQ_CUSTOM_A; the value is the one emitted."
 filter = "the value emitted by REQ_CUSTOM_A"
 
 [MIC]
+group = "mic"
 short = "Microphone sampling finished: the buffer given to setupMic is full."
 
 [CUSTOM]
+group = "custom"
 short = "Loopback event emitted by REQ_CUSTOM; the value is always 0."
 
 [SEND_DONE]
+group = "radio"
 short = "The radio finished a SEND; the value is the status (SUCCESS or an error code)."
 long = "It does not confirm delivery: use SEND_ACK for that."
 filter = "the type of the message sent"
 
 [SEND_DONE_ACK]
+group = "radio"
 short = "The radio finished a SEND_ACK; the value is TRUE if the target acknowledged."
 filter = "the type of the message sent"
 
 [RECEIVE]
+group = "radio"
 short = "A radioMsg arrived from another node."
 long = "The VM keeps two receive buffers: a message that arrives while both are waiting for the program is discarded."
 filter = "the type of the message"
@@ -374,29 +460,36 @@ var radioMsg msg = await RECEIVE(1);   // only messages of type 1
 """
 
 [Q_READY]
+group = "queue"
 short = "The message queue (qPut) went from empty to not empty; the value is its size."
 
 [REC_GR]
+group = "group"
 short = "A msgGR_t arrived from a member of a group of this node; msg.node is the sender."
 filter = "the group id"
 
 [SENDBS_DONE]
+group = "radio"
 short = "SEND_BS was queued (or refused); the value is the status. It does not confirm delivery."
 filter = "the msgId of the message"
 
 [SENDGR_DONE]
+group = "group"
 short = "SEND_GR was queued (or refused); the value is the status, EINVAL for a group not declared."
 filter = "the group id"
 
 [AGGREG_DONE]
+group = "aggregation"
 short = "An aggregation finished; the value is an aggDone_t."
 filter = "the agId of the aggregation"
 
 [LEADER_NEW]
+group = "group"
 short = "A group elected a new leader; the value is its node id."
 filter = "the group id"
 
 [LEADER_LOST]
+group = "group"
 short = "A group lost its leader; the value is 0."
 filter = "the group id"
 
@@ -404,77 +497,96 @@ filter = "the group id"
 # Functions
 
 [getNodeId]
+group = "misc"
 short = "The id of this node."
 
 [random]
+group = "misc"
 short = "A 16-bit random number."
 
 [getMem]
+group = "misc"
 short = "One byte of the VM memory, at the given address."
 params = ["addr"]
 
 [getTime]
+group = "misc"
 short = "The VM clock, in the unit of await (1/1024 s)."
 long = "The unit is 1/1024 s, not decimal milliseconds: the difference of two getTime() values divided by 1000 comes out 2.4% larger than the seconds elapsed."
 
 [qPut]
+group = "queue"
 short = "Put a radioMsg in the message queue; SUCCESS, or FAIL if the queue is full."
 params = ["msg"]
 
 [qGet]
+group = "queue"
 short = "Take the oldest radioMsg from the message queue; SUCCESS, or FAIL if the queue is empty."
 params = ["msg"]
 
 [qSize]
+group = "queue"
 short = "Number of messages in the message queue."
 
 [qClear]
+group = "queue"
 short = "Empty the message queue; returns SUCCESS."
 
 [fftAlloc]
+group = "fft"
 short = "Experimental FFT module: allocate the FFT memory. Not in any release firmware."
 params = ["points", "inverse", "buffer", "size"]
 
 [fft]
+group = "fft"
 short = "Experimental FFT module: not implemented (returns SUCCESS). Not in any release firmware."
 params = ["input", "real", "imag"]
 
 [setupMic]
+group = "mic"
 short = "Set the microphone sampling for REQ_MIC: buffer, number of samples, period in us and gain."
 params = ["buffer", "count", "period_us", "gain"]
 
 [setRFPower]
+group = "radio"
 short = "Radio power of the program's messages, from 0 to 7; returns SUCCESS."
 long = "The default is the one of the firmware build (4). The level is valid for the messages of this program and only until a new program is loaded. Values above 7 are ignored. The simulator (TOSSIM) ignores the power."
 params = ["level"]
 
 [groupInit]
+group = "group"
 short = "Declare a group: id (0 to 31), param, nhops (at least 1), membership, election flag and initial leader."
 long = "Returns SUCCESS, or EINVAL for an id above 31. Nodes are in the same group when they use the same id and param; status says whether this node is a member."
 params = ["group", "id", "param", "nhops", "status", "elFlag", "leader"]
 example = "groupInit(g, 1, 0, 2, TRUE, eACTIVE, 0);"
 
 [aggregInit]
+group = "aggregation"
 short = "Declare an aggregation over a group: sensor, function, comparison and reference value."
 long = "Set agg.agId (0 to 7) before. Returns SUCCESS, or EINVAL for an agId above 7 or a group not declared with groupInit."
 params = ["agg", "group", "sensorId", "agOper", "agComp", "refVal"]
 
 [getParent]
+group = "radio"
 short = "The parent of this node in the routing tree to the base station."
 
 # ---------------------------------------------------------------------------------------------
 # Macros
 
 [getTemp]
+group = "sensors"
 short = "Read the temperature into a variable: emit REQ_TEMP() and await TEMP."
 example = "getTemp(t);"
 
 [getPhoto]
+group = "sensors"
 short = "Read the light into a variable: emit REQ_PHOTO() and await PHOTO."
 
 [getVolts]
+group = "sensors"
 short = "Read the battery voltage into a variable: emit REQ_VOLTS() and await VOLTS."
 
 [await_until]
+group = "misc"
 short = "Wait for an event until a condition holds, keeping the last value in a variable."
 example = "await_until(msg, RECEIVE, msg.source == 5);"
