@@ -37,6 +37,8 @@ with tempfile.TemporaryDirectory() as t:
         j = json.load(open(out))
         nomes = {s["name"] for s in j["symbols"]}
         q = [s for s in j["symbols"] if s["name"] == "qPut"]
+        if any(s.get("group") not in j["groups"] for s in j["symbols"]):
+            falhas.append("símbolo sem group válido no JSON")
         if not ({"TEMP", "groupInit", "radioMsg", "await_until", "E_TIMEOVF"} <= nomes):
             falhas.append("símbolos faltando no JSON")
         if not (q and q[0]["requires"] == ["MSGQ"] and q[0]["variants"] == ["net"]
@@ -61,6 +63,8 @@ with tempfile.TemporaryDirectory() as t:
 
     defs_net = open(net).read()
     caso("falta", desc_txt=texto.replace("[getParent]", "[getParentX]"), esperado="faltam ['getParent']")
+    caso("grupo", desc_txt=texto.replace('[getParent]\ngroup = "radio"', '[getParent]\ngroup = "radios"'),
+         esperado="sem group válido")
     caso("sobra", desc_txt=texto + '\n[NAO_EXISTE]\nshort = "x"\n', esperado="sobram ['NAO_EXISTE']")
     caso("tipo", net_txt=defs_net.replace("input ushort \tTEMP", "input ubyte \tTEMP"),
          esperado="TEMP difere do modelo")

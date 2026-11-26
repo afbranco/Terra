@@ -111,13 +111,16 @@ entrada com `variants: ["net","grp"]`; quando diferem (ex.: os `unsafe`, que o G
 uma por variante.
 
 ```json
-{"schema":1,"terra":"1.5.0","variants":["net","grp"],"platforms":["tossim","micaz"],"symbols":[
- {"name":"RECEIVE","kind":"event","direction":"await","type":"radioMsg","id":45,
+{"schema":1,"terra":"1.5.0","variants":["net","grp"],"platforms":["tossim","micaz"],"groups":["leds",...],"symbols":[
+ {"name":"RECEIVE","kind":"event","group":"radio","direction":"await","type":"radioMsg","id":45,
   "filter":{"type":"ubyte","id":44,"matches":"the type of the message"},
   "requires":[],"variants":["net"],"platforms":["tossim","micaz"],
   "short":"A radioMsg arrived from another node.","long":"...","example":"...","since":"1.0.0"}, ...]}
 ```
 
+- `group`: a tabela do símbolo, um dos `groups` do topo (`leds`, `sensors`, `custom`, `radio`,
+  `queue`, `ports`, `mic`, `fft`, `group`, `aggregation`, `errors`, `misc`). A lista sai em ordem
+  alfabética do nome.
 - `kind`: `event` (`direction` `emit` ou `await`), `function`, `constant`, `macro` ou `type`
   (registro: `type_kind` `packet` ou `regtype` e `fields` com `name`, `type` e `short`).
 - `id`: o número no `.defs` (no `await`, o da forma sem argumento; `null` se só há a com filtro).

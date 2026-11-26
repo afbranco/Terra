@@ -25,6 +25,9 @@ import sys
 import tomllib
 
 TIPOS_BASICOS = {"void", "ubyte", "byte", "ushort", "short", "ulong", "long", "float"}
+# Tabelas da ajuda (pedido do TerraSim): o "group" de cada descrição tem de ser um destes.
+GROUPS = ("leds", "sensors", "custom", "radio", "queue", "ports", "mic", "fft", "group",
+          "aggregation", "errors", "misc")
 
 
 def erro(msg):
@@ -274,6 +277,9 @@ def main():
     falta = sorted(n for n in nomes if n not in desc or not desc[n].get("short"))
     if sobra or falta:
         erro("descrições: faltam %s; sobram %s" % (falta, sobra))
+    sem_grupo = sorted(n for n in nomes if desc[n].get("group") not in GROUPS)
+    if sem_grupo:
+        erro("descrições sem group válido (%s): %s" % ("/".join(GROUPS), sem_grupo))
 
     simbolos = []
     for nome in sorted(nomes, key=lambda n: (n.lower(), n)):
@@ -290,7 +296,7 @@ def main():
             for v in vs:                        # texto próprio de uma variante ([NOME.grp])
                 dv.update(d.get(v, {}) if isinstance(d.get(v), dict) else {})
             plats = [p for p in todas if any(p in plataformas[v].get(nome, []) for v in vs)]
-            o = {"name": nome, "kind": s["kind"]}
+            o = {"name": nome, "kind": s["kind"], "group": dv["group"]}
             if s["kind"] == "event":
                 o["direction"] = s["direction"]
                 o["type"] = s["type"]
@@ -339,7 +345,7 @@ def main():
             simbolos.append(o)
 
     saida = {"schema": 1, "terra": a.version, "variants": variantes, "platforms": todas,
-             "symbols": simbolos}
+             "groups": list(GROUPS), "symbols": simbolos}
     with open(a.out, "w") as f:
         json.dump(saida, f, ensure_ascii=False, indent=1)
         f.write("\n")
