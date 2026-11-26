@@ -99,6 +99,20 @@ for v in net grp; do
     done
 done
 
+# terra-docs.json (#91): os símbolos dos modelos .defs.in com as descrições de
+# TerraVM/src/defs/descricoes.toml e as plataformas dos .defs gerados acima. O gendocs reprova se
+# faltar ou sobrar descrição, ou se um .defs gerado não bater com o modelo. O test-gendocs confere
+# que ele reprova nesses casos.
+python3 "$ROOT/release/test-gendocs.py" | tee -a "$OUT/logs/docs.log"
+tail -1 "$OUT/logs/docs.log" | grep -q ': OK$' || { echo "FALHOU: test-gendocs"; exit 1; }
+python3 "$ROOT/TerraVM/src/defs/gendocs.py" --version "$VER" \
+    --descricoes "$ROOT/TerraVM/src/defs/descricoes.toml" --out "$OUT/terra-docs-$VER.json" \
+    net="$ROOT/TerraVM/src/defs/TerraNet.defs.in" grp="$ROOT/TerraVM/src/defs/TerraGrp.defs.in" \
+    --build net:tossim:"$W/terra-$VER-net-tossim-py3-x86_64/TerraNet.defs" \
+    --build grp:tossim:"$W/terra-$VER-grp-tossim-py3-x86_64/TerraGrp.defs" \
+    --build net:micaz:"$OUT/terra-$VER-net-micaz-nobs.defs" \
+    --build grp:micaz:"$OUT/terra-$VER-grp-micaz-nobs.defs" | tee -a "$OUT/logs/docs.log"
+
 # TerraVMControl.jar: compilado do fonte, num jar único. As bibliotecas (tinyos.jar inclusive)
 # vêm do jar da TerraDist v0.3.0: são idênticas às do jar de produção de 2016 (.ova).
 J="$W/jar"

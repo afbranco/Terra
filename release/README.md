@@ -16,6 +16,7 @@ workflow e no `BUILDINFO` de cada release.
 | `terra-<v>-{net,grp}-micaz-bs.{exe,ihex}` | Firmware micaz, estação base (nó 1, ligado ao computador) |
 | `terrac-<v>.tar.gz` | Compilador `terrac`, `TerraNet.defs` e `TerraGrp.defs` (os do simulador) e `terra.lang` |
 | `terrac-errors-<v>.json` | Catálogo dos códigos de erro e aviso do `terrac` (o mesmo de `terrac --catalog`) |
+| `terra-docs-<v>.json` | Os símbolos dos `.defs` (eventos, funções, constantes, macros, registros) com descrição, para editores e documentação (ver abaixo) |
 | `TerraVMControl-<v>.jar` | TerraControl, com todas as bibliotecas dentro |
 | `BUILDINFO`, `SHA256SUMS`, `logs.tar.gz` | Commit, imagem e logs de compilação e de teste |
 
@@ -100,6 +101,35 @@ linhas JSON, um diagnóstico por linha, e termina sempre com uma linha de resumo
 - O resumo traz `memory` só quando não há erro. Até a v1.4.0 trazia também `platforms`, a lista
   das plataformas do `config` do `.defs` (saiu na #122). Um diagnóstico do programa todo (o
   `W5003`: o programa passa da memória para programa da plataforma do `.defs`) vem sem `line`.
+
+## terra-docs.json
+
+Gerado pelo `TerraVM/src/defs/gendocs.py` a partir dos modelos `Terra{Net,Grp}.defs.in`, das
+descrições de `TerraVM/src/defs/descricoes.toml` (em inglês) e dos `.defs` que os builds da release
+geraram. Um símbolo por definição: quando o Net e o Grp declaram um nome do mesmo jeito, sai uma
+entrada com `variants: ["net","grp"]`; quando diferem (ex.: os `unsafe`, que o Grp não tem, #116),
+uma por variante.
+
+```json
+{"schema":1,"terra":"1.5.0","variants":["net","grp"],"platforms":["tossim","micaz"],"symbols":[
+ {"name":"RECEIVE","kind":"event","direction":"await","type":"radioMsg","id":45,
+  "filter":{"type":"ubyte","id":44,"matches":"the type of the message"},
+  "requires":[],"variants":["net"],"platforms":["tossim","micaz"],
+  "short":"A radioMsg arrived from another node.","long":"...","example":"...","since":"1.0.0"}, ...]}
+```
+
+- `kind`: `event` (`direction` `emit` ou `await`), `function`, `constant`, `macro` ou `type`
+  (registro: `type_kind` `packet` ou `regtype` e `fields` com `name`, `type` e `short`).
+- `id`: o número no `.defs` (no `await`, o da forma sem argumento; `null` se só há a com filtro).
+  `filter`: a forma `await EVT(x)`, com o tipo e o número dela e o que `x` seleciona.
+- `params` (`emit`, funções, macros), `returns` e `attrs` (`pure`, `nohold`) das funções, `value`
+  das constantes, `body` das macros, `unsafe_with` (pares que dão aviso de não determinismo).
+- `requires`: o marcador do build (`MSGQ`, `FFT`, `MIC`, `PORTS`); `platforms`: as plataformas cujo
+  `.defs` da release declara o símbolo (vazio: nenhum firmware da release tem, ex.: `MIC`).
+- `since`: a primeira release com o símbolo. O que mudou em cada release fica nas notas dela.
+
+O build reprova se faltar ou sobrar descrição, ou se um `.defs` gerado não bater com o modelo
+(`release/test-gendocs.py` confere que reprova).
 
 ## TerraControl
 
