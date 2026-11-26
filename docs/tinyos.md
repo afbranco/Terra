@@ -90,8 +90,10 @@ Run the script in a folder where it can write: the VM creates a `sensors.bin` fi
 simulation runs as fast as the computer can; a real-time pace (`Throttle` in the module) and a
 view of the nodes are up to the script.
 
-[TerraSim](https://github.com/afbranco/TerraSim) is a web simulator for teaching, built on these
-modules, with an editor, a view of the network and the deploy of the programs.
+TerraSim is a web simulator for teaching, built on these modules, with an editor, a view of the
+network and the deploy of the programs. It runs at
+[terrasim.inf.puc-rio.br](https://terrasim.inf.puc-rio.br) (access by invitation); the source is
+on [GitHub](https://github.com/afbranco/TerraSim).
 
 ## Building from the source
 

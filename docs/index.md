@@ -42,8 +42,10 @@ Android, ESP8266 and Arduino Mega, to study the integration of heterogeneous pla
 Terra VM as a common layer; that work is in the
 [integracao-heterogenea](https://github.com/afbranco/Terra/tree/integracao-heterogenea) branch.
 
-[TerraSim](https://github.com/afbranco/TerraSim) is a web simulator for teaching, based on the
-Terra releases.
+**TerraSim** is a web simulator for teaching, based on the Terra releases: write a program, run
+it on a simulated network and watch the nodes. It runs at
+[terrasim.inf.puc-rio.br](https://terrasim.inf.puc-rio.br) (access by invitation); the source is
+on [GitHub](https://github.com/afbranco/TerraSim).
 
 Terra is free software, under the [GPL v3](license.html).
 
