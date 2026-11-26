@@ -368,6 +368,10 @@ de lá.
     (só no CI; a máquina do Prof. não tem `xvfb`). Versão da extensão: a da release, ou 0.0.0 fora
     de tag. Marketplace/Open VSX depois (conta do Prof.). Falhas de `apt` (403 da Microsoft) no CI
     são do runner: `gh run rerun --failed`.
+  - lpeg (decisão do Prof., 2026-11-26: manter o novo): PR #141, o anexo do `terrac` sai do job do lpeg
+    1.x (conteúdo igual ao do 0.10.2). O 0.10.2 fica no CI só como teste, porque o TerraSim o compila
+    da fonte (`container/Dockerfile.server`); avisado para trocar pelo `lua-lpeg`. Depois, #142 tira
+    o job.
   - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
     `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
