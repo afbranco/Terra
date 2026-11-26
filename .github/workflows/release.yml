@@ -3,7 +3,7 @@
 # - pull request, push no master e execução manual: compila, testa e guarda os artefatos no Actions;
 # - tag v*: o mesmo, os testes no Avrora e depois a release em rascunho com os anexos,
 #   SHA256SUMS e BUILDINFO. Os testes no Avrora também rodam na execução manual.
-# A imagem do toolchain é fixa (tag com commit e digest), da release tinyos-toolchain 2.1.2-r2.
+# A imagem do toolchain é fixa (tag com commit e digest), da release tinyos-toolchain 2.1.2-r3.
 name: release
 
 on:
@@ -18,8 +18,8 @@ permissions:
   contents: read
 
 env:
-  TOOLCHAIN_RELEASE: 2.1.2-r2
-  TOOLCHAIN_IMAGE: ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-21d8fb1@sha256:4198b12302181edd0e8b20ae06cd3af0a2d483a06355a78c1f83371250de47ec
+  TOOLCHAIN_RELEASE: 2.1.2-r3
+  TOOLCHAIN_IMAGE: ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-0dded15@sha256:e3da1ef0e0ad3a32bef11b8a90b6923035ae4fbe2ec4abf6316c9e9e6fc1b6fb
 
 jobs:
   tinyos:

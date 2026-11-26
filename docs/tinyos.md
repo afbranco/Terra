@@ -31,7 +31,7 @@ programmer at `/dev/ttyUSB0`:
 
 ```bash
 podman run --rm -it --device /dev/ttyUSB0 -v "$PWD:/w:Z" -w /w \
-  ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-21d8fb1 sh -c '
+  ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-0dded15 sh -c '
     tos-set-symbols --objcopy avr-objcopy --objdump avr-objdump --target ihex \
       terra-<v>-net-micaz-nobs.exe node2.ihex TOS_NODE_ID=2 ActiveMessageAddressC__addr=2 &&
     avrdude -cmib510 -P/dev/ttyUSB0 -pm128 -U hfuse:w:0xd9:m -U efuse:w:0xff:m \
@@ -104,7 +104,7 @@ TinyOS 2.1.2, the AVR tools and TOSSIM (Python 3). Build inside it, in `TerraVM/
 git clone https://github.com/afbranco/Terra
 cd Terra
 podman run --rm -v "$PWD:/terra:Z" -w /terra/TerraVM/src \
-  ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-21d8fb1 \
+  ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-0dded15 \
   make micaz VM=NET MOD=MSGQ TYPE=NOBS
 ```
 
