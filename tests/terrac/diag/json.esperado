@@ -28,6 +28,9 @@
 == float_resto
 {"code":"E4030","severity":"error","file":"float_resto.terra","line":4,"col":5,"msg":"Invalid float operation."}
 {"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
+== getparent16
+{"code":"W1001","severity":"warning","file":"getparent16.terra","line":3,"msg":"Automatic casting from `ushort´ to `ubyte´. ","args":{"from":"ushort","to":"ubyte"}}
+{"summary":{"ok":true,"errors":0,"warnings":1,"optimized":true,"vm":{"name":"TerraGrp","version":"000.002.000"},"memory":{"total":20,"code":6,"ctl_vars":10,"stack":4,"radio_msgs":1},"platforms":[{"name":"tossim","max":576,"fits":true}]}}
 == laco_zero
 {"code":"E5001","severity":"error","file":"laco_zero.terra","line":3,"col":1,"msg":"tight loop"}
 {"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
