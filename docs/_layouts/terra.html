@@ -13,5 +13,14 @@
 <div class="terra-doc">
 {{ content }}
 </div>
+<script>
+  // Links para fora do site abrem em aba nova (pedido do Prof.); os internos ficam na mesma aba.
+  document.querySelectorAll('a[href]').forEach(function (a) {
+    if (a.host && a.host !== window.location.host) {
+      a.target = '_blank';
+      a.rel = 'noopener';
+    }
+  });
+</script>
 {% include footer.html %}
 </html>
