@@ -62,6 +62,10 @@ de lá.
     `.defs` e `TerraVMControl` iguais byte a byte aos da v1.4.0; catálogo com 161 códigos (só o
     texto do W5003 muda); o `terra-docs` é igual à prévia `terra-docs-dev.json` do TerraSim.
     TerraSim avisado.
+  - **`v1.6.0` publicada** (tag no `2c6c014`, 2026-11-26, a pedido do Prof.): `.defs` e docs (#132,
+    #133, #116, PRs #134 e #135). Firmware, `_TOSSIM.so`, `terrac`, catálogo e `TerraVMControl`
+    iguais byte a byte aos da v1.5.0; mudam só os `.defs` e o `terra-docs.json` (111 entradas).
+    TerraSim avisado. Depois dela: PR da troca para a tinyos-toolchain `2.1.2-r3` (pedido do Prof.).
   - Alinhada com a release **tinyos-toolchain `2.1.2-r2`** (decidido pelo Prof. em 2026-11-22;
     antes era a r1, `f42bac7`, digest `7e21b1b9…`). O workflow fixa a imagem
     `2.1.2-resolute-py3-21d8fb1@sha256:4198b12302181edd0e8b20ae06cd3af0a2d483a06355a78c1f83371250de47ec`.
