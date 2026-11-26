@@ -192,19 +192,24 @@ short = "Election flag: the node does not take part in the election."
 [radioMsg]
 group = "radio"
 short = "TerraNet radio message: type, source, target and 20 bytes of data."
-long = "Declare a variable of this type, fill it and emit SEND or SEND_ACK. The data field is a payload: declare a `pktype` (or use the field as an array) to give it a structure."
+long = "A packet is abstract: derive a type from it with `pktype`, whose fields take the place of `data`, and declare variables of that type."
 example = """
-var radioMsg msg;
+pktype tempMsg from radioMsg with
+    var ushort temp;
+end
+var tempMsg msg;
 msg.type = 1;
 msg.source = getNodeId();
 msg.target = BROADCAST;
+emit REQ_TEMP();
+msg.temp = await TEMP;
 emit SEND(msg);
 """
 [radioMsg.fields]
 type = "message type, chosen by the program; RECEIVE(x), SEND_DONE(x) and SEND_DONE_ACK(x) filter by it"
 source = "sender, filled by the sending program (usually getNodeId())"
 target = "destination node, or BROADCAST"
-data = "20 bytes of user data"
+data = "20 bytes of payload, replaced by the fields of a pktype"
 
 [fft_cpx]
 group = "fft"
@@ -254,7 +259,7 @@ group = "radio"
 short = "TerraGrp message to the base station: msgId and SEND_DATA_SIZE bytes of data."
 [msgBS_t.fields]
 msgId = "message id, chosen by the program; SENDBS_DONE(x) filters by it"
-data = "SEND_DATA_SIZE (16) bytes of user data"
+data = "SEND_DATA_SIZE (16) bytes of payload, replaced by the fields of a pktype"
 
 [msgGR_t]
 group = "group"
@@ -263,7 +268,7 @@ short = "TerraGrp group message: group, node, msgId and SEND_DATA_SIZE bytes of 
 grId = "group id"
 node = "on SEND_GR, the destination (BROADCAST for every member); on REC_GR, the sender"
 msgId = "message id, chosen by the program"
-data = "SEND_DATA_SIZE (16) bytes of user data"
+data = "SEND_DATA_SIZE (16) bytes of payload, replaced by the fields of a pktype"
 
 # ---------------------------------------------------------------------------------------------
 # Output events (emit)
@@ -338,7 +343,7 @@ group = "custom"
 short = "Loopback event: CUSTOM_A arrives with the same value."
 long = "Useful to signal between trails of the same program. `await CUSTOM_A(x)` waits only for the value x."
 example = """
-par do
+par/and do
     var ubyte v = await CUSTOM_A;
     emit LEDS(v);
 with
@@ -456,7 +461,11 @@ short = "A radioMsg arrived from another node."
 long = "The VM keeps two receive buffers: a message that arrives while both are waiting for the program is discarded."
 filter = "the type of the message"
 example = """
-var radioMsg msg = await RECEIVE(1);   // only messages of type 1
+pktype tempMsg from radioMsg with
+    var ushort temp;
+end
+var tempMsg msg = await RECEIVE(1);   // only messages of type 1
+emit LEDS(<ubyte>msg.source);
 """
 
 [Q_READY]
@@ -558,7 +567,10 @@ group = "group"
 short = "Declare a group: id (0 to 31), param, nhops (at least 1), membership, election flag and initial leader."
 long = "Returns SUCCESS, or EINVAL for an id above 31. Nodes are in the same group when they use the same id and param; status says whether this node is a member."
 params = ["group", "id", "param", "nhops", "status", "elFlag", "leader"]
-example = "groupInit(g, 1, 0, 2, TRUE, eACTIVE, 0);"
+example = """
+var group_t g;
+var ubyte stat = groupInit(g, 1, 0, 2, TRUE, eACTIVE, 0);
+"""
 
 [aggregInit]
 group = "aggregation"
@@ -576,7 +588,10 @@ short = "The parent of this node in the routing tree to the base station."
 [getTemp]
 group = "sensors"
 short = "Read the temperature into a variable: emit REQ_TEMP() and await TEMP."
-example = "getTemp(t);"
+example = """
+var ushort t;
+getTemp(t);
+"""
 
 [getPhoto]
 group = "sensors"
@@ -589,4 +604,8 @@ short = "Read the battery voltage into a variable: emit REQ_VOLTS() and await VO
 [await_until]
 group = "misc"
 short = "Wait for an event until a condition holds, keeping the last value in a variable."
-example = "await_until(msg, RECEIVE, msg.source == 5);"
+example = """
+var ubyte e;
+await_until(e, ERROR, e == E_DIVZERO);   // the first division by zero
+emit LED0(ON);
+"""

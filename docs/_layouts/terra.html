@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+{% include header.html %}
+<style>
+  .terra-doc table { border-collapse: collapse; margin: 0.5em 0 1.5em; width: 100%; }
+  .terra-doc th, .terra-doc td { border: 1px solid #ddd; padding: 4px 8px; vertical-align: top; }
+  .terra-doc th { background: #f5f5f5; }
+  .terra-doc code { white-space: nowrap; }
+  .terra-doc td code { white-space: normal; }
+  .terra-doc pre code { white-space: pre; }
+  .terra-doc h2 { margin-top: 1.5em; }
+</style>
+<div class="terra-doc">
+{{ content }}
+</div>
+{% include footer.html %}
+</html>

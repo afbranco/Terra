@@ -1,31 +1,43 @@
 docs_list_title: Terra IoT
 docs:
 - menu: Home
-  url: terra-home.html
-  
+  url: index.html
+
+- menu: Programming
+  submenu:
+
+  - page: Terra language
+    url: language.html
+
+  - page: _div
+    url:
+
+  - page: TerraNet (radio)
+    url: terranet.html
+
+  - page: TerraGrp (groups)
+    url: terragrp.html
+
+  - page: _div
+    url:
+
+  - page: terrac compiler
+    url: terrac.html
+
+  - page: terrac error codes
+    url: terrac-codes.html
+
 - menu: Platforms
   submenu:
 
   - page: TinyOS
-    url: terra-platf-tinyos.html  
+    url: terra-platf-tinyos.html
 
-- menu: Custom Flavors
+- menu: Customization
   submenu:
 
   - page: Intro
-    url: terra-custom-Intro.html  
-
-  - page: _div
-    url: 
-
-  - page: TinyOS - Net
-    url: terra-custom-TerraNet.html  
-
-  - page: TinyOS - Grp
-    url: terra-custom-TerraGrp.html  
-
-  - page: _div
-    url: 
+    url: terra-custom-Intro.html
 
   - page: Tutorial New Custom
     url: terra-custom-Tutorial.html

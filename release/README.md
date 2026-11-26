@@ -134,6 +134,25 @@ uma por variante.
 O build reprova se faltar ou sobrar descrição, ou se um `.defs` gerado não bater com o modelo
 (`release/test-gendocs.py` confere que reprova).
 
+## Site (docs/)
+
+O GitHub Pages publica o `docs/` do `master` (só a versão atual; as antigas ficam no histórico).
+As páginas são Markdown em inglês (`docs/*.md`, layout `docs/_layouts/terra.html`). As tabelas de
+referência são geradas pelo `docs/_tools/genpages.py` e ficam no repositório, em
+`docs/_includes/generated/`: `terranet.md` e `terragrp.md` do `terra-docs-<v>.json`, `codes.md`
+do `terrac-errors-<v>.json`. O CI reprova se estiverem desatualizadas. Para regenerar, com os
+anexos de um build (do CI ou local):
+
+```bash
+python3 docs/_tools/genpages.py --docs terra-docs-<v>.json --out docs/_includes/generated
+python3 docs/_tools/genpages.py --catalog terrac-errors-<v>.json --out docs/_includes/generated
+```
+
+Os exemplos Terra das páginas (blocos ```` ```terra ````) vêm depois de um comentário
+`<!-- check: ok -->` (compila sem erro nem aviso), `<!-- check: E3001 -->` (dá esse código), com
+` grp` no fim para o `TerraGrp.defs`, ou `<!-- check: skip -->` (esboço). O `build-terrac.sh`
+compila todos com o `docs/_tools/checkexamples.lua`.
+
 ## TerraControl
 
 `java -jar TerraVMControl-<v>.jar` (Java 8 ou mais novo). Ele conversa com o SerialForwarder do
