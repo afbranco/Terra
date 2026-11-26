@@ -203,6 +203,8 @@ de lá.
     não descarta mais a mensagem do `SEND_BS` depois de um pacote da serial (PR #112, #98);
     terrac: `x = await EVT` com `x` de outro tamanho (ou float) converte o valor (PR #121, #117;
     temporário do tamanho do evento, só instruções antigas; nenhum `.vmx` do corpus muda);
+  - terrac, depois da v1.4.0: sem `summary.platforms` no `--diag=json` e W5003 com os números
+    (PR #123, #122);
   - terrac: catálogo com W3006 e E6007 (161 códigos); `.vmx` com `loop i,N` com nomes de limite
     novos (#48); cast para inteiro menor corta o valor (#46); float convertido em `emit`, `await`
     e argumento, e E4030 nos casos inválidos (#45); depois da v1.3.0, cast, `-`, `~` e `not` direto
@@ -299,6 +301,10 @@ de lá.
     um temporário do tamanho do evento (`mem.lua`, fica até o fim do bloco) e `push_v`/`pop` ou
     `set_e` com conversão; teste `tests/awaitconv` (só TOSSIM, lê o `sensors.bin`). O
     `grpinvalid.vmx` muda (lê o `SENDGR_DONE` num `ushort`).
+  - PR #123 (#122, depois da v1.4.0, decisão do Prof.): o fim da compilação mostra só o uso de
+    memória; sai o `summary.platforms` do `--diag=json` (o TerraSim aprovou: chave ausente vira
+    lista vazia). O W5003 fica, contra a memória da plataforma do `.defs`, com `size`, `platform` e
+    `max` na mensagem e em `args`. Catálogo com 161 códigos (só o texto do W5003 muda).
   - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
     `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
