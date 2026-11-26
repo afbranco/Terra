@@ -21,74 +21,84 @@ build and test only the micaz: in the TOSSIM simulator and in the Avrora emulato
 | `terra-<v>-{net,grp}-micaz-bs.{exe,ihex}` | micaz firmware for the base station (node 1, connected to the computer) |
 | `terra-<v>-{net,grp}-tossim-py3-x86_64.tar.gz` | TOSSIM simulator module (`_TOSSIM.so`, `TOSSIM.py`, Python 3) and its `.defs` |
 | `terrac-<v>.tar.gz` | the [compiler](terrac.html), with the `.defs` of the simulator |
-| `TerraVMControl-<v>.jar` | TerraControl, the tool that sends programs to the network |
+| `terractl-<v>.pyz` | `terractl` (Python 3): loads programs, shows the messages, flashes the micaz with an id, simulates a grid |
+| `TerraVMControl-<v>.jar` | the Java TerraControl, replaced by `terractl` |
 
 ## Installing the firmware on a micaz
 
-The `.ihex` files have node id 1. For another id, set it in the `.exe` with the tools of the
-[tinyos-toolchain](https://github.com/afbranco/tinyos-toolchain) image. Node 2 on a MIB520
-programmer at `/dev/ttyUSB0`:
+The `.ihex` files have node id 1. For another id, use `terractl` (asset `terractl-<v>.pyz`,
+Python 3), which sets the id in the `.exe` and calls `avrdude`. Node 2 on a MIB520 programmer at
+`/dev/ttyUSB0`:
 
 ```bash
-podman run --rm -it --device /dev/ttyUSB0 -v "$PWD:/w:Z" -w /w \
-  ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-0dded15 sh -c '
-    tos-set-symbols --objcopy avr-objcopy --objdump avr-objdump --target ihex \
-      terra-<v>-net-micaz-nobs.exe node2.ihex TOS_NODE_ID=2 ActiveMessageAddressC__addr=2 &&
-    avrdude -cmib510 -P/dev/ttyUSB0 -pm128 -U hfuse:w:0xd9:m -U efuse:w:0xff:m \
-      -C/etc/avrdude.conf -U flash:w:node2.ihex:a'
+python3 terractl-<v>.pyz flash terra-<v>-net-micaz-nobs.exe --node 2 --port /dev/ttyUSB0
 ```
 
-`docker` works in place of `podman`. The base station is node 1: install
-`terra-<v>-net-micaz-bs.ihex` as it is. Use the same VM (Net or Grp) on all the nodes.
+The base station is node 1: install `terra-<v>-net-micaz-bs.ihex` as it is (or `flash` the
+`-bs.exe` with `--node 1`). Use the same VM (Net or Grp) on all the nodes. `terractl flash ... -o
+node2.ihex` only writes the file; the tools of the
+[tinyos-toolchain](https://github.com/afbranco/tinyos-toolchain) image (`tos-set-symbols`) give the
+same result.
 
 ## Sending a program to the network
 
-The base station is connected to the computer. Two programs run on the computer:
+The base station is connected to the computer. The MIB520 opens two ports: the first flashes the
+firmware, the second carries the data. `terractl` loads the `.vmx` made by `terrac` through the data
+port and shows the messages that reach the base station:
 
-1. the TinyOS **SerialForwarder**, on the data port of the programmer (the MIB520 opens two
-   ports: the first flashes the firmware, the second carries the data):
+```bash
+python3 terractl-<v>.pyz load prog.vmx --serial /dev/ttyUSB1 --listen --terra prog.terra
+```
 
-   ```bash
-   java net.tinyos.sf.SerialForwarder -comm serial@/dev/ttyUSB1:micaz
-   ```
-
-2. **TerraControl** (`java -jar TerraVMControl-<v>.jar`), which connects to the SerialForwarder
-   (port 9002), loads the `.vmx` made by `terrac` and sends it to the network.
+The serial port needs `pyserial` (package `python3-serial`). With `--terra` (or `--types`, the
+output of `terrac --types`), the messages are shown field by field, by the `pktype` of the program:
+the ones sent with `SEND` to node 1 (TerraNet) or with `SEND_BS` (TerraGrp). `--sf host:port`
+connects to a SerialForwarder instead of the serial port. `terractl listen` only shows the messages.
 
 The nodes pass the program on to each other by radio: every node, including the ones out of
 range of the base station, receives it and starts it. A new version of the program replaces the
-running one.
+running one; `terractl` keeps the last version number in `~/.local/state/terractl/version`.
+
+The Java TerraControl (`TerraVMControl-<v>.jar`, with the TinyOS SerialForwarder) still comes with
+the release, but `terractl` replaces it.
 
 ## Simulating with TOSSIM
 
-The `_TOSSIM.so` of the release is a TOSSIM module for Python 3 (x86_64), with the Terra VM of
-every node. A Python script creates the network, boots the nodes and runs the simulation:
+The `_TOSSIM.so` of the release is a TOSSIM module for Python 3.14 (x86_64), with the Terra VM of
+every node. `terractl sim` builds a grid of nodes, loads the program through the base station, as in
+the real network, and prints the log of the nodes (LEDs, radio, VM start and errors) and the
+messages that reach the base station, with the simulated time:
 
-```python
-import sys
-sys.path.insert(0, "terra-<v>-net-tossim-py3-x86_64")
-from TOSSIM import SerialForwarder, Tossim
-
-t = Tossim([])
-sf = SerialForwarder(9002)             # for TerraControl, as with the real base station
-r = t.radio()
-for a, b in ((1, 2), (2, 1)):          # two nodes that hear each other
-    r.add(a, b, -60.0)
-for n in (1, 2):
-    m = t.getNode(n)
-    for _ in range(100):
-        m.addNoiseTraceReading(-98)
-    m.createNoiseModel()
-    m.bootAtTime(n * 1000)
-while t.time() < 600 * t.ticksPerSecond():
-    t.runNextEvent()
-    sf.process()
+```bash
+tar xzf terra-<v>-net-tossim-py3-x86_64.tar.gz
+podman run --rm -v "$PWD:/w:Z" -w /w ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-0dded15 \
+  python3 terractl-<v>.pyz sim prog.vmx --tossim terra-<v>-net-tossim-py3-x86_64 --grid 3x3 --time 60
 ```
 
-Node 1 is the base station. Start TerraControl and send the program, as in the real network.
-Run the script in a folder where it can write: the VM creates a `sensors.bin` file there. The
-simulation runs as fast as the computer can; a real-time pace (`Throttle` in the module) and a
-view of the nodes are up to the script.
+```
+    3.615  <<: vmstart 22 0 0 :>>
+    4.672  <<: leds 11 3 1 :>>
+    4.759  BS: nó 11  type=7 target=1 data=001234fffefffe...
+```
+
+The image of the toolchain has the Python of the module; on a machine with Python 3.14, run it
+directly. The nodes are column×10 + line (11, 12, ... 21, 22, ...), up to 9×9; each one hears its
+8 neighbors, and node 1, the base station, hears node 11. Some options:
+
+| Option | What it does |
+|---|---|
+| `--time S` | simulated seconds (60) |
+| `--seed N` | seed of the simulation: the same seed gives the same output |
+| `--types prog.json` | shows the messages to the base station by the `pktype` of the program (`terrac --types prog.terra > prog.json`; `--terra prog.terra` runs `terrac` itself, when it is installed where `sim` runs) |
+| `--late N --late-at S` | the last N columns boot at second S (30) |
+| `--vmdbg file` | writes the `VMDBG` channel (every instruction of the VM) |
+| `--channel NAME` | also shows a TOSSIM debug channel (`AM`, `Serial`...) |
+| `--hide CMD,...` | log commands not shown (`serial`; empty shows all) |
+| `--realtime` | runs at the pace of the clock, for `terractl load --sf localhost:9002` from outside |
+
+Run it in a folder where it can write: the VM creates a `sensors.bin` file there, and the channels
+go to `.terractl-sim/`. The TerraGrp module works the same way. A script of your own can also use
+the module (`from TOSSIM import Tossim, SerialForwarder`): see `terractl/sim.py`.
 
 TerraSim is a web simulator for teaching, built on these modules, with an editor, a view of the
 network and the deploy of the programs. It runs at

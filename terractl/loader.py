@@ -56,14 +56,15 @@ class Loader:
     """`log(texto)` recebe o andamento. A versão tem de ser maior que a da rede (o mote descarta a
     igual ou menor); se um mote pede uma versão maior, a carga passa para a seguinte."""
 
-    def __init__(self, link, prog, version=None, log=print, gap=0.15):
-        self.link, self.prog, self.log, self.gap = link, prog, log, gap
-        self.version = version or (last_version() + 1)
+    def __init__(self, link, prog, version=None, log=print, gap=0.15, persist=True):
+        """`persist`: guarda a versão usada (False no simulador, que começa da versão 0)."""
+        self.link, self.prog, self.log, self.gap, self.persist = link, prog, log, gap, persist
+        self.version = version or ((last_version() if persist else 0) + 1)
         if not 1 <= self.version <= 0xFFFF:
             raise SystemExit("terractl: versão %d fora de 1..65535" % self.version)
         self.pedidos = 0           # pedidos de bloco atendidos (chegam todos com a origem da BS, que
         self.blocos_pedidos = set()  # os repassa: não dá para saber qual mote pediu)
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
         self._ultimo_anuncio = 0
 
     def announce(self):
@@ -79,11 +80,13 @@ class Loader:
         with self._lock:
             self.announce()
             for b in sorted(self.prog.blocks):
-                time.sleep(self.gap)
+                if self.gap:
+                    time.sleep(self.gap)
                 self.send_block(b)
 
     def start(self):
-        save_version(self.version)
+        if self.persist:
+            save_version(self.version)
         self.log("versão %d, %d blocos (%d a %d)" % (self.version, self.prog.nblocks, self.prog.start,
                                                       self.prog.start + self.prog.nblocks - 1))
         self.push()
@@ -100,9 +103,13 @@ class Loader:
                 self.send_block(b)
             elif v > self.version:
                 self.version = v + 1
-                save_version(self.version)
+                if self.persist:
+                    save_version(self.version)
                 self.log("a rede já está na versão %d: a carga passa para a %d" % (v, self.version))
-                threading.Thread(target=self.push, daemon=True).start()
+                if self.gap:
+                    threading.Thread(target=self.push, daemon=True).start()
+                else:
+                    self.push()         # sem espera entre os blocos (o simulador espaça)
             elif time.time() - self._ultimo_anuncio > 1:
                 self.announce()      # pediu a versão (0) ou tem uma antiga
         return True

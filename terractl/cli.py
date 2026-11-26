@@ -15,6 +15,10 @@ from . import loader as LD
 from . import messages as M
 
 
+def sim_gain():
+    return 85.0
+
+
 def _conexao(p):
     g = p.add_argument_group("conexão com a estação base")
     g.add_argument("--serial", metavar="PORTA", help="porta serial da BS (na MIB520, a segunda: /dev/ttyUSB1)")
@@ -138,6 +142,15 @@ def cmd_flash(a):
         return F.flash(caminho, a.port, a.programmer, a.avrdude)
 
 
+def cmd_sim(a):
+    from . import sim
+    rc = sim.run(a, out=lambda s: print(s, flush=True))
+    # O SerialForwarder do TOSSIM imprime uma estatística ao ser destruído: sai sem passar por ele.
+    sys.stdout.flush()
+    sys.stderr.flush()
+    os._exit(rc)
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(prog="terractl", description=__doc__)
     p.add_argument("--version", action="version", version="terractl " + __version__)
@@ -169,6 +182,34 @@ def main(argv=None):
     s.add_argument("--avrdude", default="avrdude")
     s.add_argument("--output", "-o", help="só grava o .ihex com o ID neste arquivo")
     s.set_defaults(func=cmd_flash)
+
+    s = sub.add_parser("sim", help="simula uma grade de motes com o _TOSSIM.so da release e mostra os logs")
+    s.add_argument("vmx", nargs="?", help="programa carregado pela BS (sem ele, a rede fica esperando; "
+                                         "com --realtime, carregue de fora com terractl load --sf)")
+    s.add_argument("--tossim", required=True, metavar="PASTA",
+                   help="pasta do terra-<v>-{net,grp}-tossim-py3-x86_64.tar.gz extraído (a VM é a dele)")
+    s.add_argument("--grid", default="3x3", help="LINHASxCOLUNAS, até 9x9 (padrão 3x3); nós coluna*10+linha")
+    s.add_argument("--time", type=float, default=60, help="segundos simulados (padrão 60)")
+    s.add_argument("--seed", type=int, default=1, help="semente do TOSSIM (a simulação se repete com ela)")
+    s.add_argument("--gain", type=float, default=sim_gain(), help="ganho dos enlaces em dB (85, o do TerraSim.py)")
+    s.add_argument("--load-at", type=float, default=1, help="segundo em que a BS recebe o programa (1)")
+    s.add_argument("--every", type=float, default=10, help="reanuncia a versão a cada N segundos simulados (0: não)")
+    s.add_argument("--prog-version", dest="version", type=int, help="número da versão (padrão 1)")
+    s.add_argument("--late", type=int, default=0, metavar="N", help="as últimas N colunas ligam depois")
+    s.add_argument("--late-at", type=float, default=30, help="segundo em que elas ligam (30)")
+    s.add_argument("--realtime", action="store_true", help="no ritmo do relógio, para conectar de fora pelo SerialForwarder")
+    s.add_argument("--sf-port", type=int, default=9002, help="porta do SerialForwarder do TOSSIM (9002)")
+    s.add_argument("--vmdbg", metavar="ARQ", help="grava o canal VMDBG (cada instrução da VM) neste arquivo")
+    s.add_argument("--channel", action="append", default=[], metavar="CANAL",
+                   help="mostra também este canal de dbg do TOSSIM (AM, Serial...); pode repetir")
+    s.add_argument("--hide", default="serial", metavar="CMD,...",
+                   help="comandos do TVIEW que não aparecem (padrão: serial, já que as mensagens à BS "
+                        "saem decodificadas; vazio mostra tudo)")
+    s.add_argument("--logdir", default=".terractl-sim", help="pasta dos arquivos dos canais (.terractl-sim)")
+    s.add_argument("--terra", metavar="PROG.terra", help="decodifica as mensagens à BS pelos pktype (terrac --types)")
+    s.add_argument("--types", metavar="ARQ.json", help="a saída do terrac --types, em vez de --terra")
+    s.add_argument("--terrac", default="terrac")
+    s.set_defaults(func=cmd_sim)
 
     a = p.parse_args(argv)
     return a.func(a)

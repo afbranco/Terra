@@ -25,6 +25,9 @@ with open(saida, "wb") as f:
             if a == "__init__.py":
                 texto = texto.replace('__version__ = "dev"', '__version__ = "%s"' % versao)
             poe("terractl/" + a, texto)
+        # O ruído do simulador (terractl sim), o mesmo do TerraSim.py da .ova.
+        poe("terractl/meyer-heavy_short.txt",
+            open(os.path.join(RAIZ, "TerraVM", "src", "meyer-heavy_short.txt"), encoding="utf-8").read())
         poe("__main__.py", "import sys\n\nfrom terractl.cli import main\n\nsys.exit(main())\n")
 os.chmod(saida, 0o755)
 print("build-terractl: %s (%s, %d arquivos)" % (saida, versao, len(arquivos)))
