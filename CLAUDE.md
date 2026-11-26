@@ -487,8 +487,9 @@ e `.rodata` iguais aos do `459a2091`), refazer o oráculo e criar a TerraSim v1.
 
 - Se o `handoff/` (scripts e tabelas da análise de versão) entra no repositório. Hoje está
   fora do git (`.git/info/exclude`).
-- Teste do Prof. com micaz real (MIB520, #16, roteiro em `release/README.md`): não bloqueou a
-  v1.0.0 nem a v1.0.1 e consta como pendente nas notas delas.
+- Teste com micaz real (#16): em 2026-11-26, a v1.5.0 (Net e Grp) passou em 2 micaz em 2 MIB520CA
+  pelo USB, numa VM VMware (resultado na #16; script e programas no scratchpad da sessão). Falta o
+  TerraControl (jar), multi-salto e a MTS300 (#109), que precisam de pilhas.
 - Quais correções de bugs achados na integração valem para a produção.
 
 ## Como trabalhar (mesmas regras do tinyos-toolchain)
