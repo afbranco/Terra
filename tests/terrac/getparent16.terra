@@ -1,0 +1,3 @@
+#include "TerraGrp.defs"
+// Issue #114: getParent() devolve 16 bits (o id do pai no CTP). Guardado num ubyte, o terrac avisa.
+var ubyte b = getParent();

@@ -172,7 +172,7 @@ do
 	input ushort 	INT_A 			void 	10;
 	input ushort 	INT_B 			void 	11;
 //@endif
-	input ubyte 	CUSTOM_A_ID		ubyte 	12;
+	input ubyte 	CUSTOM_A		ubyte 	12;
 	input ubyte 	CUSTOM_A 		void 	13;
 //@if MIC
 	input ushort 	MIC 			void 	14;
@@ -209,7 +209,7 @@ do
 	function ubyte setupMic(ushort*,ushort,ulong,ubyte)			16;
 //@endif
 	function ubyte setRFPower(ubyte)			17;
-	function ubyte getParent()			18;
+	function ushort getParent()			18;
 
 // Request/await macros
 #define getTemp(var)  emit REQ_TEMP();  var=await TEMP 
