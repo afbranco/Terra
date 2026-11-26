@@ -46,3 +46,11 @@ Terra VM as a common layer; that work is in the
 Terra releases.
 
 Terra is free software, under the [GPL v3](license.html).
+
+## How to cite
+
+Adriano Branco, Francisco Sant'Anna, Roberto Ierusalimschy, Noemi Rodriguez and Silvana Rossetto.
+**Terra: Flexibility and safety in wireless sensor networks.** *ACM Transactions on Sensor
+Networks*, 11(4):59:1-59:27, 2015. [doi:10.1145/2811267](https://doi.org/10.1145/2811267)
+
+The BibTeX, the article on Céu and the other works are in [Publications](publications.html).
