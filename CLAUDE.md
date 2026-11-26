@@ -183,7 +183,9 @@ de lá.
     memória para programa 1920 B, PR #101, #99; só o micaz, o TOSSIM já tinha a fila);
     Grp: `groupInit` com id > 31 e `aggregInit` com `agId` > 7 dão `EINVAL`, `SEND_GR` a grupo não
     declarado não sai (`SENDGR_DONE` com `EINVAL`), `AGGREG` sem `aggregInit` termina com `count` 0
-    (PR #102); o `VM.reset` esvazia as filas de agregação (PR #103);
+    (PR #102); o `VM.reset` esvazia as filas de agregação (PR #103); `AGGREG` com a fila de agregação
+    cheia termina na hora com `count` 0 (+11 B de RAM, PR #106); carga terminada pelo temporizador
+    fica em `ST_IDLE` e o nó volta a pedir a versão nova (PR #105);
   - terrac: catálogo com W3006 e E6007 (161 códigos); `.vmx` com `loop i,N` com nomes de limite
     novos (#48); cast para inteiro menor corta o valor (#46); float convertido em `emit`, `await`
     e argumento, e E4030 nos casos inválidos (#45);
@@ -243,6 +245,12 @@ de lá.
     `aggregInit` entrou sem teste que reprove (antes também acabava em 0).
   - PR #103 (#83): o `VM.reset` não limpava `aggQ`/`aggReqQ`/`aggLocalReqQ`; a versão nova recebia
     o `AGGREG_DONE` de uma agregação da antiga. Teste `tests/aggreset` (só TOSSIM, duas versões).
+  - PR #106 (#83): `AGGREG` recusado pela `aggQ` cheia (3 com `QUEUE=SHORT`) termina na hora com
+    `count` 0 (opção do Prof.), buffer próprio `ExtDataAggFull`. Teste `tests/aggqfull`.
+  - PR #105 (#83): `ReqState` em `RO_IDLE` (fim da carga pelo temporizador) não tinha caso no
+    `ProgReqTimerTask`; agora `ST_IDLE`. Sem teste que reprove (decisão do Prof.).
+  - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
+    `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
     teste.
   - O `gh pr merge` não acusa branch desatualizada (o repositório não exige): conferir com
