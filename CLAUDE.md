@@ -354,6 +354,12 @@ de lá.
     GIL (o CI travou; o `SFLink` manda o "U " e confere a resposta na thread de leitura). Os pedidos
     de bloco chegam com a origem da BS (não dá para saber qual mote pediu). O `flash` sai igual ao
     `tos-set-symbols` nos 4 firmwares.
+  - #94 (PR #139): `terractl sim`, o `TerraSim.py` da `.ova` em Python 3 sem visualizador (grade até 9x9,
+    8 vizinhos, ganho 85, `meyer-heavy_short.txt`, BS no 11, `--late` = parte B). Carga pelo `Loader`
+    (`persist=False`) com `TossimLink` (serial simulada, SF do TOSSIM lido na mesma thread). O `.so` é
+    do Python 3.14: no uso, rodar na imagem do toolchain (lá não há `terrac`: `--types`, não `--terra`).
+    Teste `tests/terractlsim` (3x3, mesma saída com a mesma semente). A saída do `terractl` é em
+    português e o site em inglês: a decidir com o Prof.
   - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
     `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
