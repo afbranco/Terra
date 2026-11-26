@@ -56,6 +56,12 @@ de lá.
     `ubyte`, `await` com conversão. `_TOSSIM.so` Net `7da72fd4…`, Grp `8cdb16af…`; catálogo e
     `TerraVMControl` iguais aos da v1.3.0 (161 códigos). Oráculo do TerraSim no `c6f45b4`
     idêntico à v1.3.0. TerraSim avisado.
+  - **`v1.5.0` publicada** (tag no `c8b0bcc`, 2026-11-26, a pedido do Prof.): `terrac` com o fim da
+    compilação só com o uso de memória e sem `summary.platforms` (#122, W5003 com os números),
+    anexo novo `terra-docs-1.5.0.json` (#91, fechada) e o site novo. Firmware, `_TOSSIM.so`,
+    `.defs` e `TerraVMControl` iguais byte a byte aos da v1.4.0; catálogo com 161 códigos (só o
+    texto do W5003 muda); o `terra-docs` é igual à prévia `terra-docs-dev.json` do TerraSim.
+    TerraSim avisado.
   - Alinhada com a release **tinyos-toolchain `2.1.2-r2`** (decidido pelo Prof. em 2026-11-22;
     antes era a r1, `f42bac7`, digest `7e21b1b9…`). O workflow fixa a imagem
     `2.1.2-resolute-py3-21d8fb1@sha256:4198b12302181edd0e8b20ae06cd3af0a2d483a06355a78c1f83371250de47ec`.
