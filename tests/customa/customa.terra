@@ -1,0 +1,15 @@
+#include "TerraGrp.defs"
+
+// TerraGrp: CUSTOM_A(x) com filtro, com o mesmo nome do Net (#115; antes CUSTOM_A_ID no Grp).
+// O REQ_CUSTOM_A(4) não passa pelo filtro 5; o REQ_CUSTOM_A(5) passa. Nos LEDs: 5.
+var ubyte v;
+par/and do
+  v = await CUSTOM_A(5);
+  emit LEDS(v);
+with
+  await 1s;
+  emit REQ_CUSTOM_A(4);
+  await 1s;
+  emit REQ_CUSTOM_A(5);
+end
+await FOREVER;
