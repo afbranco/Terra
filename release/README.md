@@ -72,6 +72,8 @@ lua5.1 terrac meuScript.terra      # gera meuScript.vmx; o .defs fica na mesma p
 
 Até a 1.0.1 o `terrac` só funcionava com o lpeg 0.10.2 (`luarocks --lua-version=5.1 install lpeg
 0.10.2-1`). O CI testa as duas versões, e elas têm de gerar o mesmo `.vmx` e as mesmas mensagens.
+Desde 2026-11-26 o anexo sai do job do lpeg 1.x (o conteúdo é o mesmo: o lpeg não vai no anexo); o
+0.10.2 fica no CI até o TerraSim passar para o `lua-lpeg`.
 
 ### Mensagens de erro e `--diag=json`
 

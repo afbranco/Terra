@@ -56,8 +56,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # 0.10.2: a versão de 2016 (luarocks); a da release sai dela.
-        # 1.x: a da distribuição (lua-lpeg). As saídas têm de ser as mesmas (issue #21).
+        # 1.x: a da distribuição (lua-lpeg); a da release sai dela (decisão do Prof., 2026-11-26).
+        # 0.10.2: a versão de 2016 (luarocks), só como teste enquanto o TerraSim a usa; sai do CI
+        # quando ele passar para o lua-lpeg. As saídas têm de ser as mesmas (issue #21).
         lpeg: ['0.10.2', 'distro']
     steps:
       - uses: actions/checkout@v5
@@ -77,7 +78,7 @@ jobs:
       - name: Build e testes
         run: release/build-terrac.sh "$VER" dist
       - uses: actions/upload-artifact@v4
-        if: matrix.lpeg == '0.10.2'
+        if: matrix.lpeg == 'distro'
         with:
           name: terrac
           path: dist/
