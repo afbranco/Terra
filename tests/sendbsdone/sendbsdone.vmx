@@ -1,4 +1,4 @@
-44 175 1 1 0 0 8 1 8
+43 174 1 1 0 0 8 1 8
 00 | 00000 0 track 0
 00 | 00001 0
 00 | 00002 0
@@ -37,140 +37,139 @@
 00 | 00035 0027 
 00 | 00036 0028 
 00 | 00037 0029 
-00 | 00038 0030 v:2, 
-00 | 00039 0031 
-00 | 00040 0032 flags:1, 
+00 | 00038 0030 v:1, 
+00 | 00039 0031 flags:1, 
+00 | 00040 0032 i:1, 
 00 | 00041 0033 i:1, 
-00 | 00042 0034 i:1, 
-00 | 00043 0035 __i_1:1, 
-d1 | 00044 d1 set_c ushort 8 11009          | config gate SENDBS_DONE with 1 await(s) - 0x2b01 = 11009
-08 | 00045 08 
-2b | 00046 2b 
-01 | 00047 01 
-c0 | 00048 c0 set_c ubyte 32 0              | flags = 0
-20 | 00049 20 
-00 | 00050 00 
-c0 | 00051 c0 set_c ubyte 13 7              | m.msgId = 7
-0d | 00052 0d 
-07 | 00053 07 
-29 | 00054 29 clken_c 0 3000 6              | clock enable Awake_3000_6 3000msec
-03 | 00055 03 
-00 | 00056 00 
-0b | 00057 0b 
-b8 | 00058 b8 
-00 | 00059 .00 addr:62
-3e | 00060 .06 
-01 | 00061 01 end                           | end
-40 | 00062 40 push_c 11                     | push 11
-0b | 00063 0b 
-24 | 00064 24 func 0                        | func getNodeId
-00 | 00065 00 
-0f | 00066 0f eq                            | eq
-4f | 00067 4f ifelse 37 38                  | ifelse True_37 EndIf_38
-00 | 00068 .00 addr:72
-48 | 00069 .25 
-00 | 00070 .00 addr:170
-aa | 00071 .26 
-c0 | 00072 c0 set_c ubyte 34 0              | i = 0
-22 | 00073 22 
-00 | 00074 00 
-c0 | 00075 c0 set_c ubyte 35 20             | __i_1 = 20
-23 | 00076 23 
-14 | 00077 14 
-90 | 00078 90 push_v ubyte 35               | push __i_1:ubyte
-23 | 00079 23 
-90 | 00080 90 push_v ubyte 34               | push i:ubyte
-22 | 00081 22 
-11 | 00082 11 gte                           | gte
-4f | 00083 4f ifelse 31 32                  | ifelse True_31 False_32
-00 | 00084 .00 addr:88
-58 | 00085 .1f 
-00 | 00086 .00 addr:96
-60 | 00087 .20 
-3d | 00088 3d tkins_z 1 8 11                | insert track Loop_out_11 tree 8
-88 | 00089 88 
-00 | 00090 .00 addr:163
-a3 | 00091 .0b 
-01 | 00092 01 end                           | end
-39 | 00093 39 exec 33                       | goto  33
-00 | 00094 .00 addr:78
-4e | 00095 .09 
-b1 | 00096 b1 outevt_v 40 13                | emit SEND_BS len=17 var=m
-28 | 00097 28 
-0d | 00098 0d 
-d1 | 00099 d1 set_c ushort 10 19            | await SENDBS_DONE[0]
-0a | 00100 0a 
-00 | 00101 .00 addr:104
-68 | 00102 .13 
-01 | 00103 01 end                           | end
-5c | 00104 5c getextdt_v 30 2               | getExtData v 2
-1e | 00105 1e 
-02 | 00106 02 
-40 | 00107 40 push_c 0                      | push 0
-00 | 00108 00 
-91 | 00109 91 push_v ushort 30              | push v:ushort
-1e | 00110 1e 
-0f | 00111 0f eq                            | eq
-4f | 00112 4f ifelse 28 29                  | ifelse True_28 False_29
-00 | 00113 .00 addr:117
-75 | 00114 .1c 
-00 | 00115 .00 addr:127
-7f | 00116 .1d 
-40 | 00117 40 push_c 1                      | push 1
-01 | 00118 01 
-90 | 00119 90 push_v ubyte 32               | push flags:ubyte
-20 | 00120 20 
-0a | 00121 0a bor                           | bor
-a0 | 00122 a0 pop ubyte 32                  | pop flags
-20 | 00123 20 
-39 | 00124 39 exec 30                       | goto  30
-00 | 00125 .00 addr:157
-9d | 00126 .1e 
-40 | 00127 40 push_c 5                      | push 5
-05 | 00128 05 
-91 | 00129 91 push_v ushort 30              | push v:ushort
-1e | 00130 1e 
-0f | 00131 0f eq                            | eq
-4f | 00132 4f ifelse 25 26                  | ifelse True_25 False_26
-00 | 00133 .00 addr:137
-89 | 00134 .19 
-00 | 00135 .00 addr:147
-93 | 00136 .1a 
-40 | 00137 40 push_c 2                      | push 2
-02 | 00138 02 
-90 | 00139 90 push_v ubyte 32               | push flags:ubyte
-20 | 00140 20 
-0a | 00141 0a bor                           | bor
-a0 | 00142 a0 pop ubyte 32                  | pop flags
-20 | 00143 20 
-39 | 00144 39 exec 27                       | goto  27
-00 | 00145 .00 addr:157
-9d | 00146 .1e 
-40 | 00147 40 push_c 4                      | push 4
-04 | 00148 04 
-90 | 00149 90 push_v ubyte 32               | push flags:ubyte
-20 | 00150 20 
-0a | 00151 0a bor                           | bor
-a0 | 00152 a0 pop ubyte 32                  | pop flags
-20 | 00153 20 
-39 | 00154 39 exec 27                       | goto  27
-00 | 00155 .00 addr:157
-9d | 00156 .1e 
-40 | 00157 40 push_c 34                     | push &i
-22 | 00158 22 
-60 | 00159 60 inc ubyte                     | inc ubyte
-39 | 00160 39 exec 33                       | goto  33
-00 | 00161 .00 addr:78
-4e | 00162 .09 
-48 | 00163 48 memclr 10 2                   | clear EXT gates for SENDBS_DONE
-0a | 00164 0a 
-02 | 00165 02 
-90 | 00166 90 push_v ubyte 32               | push flags:ubyte
-20 | 00167 20 
-25 | 00168 25 outevt_e 5                    | emit LEDS
-05 | 00169 05 
-01 | 00170 01 end                           | end
-48 | 00171 48 memclr 0 8                    | clear WClocks gates from 0 to 1
-00 | 00172 00 
-08 | 00173 08 
-01 | 00174 01 end                           | end
+00 | 00042 0034 __i_1:1, 
+d1 | 00043 d1 set_c ushort 8 11009          | config gate SENDBS_DONE with 1 await(s) - 0x2b01 = 11009
+08 | 00044 08 
+2b | 00045 2b 
+01 | 00046 01 
+c0 | 00047 c0 set_c ubyte 31 0              | flags = 0
+1f | 00048 1f 
+00 | 00049 00 
+c0 | 00050 c0 set_c ubyte 13 7              | m.msgId = 7
+0d | 00051 0d 
+07 | 00052 07 
+29 | 00053 29 clken_c 0 3000 6              | clock enable Awake_3000_6 3000msec
+03 | 00054 03 
+00 | 00055 00 
+0b | 00056 0b 
+b8 | 00057 b8 
+00 | 00058 .00 addr:61
+3d | 00059 .06 
+01 | 00060 01 end                           | end
+40 | 00061 40 push_c 11                     | push 11
+0b | 00062 0b 
+24 | 00063 24 func 0                        | func getNodeId
+00 | 00064 00 
+0f | 00065 0f eq                            | eq
+4f | 00066 4f ifelse 37 38                  | ifelse True_37 EndIf_38
+00 | 00067 .00 addr:71
+47 | 00068 .25 
+00 | 00069 .00 addr:169
+a9 | 00070 .26 
+c0 | 00071 c0 set_c ubyte 33 0              | i = 0
+21 | 00072 21 
+00 | 00073 00 
+c0 | 00074 c0 set_c ubyte 34 20             | __i_1 = 20
+22 | 00075 22 
+14 | 00076 14 
+90 | 00077 90 push_v ubyte 34               | push __i_1:ubyte
+22 | 00078 22 
+90 | 00079 90 push_v ubyte 33               | push i:ubyte
+21 | 00080 21 
+11 | 00081 11 gte                           | gte
+4f | 00082 4f ifelse 31 32                  | ifelse True_31 False_32
+00 | 00083 .00 addr:87
+57 | 00084 .1f 
+00 | 00085 .00 addr:95
+5f | 00086 .20 
+3d | 00087 3d tkins_z 1 8 11                | insert track Loop_out_11 tree 8
+88 | 00088 88 
+00 | 00089 .00 addr:162
+a2 | 00090 .0b 
+01 | 00091 01 end                           | end
+39 | 00092 39 exec 33                       | goto  33
+00 | 00093 .00 addr:77
+4d | 00094 .09 
+b1 | 00095 b1 outevt_v 40 13                | emit SEND_BS len=17 var=m
+28 | 00096 28 
+0d | 00097 0d 
+d1 | 00098 d1 set_c ushort 10 19            | await SENDBS_DONE[0]
+0a | 00099 0a 
+00 | 00100 .00 addr:103
+67 | 00101 .13 
+01 | 00102 01 end                           | end
+5c | 00103 5c getextdt_v 30 1               | getExtData v 1
+1e | 00104 1e 
+01 | 00105 01 
+40 | 00106 40 push_c 0                      | push 0
+00 | 00107 00 
+90 | 00108 90 push_v ubyte 30               | push v:ubyte
+1e | 00109 1e 
+0f | 00110 0f eq                            | eq
+4f | 00111 4f ifelse 28 29                  | ifelse True_28 False_29
+00 | 00112 .00 addr:116
+74 | 00113 .1c 
+00 | 00114 .00 addr:126
+7e | 00115 .1d 
+40 | 00116 40 push_c 1                      | push 1
+01 | 00117 01 
+90 | 00118 90 push_v ubyte 31               | push flags:ubyte
+1f | 00119 1f 
+0a | 00120 0a bor                           | bor
+a0 | 00121 a0 pop ubyte 31                  | pop flags
+1f | 00122 1f 
+39 | 00123 39 exec 30                       | goto  30
+00 | 00124 .00 addr:156
+9c | 00125 .1e 
+40 | 00126 40 push_c 5                      | push 5
+05 | 00127 05 
+90 | 00128 90 push_v ubyte 30               | push v:ubyte
+1e | 00129 1e 
+0f | 00130 0f eq                            | eq
+4f | 00131 4f ifelse 25 26                  | ifelse True_25 False_26
+00 | 00132 .00 addr:136
+88 | 00133 .19 
+00 | 00134 .00 addr:146
+92 | 00135 .1a 
+40 | 00136 40 push_c 2                      | push 2
+02 | 00137 02 
+90 | 00138 90 push_v ubyte 31               | push flags:ubyte
+1f | 00139 1f 
+0a | 00140 0a bor                           | bor
+a0 | 00141 a0 pop ubyte 31                  | pop flags
+1f | 00142 1f 
+39 | 00143 39 exec 27                       | goto  27
+00 | 00144 .00 addr:156
+9c | 00145 .1e 
+40 | 00146 40 push_c 4                      | push 4
+04 | 00147 04 
+90 | 00148 90 push_v ubyte 31               | push flags:ubyte
+1f | 00149 1f 
+0a | 00150 0a bor                           | bor
+a0 | 00151 a0 pop ubyte 31                  | pop flags
+1f | 00152 1f 
+39 | 00153 39 exec 27                       | goto  27
+00 | 00154 .00 addr:156
+9c | 00155 .1e 
+40 | 00156 40 push_c 33                     | push &i
+21 | 00157 21 
+60 | 00158 60 inc ubyte                     | inc ubyte
+39 | 00159 39 exec 33                       | goto  33
+00 | 00160 .00 addr:77
+4d | 00161 .09 
+48 | 00162 48 memclr 10 2                   | clear EXT gates for SENDBS_DONE
+0a | 00163 0a 
+02 | 00164 02 
+90 | 00165 90 push_v ubyte 31               | push flags:ubyte
+1f | 00166 1f 
+25 | 00167 25 outevt_e 5                    | emit LEDS
+05 | 00168 05 
+01 | 00169 01 end                           | end
+48 | 00170 48 memclr 0 8                    | clear WClocks gates from 0 to 1
+00 | 00171 00 
+08 | 00172 08 
+01 | 00173 01 end                           | end
