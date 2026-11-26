@@ -23,8 +23,8 @@ Terra was created by Adriano Branco at PUC-Rio. Contact: <img alt="afbranco at g
 - [TerraNet](terranet.html): the VM with radio messages to the nodes in range.
 - [TerraGrp](terragrp.html): the VM with groups, leader election and aggregation.
 - [terrac](terrac.html): the compiler, its options and diagnostics; [error codes](terrac-codes.html).
-- [TinyOS platform](terra-platf-tinyos.html): building the firmware, installing it on the motes.
-- [Customization](terra-custom-Intro.html): how to create a new VM with other events and functions.
+- [TinyOS platform](tinyos.html): building the firmware, installing it on the motes.
+- [Customization](customization.html): how to create a new VM with other events and functions.
 
 This site documents the latest release. Older versions are in the repository history.
 
@@ -45,4 +45,4 @@ Terra VM as a common layer; that work is in the
 [TerraSim](https://github.com/afbranco/TerraSim) is a web simulator for teaching, based on the
 Terra releases.
 
-Terra is free software, under the [GPL v3](terra-license.html).
+Terra is free software, under the [GPL v3](license.html).

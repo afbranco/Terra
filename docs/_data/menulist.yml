@@ -27,20 +27,11 @@ docs:
   - page: terrac error codes
     url: terrac-codes.html
 
-- menu: Platforms
-  submenu:
-
-  - page: TinyOS
-    url: terra-platf-tinyos.html
+- menu: TinyOS
+  url: tinyos.html
 
 - menu: Customization
-  submenu:
-
-  - page: Intro
-    url: terra-custom-Intro.html
-
-  - page: Tutorial New Custom
-    url: terra-custom-Tutorial.html
+  url: customization.html
 
 - menu: License
-  url: terra-license.html
+  url: license.html
