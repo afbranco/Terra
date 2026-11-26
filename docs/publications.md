@@ -67,8 +67,8 @@ More about Céu at [ceu-lang.org](http://www.ceu-lang.org/).
    [PDF](http://sensys.acm.org/2013/sensys13DC/branco.pdf)
 5. Adriano Branco, Ana Lúcia de Moura, Noemi Rodriguez and Silvana Rossetto. *Teaching concurrent
    and distributed computing: initiatives in Rio de Janeiro.* In IEEE 27th International Parallel
-   and Distributed Processing Symposium Workshops and PhD Forum (IPDPSW), pages 1318-1323, May
-   2013. [doi:10.1109/IPDPSW.2013.33](https://doi.org/10.1109/IPDPSW.2013.33)
+   and Distributed Processing Symposium Workshops and PhD Forum (IPDPSW), pages 1318-1323,
+   May 2013. [doi:10.1109/IPDPSW.2013.33](https://doi.org/10.1109/IPDPSW.2013.33)
 6. Adriano Branco, Noemi Rodriguez and Silvana Rossetto. *Um modelo de programação para RSSF com
    suporte a reconfiguração dinâmica de aplicações.* In XXIX Simpósio Brasileiro de Redes de
    Computadores e Sistemas Distribuídos (SBRC 2011), pages 411-423. SBC, 2011. In Portuguese.
