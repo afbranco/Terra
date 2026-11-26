@@ -217,6 +217,9 @@ de lá.
     SUCCESS ou não, sem `#define FAIL` (#132; o `gendocs` reprova nome em maiúsculas não declarado
     no texto); `pIN`/`pOUT`/`RISING`/`FALLING`/`DISABLE` só com `PORTS` (saem do `.defs` do
     TOSSIM) e o `SEND_DATA_SIZE` sai do `.defs` do Net (#133); teste `tests/terrac/portas_tossim`;
+    Grp com pares `unsafe` (PR #135, #116): os do Net e `SEND_BS`/`SEND_GR` consigo mesmos (um buffer
+    de status cada; no TOSSIM, dois `SEND_GR` na mesma reação leram o mesmo status); só avisos
+    W2001, nenhum `.vmx` muda; o `terra-docs.json` passa de 127 para 111 entradas;
   - anexo novo `terra-docs-<v>.json` (PR #124, #91), para trocar o `terraDocs.js` e o
     `TERRA_LANGUAGE.md` mantidos à mão; formato no `release/README.md`;
   - terrac: catálogo com W3006 e E6007 (161 códigos); `.vmx` com `loop i,N` com nomes de limite
@@ -323,7 +326,7 @@ de lá.
     `TerraVM/src/defs/gendocs.py` gera o anexo `terra-docs-<v>.json` dos `.defs.in`, do
     `descricoes.toml` (texto em inglês, 111 nomes) e dos `.defs` gerados no build; reprova se
     faltar/sobrar descrição ou o `.defs` não bater com o modelo. Teste `release/test-gendocs.py`.
-    127 entradas (o Grp sem `unsafe` duplica 16, #116). Faltam as páginas do `docs/`.
+    127 entradas (o Grp sem `unsafe` duplicava 16, #116; 111 depois do PR #135). Faltam as páginas do `docs/`.
     PR #125: campo `group` obrigatório (leds, sensors, radio...), pedido do TerraSim para as
     tabelas da Help; o leitor deles já funciona com o JSON (testado no `terra-docs-dev.json`).
     PR #126: o site em Markdown (inglês) no `docs/`: `index`, `language`, `terranet`, `terragrp`
