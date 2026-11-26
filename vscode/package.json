@@ -1,0 +1,205 @@
+{
+  "name": "terra",
+  "displayName": "Terra",
+  "description": "Terra programming system for sensor networks: syntax, docs on hover, terrac errors, load programs, simulate and flash the micaz",
+  "version": "0.0.0-dev",
+  "publisher": "afbranco",
+  "license": "GPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/afbranco/Terra"
+  },
+  "homepage": "https://afbranco.github.io/Terra/",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters",
+    "Snippets"
+  ],
+  "main": "./out/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "languages": [
+      {
+        "id": "terra",
+        "aliases": [
+          "Terra",
+          "terra"
+        ],
+        "extensions": [
+          ".terra"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "terra",
+        "scopeName": "source.terra",
+        "path": "./syntaxes/terra.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "terra",
+        "path": "./snippets/terra.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "terra.compile",
+        "title": "Compile",
+        "category": "Terra"
+      },
+      {
+        "command": "terra.load",
+        "title": "Load program on the network",
+        "category": "Terra"
+      },
+      {
+        "command": "terra.listen",
+        "title": "Show messages of the base station",
+        "category": "Terra"
+      },
+      {
+        "command": "terra.simulate",
+        "title": "Simulate",
+        "category": "Terra"
+      },
+      {
+        "command": "terra.flash",
+        "title": "Flash a micaz",
+        "category": "Terra"
+      }
+    ],
+    "menus": {
+      "editor/title/run": [
+        {
+          "command": "terra.simulate",
+          "when": "editorLangId == terra",
+          "group": "terra@1"
+        },
+        {
+          "command": "terra.load",
+          "when": "editorLangId == terra",
+          "group": "terra@2"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "terra.compile",
+        "key": "ctrl+shift+b",
+        "mac": "cmd+shift+b",
+        "when": "editorLangId == terra"
+      }
+    ],
+    "configuration": {
+      "title": "Terra",
+      "properties": {
+        "terra.terracPath": {
+          "type": "string",
+          "default": "terrac",
+          "description": "The terrac compiler (release asset terrac-<v>.tar.gz; needs Lua 5.1 and lpeg)."
+        },
+        "terra.compileArgs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Extra options for terrac, e.g. [\"--no-opt\"]."
+        },
+        "terra.compileOnSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Compile on save and show the errors in Problems."
+        },
+        "terra.pythonPath": {
+          "type": "string",
+          "default": "python3",
+          "description": "Python 3 used to run terractl."
+        },
+        "terra.terractlPath": {
+          "type": "string",
+          "default": "",
+          "description": "terractl .pyz (empty: the one bundled with the extension)."
+        },
+        "terra.docsPath": {
+          "type": "string",
+          "default": "",
+          "description": "terra-docs.json (empty: the one bundled with the extension)."
+        },
+        "terra.connection": {
+          "type": "string",
+          "enum": [
+            "serial",
+            "sf"
+          ],
+          "default": "serial",
+          "description": "How terractl reaches the base station: its serial port or a SerialForwarder."
+        },
+        "terra.serialPort": {
+          "type": "string",
+          "default": "/dev/ttyUSB1",
+          "description": "Serial port of the base station (on the MIB520, the second one). Needs pyserial."
+        },
+        "terra.sfAddress": {
+          "type": "string",
+          "default": "localhost:9002",
+          "description": "SerialForwarder host:port."
+        },
+        "terra.flashPort": {
+          "type": "string",
+          "default": "/dev/ttyUSB0",
+          "description": "Programming port (on the MIB520, the first one)."
+        },
+        "terra.simulation.tossimPath.net": {
+          "type": "string",
+          "default": "",
+          "description": "Folder of terra-<v>-net-tossim-py3-x86_64 (extracted)."
+        },
+        "terra.simulation.tossimPath.grp": {
+          "type": "string",
+          "default": "",
+          "description": "Folder of terra-<v>-grp-tossim-py3-x86_64 (extracted)."
+        },
+        "terra.simulation.grid": {
+          "type": "string",
+          "default": "3x3",
+          "description": "LINESxCOLUMNS, up to 9x9."
+        },
+        "terra.simulation.time": {
+          "type": "number",
+          "default": 60,
+          "description": "Simulated seconds."
+        },
+        "terra.simulation.containerImage": {
+          "type": "string",
+          "default": "ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-0dded15",
+          "description": "Image that runs the simulation (the _TOSSIM.so is for Python 3.14). Empty: run it here."
+        },
+        "terra.simulation.containerEngine": {
+          "type": "string",
+          "default": "podman",
+          "description": "podman or docker."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p .",
+    "test": "tsc -p . && node --test test/*.test.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "~1.85.0",
+    "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^3.2.0",
+    "typescript": "~5.4.5",
+    "vscode-oniguruma": "^2.0.1",
+    "vscode-textmate": "^9.0.0"
+  }
+}

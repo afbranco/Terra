@@ -1,0 +1,67 @@
+{
+  "TerraNet program": {
+    "prefix": "terranet",
+    "body": ["#include \"TerraNet.defs\"", "", "$0"],
+    "description": "Program for the TerraNet VM"
+  },
+  "TerraGrp program": {
+    "prefix": "terragrp",
+    "body": ["#include \"TerraGrp.defs\"", "", "$0"],
+    "description": "Program for the TerraGrp VM"
+  },
+  "loop": {
+    "prefix": "loop",
+    "body": ["loop do", "\t${1:await 1s;}", "\t$0", "end"],
+    "description": "Loop (needs an await in every path)"
+  },
+  "loop with counter": {
+    "prefix": "loopi",
+    "body": ["loop ${1:i}, ${2:10} do", "\t$0", "end"],
+    "description": "Loop i from 0 to N-1"
+  },
+  "if": {
+    "prefix": "if",
+    "body": ["if ${1:cond} then", "\t$0", "end"],
+    "description": "if ... then ... end"
+  },
+  "if else": {
+    "prefix": "ifelse",
+    "body": ["if ${1:cond} then", "\t$2", "else", "\t$0", "end"],
+    "description": "if ... then ... else ... end"
+  },
+  "par/or": {
+    "prefix": "paror",
+    "body": ["par/or do", "\t$1", "with", "\t$0", "end"],
+    "description": "Runs the trails until one of them ends"
+  },
+  "par/and": {
+    "prefix": "parand",
+    "body": ["par/and do", "\t$1", "with", "\t$0", "end"],
+    "description": "Runs the trails until all of them end"
+  },
+  "par": {
+    "prefix": "par",
+    "body": ["par do", "\t$1", "with", "\t$0", "end"],
+    "description": "Runs the trails forever"
+  },
+  "pktype": {
+    "prefix": "pktype",
+    "body": ["pktype ${1:msg_t} from ${2|radioMsg,msgBS_t,msgGR_t|} with", "\tvar ${3:ushort} ${4:value};", "end"],
+    "description": "Message type built on a radio packet"
+  },
+  "regtype": {
+    "prefix": "regtype",
+    "body": ["regtype ${1:rec_t} with", "\tvar ${2:ushort} ${3:value};", "end"],
+    "description": "Record type"
+  },
+  "send and wait": {
+    "prefix": "send",
+    "body": ["emit SEND(${1:msg});", "await SEND_DONE(${2:type});"],
+    "description": "TerraNet: send a radioMsg and wait for SEND_DONE"
+  },
+  "receive": {
+    "prefix": "receive",
+    "body": ["var ${1:msg_t} ${2:m} = await RECEIVE(${3:type});"],
+    "description": "TerraNet: wait for a message of a type"
+  }
+}

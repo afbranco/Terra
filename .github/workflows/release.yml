@@ -82,6 +82,32 @@ jobs:
           name: terrac
           path: dist/
 
+  vscode:
+    # Extensão do VSCode (#93), com o terractl e o terra-docs.json do build da VM dentro.
+    name: Extensão do VSCode
+    needs: tinyos
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - name: Versão
+        run: echo "VER=$(case "$GITHUB_REF" in refs/tags/v*) echo "${GITHUB_REF_NAME#v}";; *) echo "dev-${GITHUB_SHA::7}";; esac)" >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@v4
+        with:
+          name: tinyos
+          path: fw
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build e testes (com a integração num VSCode de verdade)
+        run: |
+          command -v xvfb-run || { sudo apt-get update -q && sudo apt-get install -y -q xvfb; }
+          VSCODE_INTEGRATION=1 release/build-vscode.sh "$VER" fw dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vscode
+          path: dist/
+
   avrora:
     # Os testes da VM no micaz emulado (release/test-avrora.sh). Lento: só na tag de release e
     # quando o workflow é disparado à mão (Actions > release > Run workflow), não em todo PR.
@@ -111,7 +137,7 @@ jobs:
   release:
     name: Release (rascunho)
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [tinyos, terrac, avrora]
+    needs: [tinyos, terrac, vscode, avrora]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
