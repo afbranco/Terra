@@ -344,6 +344,16 @@ de lá.
     antigas redirecionam). #80 fechada. A #91 fica aberta até a release com o anexo.
     PR #128 (pedido do Prof.): `publications` com como citar (TOSN 2015 e Céu SenSys 2013, com
     BibTeX); o PDF do SBRC 2011 agora vem da CE-RESD da SBC (a biblioteca antiga saiu do ar).
+  - terractl (#92, decisões do Prof. de 2026-11-26: aposentar o TerraControl em Java; sem "Set
+    memory data" e "Send Group Message"; com decodificação pelo `pktype`). PR #137: `terrac --types`
+    (JSON com nome, `kind`, `from`, tamanho e campos com `offset`, sem gerar `.vmx`; teste
+    `tests/terrac/types`). PR #138: pacote `terractl/` (`load`, `listen`, `flash`), anexo
+    `terractl-<v>.pyz`, testes `release/test-terractl.py` e `tests/terractl{,grp}`. Achados: o
+    `float` fica em little-endian na memória da VM (o `nx_float` do atm128 é um `memcpy`), os
+    inteiros em big-endian; o `sf.process()` do TOSSIM lê o "U " do cliente bloqueado e sem soltar o
+    GIL (o CI travou; o `SFLink` manda o "U " e confere a resposta na thread de leitura). Os pedidos
+    de bloco chegam com a origem da BS (não dá para saber qual mote pediu). O `flash` sai igual ao
+    `tos-set-symbols` nos 4 firmwares.
   - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
     `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
