@@ -45,9 +45,10 @@
 {"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
 == palavras
 {"summary":{"ok":true,"errors":0,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"},"memory":{"total":124,"code":75,"ctl_vars":21,"stack":28,"radio_msgs":4}}}
-== semantica_naodeclarada
+== portas_tossim
 {"code":"E3001","severity":"error","file":"portas_tossim.terra","line":4,"col":17,"msg":"variable/event/function \"pIN\" is not declared","args":{"name":"pIN"}}
 {"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
+== semantica_naodeclarada
 {"code":"E3001","severity":"error","file":"semantica_naodeclarada.terra","line":4,"col":1,"msg":"variable/event/function \"y\" is not declared","args":{"name":"y"}}
 {"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}
 == sintaxe_await
