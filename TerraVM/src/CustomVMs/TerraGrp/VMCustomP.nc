@@ -32,6 +32,7 @@ implementation{
 nx_uint8_t  ExtDataCustomA;			// last request custom event (internal loop-back)
 usrSendGR_t ExtDataRecGR;			// last received radio group msg
 aggDone_t   ExtDataAggDone; 			// last AggregDone calculation
+aggDone_t   ExtDataAggFull; 			// AGGREG_DONE de um AGGREG recusado (fila cheia), count 0 (#83)
 nx_uint8_t  ExtDataQReady;			// last queue ready - queue size 
 uint8_t 	ExtDataError;			// last error event
 nx_uint16_t	ExtDataLeader;			// last leader identifier
@@ -233,7 +234,16 @@ void  proc_aggreg(uint16_t id, uint32_t addr){
 	// insert queue
 	AggSeq++;
 	dbg(APPNAME,"Custom::proc_aggreg(): aggId=%d, aggSeq=%d\n",agCtl->agId,AggSeq);
-	call aggQ.enqueue((uint32_t)agCtl->agId + ((uint32_t)AggSeq<<16));
+	// Fila cheia: o AGGREG se perdia sem aviso e o `await AGGREG_DONE´ esperava para sempre. Agora
+	// termina na hora com count 0. Buffer próprio: o ExtDataAggDone pode estar em uso pela agregação em
+	// andamento. Com dois recusados na mesma reação, os dois eventos leem o agId do último (#83).
+	if (call aggQ.enqueue((uint32_t)agCtl->agId + ((uint32_t)AggSeq<<16)) != SUCCESS){
+		memset(&ExtDataAggFull, 0, sizeof(aggDone_t));
+		ExtDataAggFull.agId = agCtl->agId;
+		signal VM.queueEvt(I_AGGREG_DONE_ID, agCtl->agId, &ExtDataAggFull);
+		signal VM.queueEvt(I_AGGREG_DONE   ,     0, &ExtDataAggFull);
+		return;
+	}
 	if (aggFlag==FALSE) post procAggreg();
   	}
 	
