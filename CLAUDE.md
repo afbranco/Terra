@@ -195,6 +195,8 @@ de lá.
     `ubyte` com 1 byte na VM (PR #120, #113; desfaz o buffer de 2 bytes do #96); Grp: `getParent()`
     `ushort` (PR #118, #114), `CUSTOM_A(x)` no lugar de `CUSTOM_A_ID(x)` (PR #119, #115) e a BS
     não descarta mais a mensagem do `SEND_BS` depois de um pacote da serial (PR #112, #98);
+    terrac: `x = await EVT` com `x` de outro tamanho (ou float) converte o valor (PR #121, #117;
+    temporário do tamanho do evento, só instruções antigas; nenhum `.vmx` do corpus muda);
   - terrac: catálogo com W3006 e E6007 (161 códigos); `.vmx` com `loop i,N` com nomes de limite
     novos (#48); cast para inteiro menor corta o valor (#46); float convertido em `emit`, `await`
     e argumento, e E4030 nos casos inválidos (#45); depois da v1.3.0, cast, `-`, `~` e `not` direto
@@ -287,7 +289,10 @@ de lá.
     (#114) `getParent` `ushort` (o valor já chegava inteiro pela pilha; teste do `terrac`, W1001 em
     `tests/terrac/getparent16.terra`); PR #119 (#115) `CUSTOM_A` no Grp (teste `tests/customa`);
     #116 (Grp sem `unsafe`) e #117 (`await` copia o tamanho da variável, não o do evento: com
-    tipos diferentes o valor sai errado; a decidir se o `terrac` converte ou avisa).
+    tipos diferentes o valor sai errado). PR #121 (#117, decisão do Prof.: converter): cópia para
+    um temporário do tamanho do evento (`mem.lua`, fica até o fim do bloco) e `push_v`/`pop` ou
+    `set_e` com conversão; teste `tests/awaitconv` (só TOSSIM, lê o `sensors.bin`). O
+    `grpinvalid.vmx` muda (lê o `SENDGR_DONE` num `ushort`).
   - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
     `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
