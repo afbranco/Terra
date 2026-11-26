@@ -149,7 +149,7 @@ do
 	input ushort 	TEMP 			void 	5;
 	input ushort 	PHOTO 			void 	6;
 	input ushort	VOLTS 			void 	7;
-	input ubyte 	CUSTOM_A_ID		ubyte 	12;
+	input ubyte 	CUSTOM_A		ubyte 	12;
 	input ubyte 	CUSTOM_A 		void 	13;
 	input ubyte 	CUSTOM 			void 	15;
 
