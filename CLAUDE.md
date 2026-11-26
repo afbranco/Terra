@@ -316,6 +316,11 @@ de lá.
     127 entradas (o Grp sem `unsafe` duplica 16, #116). Faltam as páginas do `docs/`.
     PR #125: campo `group` obrigatório (leds, sensors, radio...), pedido do TerraSim para as
     tabelas da Help; o leitor deles já funciona com o JSON (testado no `terra-docs-dev.json`).
+    PR #126: o site em Markdown (inglês) no `docs/`: `index`, `language`, `terranet`, `terragrp`
+    (com a #80), `terrac`, `terrac-codes`; tabelas geradas em `docs/_includes/generated/` pelo
+    `docs/_tools/genpages.py` (o CI reprova se desatualizadas); exemplos ```` ```terra ```` com
+    `<!-- check: ... -->` compilados pelo `docs/_tools/checkexamples.lua` no `build-terrac.sh` (59).
+    Publicado em afbranco.github.io/Terra. Faltam plataforma TinyOS, customização e licença.
   - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
     `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
