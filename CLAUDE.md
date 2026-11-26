@@ -65,7 +65,10 @@ de lá.
   - **`v1.6.0` publicada** (tag no `2c6c014`, 2026-11-26, a pedido do Prof.): `.defs` e docs (#132,
     #133, #116, PRs #134 e #135). Firmware, `_TOSSIM.so`, `terrac`, catálogo e `TerraVMControl`
     iguais byte a byte aos da v1.5.0; mudam só os `.defs` e o `terra-docs.json` (111 entradas).
-    TerraSim avisado. Depois dela: PR da troca para a tinyos-toolchain `2.1.2-r3` (pedido do Prof.).
+    TerraSim avisado.
+  - **tinyos-toolchain `2.1.2-r3`** no workflow desde o PR #136 (pedido do Prof., 2026-11-26; imagem
+    `2.1.2-resolute-py3-0dded15@sha256:e3da1ef0…`): firmware, `.defs`, `_TOSSIM.so` (inteiros),
+    `terrac`, catálogo, docs e `TerraVMControl` iguais byte a byte aos da v1.6.0 (r2).
   - Alinhada com a release **tinyos-toolchain `2.1.2-r2`** (decidido pelo Prof. em 2026-11-22;
     antes era a r1, `f42bac7`, digest `7e21b1b9…`). O workflow fixa a imagem
     `2.1.2-resolute-py3-21d8fb1@sha256:4198b12302181edd0e8b20ae06cd3af0a2d483a06355a78c1f83371250de47ec`.
