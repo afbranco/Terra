@@ -1,0 +1,39 @@
+#include "TerraNet.defs"
+// terractl (#92): o nó 11 manda à estação base (target 1) três mensagens com campos de todos os
+// tipos e valores conhecidos; o teste carrega o programa com o terractl (anúncio, blocos e pedidos
+// de bloco pelo SerialForwarder do TOSSIM) e confere a decodificação pelo pktype (terrac --types,
+// terractl.types.json). LEDs do 11: o número de SEND_DONE.
+pktype leitura from radioMsg with
+  var ubyte    n;
+  var ushort   u16;
+  var short    s16;
+  var long     s32;
+  var ulong    u32;
+  var float    f;
+  var ubyte[2] v;
+  var byte     b;
+end
+var leitura m;
+var ubyte i = 0;
+if getNodeId() == 11 then
+  m.type = 7;
+  m.source = getNodeId();
+  m.target = 1;
+  m.u16 = 4660;
+  m.s16 = -2;
+  m.s32 = -100000;
+  m.u32 = 3000000000;
+  m.f = 1.5;
+  m.v[0] = 1; m.v[1] = 250;
+  m.b = -7;
+  loop do
+    await 2s;
+    m.n = i;
+    emit SEND(m);
+    await SEND_DONE(7);
+    i = i + 1;
+    emit LEDS(i);
+    if i == 3 then break; end
+  end
+end
+await FOREVER;

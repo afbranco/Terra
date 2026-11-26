@@ -72,7 +72,9 @@ for v in net grp; do
         [ $tv = $v ] || continue
         n=$(basename "$(dirname "$t")")
         mkdir -p "$W/run-$v-$n"
-        (cd "$W/run-$v-$n" && python3 "$t" "$d") | tee -a "$OUT/logs/tossim-$v.log"
+        # Com limite de tempo: uma chamada do TOSSIM que trava segura o GIL e o teste não sai sozinho.
+        (cd "$W/run-$v-$n" && timeout 600 python3 "$t" "$d" || echo "$n: saiu com $? (124: tempo esgotado)") |
+            tee -a "$OUT/logs/tossim-$v.log"
         tail -1 "$OUT/logs/tossim-$v.log" | grep -q ': OK$' || { echo "FALHOU: $n"; exit 1; }
     done
 done
@@ -116,6 +118,13 @@ python3 "$ROOT/TerraVM/src/defs/gendocs.py" --version "$VER" \
 python3 "$ROOT/docs/_tools/genpages.py" --docs "$OUT/terra-docs-$VER.json" \
     --check "$ROOT/docs/_includes/generated" | tee -a "$OUT/logs/docs.log"
 tail -1 "$OUT/logs/docs.log" | grep -q ': OK$' || { echo "FALHOU: docs/_includes/generated desatualizado"; exit 1; }
+
+# terractl (#92): testes sem o TOSSIM (quadro serial, porta serial simulada, ID no firmware contra o
+# tos-set-symbols) e o anexo .pyz. A carga e a decodificação estão em tests/terractl*.
+python3 "$ROOT/release/test-terractl.py" "$OUT" | tee "$OUT/logs/terractl.log"
+tail -1 "$OUT/logs/terractl.log" | grep -q ': OK$' || { echo "FALHOU: test-terractl"; exit 1; }
+python3 "$ROOT/release/build-terractl.py" "$OUT/terractl-$VER.pyz" "$VER" "$SDE" | tee -a "$OUT/logs/terractl.log"
+python3 "$OUT/terractl-$VER.pyz" --version | grep -qx "terractl $VER" || { echo "FALHOU: terractl.pyz"; exit 1; }
 
 # TerraVMControl.jar: compilado do fonte, num jar único. As bibliotecas (tinyos.jar inclusive)
 # vêm do jar da TerraDist v0.3.0: são idênticas às do jar de produção de 2016 (.ova).

@@ -100,6 +100,16 @@ if (cd "$W/ty" && lua5.1 "$D/terrac" --types tipos.terra > tipos.obtido) &&
 else
     echo "terrac: --types: saída DIFERENTE (ou gerou o .vmx)" | tee -a "$LOG"; fail=1
 fi
+# Os .types.json dos testes do terractl (tests/*/) têm de ser a saída do terrac --types.
+for e in "$ROOT"/tests/*/*.types.json; do
+    n=$(basename "$e" .types.json); d=$(dirname "$e")
+    rm -rf "$W/tj" && mkdir -p "$W/tj" && cp "$ROOT"/terrac/samples/*.defs "$d/$n.terra" "$W/tj/"
+    if (cd "$W/tj" && lua5.1 "$D/terrac" --types "$n.terra") | cmp -s - "$e"; then
+        echo "terrac: $n.types.json igual ao --types" | tee -a "$LOG"
+    else
+        echo "terrac: $n.types.json DIFERENTE do --types" | tee -a "$LOG"; fail=1
+    fi
+done
 # O catálogo vai na release como anexo (com o sha256 no SHA256SUMS).
 lua5.1 "$D/terrac" --catalog > "$OUT/terrac-errors-$VER.json"
 if command -v python3 > /dev/null && ! python3 -m json.tool "$OUT/terrac-errors-$VER.json" > /dev/null; then

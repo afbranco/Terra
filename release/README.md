@@ -17,6 +17,7 @@ workflow e no `BUILDINFO` de cada release.
 | `terrac-<v>.tar.gz` | Compilador `terrac`, `TerraNet.defs` e `TerraGrp.defs` (os do simulador) e `terra.lang` |
 | `terrac-errors-<v>.json` | Catálogo dos códigos de erro e aviso do `terrac` (o mesmo de `terrac --catalog`) |
 | `terra-docs-<v>.json` | Os símbolos dos `.defs` (eventos, funções, constantes, macros, registros) com descrição, para editores e documentação (ver abaixo) |
+| `terractl-<v>.pyz` | `terractl`: carga de programas, mensagens da BS e gravação com ID (Python 3) |
 | `TerraVMControl-<v>.jar` | TerraControl, com todas as bibliotecas dentro |
 | `BUILDINFO`, `SHA256SUMS`, `logs.tar.gz` | Commit, imagem e logs de compilação e de teste |
 
@@ -41,8 +42,9 @@ não tem não compila (nome desconhecido), em vez de compilar e travar no mote.
 
 ## Gravar um micaz
 
-O `.ihex` sai com o ID 1. Para outro ID, use o `.exe` e a imagem do toolchain. Exemplo: nó 2
-numa MIB520 em `/dev/ttyUSB0`:
+O `.ihex` sai com o ID 1. Para outro ID, use o `.exe` com o `terractl` (só precisa do `avrdude`, sem
+o TinyOS): `python3 terractl-<v>.pyz flash terra-<v>-net-micaz-nobs.exe --node 2 --port /dev/ttyUSB0`.
+Ou com a imagem do toolchain. Exemplo: nó 2 numa MIB520 em `/dev/ttyUSB0`:
 
 ```bash
 podman run --rm -it --device /dev/ttyUSB0 -v "$PWD:/w:Z" -w /w \
@@ -152,6 +154,33 @@ Os exemplos Terra das páginas (blocos ```` ```terra ````) vêm depois de um com
 `<!-- check: ok -->` (compila sem erro nem aviso), `<!-- check: E3001 -->` (dá esse código), com
 ` grp` no fim para o `TerraGrp.defs`, ou `<!-- check: skip -->` (esboço). O `build-terrac.sh`
 compila todos com o `docs/_tools/checkexamples.lua`.
+
+## terractl
+
+Substitui o TerraControl em Java (#92; decisão do Prof. de 2026-11-26: o Java será aposentado).
+Python 3; para a serial, o `pyserial` (pacote `python3-serial`).
+
+```bash
+python3 terractl-<v>.pyz load prog.vmx --serial /dev/ttyUSB1          # MIB520 (a segunda porta)
+python3 terractl-<v>.pyz load prog.vmx --sf localhost:9002 --listen    # SerialForwarder (TOSSIM)
+python3 terractl-<v>.pyz listen --serial /dev/ttyUSB1 --terra prog.terra
+python3 terractl-<v>.pyz flash terra-<v>-grp-micaz-nobs.exe --node 11 --port /dev/ttyUSB0
+```
+
+- `load`: anuncia a versão, manda os blocos e atende os pedidos de bloco por `--time` segundos (30;
+  0 até Ctrl-C), reanunciando a cada `--every` (10). A versão guardada fica em
+  `~/.local/state/terractl/version`; se um mote pede uma versão maior, a carga passa para a seguinte
+  (o mote descarta versão igual ou menor que a dele). `--prog-version N` escolhe o número.
+- `listen` (e `load --listen`): as mensagens que chegam à BS (Net: `SEND` com `target` 1, AM 145; Grp:
+  `SEND_BS`, AM 150). Com `--terra prog.terra` (roda o `terrac --types`) ou `--types arq.json`,
+  decodifica pelo `pktype` do programa; com mais de um, `--pktype N=nome` escolhe pelo `type` (Net)
+  ou `msgId` (Grp). `--json` dá uma mensagem por linha em JSON; `--hex`, só os bytes. Inteiros em
+  big-endian e `float` em little-endian (o `nx_float` do atm128).
+- `flash`: troca `TOS_NODE_ID` e `ActiveMessageAddressC__addr` no `.exe` (como o `tos-set-symbols`)
+  e grava com o `avrdude` (`-c mib510`, fusíveis do micaz); `-o arq.ihex` só gera o arquivo.
+- Fora: o "Set memory data" e o "Send Group Message" do TerraControl (decisão do Prof.).
+- Testes: `release/test-terractl.py` (quadro serial, porta serial simulada, ID contra o
+  `tos-set-symbols`) e `tests/terractl`, `tests/terractlgrp` (carga e decodificação no TOSSIM).
 
 ## TerraControl
 
