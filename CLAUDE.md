@@ -191,6 +191,10 @@ de lá.
     **`.defs` por build** (PR #111, #100): o do TOSSIM (no `tar.gz` e no `terrac` empacotado) perde
     portas, interrupções, MIC/BEEP/`setupMic` e FFT; `PORT_A/B`, `INT_A/B` e `MIC` viram `ushort`;
     no `--diag=json`, `platforms` só com `tossim` (o editor deixa de avisar "não cabe no micaz");
+    depois do PR #111: o `SEND_DONE()` do Net e o `SENDBS_DONE`/`SENDGR_DONE` do Grp voltam a
+    `ubyte` com 1 byte na VM (PR #120, #113; desfaz o buffer de 2 bytes do #96); Grp: `getParent()`
+    `ushort` (PR #118, #114), `CUSTOM_A(x)` no lugar de `CUSTOM_A_ID(x)` (PR #119, #115) e a BS
+    não descarta mais a mensagem do `SEND_BS` depois de um pacote da serial (PR #112, #98);
   - terrac: catálogo com W3006 e E6007 (161 códigos); `.vmx` com `loop i,N` com nomes de limite
     novos (#48); cast para inteiro menor corta o valor (#46); float convertido em `emit`, `await`
     e argumento, e E4030 nos casos inválidos (#45); depois da v1.3.0, cast, `-`, `~` e `not` direto
@@ -272,6 +276,18 @@ de lá.
     `terrac/samples/Terra{Net,Grp}.defs` sejam os gerados para o TOSSIM. Continuações: #109
     (firmware MTS300 na release), #110 (variante no `.vmx`). A decidir com o Prof.: o `.defs` do
     TOSSIM listar também o micaz no `config` (o TerraSim aprova).
+  - PR #112 (#98): a BS do Grp punha a mensagem do `SEND_BS` (recebida pelo CTP) na `outQ` sem
+    `sendToMote`; valia o que sobrou no `tempInputInQ`. Depois de um pacote da serial ia para o
+    rádio, que recusa o AM 150 no Grp, e era descartada (desde 2015). Era a instabilidade do
+    `grpbs`. Teste `tests/bsdest` (a serial repete o anúncio da versão antes do `SEND_BS`).
+  - 2026-11-26, decisões do Prof. sobre a #91 (comentário na issue): site em inglês, `requires`
+    com o marcador de build, plataformas só as que a release gera, Pages só a última versão; a
+    lista de plataformas no fim da compilação não volta (ele avalia mostrar só o uso de memória).
+    Viraram: PR #120 (#113) status em `ubyte` (teste `tests/sendbsdone` lendo num `ubyte`); PR #118
+    (#114) `getParent` `ushort` (o valor já chegava inteiro pela pilha; teste do `terrac`, W1001 em
+    `tests/terrac/getparent16.terra`); PR #119 (#115) `CUSTOM_A` no Grp (teste `tests/customa`);
+    #116 (Grp sem `unsafe`) e #117 (`await` copia o tamanho da variável, não o do evento: com
+    tipos diferentes o valor sai errado; a decidir se o `terrac` converte ou avisa).
   - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
     `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
