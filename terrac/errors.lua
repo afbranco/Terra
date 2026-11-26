@@ -202,7 +202,7 @@ _DIAG.CATALOG = {
     -- W5 limites
     { 'W5001', 'warning', 'Float constant out of range, got: "{value}", value must range (+/-) 3.4E+38' },
     { 'W5002', 'warning', 'Integer constant too large, got: "{value}", max value must be (2^32)-1' },
-    { 'W5003', 'warning', 'Please check the maximum program size for each mote type!' },
+    { 'W5003', 'warning', 'Program size ({size} bytes) is above the maximum program size of {platform} ({max} bytes)!' },
     -- W6 pré-processador
     { 'W6001', 'warning', '{msg}' },
 }
@@ -412,7 +412,7 @@ function _DIAG.summary ()
         vm = OBJ{ {'name', _ENV.vm_name}, {'version', _ENV.vm_version} }
     end
     local ok = (_DIAG.errors == 0)
-    local m = ok and _DIAG.memory or nil       -- com erro, sem memória nem plataformas
+    local m = ok and _DIAG.memory or nil       -- com erro, sem memória
     io.stderr:write(jval(OBJ{ {'summary', OBJ{
         {'ok', ok},
         {'errors', _DIAG.errors},
@@ -421,7 +421,6 @@ function _DIAG.summary ()
         {'vm', vm},
         {'memory', m and OBJ{ {'total', m.total}, {'code', m.code}, {'ctl_vars', m.ctl_vars},
                               {'stack', m.stack}, {'radio_msgs', m.radio_msgs} }},
-        {'platforms', ok and _DIAG.platforms or nil},
     }} }) .. '\n')
 end
 
