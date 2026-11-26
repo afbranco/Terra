@@ -1,0 +1,32 @@
+#include "TerraGrp.defs"
+
+// Issue #83, fila de agregação cheia: a aggQ tem 3 lugares (QUEUE=SHORT). Quatro AGGREG na mesma
+// reação: o quarto (agId 1) era descartado sem aviso e o `await AGGREG_DONE(1)´ esperava para
+// sempre. Agora ele termina na hora com count 0. O 11 é o único membro, com nhops 5: cada uma das
+// três aceitas termina pelo tempo (1 s) com count 1.
+// LEDs do 11: 4 + count do AGGREG_DONE(1) (esperado 4) e depois 4 + quantas do agId 0 terminaram
+// (5, 6, 7).
+var group_t grp1;
+var aggreg_t agA;
+var aggreg_t agB;
+var aggDone_t done;
+var ubyte stat;
+var ubyte n = 0;
+agA.agId = 0;
+agB.agId = 1;
+stat = groupInit(grp1, 1, 1, 5, TRUE, eOFF, 11);
+stat = aggregInit(agA, grp1, SID_TEMP, fMAX, opGT, 0);
+stat = aggregInit(agB, grp1, SID_TEMP, fMAX, opGT, 0);
+await 3s;
+emit AGGREG(agA);
+emit AGGREG(agA);
+emit AGGREG(agA);
+emit AGGREG(agB);
+done = await AGGREG_DONE(1);
+emit LEDS(4 + done.count);
+loop i, 3 do
+  done = await AGGREG_DONE(0);
+  n = n + done.count;
+  emit LEDS(4 + n);
+end
+await FOREVER;
