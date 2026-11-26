@@ -79,7 +79,7 @@ podman run --rm -v "$PWD:/w:Z" -w /w ghcr.io/afbranco/tinyos-toolchain:2.1.2-res
 ```
     3.615  <<: vmstart 22 0 0 :>>
     4.672  <<: leds 11 3 1 :>>
-    4.759  BS: nó 11  type=7 target=1 data=001234fffefffe...
+    4.759  BS: node 11  type=7 target=1 data=001234fffefffe...
 ```
 
 The image of the toolchain has the Python of the module; on a machine with Python 3.14, run it

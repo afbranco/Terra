@@ -38,7 +38,7 @@ def run_types(terra, terrac="terrac"):
     pasta, nome = os.path.split(os.path.abspath(terra))
     r = subprocess.run([terrac, "--types", nome], cwd=pasta, capture_output=True, text=True)
     if r.returncode != 0:
-        raise SystemExit("terractl: terrac --types %s falhou:\n%s" % (terra, (r.stdout + r.stderr).strip()))
+        raise SystemExit("terractl: terrac --types %s failed:\n%s" % (terra, (r.stdout + r.stderr).strip()))
     return json.loads(r.stdout)
 
 
@@ -52,7 +52,7 @@ class Decoder:
         self.nome = nome
         for n in list(self.mapa.values()) + ([nome] if nome else []):
             if n not in self.types or self.types[n]["kind"] != "pktype":
-                raise SystemExit("terractl: o programa não declara o pktype %r" % n)
+                raise SystemExit("terractl: the program does not declare the pktype %r" % n)
 
     def _pktype(self, base, chave):
         if chave in self.mapa:
@@ -102,8 +102,8 @@ class Decoder:
 def format_text(m):
     """Uma linha legível."""
     if "vm" not in m:
-        return "AM %d de %d: %s" % (m["am"], m["node"], m["raw"])
-    cab = "nó %d" % m["node"]
+        return "AM %d from %d: %s" % (m["am"], m["node"], m["raw"])
+    cab = "node %d" % m["node"]
     if "pktype" in m:
         fs = " ".join("%s=%s" % (k, v) for k, v in m["fields"].items())
         return "%s  %s  %s" % (cab, m["pktype"], fs)

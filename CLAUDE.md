@@ -358,8 +358,8 @@ de lá.
     8 vizinhos, ganho 85, `meyer-heavy_short.txt`, BS no 11, `--late` = parte B). Carga pelo `Loader`
     (`persist=False`) com `TossimLink` (serial simulada, SF do TOSSIM lido na mesma thread). O `.so` é
     do Python 3.14: no uso, rodar na imagem do toolchain (lá não há `terrac`: `--types`, não `--terra`).
-    Teste `tests/terractlsim` (3x3, mesma saída com a mesma semente). A saída do `terractl` é em
-    português e o site em inglês: a decidir com o Prof.
+    Teste `tests/terractlsim` (3x3, mesma saída com a mesma semente). Interface do `terractl` em
+    inglês, como o site e a extensão (decisão do Prof., 2026-11-26, PR #143); comentários em português.
   - #93 (PR #140): extensão do VSCode em `vscode/` (TypeScript), anexo `terra-vscode-<v>.vsix` com o
     `terractl` e o `terra-docs.json` dentro (interface em inglês). Gramática, trechos, hover e
     complemento pela variante do `#include`, Problems pelo `--diag=json`, comandos Load/Messages/

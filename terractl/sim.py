@@ -51,14 +51,14 @@ def grid_links(lines, cols):
 def load_tossim(pasta):
     pasta = os.path.abspath(pasta)
     if not os.path.exists(os.path.join(pasta, "TOSSIM.py")):
-        raise SystemExit("terractl sim: %s não tem o TOSSIM.py (extraia o terra-<v>-{net,grp}-tossim-"
-                         "py3-x86_64.tar.gz da release)" % pasta)
+        raise SystemExit("terractl sim: %s has no TOSSIM.py (extract terra-<v>-{net,grp}-tossim-"
+                         "py3-x86_64.tar.gz of the release)" % pasta)
     sys.path.insert(0, pasta)
     try:
         import TOSSIM
     except ImportError as e:
-        raise SystemExit("terractl sim: o _TOSSIM.so não carregou (%s). Ele é do Python 3.14 x86_64: "
-                         "rode na imagem do tinyos-toolchain (ver release/README.md)." % e)
+        raise SystemExit("terractl sim: _TOSSIM.so did not load (%s). It is for Python 3.14 x86_64: "
+                         "run it in the tinyos-toolchain image (see release/README.md)." % e)
     return TOSSIM
 
 
@@ -131,11 +131,11 @@ def run(a, out=print):
     try:
         lines, cols = (int(x) for x in a.grid.lower().split("x"))
     except ValueError:
-        raise SystemExit("terractl sim: --grid é LINHASxCOLUNAS, por exemplo 3x3")
+        raise SystemExit("terractl sim: --grid is LINESxCOLUMNS, e.g. 3x3")
     if not (1 <= lines <= 9 and 1 <= cols <= 9 and 0 <= a.late < cols):
-        raise SystemExit("terractl sim: até 9 linhas e 9 colunas (e --late menor que o número de colunas)")
+        raise SystemExit("terractl sim: up to 9 lines and 9 columns (and --late below the number of columns)")
     if not os.access(".", os.W_OK):
-        raise SystemExit("terractl sim: a pasta corrente tem de ser gravável (a VM cria nela o sensors.bin)")
+        raise SystemExit("terractl sim: the current folder must be writable (the VM creates sensors.bin there)")
 
     t = T.Tossim([])
     t.randomSeed(a.seed)
@@ -196,9 +196,9 @@ def run(a, out=print):
     if a.realtime:
         th = T.Throttle(t, 10)
         th.initialize()
-    emite("grade %dx%d (%d motes e a BS), %s, %.0f s simulados%s" % (
+    emite("grid %dx%d (%d motes and the BS), %s, %.0f s simulated%s" % (
         lines, cols, len(nos), os.path.basename(os.path.abspath(a.tossim)), a.time,
-        ", tempo real, SerialForwarder na porta %d" % a.sf_port if a.realtime else ""))
+        ", real time, SerialForwarder on port %d" % a.sf_port if a.realtime else ""))
 
     marcos = []          # (tempo, ação)
     if ld:
@@ -212,7 +212,7 @@ def run(a, out=print):
         def liga():
             for n in sorted(tardios):
                 t.getNode(n).bootAtTime(t.time() + 1)
-            emite("ligados os motes %s" % sorted(tardios))
+            emite("motes %s switched on" % sorted(tardios))
         marcos.append((a.late_at, liga))
     marcos.sort(key=lambda x: x[0])
 

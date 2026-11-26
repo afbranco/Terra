@@ -1,3 +1,3 @@
-"""terractl: biblioteca e linha de comando para a rede Terra (#92), no lugar do TerraControl em Java."""
+"""terractl: library and command line for a Terra network (#92), in place of the Java TerraControl."""
 
 __version__ = "dev"

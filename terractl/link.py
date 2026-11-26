@@ -81,7 +81,7 @@ class SFLink(Link):
     def _reader(self):
         try:
             if self._recv_exact(2) != b"U ":
-                print("terractl: o SerialForwarder em %s não respondeu ao protocolo" % self.where,
+                print("terractl: the SerialForwarder at %s did not answer the protocol" % self.where,
                       file=sys.stderr)
                 return
         except OSError:
@@ -118,8 +118,8 @@ class SerialLink(Link):
         try:
             import serial  # pyserial
         except ImportError:
-            raise SystemExit("terractl: --serial precisa do pyserial (pip install pyserial, "
-                             "ou o pacote python3-serial)")
+            raise SystemExit("terractl: --serial needs pyserial (pip install pyserial, "
+                             "or the python3-serial package)")
         self.ser = serial.Serial(port, baud, timeout=0.05)
         self.ack_timeout, self.retries = ack_timeout, retries
         self.dec = framing.Decoder()

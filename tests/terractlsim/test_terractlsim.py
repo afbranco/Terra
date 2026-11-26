@@ -38,7 +38,7 @@ for l in linhas:
     m = re.match(r"\s*([\d.]+)  <<: vmstart (\d+) ", l)
     if m:
         inicio.setdefault(int(m.group(2)), float(m.group(1)))
-msgs = [l.split("leitura  ", 1)[1] for l in linhas if "BS: nó 11  leitura  " in l]
+msgs = [l.split("leitura  ", 1)[1] for l in linhas if "BS: node 11  leitura  " in l]
 leds = [int(m.group(1)) for m in (re.search(r"<<: leds 11 3 (\d+) :>>", l) for l in linhas) if m]
 tardios_ok = all(inicio.get(n, 0) > 8 for n in (31, 32, 33))
 ok = (rc == 0 and sorted(inicio) == MOTES and tardios_ok and msgs == [CAMPOS % i for i in range(3)]
