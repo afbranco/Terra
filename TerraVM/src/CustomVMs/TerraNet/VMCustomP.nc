@@ -49,11 +49,13 @@ nx_uint8_t ExtDataGModelRdDone;		// last GModelReadDone Status
 nx_uint16_t ExtDataBufferRdDone;	// last StreamReadDone [error=0 | Count>0]
 nx_int32_t* UsrStreamBuffer;		// Pointer to user data stream buffer
 
+#ifdef TERRA_MIC
 uint8_t MIC_flag;					// Indicate if Mic Sensor was setup
 nx_uint16_t* MIC_buf;				// Mic Sensor read buffer
 uint16_t MIC_count;				// Mic Sensor read count
 uint32_t MIC_usPeriod;			// Mic Sensor read period
 uint8_t MIC_gain;				// Mic Sensor gain adjust
+#endif
 
 /*
  * Output Events implementation
@@ -173,6 +175,7 @@ void  proc_rd_stream(uint16_t id, uint32_t value){
 }
 #endif
 
+#ifdef TERRA_MIC
 void  proc_req_mic(uint16_t id, uint32_t value){
 	dbg(APPNAME,"Custom::proc_req_mic(): id=%d, value=%d, MIC Flad=%d\n",id,value, MIC_flag);
 #if defined(PLATFORM_MICAZ) || defined(PLATFORM_MICA2) || defined(PLATFORM_IRIS)
@@ -189,6 +192,7 @@ void  proc_beep(uint16_t id, uint32_t value){
 	dbg(APPNAME,"Custom::proc_beep(): id=%d, val=%d\n",id,(uint16_t)value);
 	call SA.setActuator(AID_SOUNDER, (uint16_t)value);
 }
+#endif
 	
 /*
  * Function implementation
@@ -284,6 +288,7 @@ void  func_fft(uint16_t id){
 	}
 #endif	
 
+#ifdef TERRA_MIC
 void  func_setupMic(uint16_t id){
 	error_t stat;
 	uint16_t bufAddr;
@@ -297,6 +302,7 @@ void  func_setupMic(uint16_t id){
 	signal VM.push(stat);
 
 }
+#endif
 
 void  func_RFPower(uint16_t id){
 	uint8_t powerIdx;
@@ -474,6 +480,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		case O_VOLTS 		: proc_req_volts(id,value); break;
 		case O_SEND 		: proc_send(id,value); break;
 		case O_SEND_ACK 	: proc_send_ack(id,value); break;
+#ifdef TERRA_PORTS
 		case O_PORT_A 		: proc_set_port_a(id,value); break;
 		case O_PORT_B 		: proc_set_port_b(id,value); break;
 		case O_CFG_PORT_A 	: proc_cfg_port_a(id,value); break;
@@ -482,9 +489,12 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		case O_REQ_PORT_B 	: proc_req_port_b(id,value); break;
 		case O_CFG_INT_A 	: proc_cfg_int_a(id,value); break;
 		case O_CFG_INT_B 	: proc_cfg_int_b(id,value); break;
+#endif
 		case O_CUSTOM_A 	: proc_req_custom_a(id,value); break;
+#ifdef TERRA_MIC
 		case O_REQ_MIC		: proc_req_mic(id,value); break;
 		case O_BEEP			: proc_beep(id,value); break;
+#endif
 		case O_CUSTOM 		: proc_req_custom(id,value); break;
 #ifdef M_VCN_DAT
 		case O_RD_STREAM : proc_rd_stream(id,value); break;
@@ -511,7 +521,9 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 			case F_FFT 		: func_fft(id); break;
 #endif
 
+#ifdef TERRA_MIC
 			case F_SETUP_MIC: func_setupMic(id); break;
+#endif
 			case F_RFPOWER: func_RFPower(id); break;
 
 #ifdef M_VCN_DAT
@@ -532,6 +544,11 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 	}
 
 	command void VM.reset(){
+#ifdef TERRA_MIC
+		// O setupMic vale só para o programa que o chamou: sem isto, REQ_MIC sem setupMic no programa
+		// seguinte gravava no buffer do anterior (#100).
+		MIC_flag = FALSE;
+#endif
 		// Reset leds
 		call SA.setActuator(AID_LEDS, 0);
 		// a fila de eventos foi esvaziada: nenhum buffer de rádio está em uso

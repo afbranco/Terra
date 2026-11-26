@@ -33,6 +33,14 @@ nx_uint8_t  ExtDataCustomA;			// last request custom event (internal loop-back)
 usrSendGR_t ExtDataRecGR;			// last received radio group msg
 aggDone_t   ExtDataAggDone; 			// last AggregDone calculation
 aggDone_t   ExtDataAggFull; 			// AGGREG_DONE de um AGGREG recusado (fila cheia), count 0 (#83)
+#ifdef TERRA_MIC
+// Microfone (MTS300), como no Net (#100)
+uint8_t MIC_flag;					// Indicate if Mic Sensor was setup
+nx_uint16_t* MIC_buf;				// Mic Sensor read buffer
+uint16_t MIC_count;				// Mic Sensor read count
+uint32_t MIC_usPeriod;			// Mic Sensor read period
+uint8_t MIC_gain;				// Mic Sensor gain adjust
+#endif
 nx_uint8_t  ExtDataQReady;			// last queue ready - queue size 
 uint8_t 	ExtDataError;			// last error event
 nx_uint16_t	ExtDataLeader;			// last leader identifier
@@ -191,6 +199,21 @@ void  proc_req_custom_a(uint16_t id, uint32_t value){
 	signal VM.queueEvt(I_CUSTOM_A   ,    0, &ExtDataCustomA);
 	}
 
+#ifdef TERRA_MIC
+void  proc_req_mic(uint16_t id, uint32_t value){
+	dbg(APPNAME,"Custom::proc_req_mic(): id=%d, MIC_flag=%d\n",id,MIC_flag);
+	if (MIC_flag)
+		call SA.reqStreamSensor(REQ_SOURCE1, SID_MIC, (uint16_t*)MIC_buf, MIC_count, MIC_usPeriod, MIC_gain);
+	else
+		signal VM.evtError(E_NOSETUP);
+}
+
+void  proc_beep(uint16_t id, uint32_t value){
+	dbg(APPNAME,"Custom::proc_beep(): id=%d, val=%d\n",id,(uint16_t)value);
+	call SA.setActuator(AID_SOUNDER, (uint16_t)value);
+}
+#endif
+
 void  proc_req_custom(uint16_t id, uint32_t value){
 	dbg(APPNAME,"Custom::proc_req_custom(): id=%d\n",id);
 	// Queue the custom event
@@ -281,6 +304,19 @@ void  func_getTime(uint16_t id){
 	signal VM.push(val);
 	}
 
+
+#ifdef TERRA_MIC
+void  func_setupMic(uint16_t id){
+	uint16_t bufAddr;
+	MIC_gain = (uint8_t)signal VM.pop();
+	MIC_usPeriod = (uint32_t)signal VM.pop();
+	MIC_count = (uint16_t)signal VM.pop();
+	bufAddr = (uint16_t)signal VM.pop();
+	MIC_buf = (nx_uint16_t*)signal VM.getRealAddr(bufAddr);
+	MIC_flag = TRUE;
+	signal VM.push(SUCCESS);
+}
+#endif
 
 void  func_RFPower(uint16_t id){
 	uint8_t powerIdx;
@@ -403,6 +439,7 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		case O_TEMP 		: proc_req_temp(id,value); break;
 		case O_PHOTO 		: proc_req_photo(id,value); break;
 		case O_VOLTS 		: proc_req_volts(id,value); break;
+#ifdef TERRA_PORTS
 		case O_PORT_A 		: proc_set_port_a(id,value); break;
 		case O_PORT_B 		: proc_set_port_b(id,value); break;
 		case O_CFG_PORT_A 	: proc_cfg_port_a(id,value); break;
@@ -411,8 +448,13 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 		case O_REQ_PORT_B 	: proc_req_port_b(id,value); break;
 		case O_CFG_INT_A 	: proc_cfg_int_a(id,value); break;
 		case O_CFG_INT_B 	: proc_cfg_int_b(id,value); break;
+#endif
 		case O_CUSTOM_A 	: proc_req_custom_a(id,value); break;
 		case O_CUSTOM 		: proc_req_custom(id,value); break;
+#ifdef TERRA_MIC
+		case O_REQ_MIC		: proc_req_mic(id,value); break;
+		case O_BEEP			: proc_beep(id,value); break;
+#endif
 		/* TerraGrp custom output events */
 		case O_SEND_BS 		: proc_send_bs(id,value); break;
 		case O_SEND_GR 		: proc_send_gr(id,value); break;
@@ -433,6 +475,9 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 			case F_GETTIME 	: func_getTime(id); break;
 
 			case F_RFPOWER: func_RFPower(id); break;
+#ifdef TERRA_MIC
+			case F_SETUP_MIC: func_setupMic(id); break;
+#endif
 			case F_GETPARENT: func_getParent(id); break;
 			/* TerraGrp custom functions */
 			case F_GROUPINIT : func_groupInit(id); break;		
@@ -444,6 +489,9 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 	command void VM.evtDone(void* data){}	// sem buffers a liberar (#49)
 	command void VM.reset(){
 #ifndef ONLY_BSTATION
+#ifdef TERRA_MIC
+		MIC_flag = FALSE;	// o setupMic vale só para o programa que o chamou (#100)
+#endif
 		// reset Grp and Agg control vars
 		// Maintain pointer to first and last Group/Aggreg Control
 		firstGrp = NULL;
@@ -726,6 +774,9 @@ command void VM.procOutEvt(uint8_t id,uint32_t value){
 			case SID_IN2: return I_PORT_B;
 			case SID_INT1: return I_INT_A;
 			case SID_INT2: return I_INT_B;
+#ifdef TERRA_MIC
+			case SID_MIC: return I_MIC;
+#endif
 		}
 		return 0;
 	}

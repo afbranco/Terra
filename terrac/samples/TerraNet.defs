@@ -8,13 +8,6 @@ config
 	code:00.02.00 , 
 	{
 		tossim: 1728,
-		telosb_full: 4224,
-		iris_full: 4224,
-		telosb_hyb: 1920,
-		iris_hyb: 1920,
-		micaz : 1920,
-		mica2 : 1920,
-		mica2dot : 1920,
 	} 
 do
 /*
@@ -66,10 +59,6 @@ do
 	end
 	
 	// FFT element value
-	regtype fft_cpx with
-		var long r;
-		var long i;
-	end
 
 
 	// TerraNet local Output events
@@ -81,17 +70,7 @@ do
 	output void		REQ_TEMP		void 9;
 	output void		REQ_PHOTO		void 10;
 	output void		REQ_VOLTS		void 11;
-	output void		SET_PORT_A		ubyte 12;
-	output void		SET_PORT_B		ubyte 13;
-	output void 	CFG_PORT_A		ubyte 14;
-	output void 	CFG_PORT_B		ubyte 15;
-	output void 	REQ_PORT_A		ubyte 16;
-	output void 	REQ_PORT_B		ubyte 17;
-	output void 	CFG_INT_A		ubyte 18;
-	output void 	CFG_INT_B		ubyte 19;
 	output void 	REQ_CUSTOM_A	ubyte 20;
-	output void		REQ_MIC			void  21;
-	output void		BEEP			ushort  22;
 	output void 	REQ_CUSTOM		void 23;
 	// TerraNet Custom Output events
 	output void 	SEND			radioMsg 40;
@@ -103,13 +82,8 @@ do
 	input ushort 	TEMP 			void 	5;
 	input ushort 	PHOTO 			void 	6;
 	input ushort	VOLTS 			void 	7;
-	input ubyte 	PORT_A 			void 	8;
-	input ubyte 	PORT_B 			void 	9;
-	input ubyte 	INT_A 			void 	10;
-	input ubyte 	INT_B 			void 	11;
 	input ubyte 	CUSTOM_A		ubyte 	12;
 	input ubyte 	CUSTOM_A 		void 	13;
-	input ubyte 	MIC 			void 	14;
 	input ubyte 	CUSTOM 			void 	15;
 	// TerraNet Custom Input events
 	input ubyte 	SEND_DONE 		ubyte	40;
@@ -130,9 +104,6 @@ do
 	function nohold ubyte qGet(radioMsg) 	11;
 	function pure ubyte qSize()				12;
 	function pure ubyte qClear()			13;
-	function nohold ubyte fftAlloc(ushort, ushort, ubyte*, ushort*)		14;
-	function nohold  ubyte fft(ubyte*, ulong*, ulong*)			15;
-	function ubyte setupMic(ushort*,ushort,ulong,ubyte)			16;
 	function ubyte setRFPower(ubyte)			17;
 
 // Determinist
@@ -148,14 +119,6 @@ unsafe REQ_CUSTOM_A with REQ_CUSTOM_A;
 unsafe SEND			with SEND,SEND_ACK;
 unsafe SEND_ACK		with SEND,SEND_ACK;
 
-unsafe SET_PORT_A	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
-unsafe SET_PORT_B	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
-unsafe CFG_PORT_A	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
-unsafe CFG_PORT_B	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
-unsafe REQ_PORT_A	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
-unsafe REQ_PORT_B	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
-unsafe CFG_INT_A	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
-unsafe CFG_INT_B	with SET_PORT_A,SET_PORT_B,CFG_PORT_A,CFG_PORT_B,REQ_PORT_A,REQ_PORT_B,CFG_INT_A,CFG_INT_B;
 					
 // Request/await macros
 #define getTemp(var)  emit REQ_TEMP();  var=await TEMP 
