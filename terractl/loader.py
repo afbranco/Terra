@@ -23,7 +23,7 @@ class Program:
                 except ValueError:
                     pass
         if len(self.header) < 9 or not mem:
-            raise SystemExit("terractl: %s não parece um .vmx" % path)
+            raise SystemExit("terractl: %s does not look like a .vmx" % path)
         self.start = self.header[0] // M.BLOCK_SIZE
         self.nblocks = max(mem) // M.BLOCK_SIZE + 1 - self.start
         self.blocks = {b: bytes(mem.get(b * M.BLOCK_SIZE + j, 0) for j in range(M.BLOCK_SIZE))
@@ -61,7 +61,7 @@ class Loader:
         self.link, self.prog, self.log, self.gap, self.persist = link, prog, log, gap, persist
         self.version = version or ((last_version() if persist else 0) + 1)
         if not 1 <= self.version <= 0xFFFF:
-            raise SystemExit("terractl: versão %d fora de 1..65535" % self.version)
+            raise SystemExit("terractl: version %d out of 1..65535" % self.version)
         self.pedidos = 0           # pedidos de bloco atendidos (chegam todos com a origem da BS, que
         self.blocos_pedidos = set()  # os repassa: não dá para saber qual mote pediu)
         self._lock = threading.RLock()
@@ -87,7 +87,7 @@ class Loader:
     def start(self):
         if self.persist:
             save_version(self.version)
-        self.log("versão %d, %d blocos (%d a %d)" % (self.version, self.prog.nblocks, self.prog.start,
+        self.log("version %d, %d blocks (%d to %d)" % (self.version, self.prog.nblocks, self.prog.start,
                                                       self.prog.start + self.prog.nblocks - 1))
         self.push()
 
@@ -105,7 +105,7 @@ class Loader:
                 self.version = v + 1
                 if self.persist:
                     save_version(self.version)
-                self.log("a rede já está na versão %d: a carga passa para a %d" % (v, self.version))
+                self.log("the network already has version %d: loading as %d" % (v, self.version))
                 if self.gap:
                     threading.Thread(target=self.push, daemon=True).start()
                 else:
@@ -116,6 +116,6 @@ class Loader:
 
     def resumo(self):
         if not self.pedidos:
-            return "versão %d: nenhum pedido de bloco (os blocos enviados bastaram, ou ninguém recebeu)" % self.version
-        return "versão %d: %d pedido(s) de bloco atendido(s), blocos %s" % (
+            return "version %d: no block requests (the blocks sent were enough, or nobody received them)" % self.version
+        return "version %d: %d block request(s) answered, blocks %s" % (
             self.version, self.pedidos, sorted(self.blocos_pedidos))

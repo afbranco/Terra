@@ -17,7 +17,7 @@ class Elf:
 
     def __init__(self, data):
         if data[:4] != b"\x7fELF" or data[4] != 1 or data[5] != 1:
-            raise SystemExit("terractl: o firmware tem de ser o .exe (ELF de 32 bits) da release")
+            raise SystemExit("terractl: the firmware must be the .exe (32-bit ELF) of the release")
         self.data = bytearray(data)
         (_t, _m, _v, _e, phoff, shoff, _f, _eh, phsz, phn, shsz, shn, shstr) = struct.unpack_from(
             "<HHIIIIIHHHHHH", data, 16)
@@ -45,14 +45,14 @@ class Elf:
         for s in self.secs:
             if s["name"] == name:
                 return s
-        raise SystemExit("terractl: o firmware não tem a seção %s" % name)
+        raise SystemExit("terractl: the firmware has no section %s" % name)
 
     def set_symbol(self, name, value):
         if name not in self.syms:
-            raise SystemExit("terractl: o firmware não tem o símbolo %s" % name)
+            raise SystemExit("terractl: the firmware has no symbol %s" % name)
         addr, size, sec = self.syms[name]
         if sec != ".data":
-            raise SystemExit("terractl: %s não está na .data" % name)
+            raise SystemExit("terractl: %s is not in .data" % name)
         d = self.section(".data")
         pos = d["offset"] + addr - d["addr"]
         self.data[pos:pos + size] = struct.pack("<I", value)[:size]
@@ -119,5 +119,5 @@ def avrdude_cmd(ihex_path, port, programmer="mib510", part="m128", avrdude="avrd
 
 def flash(ihex_path, port, programmer="mib510", avrdude="avrdude"):
     if not shutil.which(avrdude):
-        raise SystemExit("terractl: avrdude não encontrado (apt install avrdude)")
+        raise SystemExit("terractl: avrdude not found (apt install avrdude)")
     return subprocess.run(avrdude_cmd(ihex_path, port, programmer, avrdude=avrdude)).returncode

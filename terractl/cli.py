@@ -1,4 +1,4 @@
-"""terractl: carga de programas Terra, mensagens da estação base e gravação do firmware."""
+"""terractl: loads Terra programs, shows the messages of the base station, simulates and flashes the firmware."""
 
 import argparse
 import json
@@ -20,22 +20,22 @@ def sim_gain():
 
 
 def _conexao(p):
-    g = p.add_argument_group("conexão com a estação base")
-    g.add_argument("--serial", metavar="PORTA", help="porta serial da BS (na MIB520, a segunda: /dev/ttyUSB1)")
-    g.add_argument("--baud", type=int, default=57600, help="velocidade da serial (57600, a do micaz)")
-    g.add_argument("--sf", metavar="HOST:PORTA", help="SerialForwarder (padrão localhost:9002; TOSSIM ou remoto)")
+    g = p.add_argument_group("connection to the base station")
+    g.add_argument("--serial", metavar="PORT", help="serial port of the BS (on the MIB520, the second one: /dev/ttyUSB1)")
+    g.add_argument("--baud", type=int, default=57600, help="serial speed (57600, the micaz one)")
+    g.add_argument("--sf", metavar="HOST:PORT", help="SerialForwarder (default localhost:9002; TOSSIM or remote)")
 
 
 def _decodificacao(p):
-    g = p.add_argument_group("mensagens")
-    g.add_argument("--terra", metavar="PROG.terra", help="decodifica pelos pktype do programa (roda o terrac --types)")
-    g.add_argument("--types", metavar="ARQ.json", help="a saída do terrac --types, em vez de --terra")
-    g.add_argument("--terrac", default="terrac", help="o terrac (padrão: o do PATH)")
-    g.add_argument("--pktype", action="append", default=[], metavar="[N=]NOME",
-                   help="pktype de cada mensagem: NOME para todas, ou N=NOME para o type (Net) ou o "
-                        "msgId (Grp) N; pode repetir. Com um só pktype no programa, não precisa")
-    g.add_argument("--json", action="store_true", help="uma mensagem por linha, em JSON")
-    g.add_argument("--hex", action="store_true", help="só os bytes, sem decodificar")
+    g = p.add_argument_group("messages")
+    g.add_argument("--terra", metavar="PROG.terra", help="decode by the pktypes of the program (runs terrac --types)")
+    g.add_argument("--types", metavar="FILE.json", help="the output of terrac --types, instead of --terra")
+    g.add_argument("--terrac", default="terrac", help="the terrac (default: the one in the PATH)")
+    g.add_argument("--pktype", action="append", default=[], metavar="[N=]NAME",
+                   help="pktype of each message: NAME for all, or N=NAME for type (Net) or msgId (Grp) "
+                        "N; can repeat. Not needed when the program has a single pktype")
+    g.add_argument("--json", action="store_true", help="one message per line, in JSON")
+    g.add_argument("--hex", action="store_true", help="only the bytes, not decoded")
 
 
 def _decoder(a):
@@ -130,15 +130,15 @@ def cmd_flash(a):
     texto = F.ihex(elf.image())
     if a.output:
         open(a.output, "w").write(texto)
-        print("terractl: %s com o nó %d em %s" % (a.firmware, a.node, a.output))
+        print("terractl: %s with node %d in %s" % (a.firmware, a.node, a.output))
         if not a.port:
             return 0
     if not a.port:
-        raise SystemExit("terractl: falta --port (a primeira porta da MIB520, /dev/ttyUSB0) ou --output")
+        raise SystemExit("terractl: missing --port (the first port of the MIB520, /dev/ttyUSB0) or --output")
     with tempfile.TemporaryDirectory() as t:
         caminho = os.path.join(t, "no%d.ihex" % a.node)
         open(caminho, "w").write(texto)
-        print("terractl: gravando %s com o nó %d em %s" % (os.path.basename(a.firmware), a.node, a.port))
+        print("terractl: flashing %s with node %d on %s" % (os.path.basename(a.firmware), a.node, a.port))
         return F.flash(caminho, a.port, a.programmer, a.avrdude)
 
 
@@ -156,58 +156,58 @@ def main(argv=None):
     p.add_argument("--version", action="version", version="terractl " + __version__)
     sub = p.add_subparsers(dest="cmd", required=True)
 
-    s = sub.add_parser("load", help="carrega um .vmx na rede pela estação base")
+    s = sub.add_parser("load", help="load a .vmx on the network through the base station")
     s.add_argument("vmx")
     _conexao(s)
     s.add_argument("--prog-version", dest="version", type=int,
-                   help="número da versão (padrão: a última usada + 1; tem de ser maior que a da rede)")
-    s.add_argument("--time", type=float, default=30, help="segundos atendendo os motes (0: até Ctrl-C)")
-    s.add_argument("--every", type=float, default=10, help="reanuncia a versão a cada N segundos (0: não)")
-    s.add_argument("--listen", action="store_true", help="mostra também as mensagens dos motes")
+                   help="version number (default: the last one used + 1; must be greater than the one in the network)")
+    s.add_argument("--time", type=float, default=30, help="seconds serving the motes (0: until Ctrl-C)")
+    s.add_argument("--every", type=float, default=10, help="announce the version again every N seconds (0: no)")
+    s.add_argument("--listen", action="store_true", help="also show the messages of the motes")
     _decodificacao(s)
     s.set_defaults(func=cmd_load)
 
-    s = sub.add_parser("listen", help="mostra as mensagens que chegam à estação base")
+    s = sub.add_parser("listen", help="show the messages that reach the base station")
     _conexao(s)
-    s.add_argument("--time", type=float, default=0, help="segundos (0: até Ctrl-C)")
-    s.add_argument("--all", action="store_true", help="inclui os pedidos de bloco da carga")
+    s.add_argument("--time", type=float, default=0, help="seconds (0: until Ctrl-C)")
+    s.add_argument("--all", action="store_true", help="include the block requests of a load")
     _decodificacao(s)
     s.set_defaults(func=cmd_listen)
 
-    s = sub.add_parser("flash", help="grava o firmware da release (.exe) com o ID do nó")
+    s = sub.add_parser("flash", help="flash a firmware of the release (.exe) with a node id")
     s.add_argument("firmware", help="terra-<v>-{net,grp}-micaz-{bs,nobs}.exe")
-    s.add_argument("--node", type=int, required=True, help="ID do nó (a estação base é o 1)")
-    s.add_argument("--port", help="porta de gravação (na MIB520, a primeira: /dev/ttyUSB0)")
-    s.add_argument("--programmer", default="mib510", help="programador do avrdude (mib510 serve à MIB520)")
+    s.add_argument("--node", type=int, required=True, help="node id (the base station is 1)")
+    s.add_argument("--port", help="programming port (on the MIB520, the first one: /dev/ttyUSB0)")
+    s.add_argument("--programmer", default="mib510", help="avrdude programmer (mib510 works for the MIB520)")
     s.add_argument("--avrdude", default="avrdude")
-    s.add_argument("--output", "-o", help="só grava o .ihex com o ID neste arquivo")
+    s.add_argument("--output", "-o", help="only write the .ihex with the id to this file")
     s.set_defaults(func=cmd_flash)
 
-    s = sub.add_parser("sim", help="simula uma grade de motes com o _TOSSIM.so da release e mostra os logs")
-    s.add_argument("vmx", nargs="?", help="programa carregado pela BS (sem ele, a rede fica esperando; "
-                                         "com --realtime, carregue de fora com terractl load --sf)")
-    s.add_argument("--tossim", required=True, metavar="PASTA",
-                   help="pasta do terra-<v>-{net,grp}-tossim-py3-x86_64.tar.gz extraído (a VM é a dele)")
-    s.add_argument("--grid", default="3x3", help="LINHASxCOLUNAS, até 9x9 (padrão 3x3); nós coluna*10+linha")
-    s.add_argument("--time", type=float, default=60, help="segundos simulados (padrão 60)")
-    s.add_argument("--seed", type=int, default=1, help="semente do TOSSIM (a simulação se repete com ela)")
-    s.add_argument("--gain", type=float, default=sim_gain(), help="ganho dos enlaces em dB (85, o do TerraSim.py)")
-    s.add_argument("--load-at", type=float, default=1, help="segundo em que a BS recebe o programa (1)")
-    s.add_argument("--every", type=float, default=10, help="reanuncia a versão a cada N segundos simulados (0: não)")
-    s.add_argument("--prog-version", dest="version", type=int, help="número da versão (padrão 1)")
-    s.add_argument("--late", type=int, default=0, metavar="N", help="as últimas N colunas ligam depois")
-    s.add_argument("--late-at", type=float, default=30, help="segundo em que elas ligam (30)")
-    s.add_argument("--realtime", action="store_true", help="no ritmo do relógio, para conectar de fora pelo SerialForwarder")
-    s.add_argument("--sf-port", type=int, default=9002, help="porta do SerialForwarder do TOSSIM (9002)")
-    s.add_argument("--vmdbg", metavar="ARQ", help="grava o canal VMDBG (cada instrução da VM) neste arquivo")
-    s.add_argument("--channel", action="append", default=[], metavar="CANAL",
-                   help="mostra também este canal de dbg do TOSSIM (AM, Serial...); pode repetir")
+    s = sub.add_parser("sim", help="simulate a grid of motes with the _TOSSIM.so of the release and show the logs")
+    s.add_argument("vmx", nargs="?", help="program loaded through the BS (without it, the network waits; "
+                                         "with --realtime, load it from outside with terractl load --sf)")
+    s.add_argument("--tossim", required=True, metavar="FOLDER",
+                   help="folder of terra-<v>-{net,grp}-tossim-py3-x86_64.tar.gz, extracted (its VM is used)")
+    s.add_argument("--grid", default="3x3", help="LINESxCOLUMNS, up to 9x9 (default 3x3); nodes column*10+line")
+    s.add_argument("--time", type=float, default=60, help="simulated seconds (default 60)")
+    s.add_argument("--seed", type=int, default=1, help="TOSSIM seed (the same seed gives the same simulation)")
+    s.add_argument("--gain", type=float, default=sim_gain(), help="link gain in dB (85, the one of TerraSim.py)")
+    s.add_argument("--load-at", type=float, default=1, help="second when the BS receives the program (1)")
+    s.add_argument("--every", type=float, default=10, help="announce the version again every N simulated seconds (0: no)")
+    s.add_argument("--prog-version", dest="version", type=int, help="version number (default 1)")
+    s.add_argument("--late", type=int, default=0, metavar="N", help="the last N columns boot later")
+    s.add_argument("--late-at", type=float, default=30, help="second when they boot (30)")
+    s.add_argument("--realtime", action="store_true", help="at the pace of the clock, to connect from outside through the SerialForwarder")
+    s.add_argument("--sf-port", type=int, default=9002, help="port of the TOSSIM SerialForwarder (9002)")
+    s.add_argument("--vmdbg", metavar="FILE", help="write the VMDBG channel (every instruction of the VM) to this file")
+    s.add_argument("--channel", action="append", default=[], metavar="CHANNEL",
+                   help="also show this TOSSIM dbg channel (AM, Serial...); can repeat")
     s.add_argument("--hide", default="serial", metavar="CMD,...",
-                   help="comandos do TVIEW que não aparecem (padrão: serial, já que as mensagens à BS "
-                        "saem decodificadas; vazio mostra tudo)")
-    s.add_argument("--logdir", default=".terractl-sim", help="pasta dos arquivos dos canais (.terractl-sim)")
-    s.add_argument("--terra", metavar="PROG.terra", help="decodifica as mensagens à BS pelos pktype (terrac --types)")
-    s.add_argument("--types", metavar="ARQ.json", help="a saída do terrac --types, em vez de --terra")
+                   help="TVIEW commands not shown (default: serial, since the messages to the BS are "
+                        "shown decoded; empty shows all)")
+    s.add_argument("--logdir", default=".terractl-sim", help="folder of the channel files (.terractl-sim)")
+    s.add_argument("--terra", metavar="PROG.terra", help="decode the messages to the BS by the pktypes (terrac --types)")
+    s.add_argument("--types", metavar="FILE.json", help="the output of terrac --types, instead of --terra")
     s.add_argument("--terrac", default="terrac")
     s.set_defaults(func=cmd_sim)
 
