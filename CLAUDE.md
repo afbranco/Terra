@@ -188,7 +188,8 @@ de lá.
     fica em `ST_IDLE` e o nó volta a pedir a versão nova (PR #105);
   - terrac: catálogo com W3006 e E6007 (161 códigos); `.vmx` com `loop i,N` com nomes de limite
     novos (#48); cast para inteiro menor corta o valor (#46); float convertido em `emit`, `await`
-    e argumento, e E4030 nos casos inválidos (#45);
+    e argumento, e E4030 nos casos inválidos (#45); depois da v1.3.0, cast, `-`, `~` e `not` direto
+    em campo de registro ou elemento de array usam o valor, não o endereço (PR #107, #104);
   - o oráculo do TerraSim tem de ser refeito (tempo e mensagens na serial mudam com a #74).
   TerraControl no backlog (#73).
 - **Revisão da disseminação e do Grp** (2026-11-24, a pedido do Prof.; dois agentes de leitura,
@@ -249,6 +250,10 @@ de lá.
     `count` 0 (opção do Prof.), buffer próprio `ExtDataAggFull`. Teste `tests/aggqfull`.
   - PR #105 (#83): `ReqState` em `RO_IDLE` (fim da carga pelo temporizador) não tinha caso no
     `ProgReqTimerTask`; agora `ST_IDLE`. Sem teste que reprove (decisão do Prof.).
+  - PR #107 (#104, terrac): `<T>x.campo`, `<T>v[i]`, `-x.campo`, `~v[i]` e `not x.campo` operavam
+    sobre o endereço (faltava o `tryDerefCode` no `Op1_cast` e no `Op1_any`), desde a produção de
+    2016. Teste `tests/unario`. Corpus: nenhum `.vmx` mudou. O `--output` do terrac não tem efeito
+    (o `.vmx` sai ao lado do fonte).
   - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
     `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
