@@ -213,6 +213,10 @@ de lá.
     temporário do tamanho do evento, só instruções antigas; nenhum `.vmx` do corpus muda);
   - terrac, depois da v1.4.0: sem `summary.platforms` no `--diag=json` e W5003 com os números
     (PR #123, #122);
+  - depois da v1.5.0 (PR #134, relatados pelo TerraSim, decisões do Prof.): status descrito como
+    SUCCESS ou não, sem `#define FAIL` (#132; o `gendocs` reprova nome em maiúsculas não declarado
+    no texto); `pIN`/`pOUT`/`RISING`/`FALLING`/`DISABLE` só com `PORTS` (saem do `.defs` do
+    TOSSIM) e o `SEND_DATA_SIZE` sai do `.defs` do Net (#133); teste `tests/terrac/portas_tossim`;
   - anexo novo `terra-docs-<v>.json` (PR #124, #91), para trocar o `terraDocs.js` e o
     `TERRA_LANGUAGE.md` mantidos à mão; formato no `release/README.md`;
   - terrac: catálogo com W3006 e E6007 (161 códigos); `.vmx` com `loop i,N` com nomes de limite
