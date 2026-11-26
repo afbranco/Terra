@@ -16,6 +16,10 @@ exports.run = async function () {
   const doc = await vscode.workspace.openTextDocument(path.join(ws, "p.terra"));
   await vscode.window.showTextDocument(doc);
   assert.strictEqual(doc.languageId, "terra", "idioma");
+  // A extensão ativa sozinha ao abrir um .terra (onLanguage, implícito no contributes.languages).
+  const ext = vscode.extensions.getExtension("afbranco.terra");
+  assert.ok(ext, "extensão instalada");
+  await espera(() => ext.isActive);
 
   const cmds = await vscode.commands.getCommands(true);
   for (const c of ["terra.compile", "terra.load", "terra.listen", "terra.simulate", "terra.flash"]) {
