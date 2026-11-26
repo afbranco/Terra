@@ -186,6 +186,8 @@ de lá.
     (PR #102); o `VM.reset` esvazia as filas de agregação (PR #103); `AGGREG` com a fila de agregação
     cheia termina na hora com `count` 0 (+11 B de RAM, PR #106); carga terminada pelo temporizador
     fica em `ST_IDLE` e o nó volta a pedir a versão nova (PR #105);
+    potência de RF: o padrão é o da compilação (`RFPOWER`), o programa novo começa com ele e só as
+    mensagens do programa levam a do `setRFPower` (PR #108, só hardware);
   - terrac: catálogo com W3006 e E6007 (161 códigos); `.vmx` com `loop i,N` com nomes de limite
     novos (#48); cast para inteiro menor corta o valor (#46); float convertido em `emit`, `await`
     e argumento, e E4030 nos casos inválidos (#45); depois da v1.3.0, cast, `-`, `~` e `not` direto
@@ -254,6 +256,10 @@ de lá.
     sobre o endereço (faltava o `tryDerefCode` no `Op1_cast` e no `Op1_any`), desde a produção de
     2016. Teste `tests/unario`. Corpus: nenhum `.vmx` mudou. O `--output` do terrac não tem efeito
     (o `.vmx` sai ao lado do fonte).
+  - PR #108 (#83): potência de RF. Decisão do Prof.: padrão da compilação, o `setRFPower` vale só no
+    programa. O `tempInputOutQ` (reaproveitado pelas mensagens do sistema) e o `sendBuff` guardavam
+    a potência do programa. Sem teste que reprove (o TOSSIM ignora a potência). A velocidade da
+    disseminação (um bloco por timeout) fica como está (decisão do Prof.).
   - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
     `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por

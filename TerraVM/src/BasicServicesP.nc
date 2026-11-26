@@ -772,6 +772,11 @@ call Leds.led1On();
 		// Stop the VM
  		signal BSUpload.stop();
  		signal BSUpload.resetMemory();
+#if defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB) || defined(PLATFORM_IRIS) || defined(PLATFORM_MICA2) || defined(PLATFORM_MICA2DOT)
+		// A potência do setRFPower vale só para o programa que a definiu: o novo começa com a da
+		// compilação (RFPOWER) (#83).
+		userRFPowerIdx = RFPOWER_IDX;
+#endif
  		TViewer("vmstop",0,0);
 //logS("I",1);
  		// Get new version ID - If it is the BStation, use last loaded version + 1.
@@ -1294,11 +1299,17 @@ call Leds.led1On();
 #elif defined(INOS) || defined(INOX)
 
 #elif defined(PLATFORM_MICAZ) || defined(PLATFORM_TELOSB)
-		if (tempOutputOutQ.RFPower > 0) call RadioAux.setPower(&sendBuff,tempOutputOutQ.RFPower);
+		// Sempre: com 0 (mensagem do sistema) vale a potência da compilação. Antes o sendBuff (ou o
+		// rádio, no mica2) ficava com a da mensagem anterior, que podia ser a do programa (#83).
+		call RadioAux.setPower(&sendBuff,((tempOutputOutQ.RFPower > 0)? tempOutputOutQ.RFPower : RFPowerTab[RFPOWER_IDX]));
 #elif defined(PLATFORM_IRIS)
-		if (tempOutputOutQ.RFPower > 0) call RadioAux.set(&sendBuff,tempOutputOutQ.RFPower);
+		// Sempre: com 0 (mensagem do sistema) vale a potência da compilação. Antes o sendBuff (ou o
+		// rádio, no mica2) ficava com a da mensagem anterior, que podia ser a do programa (#83).
+		call RadioAux.set(&sendBuff,((tempOutputOutQ.RFPower > 0)? tempOutputOutQ.RFPower : RFPowerTab[RFPOWER_IDX]));
 #elif defined(PLATFORM_MICA2) || defined(PLATFORM_MICA2DOT)
-		if (tempOutputOutQ.RFPower > 0) atomic {call RadioAux.setRFPower(tempOutputOutQ.RFPower);};
+		// Sempre: com 0 (mensagem do sistema) vale a potência da compilação. Antes o sendBuff (ou o
+		// rádio, no mica2) ficava com a da mensagem anterior, que podia ser a do programa (#83).
+		atomic {call RadioAux.setRFPower(((tempOutputOutQ.RFPower > 0)? tempOutputOutQ.RFPower : RFPowerTab[RFPOWER_IDX]));};
 
 #endif
 		err = RadioSender_send(tempOutputOutQ.AM_ID,tempOutputOutQ.sendToMote, &sendBuff, tempOutputOutQ.DataSize);
@@ -1644,9 +1655,13 @@ call Leds.led1On();
 #endif
 		dbg("VMDBG","Radio: Sending user msg AM_ID=%d to node %d\n",am_id, target);		
 		if (call outQ.put(&tempInputOutQ)!= SUCCESS) {
+			tempInputOutQ.RFPower = 0;
 			dbg(APPNAME, "BS::BSRadio.send(): outQueue is full! Losting a message.\n");
 			return EBUSY;
 		}
+		// O tempInputOutQ é reaproveitado pelas mensagens do sistema (disseminação...): sem isto elas
+		// saíam com a potência do programa (#83). 0 = potência da compilação.
+		tempInputOutQ.RFPower = 0;
 		return SUCCESS;
 	}
 
