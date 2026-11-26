@@ -31,6 +31,10 @@
 == getparent16
 {"code":"W1001","severity":"warning","file":"getparent16.terra","line":3,"msg":"Automatic casting from `ushort´ to `ubyte´. ","args":{"from":"ushort","to":"ubyte"}}
 {"summary":{"ok":true,"errors":0,"warnings":1,"optimized":true,"vm":{"name":"TerraGrp","version":"000.002.000"},"memory":{"total":20,"code":6,"ctl_vars":10,"stack":4,"radio_msgs":1}}}
+== grp_unsafe
+{"code":"W2001","severity":"warning","file":"grp_unsafe.terra","line":10,"col":3,"msg":"nondeterminism (call conflict) : event `LED0´ (line 10) vs event `LEDS´ (line 12)","args":{"a":"event `LED0´ (line 10)","b":"event `LEDS´ (line 12)","kind_a":"event","kind_b":"event","line_a":10,"line_b":12,"name_a":"LED0","name_b":"LEDS"},"related":[{"file":"grp_unsafe.terra","line":12,"col":3}]}
+{"code":"W2001","severity":"warning","file":"grp_unsafe.terra","line":15,"col":3,"msg":"nondeterminism (call conflict) : event `SEND_GR´ (line 15) vs event `SEND_GR´ (line 17)","args":{"a":"event `SEND_GR´ (line 15)","b":"event `SEND_GR´ (line 17)","kind_a":"event","kind_b":"event","line_a":15,"line_b":17,"name_a":"SEND_GR","name_b":"SEND_GR"},"related":[{"file":"grp_unsafe.terra","line":17,"col":3}]}
+{"summary":{"ok":true,"errors":0,"warnings":2,"optimized":true,"vm":{"name":"TerraGrp","version":"000.002.000"},"memory":{"total":105,"code":70,"ctl_vars":35,"stack":0,"radio_msgs":4}}}
 == laco_zero
 {"code":"E5001","severity":"error","file":"laco_zero.terra","line":3,"col":1,"msg":"tight loop"}
 {"summary":{"ok":false,"errors":1,"warnings":0,"optimized":true,"vm":{"name":"TerraNet_MsgQ","version":"000.002.000"}}}

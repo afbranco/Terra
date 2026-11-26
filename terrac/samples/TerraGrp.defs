@@ -172,6 +172,22 @@ do
 	function ubyte setRFPower(ubyte)			17;
 	function ushort getParent()			18;
 
+// Determinist (#116: os mesmos pares do TerraNet, que usam o mesmo código de LEDs, sensores e
+// portas; SEND_BS e SEND_GR têm um único buffer de status cada: dois na mesma reação leem o status
+// do último)
+
+unsafe LEDS 		with LEDS, LED0, LED1, LED2;
+unsafe LED0 		with LEDS, LED0, LED1, LED2;
+unsafe LED1 		with LEDS, LED0, LED1, LED2;
+unsafe LED2 		with LEDS, LED0, LED1, LED2;
+unsafe REQ_TEMP 	with REQ_TEMP, REQ_PHOTO,REQ_VOLTS;
+unsafe REQ_PHOTO 	with REQ_TEMP, REQ_PHOTO,REQ_VOLTS;
+unsafe REQ_VOLTS 	with REQ_TEMP, REQ_PHOTO,REQ_VOLTS;
+unsafe REQ_CUSTOM_A with REQ_CUSTOM_A;
+unsafe SEND_BS		with SEND_BS;
+unsafe SEND_GR		with SEND_GR;
+
+
 // Request/await macros
 #define getTemp(var)  emit REQ_TEMP();  var=await TEMP 
 #define getPhoto(var) emit REQ_PHOTO(); var=await PHOTO 
