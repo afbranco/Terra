@@ -15,6 +15,7 @@ _OPTS = {
     warn      = true,
     wstrong   = true,
     wweak     = false,
+    types     = false,
     includePath="",
 
 }
@@ -28,6 +29,7 @@ _OPTS_NPARAMS = {
     warn      = 0,
     wstrong   = 0,
     wweak     = 0,
+    types     = 0,
 }
 
 function trim (s)
@@ -108,6 +110,7 @@ if not _OPTS.input then
         -Ipath                   # Path for include files (.defs)
         --diag=json              # diagnostics as JSON lines on stderr (text)
         --catalog                # print the catalog of diagnostic codes (JSON)
+        --types                  # print the program's types and field layout (JSON), no .vmx
 ]])
     os.exit(1)
 end
@@ -224,6 +227,34 @@ do
     dofile 'ast.lua'
     dofile 'env.lua'
 --    _AST.dump(_AST.root)
+    -- --types (#92): os registros, pacotes e pktypes com a posição de cada campo, para o terractl
+    -- decodificar as mensagens. Só a análise de nomes e tipos; não gera o .vmx.
+    if _OPTS.types then
+        local OBJ, list = _DIAG.OBJ, {}
+        local function campos (fields)
+            local fs = {}
+            for _, f in ipairs(fields) do
+                if f.id ~= '_remain' then
+                    fs[#fs+1] = OBJ{ {'name', f.id}, {'type', f.tp}, {'dim', f.dim or nil},
+                                     {'offset', f.offset}, {'size', f.len} }
+                end
+            end
+            return fs
+        end
+        for id, t in pairs(_ENV.c) do
+            if t.fields then
+                list[#list+1] = OBJ{ {'name', id}, {'kind', t.supertp and 'pktype' or 'regtype'},
+                                     {'from', t.supertp}, {'size', t.len}, {'fields', campos(t.fields)} }
+            end
+        end
+        for id, t in pairs(_ENV.packets) do
+            list[#list+1] = OBJ{ {'name', id}, {'kind', 'packet'}, {'size', t.len},
+                                 {'fields', campos(t.fields)} }
+        end
+        table.sort(list, function (a, b) return a.__obj[1][2] < b.__obj[1][2] end)
+        io.stdout:write(_DIAG.jval(OBJ{ {'format', 1}, {'types', list} }) .. '\n')
+        _DIAG.exit(0)
+    end
     dofile 'props.lua'
     dofile 'ana.lua'
     dofile 'acc.lua'

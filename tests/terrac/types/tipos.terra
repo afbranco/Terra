@@ -1,0 +1,17 @@
+#include "TerraNet.defs"
+// terrac --types (#92): os registros, pacotes e pktypes com a posição de cada campo. O pktype herda o
+// cabeçalho do radioMsg (type, source, target) e os campos dele ocupam o payload, em sequência, sem
+// alinhamento. Saída esperada em tipos.esperado.
+regtype ponto with
+  var short x;
+  var short y;
+end
+pktype leitura from radioMsg with
+  var ubyte  id;
+  var ushort temp;
+  var long   t;
+  var float  f;
+  var ubyte[3] v;
+end
+var leitura m;
+m.temp = 1;
