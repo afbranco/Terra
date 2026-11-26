@@ -407,6 +407,8 @@ end
 function Op1_any(me,mnemonic)
     local op, e1 = unpack(me)
 		CONC(me,e1)
+    -- Campo ou elemento de array: o CONC deixa o endereço; carrega o valor, como no Op2_any (#104).
+    if not e1.arr then tryDerefCode(me,e1.tag,e1.tp) end
 --print("code::Op1_any",e1.tag)
     mnemonic = (e1.tp=='float' and opcode['op_'..mnemonic..'_f'] and mnemonic..'_f') or mnemonic 
     codeB = LINE(me,mnemonic,nil,'// stack0 = '..mnemonic..'(stack0)')
@@ -1371,6 +1373,8 @@ F = {
   Op1_cast = function (me)
     local tp, exp = unpack(me)
     CONC(me,exp)
+    -- Campo ou elemento de array: o CONC deixa o endereço; carrega o valor, como no Op2_any (#104).
+    if not exp.arr then tryDerefCode(me,exp.tag,exp.tp) end
     local fromTp = ((exp.tp=='ubyte' or exp.tp=='ushort' or exp.tp=='ulong') and 'ulong') or ((exp.tp=='byte' or exp.tp=='short' or exp.tp=='long') and 'long') or 'float'  
     local toTp = ((tp=='ubyte' or tp=='ushort' or tp=='ulong') and 'ulong') or ((tp=='byte' or tp=='short' or tp=='long') and 'long') or 'float'  
     codeB = LINE(me,'cast '..fromTp..' '..toTp,nil,'// cast <type> ')

@@ -1,0 +1,168 @@
+43 167 1 1 0 0 8 0 8
+00 | 00000 0 track 0
+00 | 00001 0
+00 | 00002 0
+00 | 00003 0
+00 | 00004 0 track 1
+00 | 00005 0
+00 | 00006 0
+00 | 00007 0
+00 | 00008 0000 wClock 0
+00 | 00009 0001
+00 | 00010 0002
+00 | 00011 0003
+00 | 00012 0004
+00 | 00013 0005
+00 | 00014 0006
+00 | 00015 0007
+00 | 00016 0008 $ret:1, 
+00 | 00017 0009 d:11, 
+00 | 00018 0010 
+00 | 00019 0011 
+00 | 00020 0012 
+00 | 00021 0013 
+00 | 00022 0014 
+00 | 00023 0015 
+00 | 00024 0016 
+00 | 00025 0017 
+00 | 00026 0018 
+00 | 00027 0019 
+00 | 00028 0020 v:6, 
+00 | 00029 0021 
+00 | 00030 0022 
+00 | 00031 0023 
+00 | 00032 0024 
+00 | 00033 0025 
+00 | 00034 0026 a:4, 
+00 | 00035 0027 
+00 | 00036 0028 
+00 | 00037 0029 
+00 | 00038 0030 b:4, 
+00 | 00039 0031 
+00 | 00040 0032 
+00 | 00041 0033 
+00 | 00042 0034 r:1, 
+c0 | 00043 c0 set_c ubyte 34 0              | r = 0
+22 | 00044 22 
+00 | 00045 00 
+c1 | 00046 c1 set_c ushort 10 1             | d.count = 1
+0a | 00047 0a 
+01 | 00048 01 
+c1 | 00049 c1 set_c ushort 12 0             | d.countTrue = 0
+0c | 00050 0c 
+00 | 00051 00 
+c1 | 00052 c1 set_c ushort 22 2             | v[1] = 2
+16 | 00053 16 
+02 | 00054 02 
+c1 | 00055 c1 set_c ushort 24 0             | v[2] = 0
+18 | 00056 18 
+00 | 00057 00 
+29 | 00058 29 clken_c 0 2000 6              | clock enable Awake_2000_6 2000msec
+03 | 00059 03 
+00 | 00060 00 
+07 | 00061 07 
+d0 | 00062 d0 
+00 | 00063 .00 addr:66
+42 | 00064 .06 
+01 | 00065 01 end                           | end
+40 | 00066 40 push_c 2                      | push 2
+02 | 00067 02 
+91 | 00068 91 push_v ushort 22                     | push_v ushort &v[1] [Optm:: push_c addr + deref]
+16 | 00069 16 
+40 | 00070 40 push_c 255                    | push 255
+ff | 00071 ff 
+0b | 00072 0b band                          | band
+0f | 00073 0f eq                            | eq
+40 | 00074 40 push_c 1                      | push 1
+01 | 00075 01 
+91 | 00076 91 push_v ushort 10                     | push d.count [Optm:: push_c addr + deref]
+0a | 00077 0a 
+40 | 00078 40 push_c 255                    | push 255
+ff | 00079 ff 
+0b | 00080 0b band                          | band
+0f | 00081 0f eq                            | eq
+16 | 00082 16 land                          | land
+4f | 00083 4f ifelse 10 11                  | ifelse True_10 EndIf_11
+00 | 00084 .00 addr:88
+58 | 00085 .0a 
+00 | 00086 .00 addr:98
+62 | 00087 .0b 
+40 | 00088 40 push_c 1                      | push 1
+01 | 00089 01 
+90 | 00090 90 push_v ubyte 34               | push r:ubyte
+22 | 00091 22 
+06 | 00092 06 add                           | add
+a0 | 00093 a0 pop ubyte 34                  | pop r
+22 | 00094 22 
+39 | 00095 39 exec 11                       | goto  11
+00 | 00096 .00 addr:98
+62 | 00097 .0b 
+91 | 00098 91 push_v ushort 10                     | push d.count [Optm:: push_c addr + deref]
+0a | 00099 0a 
+04 | 00100 04 neg                           | neg
+a6 | 00101 a6 pop long 26                   | pop a
+1a | 00102 1a 
+91 | 00103 91 push_v ushort 22                     | push_v ushort &v[1] [Optm:: push_c addr + deref]
+16 | 00104 16 
+02 | 00105 02 bnot                          | bnot
+a6 | 00106 a6 pop long 30                   | pop b
+1e | 00107 1e 
+40 | 00108 40 push_c 3                      | push 3
+03 | 00109 03 
+04 | 00110 04 neg                           | neg
+96 | 00111 96 push_v long 30                | push b:long
+1e | 00112 1e 
+0f | 00113 0f eq                            | eq
+40 | 00114 40 push_c 1                      | push 1
+01 | 00115 01 
+04 | 00116 04 neg                           | neg
+96 | 00117 96 push_v long 26                | push a:long
+1a | 00118 1a 
+0f | 00119 0f eq                            | eq
+16 | 00120 16 land                          | land
+4f | 00121 4f ifelse 17 18                  | ifelse True_17 EndIf_18
+00 | 00122 .00 addr:126
+7e | 00123 .11 
+00 | 00124 .00 addr:136
+88 | 00125 .12 
+40 | 00126 40 push_c 2                      | push 2
+02 | 00127 02 
+90 | 00128 90 push_v ubyte 34               | push r:ubyte
+22 | 00129 22 
+06 | 00130 06 add                           | add
+a0 | 00131 a0 pop ubyte 34                  | pop r
+22 | 00132 22 
+39 | 00133 39 exec 18                       | goto  18
+00 | 00134 .00 addr:136
+88 | 00135 .12 
+91 | 00136 91 push_v ushort 24                     | push_v ushort &v[2] [Optm:: push_c addr + deref]
+18 | 00137 18 
+03 | 00138 03 lnot                          | lnot
+91 | 00139 91 push_v ushort 12                     | push d.countTrue [Optm:: push_c addr + deref]
+0c | 00140 0c 
+03 | 00141 03 lnot                          | lnot
+16 | 00142 16 land                          | land
+4f | 00143 4f ifelse 22 23                  | ifelse True_22 EndIf_23
+00 | 00144 .00 addr:148
+94 | 00145 .16 
+00 | 00146 .00 addr:158
+9e | 00147 .17 
+40 | 00148 40 push_c 4                      | push 4
+04 | 00149 04 
+90 | 00150 90 push_v ubyte 34               | push r:ubyte
+22 | 00151 22 
+06 | 00152 06 add                           | add
+a0 | 00153 a0 pop ubyte 34                  | pop r
+22 | 00154 22 
+39 | 00155 39 exec 23                       | goto  23
+00 | 00156 .00 addr:158
+9e | 00157 .17 
+90 | 00158 90 push_v ubyte 34               | push r:ubyte
+22 | 00159 22 
+25 | 00160 25 outevt_e 5                    | emit LEDS
+05 | 00161 05 
+01 | 00162 01 end                           | end
+48 | 00163 48 memclr 0 8                    | clear WClocks gates from 0 to 1
+00 | 00164 00 
+08 | 00165 08 
+01 | 00166 01 end                           | end
