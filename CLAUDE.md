@@ -114,6 +114,8 @@ de lá.
     no mesmo endereço antes de `exec` perdiam o redirecionamento. O padrão não aparece em 876
     programas otimizados. `tests/terrac/optm_rotulos.lua` confere o destino de cada rótulo. Falta
     um programa que quebre.
+    **Fechada em 2026-11-26** (decisão do Prof.): otimização ligada por padrão; quem tiver problema
+    usa `--no-opt`. O TerraSim vai ter a opção no menu de configuração (hoje compila com `--no-opt`).
   - #28 erro do cpp sem coluna (`#if` sem `#endif`) saía como E1005: **fechada** (PR #29,
     `56e4edb`), relatado pelo TerraSim. Saiu na v1.1.1.
 - Depois da v1.1.1 (2026-11-23), no `master`, para a próxima release:
