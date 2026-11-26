@@ -82,6 +82,13 @@ else:
     confere(chegou == [(145, 11, 0xFFFF, bytes([7, 0, 11, 0, 1, 42]))], "mensagem do mote entregue")
     termios.tcflush(escravo, termios.TCIOFLUSH)
 
+# Grade do simulador (terractl sim): 8 vizinhos dentro da grade, como o TerraSim.py da .ova.
+from terractl import sim  # noqa: E402
+confere(len(sim.grid_links(3, 3)) == 20 and (11, 22) in sim.grid_links(3, 3)
+        and (13, 21) not in sim.grid_links(3, 3), "grade 3x3: 20 enlaces, diagonais dentro da grade")
+confere(sim.grid_links(1, 1) == [] and len(sim.grid_links(9, 9)) == 2 * 9 * 8 + 2 * 8 * 8, "grades 1x1 e 9x9")
+confere(len(sim.noise_trace()) == 10000, "ruído do TerraSim.py com 10 mil leituras")
+
 # Gravação com ID
 exes = sorted(glob.glob(os.path.join(sys.argv[1], "terra-*-micaz-*.exe"))) if len(sys.argv) > 1 else []
 confere(len(exes) == 4, "4 firmwares micaz em %s" % (sys.argv[1:] or ["?"]))

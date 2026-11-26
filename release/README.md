@@ -176,11 +176,18 @@ python3 terractl-<v>.pyz flash terra-<v>-grp-micaz-nobs.exe --node 11 --port /de
   decodifica pelo `pktype` do programa; com mais de um, `--pktype N=nome` escolhe pelo `type` (Net)
   ou `msgId` (Grp). `--json` dá uma mensagem por linha em JSON; `--hex`, só os bytes. Inteiros em
   big-endian e `float` em little-endian (o `nx_float` do atm128).
+- `sim`: simulação local (#94) com o `_TOSSIM.so` da release (`--tossim pasta`; Python 3.14, então
+  na imagem do toolchain): grade `--grid LxC` (até 9x9, nós coluna*10+linha, 8 vizinhos, ganho 85 e
+  o ruído do `TerraSim.py` da `.ova`), o `.vmx` carregado pela BS e os logs (TVIEW, mensagens à BS
+  decodificadas) com o tempo simulado. `--late N --late-at S` liga as últimas colunas depois,
+  `--vmdbg`, `--channel`, `--seed`; `--realtime` abre o SerialForwarder (9002) para um
+  `terractl load --sf` de fora. Uso no `docs/tinyos.md`.
 - `flash`: troca `TOS_NODE_ID` e `ActiveMessageAddressC__addr` no `.exe` (como o `tos-set-symbols`)
   e grava com o `avrdude` (`-c mib510`, fusíveis do micaz); `-o arq.ihex` só gera o arquivo.
 - Fora: o "Set memory data" e o "Send Group Message" do TerraControl (decisão do Prof.).
 - Testes: `release/test-terractl.py` (quadro serial, porta serial simulada, ID contra o
-  `tos-set-symbols`) e `tests/terractl`, `tests/terractlgrp` (carga e decodificação no TOSSIM).
+  `tos-set-symbols`, grade do `sim`) e `tests/terractl`, `tests/terractlgrp` (carga e decodificação
+  no TOSSIM), `tests/terractlsim` (grade 3x3 com o `sim`).
 
 ## TerraControl
 
