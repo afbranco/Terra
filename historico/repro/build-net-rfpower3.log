@@ -1,0 +1,91 @@
+***********************
+**** Configuration ****
+VM          = NET
+MODULES     = MSGQ -- [FFT,VCN_DAT,VCN_DET,MSGQ]
+MOTE        = micaz 
+RFPOWER     = 3
+LPL         = NO
+SENSORBOARD = mda100
+TYPE        = ALL
+HYB         = YES
+SETDATA     = NO
+QUEUE       = SHORT
+VM_MEM_BLKS = 72
+VM_MEM      = 1728
+TOSVERSION  = 212
+***********************
+Make Cmds- micaz sim-sf
+mkdir -p simbuild/micaz
+  placing object files in simbuild/micaz
+  writing XML schema to app.xml
+  compiling TerraVMAppC to object file sim.o
+ncc -c -shared -fPIC -o simbuild/micaz/sim.o -g -O0 -DCC2420_DEF_RFPOWER=15 -DRFPOWER_IDX=3 -fno-strict-aliasing  -tossim -fnesc-nido-tosnodes=1000 -fnesc-simulate -fnesc-nido-motenumber=sim_node\(\) -I/opt/tinyos-2.1.2/tos/lib/tossim/sf -Wall -Wshadow -Wnesc-all -target=micaz -fnesc-cfile=simbuild/micaz/app.c -board=mda100 -DTOSH_DATA_LENGTH=29 -DDEFINED_TOS_AM_GROUP=0x22 --param max-inline-insns-single=100000 -Isimbuild/micaz -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=72 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"root\" -DIDENT_HOSTNAME=\"8b1c4c958967\" -DIDENT_USERHASH=0x278de68cL -DIDENT_TIMESTAMP=0x6b026f7cL -DIDENT_UIDHASH=0xb8e45721L -Wno-nesc-data-race TerraVMAppC.nc   -fnesc-dump=components -fnesc-dump=variables -fnesc-dump=constants -fnesc-dump=typedefs -fnesc-dump=interfacedefs -fnesc-dump=tags -fnesc-dumpfile=app.xml
+BasicServicesP.nc: In function 'BasicServicesP$recReqDataNet_receive':
+BasicServicesP.nc:656:14: warning: variable 'xmsg' set but not used [-Wunused-but-set-variable]
+BasicServicesP.nc: In function 'BasicServicesP$recReqProgBlockNet_receive':
+BasicServicesP.nc:584:19: warning: variable 'xmsg' set but not used [-Wunused-but-set-variable]
+TerraVMC.nc: In function 'TerraVMC$f_outevt_v':
+TerraVMC.nc:1556:11: warning: variable 'v2_len' set but not used [-Wunused-but-set-variable]
+TerraVMC.nc: In function 'TerraVMC$f_pop':
+TerraVMC.nc:1533:11: warning: variable 'v1_len' set but not used [-Wunused-but-set-variable]
+TerraVMC.nc: In function 'TerraVMC$f_push_v':
+TerraVMC.nc:1517:11: warning: variable 'v1_len' set but not used [-Wunused-but-set-variable]
+TerraVMC.nc: In function 'TerraVMC$f_poparr_v':
+TerraVMC.nc:1229:11: warning: variable 'v2_len' set but not used [-Wunused-but-set-variable]
+TerraVMC.nc: In function 'TerraVMC$f_setarr_vv':
+TerraVMC.nc:1188:11: warning: variable 'v4_len' set but not used [-Wunused-but-set-variable]
+TerraVMC.nc:1188:11: warning: variable 'v2_len' set but not used [-Wunused-but-set-variable]
+TerraVMC.nc: In function 'TerraVMC$f_setarr_vc':
+TerraVMC.nc:1154:11: warning: variable 'v2_len' set but not used [-Wunused-but-set-variable]
+/opt/tinyos-2.1.2/tos/lib/tossim/sim_noise.c: In function 'sim_noise_gen':
+/opt/tinyos-2.1.2/tos/lib/tossim/sim_noise.c:291:7: warning: variable 'noiseIndex' set but not used [-Wunused-but-set-variable]
+BasicServicesP.nc: In function 'BasicServicesP$RadioSender$sendDone':
+BasicServicesP.nc:1412:8: warning: variable 'reqRetry' set but not used [-Wunused-but-set-variable]
+  compiling Python support and C libraries into pytossim.o, tossim.o, and c-support.o
+g++ -c  -shared -fPIC -o simbuild/micaz/pytossim.o -g -O0 -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=72 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"root\" -DIDENT_HOSTNAME=\"8b1c4c958967\" -DIDENT_USERHASH=0x278de68cL -DIDENT_TIMESTAMP=0x6b026f7cL -DIDENT_UIDHASH=0xb8e45721L  -I/opt/tinyos-2.1.2/tos/lib/tossim/sf /opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx -I/usr/include/python2.7 -I/opt/tinyos-2.1.2/tos/lib/tossim -DHAVE_CONFIG_H 
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx: In function 'void SWIG_Python_AddErrorMsg(const char*)':
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:870:42: warning: format not a string literal and no format arguments [-Wformat-security]
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx: In function 'PyObject* _wrap_nesc_app_t_numVariables_set(PyObject*, PyObject*)':
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:5485:35: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:5486:35: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx: In function 'PyObject* _wrap_nesc_app_t_numVariables_get(PyObject*, PyObject*)':
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:5557:35: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:5558:35: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx: In function 'PyObject* _wrap_nesc_app_t_variableNames_set(PyObject*, PyObject*)':
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:5626:35: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:5627:35: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx: In function 'PyObject* _wrap_nesc_app_t_variableNames_get(PyObject*, PyObject*)':
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:5698:35: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:5699:35: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx: In function 'PyObject* _wrap_nesc_app_t_variableTypes_set(PyObject*, PyObject*)':
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:5767:35: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:5768:35: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx: In function 'PyObject* _wrap_nesc_app_t_variableTypes_get(PyObject*, PyObject*)':
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:5839:35: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:5840:35: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx: In function 'PyObject* _wrap_nesc_app_t_variableArray_set(PyObject*, PyObject*)':
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:5908:35: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:5909:35: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx: In function 'PyObject* _wrap_nesc_app_t_variableArray_get(PyObject*, PyObject*)':
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:5980:35: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:5981:35: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx: In function 'PyObject* _wrap_delete_nesc_app_t(PyObject*, PyObject*)':
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:6058:35: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:6059:35: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx: In function 'PyObject* _wrap_new_Mote(PyObject*, PyObject*)':
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:6250:35: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:6251:35: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx: In function 'PyObject* _wrap_new_Tossim(PyObject*, PyObject*)':
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:6651:35: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+/opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim_wrap.cxx:6652:35: warning: deprecated conversion from string constant to 'char*' [-Wwrite-strings]
+g++ -c  -shared -fPIC -o simbuild/micaz/tossim.o -g -O0 -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=72 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"root\" -DIDENT_HOSTNAME=\"8b1c4c958967\" -DIDENT_USERHASH=0x278de68cL -DIDENT_TIMESTAMP=0x6b026f7cL -DIDENT_UIDHASH=0xb8e45721L  -I/opt/tinyos-2.1.2/tos/lib/tossim/sf /opt/tinyos-2.1.2/tos/lib/tossim/sf/tossim.c -I/usr/include/python2.7 -I/opt/tinyos-2.1.2/tos/lib/tossim
+g++ -c  -shared -fPIC -o simbuild/micaz/c-support.o -g -O0 -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=72 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"root\" -DIDENT_HOSTNAME=\"8b1c4c958967\" -DIDENT_USERHASH=0x278de68cL -DIDENT_TIMESTAMP=0x6b026f7cL -DIDENT_UIDHASH=0xb8e45721L  -I/opt/tinyos-2.1.2/tos/lib/tossim/sf /opt/tinyos-2.1.2/tos/lib/tossim/hashtable.c -I/usr/include/python2.7 -I/opt/tinyos-2.1.2/tos/lib/tossim
+  compiling sf support and C libraries into sf.o, c-sf.o, and throttle.o
+g++ -c  -shared -fPIC -o simbuild/micaz/c-sf.o -g -O0 -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=72 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"root\" -DIDENT_HOSTNAME=\"8b1c4c958967\" -DIDENT_USERHASH=0x278de68cL -DIDENT_TIMESTAMP=0x6b026f7cL -DIDENT_UIDHASH=0xb8e45721L  -I/opt/tinyos-2.1.2/tos/lib/tossim/sf /opt/tinyos-2.1.2/tos/lib/tossim/sf/sim_serial_forwarder.c -I/usr/include/python2.7 -I/opt/tinyos-2.1.2/tos/lib/tossim
+g++ -c  -shared -fPIC -o simbuild/micaz/sf.o -g -O0 -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=72 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"root\" -DIDENT_HOSTNAME=\"8b1c4c958967\" -DIDENT_USERHASH=0x278de68cL -DIDENT_TIMESTAMP=0x6b026f7cL -DIDENT_UIDHASH=0xb8e45721L  -I/opt/tinyos-2.1.2/tos/lib/tossim/sf /opt/tinyos-2.1.2/tos/lib/tossim/sf/SerialForwarder.c  -I/usr/include/python2.7 -I/opt/tinyos-2.1.2/tos/lib/tossim
+g++ -c  -shared -fPIC -o simbuild/micaz/throttle.o -g -O0 -O2 -DMDA100 -I/opt/tinyos-2.1.2/tos/sensorboards/mda100/cb -DSBOARD=100 -DSHORT_QUEUES -DM_MSG_QUEUE -DVM_MEM_BLKS=72 -DTOSVER=212 -DNO_DEBUG -I. -I/home/branco/gitspace/Terra/TerraVM/src/CustomVMs/TerraNet -I/home/branco/gitspace/Terra/TerraVM/src/XComps -DIDENT_APPNAME=\"TerraVMAppC\" -DIDENT_USERNAME=\"root\" -DIDENT_HOSTNAME=\"8b1c4c958967\" -DIDENT_USERHASH=0x278de68cL -DIDENT_TIMESTAMP=0x6b026f7cL -DIDENT_UIDHASH=0xb8e45721L  -I/opt/tinyos-2.1.2/tos/lib/tossim/sf /opt/tinyos-2.1.2/tos/lib/tossim/sf/Throttle.cpp -I/usr/include/python2.7 -I/opt/tinyos-2.1.2/tos/lib/tossim
+  linking into shared object ./_TOSSIMmodule.so
+g++ -shared -fPIC  simbuild/micaz/pytossim.o simbuild/micaz/sim.o simbuild/micaz/tossim.o simbuild/micaz/c-support.o simbuild/micaz/c-sf.o simbuild/micaz/sf.o simbuild/micaz/throttle.o  -lstdc++  -lm -o _TOSSIMmodule.so
+  copying Python script interface TOSSIM.py from lib/tossim to local directory
+ 
+*** Successfully built micaz TOSSIM library with TOSSIM Live extensions. 

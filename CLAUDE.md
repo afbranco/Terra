@@ -444,7 +444,8 @@ Arduino Uno"), com a estrutura de pastas da época (`TerraVM/src/CustomVMs/{Terr
   `system/`. A reorganização veio em 2016-10-07 ("Mudança do nome do Projeto").
 - Depois do `f02b8e6`: **321 commits**, a maioria em docs, Arduino, ESP, RPi e `terrac`; **37**
   mexem na VM TinyOS. São esses os candidatos a "inovação" a avaliar.
-- Ferramentas e dados em `handoff/provenance/` (fora do git, `.git/info/exclude`):
+- Ferramentas e dados em `historico/provenance/` (no repositório desde 2026-11-26, decisão do Prof.;
+  o `handoff/` local, fora do git, guarda a `.ova` e os `.so`):
   `linecheck.py <linhas.tsv> <src da versão> <src a comparar>` e `blanklines.py`, as tabelas
   de linhas dos dois `.so` (`so-Net.lines.tsv`, `so-Grp.lines.tsv`) e a lista dos 430 commits.
 
@@ -523,8 +524,6 @@ e `.rodata` iguais aos do `459a2091`), refazer o oráculo e criar a TerraSim v1.
 
 ## Pendências para decidir com o Prof.
 
-- Se o `handoff/` (scripts e tabelas da análise de versão) entra no repositório. Hoje está
-  fora do git (`.git/info/exclude`).
 - Teste com micaz real (#16): em 2026-11-26, a v1.5.0 (Net e Grp) passou em 2 micaz em 2 MIB520CA
   pelo USB, numa VM VMware (resultado na #16; script e programas no scratchpad da sessão). Falta refazer
   com o `terractl` (#92; o Prof. decidiu aposentar o TerraControl em Java, #73 fechada), multi-salto
