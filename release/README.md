@@ -9,17 +9,34 @@ workflow e no `BUILDINFO` de cada release.
 
 | Arquivo | O que é |
 |---|---|
-| `terra-<v>-net-tossim-py3-x86_64.tar.gz` | Simulador TerraNet: `_TOSSIM.so` e `TOSSIM.py` (Python 3.14, x86_64) |
+| `terra-<v>-net-tossim-py3-x86_64.tar.gz` | Simulador TerraNet: `_TOSSIM.so`, `TOSSIM.py` (Python 3.14, x86_64) e o `TerraNet.defs` dele |
 | `terra-<v>-grp-tossim-py3-x86_64.tar.gz` | Simulador TerraGrp, idem |
-| `terra-<v>-{net,grp}-micaz-nobs.{exe,ihex}` | Firmware micaz, nó comum |
+| `terra-<v>-{net,grp}-micaz-nobs.{exe,ihex}` | Firmware micaz, nó comum (placa MDA100) |
+| `terra-<v>-{net,grp}-micaz-nobs.defs` | O `.defs` desse firmware: compile com ele os programas para o micaz |
 | `terra-<v>-{net,grp}-micaz-bs.{exe,ihex}` | Firmware micaz, estação base (nó 1, ligado ao computador) |
-| `terrac-<v>.tar.gz` | Compilador `terrac`, `TerraNet.defs`, `TerraGrp.defs` e `terra.lang` |
+| `terrac-<v>.tar.gz` | Compilador `terrac`, `TerraNet.defs` e `TerraGrp.defs` (os do simulador) e `terra.lang` |
 | `terrac-errors-<v>.json` | Catálogo dos códigos de erro e aviso do `terrac` (o mesmo de `terrac --catalog`) |
 | `TerraVMControl-<v>.jar` | TerraControl, com todas as bibliotecas dentro |
 | `BUILDINFO`, `SHA256SUMS`, `logs.tar.gz` | Commit, imagem e logs de compilação e de teste |
 
-As opções de compilação são as da produção (`RFPOWER=4`, o padrão; o Net com `MOD=MSGQ` no
-simulador). Os comandos exatos estão em `build-tinyos.sh` e nos logs.
+As opções de compilação são as da produção (`RFPOWER=4`, o padrão; o Net com `MOD=MSGQ`). Os
+comandos exatos estão em `build-tinyos.sh` e nos logs.
+
+### Um `.defs` por firmware
+
+Desde a 1.4.0 o `.defs` acompanha o build: só declara o que existe naquele firmware (#100). O
+`make` o gera em `build/micaz/` a partir de `TerraVM/src/defs/Terra{Net,Grp}.defs.in`, conforme:
+
+- os módulos (`MOD=MSGQ`: `qPut`, `qGet`, `qSize`, `qClear`, `Q_READY`; `MOD=FFT`: `fftAlloc`, `fft`);
+- o hardware: portas e interrupções (`SET_PORT_*`, `CFG_PORT_*`, `REQ_PORT_*`, `CFG_INT_*`, `PORT_*`,
+  `INT_*`) só nos mica, fora do simulador;
+- a placa: `REQ_MIC`, `MIC`, `setupMic`, `BEEP` e `E_NOSETUP` só com `SENSOR=MTS300CA`/`MTS300CB`,
+  no Net e no Grp;
+- a memória para programa (`config`), a do build, só para a plataforma dele.
+
+O build da release confere cada `.defs` contra o código compilado (`release/check-defs.py`): toda
+saída e toda função declarada tem de ter tratamento na VM. Um programa que use o que o firmware
+não tem não compila (nome desconhecido), em vez de compilar e travar no mote.
 
 ## Gravar um micaz
 

@@ -20,6 +20,16 @@ mkdir -p "$OUT/logs"
 # Datas dos tar.gz e do jar: fixas, as do commit (SOURCE_DATE_EPOCH) ou, sem ele, 1980-01-02.
 SDE=${SOURCE_DATE_EPOCH:-315619200}
 
+# .defs da variante (#100): o build gera em build/micaz/; o check-defs confere cada entrada contra
+# o app.c pré-processado do mesmo build. Uso: defs <app.c> <saída .defs> <nome do log>
+defs() {
+    local f
+    f=$(ls "$W"/src/build/micaz/Terra*.defs)
+    python3 "$ROOT/release/check-defs.py" "$f" "$1" | tee -a "$OUT/logs/$3.log"
+    tail -1 "$OUT/logs/$3.log" | grep -q ': OK$' || { echo "FALHOU: check-defs $3"; exit 1; }
+    cp "$f" "$2"
+}
+
 # Compila TerraVM/src numa cópia limpa. Uso: vm <nome do log> <argumentos do make>
 vm() {
     local name=$1; shift
@@ -44,6 +54,10 @@ for v in net grp; do
     d="$W/terra-$VER-$v-tossim-py3-x86_64"
     rm -rf "$d"; mkdir -p "$d"
     cp "$W/src/_TOSSIM.so" "$W/src/TOSSIM.py" "$d/"
+    defs "$W/src/simbuild/micaz/app.c" "$d/" "tossim-$v"
+    # O .defs do TOSSIM é o que vai com o terrac (terrac/samples): tem de ser o commitado.
+    n=$(basename "$(ls "$d"/Terra*.defs)")
+    cmp -s "$d/$n" "$ROOT/terrac/samples/$n" || { echo "FALHOU: terrac/samples/$n difere do gerado"; exit 1; }
     tar -C "$W" --sort=name --mtime="@$SDE" --owner=0 --group=0 --numeric-owner \
         -cf - "$(basename "$d")" | gzip -n > "$OUT/$(basename "$d").tar.gz"
     # Roda numa pasta gravável: a VM cria ali o sensors.bin e, se não conseguir, sai com
@@ -63,7 +77,8 @@ for v in net grp; do
     done
 done
 
-# Firmware micaz. O ID do nó é gravado na instalação (ver release/README.md).
+# Firmware micaz (placa MDA100, o padrão do Makefile). O ID do nó é gravado na instalação (ver
+# release/README.md).
 # O Net leva a fila de mensagens (MOD=MSGQ), como o TOSSIM e a produção de 2016: o TerraNet.defs
 # declara qPut/qGet/qSize/qClear. Até a v1.3.0 saía sem ela (#99).
 for v in net grp; do
@@ -77,6 +92,10 @@ for v in net grp; do
         [ "$rom" -le 131072 ] && [ "$ram" -le 4096 ] || { echo "FALHOU: não cabe no micaz"; exit 1; }
         cp "$W/src/build/micaz/main.exe" "$OUT/terra-$VER-$v-micaz-$t.exe"
         cp "$W/src/build/micaz/main.ihex" "$OUT/terra-$VER-$v-micaz-$t.ihex"
+        # A BS não roda programas: só o NOBS tem .defs.
+        if [ $t = nobs ]; then
+            defs "$W/src/build/micaz/app.c" "$OUT/terra-$VER-$v-micaz-$t.defs" "micaz-$v-$t"
+        fi
     done
 done
 

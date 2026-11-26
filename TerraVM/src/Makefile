@@ -447,7 +447,27 @@ CFLAGS += -I. -I$(VMDIR) -I$(XCOMPSDIR)
 
 COMPONENT   = TerraVMAppC
 
-BUILD_EXTRA_DEPS = newProgVersionMsg.java newProgBlockMsg.java reqProgBlockMsg.java setDataNDMsg.java reqDataMsg.java usrMsg.java
+# .defs da variante (#100): só declara o que existe neste build (módulos, placa, hardware). Sai em
+# build/<mote>/ ao lado do firmware; não é gerado para a BS (TYPE=BS), que não roda programas.
+DEFS_NAME = $(if $(filter GRP,$(VM)),TerraGrp,TerraNet)
+DEFS_SIM  = $(findstring sim,$(MAKECMDGOALS))
+DEFS_HW   = $(and $(if $(DEFS_SIM),,x),$(filter micaz mica2 iris,$(MOTE)))
+DEFS_FLAGS = $(if $(filter -DM_MSG_QUEUE,$(CFLAGS)),MSGQ) $(if $(filter -DM_FFT,$(CFLAGS)),FFT) \
+             $(if $(DEFS_HW),PORTS) $(if $(and $(DEFS_HW),$(filter -DSBOARD=300,$(CFLAGS))),MIC)
+DEFS_SUFIXO = $(if $(filter MSGQ,$(DEFS_FLAGS)),_MsgQ)$(if $(filter FFT,$(DEFS_FLAGS)),_FFT)$(if $(filter MIC,$(DEFS_FLAGS)),_MTS300)
+DEFS_PLATF = $(if $(DEFS_SIM),tossim,$(if $(filter iris telosb,$(MOTE)),$(MOTE)_$(if $(filter YES,$(HYB)),hyb,full),$(MOTE)))
+ifneq ($(TYPE),BS)
+  ifneq ($(MOTE),)
+    BUILD_EXTRA_DEPS += terradefs
+  endif
+endif
+.PHONY: terradefs
+terradefs:
+	mkdir -p build/$(MOTE)
+	python3 defs/gendefs.py defs/$(DEFS_NAME).defs.in build/$(MOTE)/$(DEFS_NAME).defs \
+	  $(DEFS_NAME)$(DEFS_SUFIXO) $(DEFS_PLATF) $(MBLOCKS_F) $(DEFS_FLAGS)
+
+BUILD_EXTRA_DEPS += newProgVersionMsg.java newProgBlockMsg.java reqProgBlockMsg.java setDataNDMsg.java reqDataMsg.java usrMsg.java
 
 newProgVersionMsg.java: BasicServices.h
 	mig java -target=$(PLATFORM) $(CFLAGS) -java-classname=newProgVersionMsg BasicServices.h newProgVersion -o $@

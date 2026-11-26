@@ -1,6 +1,18 @@
 #ifndef SENS_ACT_H
 #define SENS_ACT_H
 
+// Portas e interrupções (SET/CFG/REQ_PORT, CFG_INT, PORT_A/B, INT_A/B): só no hardware mica, fora do
+// TOSSIM (#100).
+#if !defined(TOSSIM) && (defined(PLATFORM_MICAZ) || defined(PLATFORM_MICA2) || defined(PLATFORM_IRIS))
+#define TERRA_PORTS 1
+#endif
+
+// Microfone e sounder: só com a placa MTS300 (SENSOR=MTS300CA/CB) nos mica, fora do TOSSIM. É a mesma
+// condição do MIC no .defs gerado (TerraVM/src/defs, #100).
+#if !defined(TOSSIM) && (defined(PLATFORM_MICAZ) || defined(PLATFORM_MICA2) || defined(PLATFORM_IRIS)) && SBOARD == 300
+#define TERRA_MIC 1
+#endif
+
 
 enum{
 	// Sensor control BIT (Identify request sources) max=4 - 0..3)
