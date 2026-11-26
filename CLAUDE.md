@@ -188,6 +188,9 @@ de lá.
     fica em `ST_IDLE` e o nó volta a pedir a versão nova (PR #105);
     potência de RF: o padrão é o da compilação (`RFPOWER`), o programa novo começa com ele e só as
     mensagens do programa levam a do `setRFPower` (PR #108, só hardware);
+    **`.defs` por build** (PR #111, #100): o do TOSSIM (no `tar.gz` e no `terrac` empacotado) perde
+    portas, interrupções, MIC/BEEP/`setupMic` e FFT; `PORT_A/B`, `INT_A/B` e `MIC` viram `ushort`;
+    no `--diag=json`, `platforms` só com `tossim` (o editor deixa de avisar "não cabe no micaz");
   - terrac: catálogo com W3006 e E6007 (161 códigos); `.vmx` com `loop i,N` com nomes de limite
     novos (#48); cast para inteiro menor corta o valor (#46); float convertido em `emit`, `await`
     e argumento, e E4030 nos casos inválidos (#45); depois da v1.3.0, cast, `-`, `~` e `not` direto
@@ -260,6 +263,15 @@ de lá.
     programa. O `tempInputOutQ` (reaproveitado pelas mensagens do sistema) e o `sendBuff` guardavam
     a potência do programa. Sem teste que reprove (o TOSSIM ignora a potência). A velocidade da
     disseminação (um bloco por timeout) fica como está (decisão do Prof.).
+  - PR #111 (#100, fecha a #83): `.defs` gerado pelo build. Modelos `TerraVM/src/defs/Terra{Net,Grp}.defs.in`
+    com `//@if MSGQ/FFT/MIC/PORTS` (não passam pelo `cpp` do build: os `#define` do `.defs` têm de
+    chegar ao `terrac`); o `make` gera `build/<mote>/Terra*.defs` (`gendefs.py`) só com a plataforma
+    do build. `TERRA_PORTS`/`TERRA_MIC` no `SensAct.h`; os `case` da VM seguem as mesmas condições.
+    MIC/BEEP/`setupMic` no Grp com a MTS300 (o código do Net; decisão do Prof.: depende da placa,
+    não da VM). `release/check-defs.py` confere `.defs` x `app.c`; o `build-tinyos.sh` exige que
+    `terrac/samples/Terra{Net,Grp}.defs` sejam os gerados para o TOSSIM. Continuações: #109
+    (firmware MTS300 na release), #110 (variante no `.vmx`). A decidir com o Prof.: o `.defs` do
+    TOSSIM listar também o micaz no `config` (o TerraSim aprova).
   - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
     `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
