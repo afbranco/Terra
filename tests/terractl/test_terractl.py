@@ -17,8 +17,10 @@ import sys
 import tempfile
 import threading
 import time
+import traceback
 
 SEGUNDOS = 25
+NOME = "test_terractl"
 PORTA_SF = 9013
 AQUI = os.path.dirname(os.path.abspath(__file__))
 RAIZ = os.path.dirname(os.path.dirname(AQUI))
@@ -47,6 +49,14 @@ for n in (1, 11):
     m.createNoiseModel()
     m.bootAtTime(n * 1000003)
 
+def desiste(motivo):
+    """O teste nunca fica preso: imprime o motivo e sai (os._exit, como no fim)."""
+    print("%s: %s: FALHOU" % (NOME, motivo))
+    sys.stdout.flush()
+    os._exit(1)
+
+
+threading.Timer(SEGUNDOS * 4, desiste, ("passou de %d s de relógio" % (SEGUNDOS * 4),)).start()
 sf = SerialForwarder(PORTA_SF)
 th = Throttle(t, 10)
 th.initialize()
@@ -55,18 +65,28 @@ fim_sim = [False]
 
 
 def simula():
-    while not fim_sim[0] and t.time() < SEGUNDOS * tps:
-        t.runNextEvent()
-        sf.process()
-        th.checkThrottle()
+    try:
+        while not fim_sim[0] and t.time() < SEGUNDOS * tps:
+            t.runNextEvent()
+            sf.process()
+            th.checkThrottle()
+    except Exception:
+        traceback.print_exc()
+        desiste("a simulação parou com exceção")
     fim_sim[0] = True
 
 
+# Conecta antes de a simulação começar: o sf.process() do TOSSIM lê o "U " do cliente bloqueado e
+# sem soltar o GIL; com o "U " já no socket, não espera (ver link.SFLink).
+try:
+    lk = link.SFLink("127.0.0.1", PORTA_SF)
+except OSError:
+    traceback.print_exc()
+    desiste("sem conexão com o SerialForwarder do TOSSIM")
 threading.Thread(target=simula, daemon=True).start()
 
 recebidas = []
 registro = []
-lk = link.SFLink("127.0.0.1", PORTA_SF)
 dec = messages.Decoder(json.load(open(os.path.join(AQUI, "terractl.types.json"))))
 ld = loader.Loader(lk, loader.Program(os.path.join(AQUI, "terractl.vmx")), log=registro.append)
 

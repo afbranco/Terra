@@ -4,6 +4,7 @@ o do TOSSIM ou um remoto). As duas entregam e recebem pacotes Active Message:
 
 import socket
 import struct
+import sys
 import threading
 import time
 
@@ -47,7 +48,9 @@ class Link:
 
 class SFLink(Link):
     """SerialForwarder: TCP, os dois lados mandam "U " e depois cada pacote vai com 1 byte de
-    tamanho na frente."""
+    tamanho na frente. O "U " vai logo depois da conexão e a resposta é conferida na thread de
+    leitura: o SerialForwarder do TOSSIM lê o "U " bloqueado dentro do sf.process(), sem soltar o
+    GIL, e uma espera aqui travaria os dois quando a simulação roda numa thread do mesmo processo."""
 
     def __init__(self, host="localhost", port=9002, timeout=30):
         super().__init__()
@@ -61,9 +64,8 @@ class SFLink(Link):
                     raise
                 time.sleep(0.2)
         self.s.sendall(b"U ")
-        if self._recv_exact(2) != b"U ":
-            raise IOError("o SerialForwarder em %s:%d não respondeu ao protocolo" % (host, port))
         self.s.settimeout(None)
+        self.where = "%s:%d" % (host, port)
         self._lock = threading.Lock()
         threading.Thread(target=self._reader, daemon=True).start()
 
@@ -77,6 +79,13 @@ class SFLink(Link):
         return d
 
     def _reader(self):
+        try:
+            if self._recv_exact(2) != b"U ":
+                print("terractl: o SerialForwarder em %s não respondeu ao protocolo" % self.where,
+                      file=sys.stderr)
+                return
+        except OSError:
+            return
         while not self._closed:
             try:
                 n = self._recv_exact(1)

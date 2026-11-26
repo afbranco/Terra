@@ -72,7 +72,9 @@ for v in net grp; do
         [ $tv = $v ] || continue
         n=$(basename "$(dirname "$t")")
         mkdir -p "$W/run-$v-$n"
-        (cd "$W/run-$v-$n" && python3 "$t" "$d") | tee -a "$OUT/logs/tossim-$v.log"
+        # Com limite de tempo: uma chamada do TOSSIM que trava segura o GIL e o teste não sai sozinho.
+        (cd "$W/run-$v-$n" && timeout 600 python3 "$t" "$d" || echo "$n: saiu com $? (124: tempo esgotado)") |
+            tee -a "$OUT/logs/tossim-$v.log"
         tail -1 "$OUT/logs/tossim-$v.log" | grep -q ': OK$' || { echo "FALHOU: $n"; exit 1; }
     done
 done
