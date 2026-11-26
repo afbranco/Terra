@@ -1,0 +1,18 @@
+#include "TerraGrp.defs"
+// Issue #116: o .defs do Grp não tinha nenhum unsafe, e o terrac não avisava de conflitos que o Net
+// avisa. Dois avisos de não determinismo: LED0 x LEDS, e dois SEND_GR na mesma reação (o buffer de
+// status é um só: os dois SENDGR_DONE leem o status do último).
+pktype msgG from msgGR_t with
+  var ubyte a;
+end
+var msgG m;
+par/and do
+  emit LED0(ON);
+with
+  emit LEDS(2);
+end
+par/and do
+  emit SEND_GR(m);
+with
+  emit SEND_GR(m);
+end

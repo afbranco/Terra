@@ -281,4 +281,25 @@ emit LED0(ON);
 
 ### Nondeterminism
 
-TerraGrp declares no `unsafe` pairs: the compiler does not warn about two trails that use the same output event in the same reaction.
+Two trails that use these symbols in the same reaction give a nondeterminism warning (W2xxx): the order of the effects is not defined.
+
+| Symbol | Conflicts with |
+|---|---|
+| `CFG_INT_A` | `SET_PORT_A`, `SET_PORT_B`, `CFG_PORT_A`, `CFG_PORT_B`, `REQ_PORT_A`, `REQ_PORT_B`, `CFG_INT_A`, `CFG_INT_B` |
+| `CFG_INT_B` | `SET_PORT_A`, `SET_PORT_B`, `CFG_PORT_A`, `CFG_PORT_B`, `REQ_PORT_A`, `REQ_PORT_B`, `CFG_INT_A`, `CFG_INT_B` |
+| `CFG_PORT_A` | `SET_PORT_A`, `SET_PORT_B`, `CFG_PORT_A`, `CFG_PORT_B`, `REQ_PORT_A`, `REQ_PORT_B`, `CFG_INT_A`, `CFG_INT_B` |
+| `CFG_PORT_B` | `SET_PORT_A`, `SET_PORT_B`, `CFG_PORT_A`, `CFG_PORT_B`, `REQ_PORT_A`, `REQ_PORT_B`, `CFG_INT_A`, `CFG_INT_B` |
+| `LED0` | `LEDS`, `LED0`, `LED1`, `LED2` |
+| `LED1` | `LEDS`, `LED0`, `LED1`, `LED2` |
+| `LED2` | `LEDS`, `LED0`, `LED1`, `LED2` |
+| `LEDS` | `LEDS`, `LED0`, `LED1`, `LED2` |
+| `REQ_CUSTOM_A` | `REQ_CUSTOM_A` |
+| `REQ_PHOTO` | `REQ_TEMP`, `REQ_PHOTO`, `REQ_VOLTS` |
+| `REQ_PORT_A` | `SET_PORT_A`, `SET_PORT_B`, `CFG_PORT_A`, `CFG_PORT_B`, `REQ_PORT_A`, `REQ_PORT_B`, `CFG_INT_A`, `CFG_INT_B` |
+| `REQ_PORT_B` | `SET_PORT_A`, `SET_PORT_B`, `CFG_PORT_A`, `CFG_PORT_B`, `REQ_PORT_A`, `REQ_PORT_B`, `CFG_INT_A`, `CFG_INT_B` |
+| `REQ_TEMP` | `REQ_TEMP`, `REQ_PHOTO`, `REQ_VOLTS` |
+| `REQ_VOLTS` | `REQ_TEMP`, `REQ_PHOTO`, `REQ_VOLTS` |
+| `SEND_BS` | `SEND_BS` |
+| `SEND_GR` | `SEND_GR` |
+| `SET_PORT_A` | `SET_PORT_A`, `SET_PORT_B`, `CFG_PORT_A`, `CFG_PORT_B`, `REQ_PORT_A`, `REQ_PORT_B`, `CFG_INT_A`, `CFG_INT_B` |
+| `SET_PORT_B` | `SET_PORT_A`, `SET_PORT_B`, `CFG_PORT_A`, `CFG_PORT_B`, `REQ_PORT_A`, `REQ_PORT_B`, `CFG_INT_A`, `CFG_INT_B` |

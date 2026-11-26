@@ -107,8 +107,8 @@ linhas JSON, um diagnóstico por linha, e termina sempre com uma linha de resumo
 Gerado pelo `TerraVM/src/defs/gendocs.py` a partir dos modelos `Terra{Net,Grp}.defs.in`, das
 descrições de `TerraVM/src/defs/descricoes.toml` (em inglês) e dos `.defs` que os builds da release
 geraram. Um símbolo por definição: quando o Net e o Grp declaram um nome do mesmo jeito, sai uma
-entrada com `variants: ["net","grp"]`; quando diferem (ex.: os `unsafe`, que o Grp não tem, #116),
-uma por variante.
+entrada com `variants: ["net","grp"]`; quando diferem (no tipo, nos
+parâmetros ou nos pares `unsafe`), uma por variante.
 
 ```json
 {"schema":1,"terra":"1.5.0","variants":["net","grp"],"platforms":["tossim","micaz"],"groups":["leds",...],"symbols":[
