@@ -6,7 +6,8 @@ title: The Terra language
 # The Terra language
 
 Terra programs are written in **Céu-T**, a reactive language derived from
-[Céu](http://www.ceu-lang.org/). A program does not poll: it reacts to events (a sensor reading,
+[Céu](http://www.ceu-lang.org/) ([Sant'Anna et al., SenSys 2013](https://doi.org/10.1145/2517351.2517360)).
+A program does not poll: it reacts to events (a sensor reading,
 a radio message, a timer) and goes back to waiting. The compiler (`terrac`) turns the program into
 bytecode for the Terra virtual machine, which runs on each node of the network.
 
@@ -20,6 +21,9 @@ Three properties come from the language and are checked by the compiler:
 - **Nondeterminism warnings.** When two trails do conflicting things in the same reaction (write
   the same variable, or emit events that cannot be emitted together), the compiler warns
   (W2xxx).
+
+The model and its guarantees are discussed in the
+[Terra article](https://doi.org/10.1145/2811267) (ACM TOSN, 2015); see [Publications](publications.html).
 
 The events, functions and constants that a program can use come from the VM it runs on:
 [TerraNet](terranet.html) (radio) or [TerraGrp](terragrp.html) (groups and aggregation).
