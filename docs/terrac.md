@@ -37,6 +37,7 @@ the firmware does not have does not compile.
 | `-Ipath` | | folder for `#include` files |
 | `--diag=json` | text | diagnostics as JSON lines on the standard error |
 | `--catalog` | | print the catalog of codes (JSON) and exit |
+| `--types` | | print the records, packets and `pktype`s of the program, with the offset and size of each field (JSON), and exit without writing the `.vmx`. Used by `terractl` to decode the messages |
 
 ## Output
 

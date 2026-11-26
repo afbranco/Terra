@@ -92,6 +92,14 @@ if [ $rc = 1 ] && grep -q '^{"code":"E0001"' "$W/e/err" && tail -1 "$W/e/err" | 
 else
     echo "terrac: falha interna sem E0001 (rc $rc)" | tee -a "$LOG"; cat "$W/e/err" >> "$LOG"; fail=1
 fi
+# terrac --types (#92): o layout dos campos, para o terractl decodificar as mensagens; sem .vmx.
+mkdir -p "$W/ty" && cp "$ROOT/terrac/samples/TerraNet.defs" "$ROOT/tests/terrac/types/tipos.terra" "$W/ty/"
+if (cd "$W/ty" && lua5.1 "$D/terrac" --types tipos.terra > tipos.obtido) &&
+   [ ! -e "$W/ty/tipos.vmx" ] && diff -u "$ROOT/tests/terrac/types/tipos.esperado" "$W/ty/tipos.obtido" | tee -a "$LOG"; then
+    echo "terrac: --types: saída esperada" | tee -a "$LOG"
+else
+    echo "terrac: --types: saída DIFERENTE (ou gerou o .vmx)" | tee -a "$LOG"; fail=1
+fi
 # O catálogo vai na release como anexo (com o sha256 no SHA256SUMS).
 lua5.1 "$D/terrac" --catalog > "$OUT/terrac-errors-$VER.json"
 if command -v python3 > /dev/null && ! python3 -m json.tool "$OUT/terrac-errors-$VER.json" > /dev/null; then
