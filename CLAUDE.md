@@ -322,6 +322,8 @@ de lá.
     `<!-- check: ... -->` compilados pelo `docs/_tools/checkexamples.lua` no `build-terrac.sh` (59).
     Publicado em afbranco.github.io/Terra. PR #127: `tinyos`, `customization`, `license` (as URLs
     antigas redirecionam). #80 fechada. A #91 fica aberta até a release com o anexo.
+    PR #128 (pedido do Prof.): `publications` com como citar (TOSN 2015 e Céu SenSys 2013, com
+    BibTeX); o PDF do SBRC 2011 agora vem da CE-RESD da SBC (a biblioteca antiga saiu do ar).
   - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
     `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
