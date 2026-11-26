@@ -50,6 +50,12 @@ de lá.
     avisado com a lista e o passo a passo (trocar anexos, refazer o oráculo, catálogo, release). A TerraSim
     v1.3.0 entrou em produção com ela em 2026-11-25 (oráculo diverge na BS pela #74, avaliador
     dentro do ruído).
+  - **`v1.4.0` publicada** (tag no `adf9952`, 2026-11-26, a pedido do Prof.): PRs #89, #90, #96,
+    #97, #101 a #103, #105 a #108, #111, #112 e #118 a #121 (lista "Para aplicar no TerraSim").
+    `.defs` por firmware (anexos `terra-1.4.0-{net,grp}-micaz-nobs.defs`), status `SEND*_DONE` em
+    `ubyte`, `await` com conversão. `_TOSSIM.so` Net `7da72fd4…`, Grp `8cdb16af…`; catálogo e
+    `TerraVMControl` iguais aos da v1.3.0 (161 códigos). Oráculo do TerraSim no `c6f45b4`
+    idêntico à v1.3.0. TerraSim avisado.
   - Alinhada com a release **tinyos-toolchain `2.1.2-r2`** (decidido pelo Prof. em 2026-11-22;
     antes era a r1, `f42bac7`, digest `7e21b1b9…`). O workflow fixa a imagem
     `2.1.2-resolute-py3-21d8fb1@sha256:4198b12302181edd0e8b20ae06cd3af0a2d483a06355a78c1f83371250de47ec`.
