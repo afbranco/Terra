@@ -1,0 +1,31 @@
+#include "TerraGrp.defs"
+// terractl (#92) no Grp: o nó 11 manda três SEND_BS (pela árvore do CTP) com campos de vários tipos;
+// o teste carrega o programa com o terractl e confere a decodificação pelo pktype do msgBS_t
+// (terractlgrp.types.json, do terrac --types). LEDs do 11: o número de SENDBS_DONE.
+pktype dado from msgBS_t with
+  var ubyte  n;
+  var ushort u16;
+  var long   s32;
+  var float  f;
+  var byte   b;
+end
+var dado d;
+var ubyte i = 0;
+var ubyte st;
+if getNodeId() == 11 then
+  d.msgId = 9;
+  d.u16 = 4660;
+  d.s32 = -100000;
+  d.f = -2.25;
+  d.b = -7;
+  loop do
+    await 2s;
+    d.n = i;
+    emit SEND_BS(d);
+    st = await SENDBS_DONE();
+    i = i + 1;
+    emit LEDS(i);
+    if i == 3 then break; end
+  end
+end
+await FOREVER;
