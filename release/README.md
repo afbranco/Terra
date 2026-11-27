@@ -161,7 +161,7 @@ compila todos com o `docs/_tools/checkexamples.lua`.
 ## terractl
 
 Substitui o TerraControl em Java (#92; decisão do Prof. de 2026-11-26: o Java será aposentado).
-Python 3; para a serial, o `pyserial` (pacote `python3-serial`).
+Só o Python 3: o `pyserial` vai dentro do `.pyz` (#145), sem `pip` nem venv.
 
 ```bash
 python3 terractl-<v>.pyz load prog.vmx --serial /dev/ttyUSB1          # MIB520 (a segunda porta)

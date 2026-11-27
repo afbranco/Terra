@@ -124,6 +124,9 @@ tail -1 "$OUT/logs/docs.log" | grep -q ': OK$' || { echo "FALHOU: docs/_includes
 python3 "$ROOT/release/test-terractl.py" "$OUT" | tee "$OUT/logs/terractl.log"
 tail -1 "$OUT/logs/terractl.log" | grep -q ': OK$' || { echo "FALHOU: test-terractl"; exit 1; }
 python3 "$ROOT/release/build-terractl.py" "$OUT/terractl-$VER.pyz" "$VER" "$SDE" | tee -a "$OUT/logs/terractl.log"
+# o .pyz sozinho, sem os pacotes do sistema: o pyserial tem de vir de dentro dele (#145)
+python3 -S "$ROOT/release/test-terractl.py" "$OUT" --pyz "$OUT/terractl-$VER.pyz" | tee -a "$OUT/logs/terractl.log"
+tail -1 "$OUT/logs/terractl.log" | grep -q ': OK$' || { echo "FALHOU: test-terractl no .pyz"; exit 1; }
 python3 "$OUT/terractl-$VER.pyz" --version | grep -qx "terractl $VER" || { echo "FALHOU: terractl.pyz"; exit 1; }
 
 # TerraVMControl.jar: compilado do fonte, num jar único. As bibliotecas (tinyos.jar inclusive)

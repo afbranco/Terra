@@ -8,7 +8,9 @@ tests/terractl e tests/terractlgrp):
 - gravação: o firmware com o ID do nó sai igual ao do tos-set-symbols + avr-objcopy (o que o make
   do TinyOS faz), e com o ID 1 igual ao .ihex da release.
 
-Uso, na imagem do tinyos-toolchain: test-terractl.py <pasta com os terra-<v>-*-micaz-*.exe>
+Uso, na imagem do tinyos-toolchain: test-terractl.py <pasta com os terra-<v>-*-micaz-*.exe> [--pyz X]
+Com --pyz, testa o terractl de dentro do .pyz; com `python3 -S` (sem os pacotes do sistema), confere
+que o pyserial vem de dentro dele (#145).
 """
 import glob
 import os
@@ -18,7 +20,15 @@ import tempfile
 import threading
 import time
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+PYZ = None
+if "--pyz" in sys.argv:
+    i = sys.argv.index("--pyz")
+    PYZ = sys.argv[i + 1]
+    del sys.argv[i:i + 2]
+if PYZ:
+    sys.path.insert(0, os.path.abspath(PYZ))
+else:
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from terractl import flash, framing, link  # noqa: E402
 
 falhas = []
@@ -28,6 +38,10 @@ def confere(cond, msg):
     print(("ok: " if cond else "FALHOU: ") + msg)
     if not cond:
         falhas.append(msg)
+
+
+if PYZ:
+    confere(link.__file__.startswith(os.path.abspath(PYZ)), "terractl de dentro do .pyz")
 
 
 # Quadro serial
@@ -47,6 +61,8 @@ confere(d.feed(bytes(ruim)) == [] and d.bad == 1, "quadro com CRC errado descart
 try:
     import serial  # noqa: F401
     tem_serial = True
+    if PYZ and sys.flags.no_site:
+        confere(serial.__file__.startswith(os.path.abspath(PYZ)), "pyserial de dentro do .pyz")
 except ImportError:
     tem_serial = False
 if not tem_serial:
