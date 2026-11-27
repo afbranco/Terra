@@ -430,6 +430,14 @@ de lá.
     Prof. (instância isolada, `--user-data-dir`/`--extensions-dir` no scratchpad, com aviso a ele): a
     `linux-x64` instalada do `.vsix` descompactou o pacote, deu o E3001 no Problems e simulou Net e
     Grp (variante pelo `#include`) até o fim.
+  - Testes de VM com a carga do `terractl` (PR #163, #162, último item da #92, pedido do Prof.
+    2026-11-27): `tests/vmtest.py` (`deploy()` com `loader.Program` e `messages`) nos 40 testes e no
+    `avrora_vmx.py` (que usa também `link.am_packet`/`parse_am`); -834 linhas. Os testes entregam
+    os pacotes no tempo simulado (o `Loader` usa o relógio real). Conferido: pacotes iguais aos da
+    `deploy()` antiga (147 casos), mesmo `tview.txt` nos 41 testes alterados, Avrora OK no workflow
+    manual, e com o `new_prog_block` estragado `floatset`/`reqblock` reprovam. Achado nisso: o
+    `tests/wclock` passava sem o programa rodar (a linha de LED do `VM.reset`); PR #165 (#164) exige
+    mais de uma. A #92 fica aberta só pelo micaz (#16).
   - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
     `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
