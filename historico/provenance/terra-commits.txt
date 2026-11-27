@@ -1,0 +1,430 @@
+9b4bebe8 2018-03-12 TPC missing files
+86e8d7cd 2018-03-12 TPC Tests
+153eb0ec 2018-03-12 TPC Tests
+95feb4ff 2018-03-12 TPC tests
+2488915a 2017-12-18 ...
+97a842d9 2017-12-18 ...
+577f83e4 2017-12-18 Docs: email info
+d2e931b6 2017-11-07 TerraVM: Disabling RTC Mega compilation (RTC is not working yet)
+af4a989c 2017-11-02 .
+30b10f19 2017-11-02 .
+9e29735f 2017-11-02 .
+ab69f1fa 2017-11-02 TerraSim - Setting all nodes in the simulation to start as Type=1
+270de851 2017-11-02 .
+d93691ad 2017-11-02 .
+ef826043 2017-11-02 .
+95908583 2017-11-02 .
+a087ee12 2017-11-02 .
+57aac043 2017-11-02 .
+7a1fbb92 2017-11-02 ..
+49f935af 2017-11-02 ..
+89e93eb8 2017-11-02 ..
+b95bcb9f 2017-11-02 .
+abacf684 2017-11-02 ..
+58bb5d1d 2017-11-02 ..
+58e8185b 2017-11-02 ..
+8bf95c12 2017-11-02 ..
+eba17d58 2017-11-02 ..
+d2b16243 2017-10-25 --
+5a9bec46 2017-10-25 --
+4a3c1b03 2017-10-25 ..
+78a6c3f4 2017-10-25 ..
+1b68fe40 2017-10-25 ..
+6609c0b6 2017-10-25 ..
+ff31a0a2 2017-10-25 ..
+1bb1bdad 2017-10-25 ..
+58d8c452 2017-10-25 ..
+c4ad7c48 2017-10-25 ..
+d6ef0f59 2017-10-25 ..
+9e3a91a4 2017-10-24 ..
+16e422bf 2017-10-24 ..
+b21d2de1 2017-10-20 ..
+5486ac79 2017-10-20 ..
+119484a2 2017-10-20 ..
+86c42295 2017-10-20 ..
+3002b771 2017-10-20 ..
+26d32964 2017-10-20 ..
+5eb28713 2017-10-20 ..
+83c89200 2017-10-20 ..
+9085508f 2017-10-20 ..
+e9479c39 2017-10-20 ..
+b710e187 2017-10-20 ..
+a24ac153 2017-10-20 ..
+eeceb611 2017-10-20 ..
+f652a27d 2017-10-20 ..
+ed916ead 2017-10-20 ..
+4ada2d1c 2017-10-20 ..
+2ed89a37 2017-10-19 ..
+c8cde0af 2017-10-19 ..
+15c81792 2017-10-19 ..
+9ed39133 2017-10-19 ..
+ec3d58af 2017-10-19 ..
+4b2bb8a9 2017-10-19 ..
+055dfdcc 2017-10-19 ..
+94dbc747 2017-10-19 ..
+c67c901e 2017-10-19 ..
+c260b640 2017-10-19 ..
+c9fb3f99 2017-10-19 ..
+209718ab 2017-10-19 ..
+d99e8b13 2017-10-19 ..
+42deed27 2017-10-19 ..
+448b2a07 2017-10-19 ..
+4f090854 2017-10-19 ..
+2b445b55 2017-10-19 ..
+d9c4a507 2017-10-19 ..
+0e907f95 2017-10-19 ..
+f98ff38a 2017-10-19 ..
+3785eb29 2017-10-19 ..
+0c39e433 2017-10-19 ..
+a6db1a96 2017-10-19 ..
+5b401c89 2017-10-19 ..
+5f15abca 2017-10-19 ..
+0c4608cc 2017-10-19 ..
+40447be3 2017-10-19 ..
+f38f4850 2017-10-19 ..
+b0195107 2017-10-19 ..
+7138dba2 2017-10-19 ..
+52539024 2017-10-19 ..
+b01c82aa 2017-10-19 ..
+f2b1ad46 2017-10-19 ..
+7a3e0222 2017-10-18 ..
+22df0296 2017-10-18 ..
+86454a6e 2017-10-18 Docs: Versão inicial para o manual de customização.
+f011c8c9 2017-10-17 ..
+9e4e9ab1 2017-10-17 ..
+6a21980a 2017-10-17 ..
+4bbbb47f 2017-10-17 ..
+81c4106e 2017-10-08 TerraVM: Removing some compiler warning
+f4cfaf69 2017-10-08 ..
+9aace4c0 2017-10-08 Make Mega: Ino tools path option in the makefile.
+9ed4a61e 2017-10-08 Docs: Ino tools path option in the makefile
+c324776d 2017-10-08 TerraVM::Esp: Disabling GPIO Int to post task to generate Terra Event.
+f4867c2c 2017-10-08 TerraEsp.defs - bug fix
+f66e9163 2017-10-08 TerraVM::Makefiles: Testing USB path and including USB: option in help
+4d700d73 2017-10-08 ..
+1f65cf47 2017-10-08 TerraVM:Esp: Removing unused file
+0589adeb 2017-10-07 TerraVM::Esp: Limmit GPIO number to 15
+dc06d67b 2017-10-07 ..
+c5464109 2017-10-07 ..
+4058873f 2017-10-07 ..
+12739134 2017-10-07 ..
+8131f3df 2017-10-07 TerraVM & Docs: New TerraEsp documentation. Adding GPIO and Interrupt 
+e3819301 2017-10-07 TerraVM::InoMega: ...
+88587333 2017-10-07 Docs: TerraIno ....
+eb576335 2017-10-07 Docs: TerraIno...
+8e709d26 2017-10-02 --
+c324bbbb 2017-10-02 TerraVm:Ino: Inserting Copyright text in DHT files
+fd36775b 2017-10-01 Docs: Marking empty menu items with "x"
+1b614577 2017-10-01 --
+712f56e5 2017-10-01 --
+6366f28e 2017-10-01 --
+fb261397 2017-10-01 --
+c840e916 2017-10-01 Makefile - Bugfix "esp" target
+a90524a6 2017-10-01 --
+41c9d7a9 2017-10-01 --
+f8a72a7b 2017-10-01 --
+fef908b3 2017-10-01 --
+5ba00b0c 2017-10-01 terrac: bugfix issue #11
+b8666c10 2017-09-30 Docs: missing file and improve code example for TerraIno
+7d38e2ad 2017-09-30 Docs: Including TerraIno code examples
+c5538e73 2017-09-30 TerraVM - TerraIno customization - Basic flavor - GPIO, some ADC, Intx
+9eb1f373 2017-09-30 terrac - moved Defs files to TerraVM/src/TerraDefs
+aac954af 2017-09-30 --
+4f42dae0 2017-09-30 Docs: Custom/Flavors documentation (Net,GRP,INO)
+bab5c1a0 2017-09-25 Docs:TerraIno: How to compile the script!
+179e921c 2017-09-19 ..
+ace0c406 2017-09-19 ..
+416a97f9 2017-09-19 Makefile_ino: Path to Arduino instalation
+59d06853 2017-09-19 InoMega -  avr-gcc path options
+53d915fe 2017-09-18 Update terra-platf-inoMega.html
+d392007e 2017-09-18 ..
+381e04bd 2017-09-18 TerraVM - Custom Ino - Adding missing files
+08849624 2017-09-18 terrac - Ino Defs - A/D 0..4
+59a8a85d 2017-09-18 TerraVM Custom - Customizing A/D 0 .. 3
+f9df6c08 2017-09-18 InoDocs - ANx_REF options
+167c7e5f 2017-09-17 Make Help - some corrections
+0c66aa93 2017-09-17 ..
+8d37ce74 2017-09-17 ..
+73f8413a 2017-09-17 ..
+15dac818 2017-09-17 ..
+d22066c2 2017-09-17 Makefile_help - adjusting some options.
+6ba99cc6 2017-09-17 ..
+2d9c5bce 2017-09-17 ..
+97a79487 2017-09-17 Docs: TerraIno - Initial documentation.
+efd8f6e5 2017-09-17 Makefile: Changing default BS_BAUD of mega to 115200
+4b473323 2017-09-15 TerraControl - recompiling TControl.jar
+39854175 2017-09-15 terrac - Adding terrac file
+8fe86ab8 2017-09-15 TerraControl - Adding jar files
+0c9f371b 2017-09-14 ..
+f6b59114 2017-09-14 TerraVMC - Preventing warning "variable set but nor used" for MEGA
+6d8d6f1b 2017-09-14 TerraVM/makefile - Including -DMEGA and -DUNO
+beffa8d3 2017-09-14 TerraVM/src/interfaces - Adding InternalFlash.nc
+7aab3c10 2017-08-28 Update terra-platf-droid.html
+f9fa51d1 2017-08-28 Update terra-gsoc.html
+8eee7343 2017-08-28 Merge pull request #9 from mauriciopsgv/master
+25024cc6 2017-08-28 Terra page updates with GSoC final report and Android platform documen
+a7224741 2017-08-28 GSoC 2017 Porting Terra to Android Devices
+bc8e6824 2017-08-25 Rename LICENSE to LICENSE.txt
+2cf5662a 2017-08-25 Create LICENSE
+846112c8 2017-08-25 .
+6b529fb2 2017-08-25 ..
+f2be5e5f 2017-08-25 .
+899812cd 2017-08-25 .
+9bf80cf2 2017-08-25 ..
+5716051d 2017-08-25 ..
+72d11184 2017-08-25 ..
+cd574088 2017-08-25 ..
+441ddae6 2017-08-25 ..
+c1ba0ecc 2017-08-25 ..
+33c6aca7 2017-08-25 ..
+daf5e353 2017-08-25 ..
+398ba41e 2017-08-25 ..
+64ce007c 2017-08-25 Terrac - Céu license
+8d9ec0a4 2017-08-24 ..
+6e897981 2017-08-24 ..
+95bd55f1 2017-08-24 Create COPYING
+bf5456cd 2017-08-24 Inserting GPL license text
+b8f2dac5 2017-08-24 ..
+2dba6093 2017-08-23 TerraLogo: Logo files
+87b678f1 2017-08-20 Merge branch 'master' of https://github.com/afbranco/Terra.git
+f01a0c1f 2017-08-20 .
+33f9f136 2017-08-20 Update README.md
+41729558 2017-08-20 .
+19c93b48 2017-08-20 .
+557fe9ca 2017-08-18 Merge branch 'master' of https://github.com/afbranco/Terra.git
+a87707a6 2017-08-18 New Logo.
+840c335a 2017-08-18 Update README.md
+7fd95129 2017-08-18 Update README.md
+021c3ca5 2017-08-18 .
+c3d42e7e 2017-08-18 .
+3f265e46 2017-08-18 .
+4c89c19e 2017-08-18 .
+0b5b1d04 2017-08-18 .
+0a9e59d6 2017-08-18 .
+64a462b8 2017-08-18 .
+18bd5a97 2017-08-18 .
+f4253328 2017-08-18 .
+5dae7473 2017-08-18 .
+ca7503d9 2017-08-18 .
+567b87b6 2017-08-18 .
+081fa2e3 2017-08-18 .
+09284aa2 2017-08-18 .
+2929e5a9 2017-08-18 .
+26f38df3 2017-08-18 .
+c61b9f6f 2017-08-18 ...
+f868f41f 2017-08-18 ...
+8987ed0c 2017-08-17 .
+1319875d 2017-08-17 .
+2ea977f4 2017-08-17 .
+83cb78b3 2017-08-17 .
+b544a4ab 2017-08-17 .
+6a7144ad 2017-08-17 .
+a2a5cc6b 2017-08-17 .
+257fd2eb 2017-08-17 .
+fad8c432 2017-08-17 .
+4b515f08 2017-08-17 .
+5cff0afd 2017-08-17 .
+0b403e25 2017-08-17 .
+268f8b47 2017-08-17 .
+b845f805 2017-08-17 .
+22048c63 2017-08-17 .
+beb97a8c 2017-08-17 Incluindo novas páginas vazias
+e35abdcb 2017-08-17 .
+2d28cec1 2017-08-17 .
+34b75a71 2017-08-17 .
+77d1c036 2017-08-17 .
+c87d68e3 2017-08-17 .
+6cbcc618 2017-08-17 .
+55c3888a 2017-08-17 .
+eaab56db 2017-08-17 .
+3a06c37c 2017-08-17 .
+334ffcca 2017-08-17 .
+7091c7f7 2017-08-17 .
+6bbca6a3 2017-08-17 .
+54c9a362 2017-08-17 .
+76c8919a 2017-08-17 .
+94389251 2017-08-17 ..
+b39a857f 2017-08-17 xx
+114f1dc3 2017-08-17 ..
+b5360704 2017-08-17 Novo menu de 2 níveis
+998fcd46 2017-08-17 ...
+8d2ea580 2017-08-17 .
+09a8ed76 2017-08-17 .
+62af7efc 2017-08-17 ...
+6b040042 2017-08-17 ...
+7542d2ed 2017-08-17 ...
+84a05df9 2017-08-17 ....
+8ac14e34 2017-08-17 ...
+f4ccd8be 2017-08-17 ...
+08e808e5 2017-08-17 ....
+c5362923 2017-08-17 ...
+8531ce5c 2017-08-17 removing css
+6c645bb1 2017-08-17 adding .css files
+7a22f73c 2017-08-17 Redirecionando link para download do .ova de Terra
+36d6d340 2017-08-17 ...
+23a646b2 2017-08-17 Incluindo todas páginas com menu simples.
+a7ee9ae5 2017-08-17 ...
+25b55fad 2017-08-17 ...
+3532c839 2017-08-17 ...
+7c5f570a 2017-08-17 New header and footer files
+1c0c0e16 2017-08-16 ...
+235ae314 2017-08-16 ...
+affb8084 2017-08-16 ...
+77c9eb27 2017-08-16 .....
+322e8300 2017-08-16 ....
+27294002 2017-08-16 debug.... ing
+3d33ccd6 2017-08-16 Merge branch 'master' of https://github.com/afbranco/Terra.git
+9a6ddf9e 2017-08-16 Primeiros testes criando a página de docimentação
+4d6363a4 2017-08-16 Set theme jekyll-theme-cayman
+49d75256 2017-08-16 Págian inicial de teste
+5ed82242 2017-08-16 Rename main.html to index.html
+e8084c9b 2017-08-16 Merge branch 'master' of https://github.com/afbranco/Terra.git
+7ce61663 2017-08-16 Nada especial...
+58d7a85a 2017-08-16 Set theme jekyll-theme-cayman
+801e1d27 2017-08-16 Create main.html
+099f7666 2017-05-01 TerraUdpUpload: Validating the commnad line input and including
+fa6d43c6 2017-05-01 TerraVM/Makefile: Allowing lower case option for SSID and PASSWD.
+54f109f1 2017-05-01 TerraBeacon/MAkefile: Adjusting NET_ID codes
+19a7764e 2017-04-27 TerraUdpUpload: Set PersistFalg as FALSE and create a command file to
+a7658fa5 2017-04-27 TerraControl: PersitFlag implementation
+6f80b191 2017-04-27 ProStorage - Internal flash and prog storage implementation
+4d27ef08 2017-04-27 Makefile - Full revision and Help text
+05e86a6c 2017-04-02 TerraVM: Script de carga nos nós
+4c469334 2017-04-02 terrac: Criação do TerraEsp.defs e script rssf_mica2
+07dcc983 2017-04-02 TerraVM: Versão com o primeiro teste multirede
+c3ee4006 2017-04-02 TerraVM: Versão com o primeiro teste de multirede
+7e1eebdf 2017-03-29 ArduinoUno328: MCUInit: Diretiva de compilação (INO_HALF_CLOCK) com a
+f3a387b0 2017-03-27 TerraControl: form: Sorting file names
+03cd2eee 2017-03-06 TerraUdpUpload: Incluindo campo moteType e modificando o mote id para
+af953cf4 2017-03-06 RPi/platform_message.h - Incluido arquivo no Git
+ae3bbbcc 2017-03-06 Correções gerais para ajustar o funcionamento em multirede
+dbd573c4 2017-02-27 TerraVM v2 - Alterando DataSensor dp TOSSIM para 1000 nós
+12d64e58 2017-02-25 Terrac: BlockSize como variável, definido agora como 22 bytes
+fb7b4f41 2017-02-13 Esp - adding makefile
+99fc1896 2017-02-13 TerraVM: Adding ESP files
+9d52c094 2017-02-13 TerraControl: Versão inicial para executar scritps por MoteType
+da5227e3 2017-02-13 TerraVM: Versão inicial para executar scritps por MoteType
+6b1d5c2d 2017-02-12 DataSendor & TerraViewer - Adding a 4th value for MoteType
+d66bfc7e 2017-02-02 --
+6bd3347a 2017-02-02 TerraVM: Bugfix - Evento externo nÃo sincronizava o wall clock
+04d5679a 2016-12-30 terrac: Alteração para usar a lib nova do lpeg. Criação do TerraIx.def
+a7886673 2016-12-30 TerraRpi: Versão operacional. Mais alguns ajustes colaterias nos outro
+1b5eab88 2016-12-30 TerraUdpUpload - Criação do programa patra upload de script terra via
+3c30cb55 2016-12-23 terrac: code.lua -- bugfix -- clear of EXT event gate
+2293a4f9 2016-12-07 Modificação no InoUno e InoMega para funcionar com o TerraBeacon.
+8bf25d96 2016-12-07 TerraBeacon - new project
+8478d135 2016-12-06 Versão inicial com o TerraIno Mega
+2343c76a 2016-10-07 Criando no projeto TerraVM
+80d98acd 2016-10-07 Mudança do nome do Projeto
+e8df092b 2016-06-11 Make Terra: Incluindo opção de passar o ID da BS station em vez de ser
+0abb275c 2016-06-11 Make Ino: PAssar o Clock da CPU como parâmetro denro do Make
+74b669cb 2016-05-30 TerraIX: Incluindo nova customização para Linux
+f02b8e68 2016-05-27 TerraVM: Adaptação inicial para o Arduino Uno
+9179201d 2016-05-27 Ino: reorganização por tipo de CPU
+8c27dea9 2016-05-25 TerraSim: comentando o dbg da VM para diminuir o tamanho do arquivo.
+c94fdc33 2016-05-11 Terrac: 
+e185d6af 2016-05-04 TerraControl: 
+b53382a5 2016-03-09 TerraIno: Modificando para INOX e INOS
+f82b616f 2016-03-09 TerraIno.defs: Lipando o Volcano e criando/corigindo algumas operações
+a0387080 2016-03-09 TerraIno: Ateração para INOX e INOS
+49825e06 2016-02-04 TerraVM: Correção do bug da otimização do compilador - Alterando de -O
+ef21f22d 2015-08-06 TerraVM: inclusão da função para recuperar o "parent node" no CTP.
+5d8728d4 2015-08-06 terrac: atualização dos .defs
+bf44e473 2015-08-02 nescino: Makefile + SDcard/Storage
+540d51cd 2015-08-02 terrac: Volcano mais algumas correções
+2345944b 2015-08-02 TerraControl
+03958ad6 2015-08-02 TerraNet + TerraVM geral + Makefile
+75179b9a 2015-08-02 TerraVM:XComps: Atualiazações para o Volcano
+22466e79 2015-08-02 TerraNet: incluindo o arquivo energy.c com as funções do Volcano para
+f32dd25d 2015-07-22 TerraVN: getTime, fix no setarr_vc, Vulvano ainda em teste,...
+6867a15c 2015-07-07 x
+cab7fd63 2015-07-07 nescino: limpeza dos logs
+f65814ea 2015-07-07 terrac: Volcano
+17676e0f 2015-07-07 TerraVM: Volcano no TelosB
+ef41faa4 2015-06-09 TerraControl: Removendo imports não usados
+48caf418 2015-06-09 TerraControl: Formato decimal para recSendBS()
+841aa59f 2015-06-07 terrac: correções e melhorias gerais
+c9705f4b 2015-06-07 Correções gerais
+1eb20f8b 2015-05-01 V3: Versão Inicial V3 - Testes simples no NET e no GRP.
+62b70a83 2015-04-21 TControl: Impressão do decimal de 32bits
+68ed957f 2015-04-21 Fix: Constant bytes
+07570851 2015-04-21 Incuding tossim '.so. file
+7d0d5758 2015-04-21 Criando TerraDist files
+135ab770 2015-04-06 Fechando v2
+035a4e83 2015-04-06 Fechando v2
+923e16d1 2015-04-06 Fechando v2
+8432d433 2014-11-24 Fix rshft operation.
+f4b53742 2014-11-24 Adding Stream interface for Mic
+167a54e9 2014-11-24 Adding Mic and Sounder support
+46738148 2014-11-24 Adding Mic and Sounder support
+5d02ba49 2014-11-24 Removing incorrect pop() in req_custom_a.
+dcc1c052 2014-11-24 Corrected CUSTOM_A id
+96c7221e 2014-11-24 Removing incorrect pop() in req_custom_a.
+7f684c39 2014-11-24 Creating SerialForward for Xbee
+c096e8bc 2014-11-11 Fix debug text for 'mod' operation.
+4438666a 2014-11-04 Debug
+bdc9f64e 2014-11-04 Simple BaseStation modification
+45814627 2014-11-04 Simple BS tests
+589285eb 2014-11-04 Fix f_pusharr_v bug.
+fa4d4246 2014-11-02 Commenting some prints
+e0c76c90 2014-11-02 Including prints for some debug
+0c3b98cc 2014-11-02 Including optimization functions
+c1920613 2014-10-10 Garantindo o noAck em oposição ao RequestAck
+69791e97 2014-10-10 Incuindo parâmetro para INO_INSTALL_PORT
+dec3200e 2014-10-10 Comentando um print
+0d570f74 2014-10-10 Corrigindo o return do wasAcked()
+bec047c5 2014-10-09 Primeiros testes com a versão INO.
+7fb46a8d 2014-10-09 Versão adaptada para ligar direto numa XBee via USB (Sem a placa do
+1482a201 2014-10-09 Corrigindo texto de algumas mensagens.
+58619052 2014-10-09 Correções par o primeiro teste do INO.
+0b460c2d 2014-10-09 Aterando para aceitar constante de um caracter entre plics 'A', o valo
+822ae034 2014-10-09 Fechando primeiro teste funcional.
+761b977e 2014-10-09 Varios ajustes para fechar primeira versão da customização INO.
+5679a558 2014-10-09 Incluido comando logS()
+9a8b6810 2014-10-09 Incluido comando logS()
+2cb4f368 2014-10-09 Incluido comando logS()
+f051c520 2014-10-09 Corrigido bug de perda de wClock para tempo negativo.
+5f11630a 2014-10-09 Corrigindo MBLOCKS para Ino
+d4fb4971 2014-10-08 Programas de teste do Ino
+0b81277e 2014-10-08 Criação da Adaptaçao do TinyOS para Arduino (Ino)
+a2230bfb 2014-10-08 Criação do Makefile para Ino
+7c76cbdc 2014-10-08 Adaptação para incluir o Ino - em teste...
+86f352c7 2014-10-08 ?
+7f14a0e7 2014-10-08 ?
+f8efb83a 2014-10-08 Criação da customizaçao TerraIno
+cea0f6b0 2014-10-08 Modificação para falar direto via XBee - Versão incompleta.
+ae7b0b35 2014-09-04 Ainda Versão 0.2 (faltava marcar alguns arquivos novos)
+cba1af61 2014-09-04 Incluindo os componetes FFT e Volcano
+d97058dd 2014-09-04 Tentativa da versão 0.2
+e66ad20e 2014-09-04 Incuindo tratamento de mensage do usuário no sentido da serial para o
+c87868ad 2014-09-04 Corrigindo a formatação Hexa de 32bits.
+ab6ddec6 2014-09-04 Voltando com o botão de abrir diretório.
+9d3af428 2014-09-04 Deleta arquivo 'precomp.terra' após a precompilação.
+c8756720 2014-09-03 Varias modificações e correções
+fdce90b7 2014-09-03 'gedit' language file
+422166a6 2014-09-03 -
+5e8f478a 2014-09-01 - Incusão do FFT e Volcano no TerraNet
+da87df07 2014-08-13 Modificado para memória grande. Preparado para até 64K de RAM.
+3a708387 2014-08-13 Movendo SensAct para XComps dir
+73c10a55 2014-08-12 Versão em teste incluindo: 
+31274dec 2014-07-08 Vários:
+e3197e3b 2014-07-05 Inclui 'packet' e 'pktype' para tratar campo de 'payload em 'register'
+c35d2088 2014-07-05 Evento de entrada com id>127 recebe agora um auxId.
+68886087 2014-07-03 Atualizando o gitIgnore
+5d22abfd 2014-07-03 TerraVM - Adaptado para atender ao novo TerraGrp. Alterado
+ef149b8d 2014-07-03 TerraC - Novos TerraNet.cfg e TerraGrp.cfg. NOva função 'random()'.
+36d8e086 2014-07-03 TerraNet - Adaptado ao novo BasicService após o TerraGrp. Incuida a
+8d82dcff 2014-07-03 TerraGrp - Versão com problema no CTP
+013d440d 2014-06-27 Alguns pequenos bugs fix
+944e7498 2014-06-25 1 - Erro para quando tentar usar um pointer não inicializado.
+6d842209 2014-06-24 Versão usando Addr no lugar dos Labels
+230ba2b1 2014-06-23 Versão "funcionando" antes da modificação da troca dos Labels por Addr
+a19be897 2014-06-14 Versão com o vetor de field funcionando parcialmente. var.filed é
+e029746c 2014-06-13 Commit da versão em desenvolvimento/testes: antes de alterar o parser
+d167d119 2014-06-08 Creating a working version into new github repository
+a26775e9 2014-06-08 Creating a working project into new github repository
+825ce3fd 2014-06-08 Creating a working version into new github repository
+da59efac 2014-06-08 Update README.md
+4d3aa2a4 2014-06-08 Update README.md
+231b56b3 2014-06-08 Update README.md
+c83c3c66 2014-06-08 Initial commit
