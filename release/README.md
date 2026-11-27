@@ -62,8 +62,7 @@ a primeira grava o firmware e a segunda é a de dados, usada pelo SerialForwarde
 
 ## terrac
 
-Requer Lua 5.1, o lpeg (0.10.2 ou 1.x) e o `cpp`. Em Ubuntu/Debian, o lpeg da distribuição
-serve:
+Requer Lua 5.1, o lpeg 1.x e o `cpp`. Em Ubuntu/Debian, o lpeg da distribuição serve:
 
 ```bash
 sudo apt-get install lua5.1 lua-lpeg cpp
@@ -71,9 +70,9 @@ lua5.1 terrac meuScript.terra      # gera meuScript.vmx; o .defs fica na mesma p
 ```
 
 Até a 1.0.1 o `terrac` só funcionava com o lpeg 0.10.2 (`luarocks --lua-version=5.1 install lpeg
-0.10.2-1`). O CI testa as duas versões, e elas têm de gerar o mesmo `.vmx` e as mesmas mensagens.
-Desde 2026-11-26 o anexo sai do job do lpeg 1.x (o conteúdo é o mesmo: o lpeg não vai no anexo); o
-0.10.2 fica no CI até o TerraSim passar para o `lua-lpeg`.
+0.10.2-1`). Desde a 1.1.0 funciona com as duas, com o mesmo `.vmx` e as mesmas mensagens; o CI
+testou as duas até 2026-11-27, quando o TerraSim passou para o `lua-lpeg` e o 0.10.2 saiu (#142).
+Hoje só o lpeg 1.x é testado.
 
 ### Mensagens de erro e `--diag=json`
 

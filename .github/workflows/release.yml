@@ -50,35 +50,22 @@ jobs:
           path: dist/
 
   terrac:
-    name: terrac (lpeg ${{ matrix.lpeg }})
+    # lpeg 1.x, a da distribuição (lua-lpeg): decisão do Prof., 2026-11-26. O 0.10.2 de 2016 saiu
+    # do CI quando o TerraSim passou para o lua-lpeg (#142); as saídas eram as mesmas (#21, PR #141).
+    name: terrac
     runs-on: ubuntu-24.04
     timeout-minutes: 20
-    strategy:
-      fail-fast: false
-      matrix:
-        # 1.x: a da distribuição (lua-lpeg); a da release sai dela (decisão do Prof., 2026-11-26).
-        # 0.10.2: a versão de 2016 (luarocks), só como teste enquanto o TerraSim a usa; sai do CI
-        # quando ele passar para o lua-lpeg. As saídas têm de ser as mesmas (issue #21).
-        lpeg: ['0.10.2', 'distro']
     steps:
       - uses: actions/checkout@v5
       - name: Versão
         run: echo "VER=$(case "$GITHUB_REF" in refs/tags/v*) echo "${GITHUB_REF_NAME#v}";; *) echo "dev-${GITHUB_SHA::7}";; esac)" >> "$GITHUB_ENV"
-      - name: Lua 5.1 e lpeg 0.10.2
-        if: matrix.lpeg == '0.10.2'
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq lua5.1 liblua5.1-0-dev luarocks
-          sudo luarocks --lua-version=5.1 install lpeg 0.10.2-1
       - name: Lua 5.1 e lpeg da distribuição
-        if: matrix.lpeg == 'distro'
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq lua5.1 lua-lpeg
       - name: Build e testes
         run: release/build-terrac.sh "$VER" dist
       - uses: actions/upload-artifact@v4
-        if: matrix.lpeg == 'distro'
         with:
           name: terrac
           path: dist/
