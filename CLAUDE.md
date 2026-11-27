@@ -80,10 +80,17 @@ de lá.
     No servidor e fora do git: `files/Terra/TerraNG_v0.3.0.ova`, a tese em `files/Doutorado/`
     (o site do GitHub aponta para ela) e o `count.php`. Decisão do Prof.: o conteúdo técnico fica
     no site do GitHub; a PUC fica com a página da pesquisa (o problema, a abordagem, as publicações,
-    as pessoas) apontando para o GitHub. PR `terra-site#1` pronto: garantias e ensino conferidos
+    as pessoas) apontando para o GitHub. PR `terra-site#1` publicado pelo Prof. e mesclado em 2026-11-27 (ele
+    limpou o servidor: só `index.html`, 3 imagens e `files/`; conferido por sha256): garantias e ensino conferidos
     com a tese; doutorado no DI/PUC-Rio com Noemi Rodriguez (orientadora) e Silvana Rossetto
     (coorientadora), sem afiliações atuais (decisão do Prof.: ficariam inconsistentes); fomento CNPq
-    e FAPERJ; destaque para o TerraSim, o VS Code e a documentação. Merge depois que o Prof. publicar.
+    e FAPERJ; destaque para o TerraSim, o VS Code e a documentação. Links com https para
+    `https://www.inf.puc-rio.br/~prjterra/` (o `https://terra.inf.puc-rio.br` dá erro de certificado).
+    PR #159: o preprint do Céu TECS (página `~noemi/`, fora do ar) virou o DOI `10.1145/3035544`.
+    PR #161: o site do GitHub aponta para a página da pesquisa. **#95 fechada.**
+    Pastas do host VMware (`~/hgfs`: `host-downloads`, `onedrive-gist`): serviço de usuário
+    `hgfs.service` (monta no login e remonta se o `vmhgfs-fuse` cair; pedido do Prof.). Para passar
+    arquivos ao Windows do Prof., `~/hgfs/host-downloads/`.
     A lista de publicações repete a do `docs/publications.md`: mudar nas duas.
   - **tinyos-toolchain `2.1.2-r3`** no workflow desde o PR #136 (pedido do Prof., 2026-11-26; imagem
     `2.1.2-resolute-py3-0dded15@sha256:e3da1ef0…`): firmware, `.defs`, `_TOSSIM.so` (inteiros),
@@ -423,7 +430,6 @@ de lá.
     Prof. (instância isolada, `--user-data-dir`/`--extensions-dir` no scratchpad, com aviso a ele): a
     `linux-x64` instalada do `.vsix` descompactou o pacote, deu o E3001 no Problems e simulou Net e
     Grp (variante pelo `#include`) até o fim.
-    Falta na #95: o site da PUC (ver "Site da PUC" nas releases).
   - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
     `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
