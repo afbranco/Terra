@@ -80,9 +80,11 @@ de lá.
     No servidor e fora do git: `files/Terra/TerraNG_v0.3.0.ova`, a tese em `files/Doutorado/`
     (o site do GitHub aponta para ela) e o `count.php`. Decisão do Prof.: o conteúdo técnico fica
     no site do GitHub; a PUC fica com a página da pesquisa (o problema, a abordagem, as publicações,
-    as pessoas) apontando para o GitHub. PR `terra-site#1` (página só de links) a refazer nesse
-    formato; texto proposto ao Prof., com dúvidas (orientadores e afiliações, fomento, garantias,
-    nome Céu-T).
+    as pessoas) apontando para o GitHub. PR `terra-site#1` pronto: garantias e ensino conferidos
+    com a tese; doutorado no DI/PUC-Rio com Noemi Rodriguez (orientadora) e Silvana Rossetto
+    (coorientadora), sem afiliações atuais (decisão do Prof.: ficariam inconsistentes); fomento CNPq
+    e FAPERJ; destaque para o TerraSim, o VS Code e a documentação. Merge depois que o Prof. publicar.
+    A lista de publicações repete a do `docs/publications.md`: mudar nas duas.
   - **tinyos-toolchain `2.1.2-r3`** no workflow desde o PR #136 (pedido do Prof., 2026-11-26; imagem
     `2.1.2-resolute-py3-0dded15@sha256:e3da1ef0…`): firmware, `.defs`, `_TOSSIM.so` (inteiros),
     `terrac`, catálogo, docs e `TerraVMControl` iguais byte a byte aos da v1.6.0 (r2).
