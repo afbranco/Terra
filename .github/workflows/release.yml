@@ -101,9 +101,10 @@ jobs:
           path: dist/
 
   vscode:
-    # Extensão do VSCode (#93), com o terractl e o terra-docs.json do build da VM dentro.
+    # Extensão do VSCode (#93), com o terractl e o terra-docs.json do build da VM dentro; a linux-x64
+    # leva também o pacote terra-<v>-linux-x86_64 (#95).
     name: Extensão do VSCode
-    needs: tinyos
+    needs: [tinyos, bundle]
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -113,6 +114,10 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: tinyos
+          path: fw
+      - uses: actions/download-artifact@v4
+        with:
+          name: bundle
           path: fw
       - uses: actions/setup-node@v4
         with:

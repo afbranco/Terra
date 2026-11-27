@@ -101,8 +101,8 @@
       "properties": {
         "terra.terracPath": {
           "type": "string",
-          "default": "terrac",
-          "description": "The terrac compiler (release asset terrac-<v>.tar.gz; needs Lua 5.1 and lpeg)."
+          "default": "",
+          "description": "The terrac compiler. Empty: the one inside the extension (Linux), or terrac in the PATH (asset terrac-<v>-linux-x86_64, or terrac-<v>.tar.gz with Lua 5.1 and lpeg)."
         },
         "terra.compileArgs": {
           "type": "array",
@@ -119,13 +119,13 @@
         },
         "terra.pythonPath": {
           "type": "string",
-          "default": "python3",
-          "description": "Python 3 used to run terractl."
+          "default": "",
+          "description": "Python 3 used to run terractl. Empty: the one inside the extension (Linux), or python3."
         },
         "terra.terractlPath": {
           "type": "string",
           "default": "",
-          "description": "terractl .pyz (empty: the one bundled with the extension)."
+          "description": "terractl .pyz (empty: the one bundled with the extension, with its own Python on Linux)."
         },
         "terra.docsPath": {
           "type": "string",
@@ -144,7 +144,7 @@
         "terra.serialPort": {
           "type": "string",
           "default": "/dev/ttyUSB1",
-          "description": "Serial port of the base station (on the MIB520, the second one). Needs pyserial."
+          "description": "Serial port of the base station (on the MIB520, the second one)."
         },
         "terra.sfAddress": {
           "type": "string",
@@ -159,12 +159,12 @@
         "terra.simulation.tossimPath.net": {
           "type": "string",
           "default": "",
-          "description": "Folder of terra-<v>-net-tossim-py3-x86_64 (extracted)."
+          "description": "Folder of terra-<v>-net-tossim-py3-x86_64 (extracted). Empty: the simulator inside the extension (Linux)."
         },
         "terra.simulation.tossimPath.grp": {
           "type": "string",
           "default": "",
-          "description": "Folder of terra-<v>-grp-tossim-py3-x86_64 (extracted)."
+          "description": "Folder of terra-<v>-grp-tossim-py3-x86_64 (extracted). Empty: the simulator inside the extension (Linux)."
         },
         "terra.simulation.grid": {
           "type": "string",
@@ -179,7 +179,7 @@
         "terra.simulation.containerImage": {
           "type": "string",
           "default": "ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-0dded15",
-          "description": "Image that runs the simulation (the _TOSSIM.so is for Python 3.14). Empty: run it here."
+          "description": "Without the simulator inside the extension: image that runs it (the _TOSSIM.so is for Python 3.14). Empty: run it here."
         },
         "terra.simulation.containerEngine": {
           "type": "string",

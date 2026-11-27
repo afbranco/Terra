@@ -29,7 +29,8 @@ one.
 | `terra-<v>-{net,grp}-micaz-bs.{exe,ihex}` | micaz firmware for the base station (node 1, connected to the computer) |
 | `terra-<v>-{net,grp}-tossim-py3-x86_64.tar.gz` | TOSSIM simulator module (`_TOSSIM.so`, `TOSSIM.py`, Python 3) and its `.defs` |
 | `terrac-<v>.tar.gz` | the [compiler](terrac.html), with the `.defs` of the simulator |
-| `terra-vscode-<v>.vsix` | extension for VS Code: highlighting, docs on hover, `terrac` errors, load, simulate and flash |
+| `terra-vscode-<v>-linux-x64.vsix` | extension for VS Code on Linux, with the package `terra-<v>-linux-x86_64` inside: nothing else to install |
+| `terra-vscode-<v>.vsix` | extension for VS Code, other systems: highlighting, docs on hover, `terrac` errors, load, simulate and flash |
 | `terractl-<v>.pyz` | `terractl` (Python 3): loads programs, shows the messages, flashes the micaz with an id, simulates a grid |
 | `TerraVMControl-<v>.jar` | the Java TerraControl, replaced by `terractl` |
 

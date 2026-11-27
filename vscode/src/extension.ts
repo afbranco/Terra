@@ -1,12 +1,14 @@
 // Extensão Terra para o VSCode (#93): destaque de sintaxe, trechos, hover e complemento pelo
 // terra-docs.json, erros do `terrac --diag=json` no painel Problems e comandos que chamam o terractl
 // (carregar, mensagens da BS, simular, gravar o micaz). O terractl e o terra-docs.json vêm dentro da
-// extensão (bin/ e docs/), da mesma release.
+// extensão (bin/ e docs/), da mesma release. A extensão linux-x64 leva também o pacote
+// terra-<v>-linux-x86_64.tar.gz (bundle/, #95): terrac, terractl com o Python dele, simuladores e
+// firmware, descompactados na primeira ativação na pasta da extensão (globalStorage), por versão.
 
-import { execFile } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
+import { ensureBundle, run } from "./bundle";
 import { Diag, parseDiagOutput, range, summaryText } from "./diag";
 import { Docs, KEYWORDS, hoverMarkdown, signature, variantOf } from "./docs";
 
@@ -17,14 +19,22 @@ let status: vscode.StatusBarItem;
 let output: vscode.OutputChannel;
 let docs: Docs | undefined;
 let ctx: vscode.ExtensionContext;
+let home: string | undefined;           // o pacote descompactado (extensão linux-x64)
+let homeReady: Promise<void> = Promise.resolve();
 
 function cfg() {
   return vscode.workspace.getConfiguration("terra");
 }
 
+// Uma configuração explícita vale; senão o do pacote; senão o do PATH.
+function terracPath(): string {
+  return cfg().get<string>("terracPath") || (home ? path.join(home, "bin", "terrac") : "terrac");
+}
+
 function terractl(): string[] {
-  const p = cfg().get<string>("terractlPath") || ctx.asAbsolutePath(path.join("bin", "terractl.pyz"));
-  return [cfg().get<string>("pythonPath") || "python3", p];
+  const p = cfg().get<string>("terractlPath");
+  if (!p && home) return [path.join(home, "bin", "terractl")];
+  return [cfg().get<string>("pythonPath") || "python3", p || ctx.asAbsolutePath(path.join("bin", "terractl.pyz"))];
 }
 
 function loadDocs(): void {
@@ -37,15 +47,6 @@ function loadDocs(): void {
   }
 }
 
-function run(cmd: string, args: string[], cwd: string): Promise<{ code: number; stdout: string; stderr: string }> {
-  return new Promise((resolve) => {
-    execFile(cmd, args, { cwd, maxBuffer: 16 * 1024 * 1024 }, (err: any, stdout, stderr) => {
-      if (err && typeof err.code !== "number") {
-        resolve({ code: -1, stdout: "", stderr: `${cmd}: ${err.message}` });
-      } else resolve({ code: err ? err.code : 0, stdout, stderr });
-    });
-  });
-}
 
 function toDiagnostic(d: Diag, doc: vscode.TextDocument): vscode.Diagnostic {
   const lineNo = Math.min(Math.max((d.line ?? 1) - 1, 0), doc.lineCount - 1);
@@ -70,8 +71,9 @@ function toDiagnostic(d: Diag, doc: vscode.TextDocument): vscode.Diagnostic {
 async function compile(doc: vscode.TextDocument, quiet = false): Promise<string | undefined> {
   if (doc.languageId !== "terra" || doc.uri.scheme !== "file") return undefined;
   if (doc.isDirty) await doc.save();
+  await homeReady;
   const file = doc.uri.fsPath;
-  const terrac = cfg().get<string>("terracPath") || "terrac";
+  const terrac = terracPath();
   const args = [...(cfg().get<string[]>("compileArgs") ?? []), "--diag=json", path.basename(file)];
   const r = await run(terrac, args, path.dirname(file));
   const res = parseDiagOutput(r.stderr);
@@ -91,7 +93,7 @@ async function compile(doc: vscode.TextDocument, quiet = false): Promise<string 
 
 // O layout dos pktype do programa (terrac --types), num arquivo para o terractl.
 async function types(file: string): Promise<string | undefined> {
-  const terrac = cfg().get<string>("terracPath") || "terrac";
+  const terrac = terracPath();
   const r = await run(terrac, ["--types", path.basename(file)], path.dirname(file));
   if (r.code !== 0) return undefined;
   const dir = ctx.globalStorageUri.fsPath;
@@ -144,6 +146,16 @@ async function cmdSimulate(): Promise<void> {
   if (!vmx) return void vscode.window.showErrorMessage("terra: the program has errors (see Problems)");
   const variant = variantOf(doc.getText()) ?? "net";
   let tossim = cfg().get<string>(`simulation.tossimPath.${variant}`) || "";
+  const tj = await types(doc.uri.fsPath);
+  const work = path.join(ctx.globalStorageUri.fsPath, "sim");
+  fs.mkdirSync(work, { recursive: true });
+  const common = ["--grid", cfg().get<string>("simulation.grid") || "3x3",
+    "--time", String(cfg().get<number>("simulation.time") ?? 60), ...(tj ? ["--types", tj] : [])];
+  if (home && !tossim) {
+    // o simulador e o Python do pacote: sem contêiner
+    terminal(`Terra: simulate ${path.basename(vmx)}`, [...terractl(), "sim", vmx, "--vm", variant, ...common], work);
+    return;
+  }
   if (!tossim) {
     const pick = await vscode.window.showOpenDialog({
       canSelectFolders: true, canSelectFiles: false,
@@ -153,12 +165,8 @@ async function cmdSimulate(): Promise<void> {
     tossim = pick[0].fsPath;
     await cfg().update(`simulation.tossimPath.${variant}`, tossim, vscode.ConfigurationTarget.Global);
   }
-  const tj = await types(doc.uri.fsPath);
-  const work = path.join(ctx.globalStorageUri.fsPath, "sim");
-  fs.mkdirSync(work, { recursive: true });
   const [py, pyz] = terractl();
-  let argv = [py, pyz, "sim", vmx, "--tossim", tossim, "--grid", cfg().get<string>("simulation.grid") || "3x3",
-    "--time", String(cfg().get<number>("simulation.time") ?? 60), ...(tj ? ["--types", tj] : [])];
+  let argv = [py, pyz, "sim", vmx, "--tossim", tossim, ...common];
   const image = cfg().get<string>("simulation.containerImage") || "";
   if (image) {
     // O _TOSSIM.so é do Python 3.14: roda na imagem do tinyos-toolchain, com as pastas montadas no
@@ -172,10 +180,27 @@ async function cmdSimulate(): Promise<void> {
 }
 
 async function cmdFlash(): Promise<void> {
-  const pick = await vscode.window.showOpenDialog({
-    canSelectMany: false, filters: { Firmware: ["exe"] }, openLabel: "Firmware (terra-<v>-*-micaz-*.exe)",
-  });
-  if (!pick?.length) return;
+  await homeReady;
+  let firmware: string | undefined;
+  if (home) {
+    // o firmware do pacote, pelo nome curto que o terractl entende
+    const OUTRO = "Another file...";
+    const q = await vscode.window.showQuickPick([
+      { label: "net-nobs", description: "TerraNet, common node" },
+      { label: "net-bs", description: "TerraNet, base station (node 1)" },
+      { label: "grp-nobs", description: "TerraGrp, common node" },
+      { label: "grp-bs", description: "TerraGrp, base station (node 1)" },
+      { label: OUTRO }], { placeHolder: "Firmware to flash" });
+    if (!q) return;
+    if (q.label !== OUTRO) firmware = q.label;
+  }
+  if (!firmware) {
+    const pick = await vscode.window.showOpenDialog({
+      canSelectMany: false, filters: { Firmware: ["exe"] }, openLabel: "Firmware (terra-<v>-*-micaz-*.exe)",
+    });
+    if (!pick?.length) return;
+    firmware = pick[0].fsPath;
+  }
   const node = await vscode.window.showInputBox({
     prompt: "Node id (the base station is 1)", validateInput: (v) => (/^\d+$/.test(v) && +v > 0 && +v < 65535 ? null : "1 to 65534"),
   });
@@ -184,7 +209,7 @@ async function cmdFlash(): Promise<void> {
     prompt: "Programming port (on the MIB520, the first one)", value: cfg().get<string>("flashPort") || "/dev/ttyUSB0",
   });
   if (!port) return;
-  terminal(`Terra: flash node ${node}`, [...terractl(), "flash", pick[0].fsPath, "--node", node, "--port", port]);
+  terminal(`Terra: flash node ${node}`, [...terractl(), "flash", firmware, "--node", node, "--port", port]);
 }
 
 function wordAt(doc: vscode.TextDocument, pos: vscode.Position): string | undefined {
@@ -199,6 +224,9 @@ export function activate(context: vscode.ExtensionContext): void {
   status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
   status.command = "workbench.actions.view.problems";
   loadDocs();
+  homeReady = ensureBundle(context.extensionPath, context.globalStorageUri.fsPath, (s) => output.appendLine(s))
+    .then((h) => { home = h; })
+    .catch((e) => { output.appendLine(`terra: could not unpack the package: ${e}`); });
   const sel: vscode.DocumentSelector = { language: "terra" };
 
   context.subscriptions.push(

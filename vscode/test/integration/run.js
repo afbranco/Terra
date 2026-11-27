@@ -21,8 +21,10 @@ esac
 `, { mode: 0o755 });
   fs.writeFileSync(path.join(ws, "p.terra"), '#include "TerraNet.defs"\nvar ubyte x;\ny = 1;\nemit LEDS(x);\n');
   fs.mkdirSync(path.join(ws, ".vscode"));
+  // Com TERRA_INTEGRATION_BUNDLE=1 (extensão linux-x64, #95), o terrac é o do pacote dentro dela.
+  const comPacote = process.env.TERRA_INTEGRATION_BUNDLE === "1";
   fs.writeFileSync(path.join(ws, ".vscode", "settings.json"),
-    JSON.stringify({ "terra.terracPath": fake, "terra.compileOnSave": false }));
+    JSON.stringify(comPacote ? { "terra.compileOnSave": false } : { "terra.terracPath": fake, "terra.compileOnSave": false }));
   await runTests({
     version: "1.85.2",
     extensionDevelopmentPath: raiz,
@@ -30,7 +32,7 @@ esac
     launchArgs: [ws, "--disable-extensions", "--disable-workspace-trust",
       "--user-data-dir", fs.mkdtempSync(path.join(os.tmpdir(), "terra-ud-"))],
   });
-  console.log("integração: OK");
+  console.log("integração: OK" + (comPacote ? " (terrac do pacote)" : ""));
 }
 
 main().catch((e) => {

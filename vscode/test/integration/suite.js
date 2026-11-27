@@ -27,7 +27,8 @@ exports.run = async function () {
   }
 
   await vscode.commands.executeCommand("terra.compile");
-  await espera(() => vscode.languages.getDiagnostics(doc.uri).length > 0);
+  // com o pacote, a primeira compilação espera ele ser descompactado (uns segundos)
+  await espera(() => vscode.languages.getDiagnostics(doc.uri).length > 0, 60000);
   const [d] = vscode.languages.getDiagnostics(doc.uri);
   assert.strictEqual(d.severity, vscode.DiagnosticSeverity.Error);
   assert.strictEqual(d.range.start.line, 2);
