@@ -76,6 +76,30 @@ jobs:
           name: terrac
           path: dist/
 
+  bundle:
+    # O pacote terra-<v>-linux-x86_64.tar.gz (#95): terrac, terractl, Python, simuladores e firmware,
+    # sem instalar nada. Testado num Fedora 43 sem Python, Lua nem cpp.
+    name: Pacote Linux
+    needs: [tinyos, terrac]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - name: Versão
+        run: echo "VER=$(case "$GITHUB_REF" in refs/tags/v*) echo "${GITHUB_REF_NAME#v}";; *) echo "dev-${GITHUB_SHA::7}";; esac)" >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@v4
+        with:
+          path: in
+          merge-multiple: true
+      - name: Build e teste
+        run: |
+          release/build-bundle.sh "$VER" in dist
+          release/test-bundle.sh "dist/terra-$VER-linux-x86_64.tar.gz" docker
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bundle
+          path: dist/
+
   vscode:
     # Extensão do VSCode (#93), com o terractl e o terra-docs.json do build da VM dentro.
     name: Extensão do VSCode
@@ -131,7 +155,7 @@ jobs:
   release:
     name: Release (rascunho)
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [tinyos, terrac, vscode, avrora]
+    needs: [tinyos, terrac, bundle, vscode, avrora]
     runs-on: ubuntu-24.04
     permissions:
       contents: write

@@ -1,8 +1,10 @@
 """terractl: loads Terra programs, shows the messages of the base station, simulates and flashes the firmware."""
 
 import argparse
+import glob
 import json
 import os
+import re
 import sys
 import tempfile
 import threading
@@ -30,7 +32,7 @@ def _decodificacao(p):
     g = p.add_argument_group("messages")
     g.add_argument("--terra", metavar="PROG.terra", help="decode by the pktypes of the program (runs terrac --types)")
     g.add_argument("--types", metavar="FILE.json", help="the output of terrac --types, instead of --terra")
-    g.add_argument("--terrac", default="terrac", help="the terrac (default: the one in the PATH)")
+    g.add_argument("--terrac", default=default_terrac(), help="the terrac (default: the one of the package, or the PATH)")
     g.add_argument("--pktype", action="append", default=[], metavar="[N=]NAME",
                    help="pktype of each message: NAME for all, or N=NAME for type (Net) or msgId (Grp) "
                         "N; can repeat. Not needed when the program has a single pktype")
@@ -125,7 +127,30 @@ def cmd_listen(a):
     return 0
 
 
+def terra_home(*partes):
+    """Pasta do pacote terra-<v>-linux-x86_64 (#95), que o bin/terractl dele põe em TERRA_HOME."""
+    h = os.environ.get("TERRA_HOME")
+    return os.path.join(h, *partes) if h else None
+
+
+def default_terrac():
+    t = terra_home("bin", "terrac")
+    return t if t and os.path.exists(t) else "terrac"
+
+
+def firmware_path(nome):
+    """O caminho do .exe, ou um nome curto (net-bs, net-nobs, grp-bs, grp-nobs) do firmware do pacote."""
+    if os.path.exists(nome) or not re.fullmatch(r"(net|grp)-(bs|nobs)", nome):
+        return nome
+    achados = sorted(glob.glob(terra_home("firmware", "terra-*-%s-micaz-%s.exe" % tuple(nome.split("-"))) or ""))
+    if not achados:
+        raise SystemExit("terractl: firmware %s not found (it comes in terra-<v>-linux-x86_64; "
+                         "or give the path of the .exe)" % nome)
+    return achados[-1]
+
+
 def cmd_flash(a):
+    a.firmware = firmware_path(a.firmware)
     elf = F.with_node_id(a.firmware, a.node)
     texto = F.ihex(elf.image())
     if a.output:
@@ -144,6 +169,11 @@ def cmd_flash(a):
 
 def cmd_sim(a):
     from . import sim
+    if not a.tossim:
+        a.tossim = terra_home("tossim", a.vm)
+        if not a.tossim or not os.path.isdir(a.tossim):
+            raise SystemExit("terractl: missing --tossim (the folder of terra-<v>-%s-tossim-py3-x86_64.tar.gz, "
+                             "extracted; terra-<v>-linux-x86_64 brings it)" % a.vm)
     rc = sim.run(a, out=lambda s: print(s, flush=True))
     # O SerialForwarder do TOSSIM imprime uma estatística ao ser destruído: sai sem passar por ele.
     sys.stdout.flush()
@@ -175,7 +205,8 @@ def main(argv=None):
     s.set_defaults(func=cmd_listen)
 
     s = sub.add_parser("flash", help="flash a firmware of the release (.exe) with a node id")
-    s.add_argument("firmware", help="terra-<v>-{net,grp}-micaz-{bs,nobs}.exe")
+    s.add_argument("firmware", help="terra-<v>-{net,grp}-micaz-{bs,nobs}.exe, or net-bs, net-nobs, grp-bs, "
+                                    "grp-nobs (the firmware of the package terra-<v>-linux-x86_64)")
     s.add_argument("--node", type=int, required=True, help="node id (the base station is 1)")
     s.add_argument("--port", help="programming port (on the MIB520, the first one: /dev/ttyUSB0)")
     s.add_argument("--programmer", default="mib510", help="avrdude programmer (mib510 works for the MIB520)")
@@ -186,8 +217,10 @@ def main(argv=None):
     s = sub.add_parser("sim", help="simulate a grid of motes with the _TOSSIM.so of the release and show the logs")
     s.add_argument("vmx", nargs="?", help="program loaded through the BS (without it, the network waits; "
                                          "with --realtime, load it from outside with terractl load --sf)")
-    s.add_argument("--tossim", required=True, metavar="FOLDER",
-                   help="folder of terra-<v>-{net,grp}-tossim-py3-x86_64.tar.gz, extracted (its VM is used)")
+    s.add_argument("--tossim", metavar="FOLDER",
+                   help="folder of terra-<v>-{net,grp}-tossim-py3-x86_64.tar.gz, extracted (its VM is used); "
+                        "default: the one of --vm in the package terra-<v>-linux-x86_64")
+    s.add_argument("--vm", choices=["net", "grp"], default="net", help="VM of the package to simulate (net)")
     s.add_argument("--grid", default="3x3", help="LINESxCOLUMNS, up to 9x9 (default 3x3); nodes column*10+line")
     s.add_argument("--time", type=float, default=60, help="simulated seconds (default 60)")
     s.add_argument("--seed", type=int, default=1, help="TOSSIM seed (the same seed gives the same simulation)")
@@ -208,7 +241,7 @@ def main(argv=None):
     s.add_argument("--logdir", default=".terractl-sim", help="folder of the channel files (.terractl-sim)")
     s.add_argument("--terra", metavar="PROG.terra", help="decode the messages to the BS by the pktypes (terrac --types)")
     s.add_argument("--types", metavar="FILE.json", help="the output of terrac --types, instead of --terra")
-    s.add_argument("--terrac", default="terrac")
+    s.add_argument("--terrac", default=default_terrac())
     s.set_defaults(func=cmd_sim)
 
     a = p.parse_args(argv)

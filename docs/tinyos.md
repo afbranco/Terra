@@ -14,8 +14,16 @@ build and test only the micaz: in the TOSSIM simulator and in the Avrora emulato
 
 ## Release assets
 
+On Linux, start with **`terra-<v>-linux-x86_64.tar.gz`**: everything in one folder (compiler,
+`terractl`, simulators, firmware, `.defs` and its own Python), with nothing to install and no
+administrator needed. Extract it anywhere and use `bin/terrac` and `bin/terractl` (see the
+`README.txt` inside); delete the folder to uninstall. The other assets are the same pieces, one by
+one.
+
 | Asset | What it is |
 |---|---|
+| `terra-<v>-linux-x86_64.tar.gz` | all of the below for Linux x86_64, ready to use, with Python 3.14 inside |
+| `terrac-<v>-linux-x86_64` | the compiler as a single executable for Linux (Lua, LPeg and the preprocessor inside) |
 | `terra-<v>-{net,grp}-micaz-nobs.{exe,ihex}` | micaz firmware for a common node (MDA100 sensor board) |
 | `terra-<v>-{net,grp}-micaz-nobs.defs` | the `.defs` of that firmware: compile the programs for the micaz with it |
 | `terra-<v>-{net,grp}-micaz-bs.{exe,ihex}` | micaz firmware for the base station (node 1, connected to the computer) |

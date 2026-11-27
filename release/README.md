@@ -9,6 +9,8 @@ workflow e no `BUILDINFO` de cada release.
 
 | Arquivo | O que é |
 |---|---|
+| `terra-<v>-linux-x86_64.tar.gz` | O pacote para Linux (#95): `bin/terrac`, `bin/terractl`, o Python 3.14 do python-build-standalone, os dois simuladores, o firmware micaz e os `.defs`; sem instalar nada (ver "Pacote Linux") |
+| `terrac-<v>-linux-x86_64` | O `terrac` executável (Lua, lpeg e mcpp dentro; `--licenses`) |
 | `terra-<v>-net-tossim-py3-x86_64.tar.gz` | Simulador TerraNet: `_TOSSIM.so`, `TOSSIM.py` (Python 3.14, x86_64) e o `TerraNet.defs` dele |
 | `terra-<v>-grp-tossim-py3-x86_64.tar.gz` | Simulador TerraGrp, idem |
 | `terra-<v>-{net,grp}-micaz-nobs.{exe,ihex}` | Firmware micaz, nó comum (placa MDA100) |
@@ -205,6 +207,23 @@ python3 terractl-<v>.pyz flash terra-<v>-grp-micaz-nobs.exe --node 11 --port /de
 - Testes: `release/test-terractl.py` (quadro serial, porta serial simulada, ID contra o
   `tos-set-symbols`, grade do `sim`) e `tests/terractl`, `tests/terractlgrp` (carga e decodificação
   no TOSSIM), `tests/terractlsim` (grade 3x3 com o `sim`).
+
+## Pacote Linux
+
+`release/build-bundle.sh <v> <anexos> <saída>` monta o `terra-<v>-linux-x86_64.tar.gz` (decisões do
+Prof., 2026-11-27: o laboratório não tem admin nem contêiner; Fedora em dual boot):
+
+- `bin/terrac`: o executável, com `-I defs/` (um `.defs` na pasta do programa tem prioridade);
+- `bin/terractl`: o `.pyz` com o Python do pacote (`python3 -I`) e `TERRA_HOME`, pelo qual o
+  `terractl` acha o `terrac` (`--terra`), os simuladores (`sim --vm net|grp`, sem `--tossim`) e o
+  firmware (`flash net-bs|net-nobs|grp-bs|grp-nobs`);
+- `python/`: o CPython 3.14 do python-build-standalone (release 20261110, sha256 conferido), sem
+  testes, Tk, IDLE, pip e cabeçalhos. O `_TOSSIM.so` é do Python 3.14 do Ubuntu e roda com ele;
+- `tossim/{net,grp}/`, `firmware/`, `defs/`, `licenses/` e `README.txt`.
+
+Os links em `bin/` funcionam de qualquer lugar (`readlink -f`), também num link no `PATH`. Teste:
+`release/test-bundle.sh` num Fedora 43 sem Python, Lua nem `cpp`, numa pasta com espaço no nome
+(compila, simula Net e Grp com as mensagens decodificadas e grava um `.ihex` com ID).
 
 ## Extensão do VSCode
 
