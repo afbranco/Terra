@@ -372,6 +372,12 @@ de lá.
     1.x (conteúdo igual ao do 0.10.2). O 0.10.2 fica no CI só como teste, porque o TerraSim o compila
     da fonte (`container/Dockerfile.server`); avisado para trocar pelo `lua-lpeg`. Depois, #142 tira
     o job.
+  - Instalação sem admin (#95; decisões do Prof., 2026-11-27): no lab não pode contêiner nem admin
+    (Fedora em dual boot); só Linux por agora. Uma extensão `linux-x64` com tudo dentro (`terrac`
+    executável com pré-processador embutido, `terractl`, um Python próprio para o simulador, que é
+    preso à versão do Python: o `.so` do 3.14 dá segfault no 3.12), e um `tar.gz` com o mesmo
+    conteúdo para usar fora do VSCode. O suporte só configura a USB. PR #146 (#145): o `pyserial`
+    vai dentro do `.pyz` (sdist 3.5, por causa da licença); teste `python3 -S test-terractl.py --pyz`.
   - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
     `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
