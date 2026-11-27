@@ -396,6 +396,16 @@ de lá.
     `vscode/src/bundle.ts` o descompacta no `globalStorage` (por versão), e compilar, carregar,
     simular (`--vm`, sem contêiner) e gravar usam o pacote; configuração explícita vale por cima.
     A integração no CI roda duas vezes: com o `terrac` falso e com o do pacote. A universal continua.
+    PR #155 (#154): tutorial `docs/getting-started.md` (no menu e no `index.md`) e `terractl sim
+    --hide` com padrão `serial,radio`. PR #157 (#156, pedido do Prof.): o pacote em 14 imagens de
+    distros (`release/test-bundle-distros.sh`, tabela no `release/README.md`): Ubuntu 20.04 a 24.04,
+    Mint 22, Debian 11 a 13, Fedora 41 e 43, openSUSE Leap 15.6 e Tumbleweed, Arch, Rocky e Alma 9
+    (glibc 2.31 a 2.44), todas OK; job só em tag e manual. 2026-11-27, no VSCode 1.143 da máquina do
+    Prof. (instância isolada, `--user-data-dir`/`--extensions-dir` no scratchpad, com aviso a ele): a
+    `linux-x64` instalada do `.vsix` descompactou o pacote, deu o E3001 no Problems e simulou Net e
+    Grp (variante pelo `#include`) até o fim.
+    Falta na #95: o site da PUC (abas Download, Tutorial e Tools apontam para a `.ova`; fora do
+    repositório) e a release com os anexos novos (o tutorial já publicado cita anexos da v1.7.0).
   - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
     `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
