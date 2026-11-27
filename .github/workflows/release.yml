@@ -100,6 +100,23 @@ jobs:
           name: bundle
           path: dist/
 
+  bundle-distros:
+    # O pacote em 14 imagens de distros (Ubuntu, Mint, Debian, Fedora, openSUSE, Arch, Rocky, Alma).
+    # Como o Avrora, só nas tags e na execução manual (~10 min).
+    name: Pacote Linux nas distros
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    needs: bundle
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          name: bundle
+          path: in
+      - name: Teste em cada distro
+        run: release/test-bundle-distros.sh in/terra-*-linux-x86_64.tar.gz docker | tee -a "$GITHUB_STEP_SUMMARY"
+
   vscode:
     # Extensão do VSCode (#93), com o terractl e o terra-docs.json do build da VM dentro; a linux-x64
     # leva também o pacote terra-<v>-linux-x86_64 (#95).
@@ -160,7 +177,7 @@ jobs:
   release:
     name: Release (rascunho)
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [tinyos, terrac, bundle, vscode, avrora]
+    needs: [tinyos, terrac, bundle, bundle-distros, vscode, avrora]
     runs-on: ubuntu-24.04
     permissions:
       contents: write

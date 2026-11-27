@@ -226,6 +226,31 @@ Os links em `bin/` funcionam de qualquer lugar (`readlink -f`), também num link
 `release/test-bundle.sh` num Fedora 43 sem Python, Lua nem `cpp`, numa pasta com espaço no nome
 (compila, simula Net e Grp com as mensagens decodificadas e grava um `.ihex` com ID).
 
+Distros testadas (`release/test-bundle-distros.sh`, imagens oficiais fixadas pelo digest; o mesmo
+teste em cada uma; 2026-11-27, com o pacote da v1.6.0 montado localmente). "Na imagem" é o que a
+distro já tinha dos programas que o Terra poderia usar: o pacote não usa nenhum deles. A imagem do
+Mint é a `linuxmintd` (o `/etc/os-release` dela é o do Ubuntu de base). Pede glibc 2.29 ou mais
+nova (o `_TOSSIM.so`) e a `libstdc++`, que toda distro de desktop traz.
+
+| Imagem | Distro (/etc/os-release) | glibc | Resultado | Na imagem |
+|---|---|---|---|---|
+| `ubuntu:20.04` | Ubuntu 20.04.6 LTS | 2.31 | OK | nada |
+| `ubuntu:22.04` | Ubuntu 22.04.5 LTS | 2.35 | OK | nada |
+| `ubuntu:24.04` | Ubuntu 24.04.5 LTS | 2.39 | OK | nada |
+| `linuxmintd/mint22-amd64` | Ubuntu 24.04.5 LTS | 2.39 | OK | python3 cpp gcc |
+| `debian:11` | Debian GNU/Linux 11 (bullseye) | 2.31 | OK | nada |
+| `debian:12` | Debian GNU/Linux 12 (bookworm) | 2.36 | OK | nada |
+| `debian:13` | Debian GNU/Linux 13 (trixie) | 2.41 | OK | nada |
+| `fedora:41` | Fedora Linux 41 (Container Image) | 2.40 | OK | nada |
+| `fedora:43` | Fedora Linux 43 (Container Image) | 2.42 | OK | nada |
+| `opensuse/leap:15.6` | openSUSE Leap 15.6 | 2.38 | OK | nada |
+| `opensuse/tumbleweed` | openSUSE Tumbleweed | 2.44 | OK | nada |
+| `archlinux` | Arch Linux | 2.44 | OK | nada |
+| `rockylinux/rockylinux:9` | Rocky Linux 9.9 (Blue Onyx) | 2.34 | OK | python3 |
+| `almalinux:9` | AlmaLinux 9.9 (Chartreuse Bobcat) | 2.34 | OK | python3 |
+
+No CI, o job "Pacote Linux nas distros" roda esta tabela nas tags `v*` e na execução manual.
+
 ## Extensão do VSCode
 
 `code --install-extension terra-vscode-<v>.vsix` (ou "Install from VSIX..." no VSCode). Leva dentro

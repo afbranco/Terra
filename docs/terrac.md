@@ -13,7 +13,7 @@ Lua and comes in the release asset `terrac-<version>.tar.gz`, with the `.defs` o
 
 On Linux (x86_64), the release asset `terrac-<version>-linux-x86_64` is a single executable with
 Lua, LPeg and a C preprocessor (mcpp) inside: nothing to install, no administrator needed. It runs
-on any distribution (tested on Ubuntu 24.04 and Fedora 43):
+on any distribution (tested on Ubuntu, Debian, Fedora, openSUSE, Arch, Rocky and AlmaLinux):
 
 ```bash
 chmod +x terrac-<version>-linux-x86_64

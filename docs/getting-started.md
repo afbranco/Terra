@@ -6,7 +6,8 @@ title: Getting started
 # Getting started
 
 This page goes from nothing to a program running on a simulated network, and then on micaz
-motes. It needs a Linux PC (x86_64; tested on Ubuntu 24.04 and Fedora 43). Nothing is installed on
+motes. It needs a Linux PC (x86_64, glibc 2.29 or newer; tested on Ubuntu 20.04 to 24.04, Linux Mint 22,
+Debian 11 to 13, Fedora 41 and 43, openSUSE Leap 15.6 and Tumbleweed, Arch, Rocky and AlmaLinux 9). Nothing is installed on
 the machine and no administrator rights are needed: everything stays in one folder, apart from the
 Python, Lua or compilers the machine may have. Only the USB access to the motes may need the
 administrator, once (step 5).
