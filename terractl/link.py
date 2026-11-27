@@ -118,8 +118,8 @@ class SerialLink(Link):
         try:
             import serial  # pyserial
         except ImportError:
-            raise SystemExit("terractl: --serial needs pyserial (pip install pyserial, "
-                             "or the python3-serial package)")
+            raise SystemExit("terractl: --serial needs pyserial (it comes inside terractl-<v>.pyz; "
+                             "from the source tree: pip install pyserial)")
         self.ser = serial.Serial(port, baud, timeout=0.05)
         self.ack_timeout, self.retries = ack_timeout, retries
         self.dec = framing.Decoder()

@@ -51,7 +51,7 @@ port and shows the messages that reach the base station:
 python3 terractl-<v>.pyz load prog.vmx --serial /dev/ttyUSB1 --listen --terra prog.terra
 ```
 
-The serial port needs `pyserial` (package `python3-serial`). With `--terra` (or `--types`, the
+The `.pyz` brings `pyserial` inside: it runs with the `python3` of the machine, nothing to install. With `--terra` (or `--types`, the
 output of `terrac --types`), the messages are shown field by field, by the `pktype` of the program:
 the ones sent with `SEND` to node 1 (TerraNet) or with `SEND_BS` (TerraGrp). `--sf host:port`
 connects to a SerialForwarder instead of the serial port. `terractl listen` only shows the messages.

@@ -18,7 +18,7 @@ based on Céu. This extension:
   `tinyos-toolchain` container image: the simulator module is for Python 3.14);
 - **Terra: Flash a micaz**: a firmware of the release with a node id, through `avrdude`.
 
-`terractl` comes inside the extension and needs Python 3 (and `pyserial` for the serial port). The
+`terractl` comes inside the extension and needs only Python 3 (`pyserial` comes inside). The
 compiler (`terrac-<v>.tar.gz` of the release) needs Lua 5.1 and lpeg; set `terra.terracPath` if it
 is not in the PATH. The simulator needs the `terra-<v>-{net,grp}-tossim-py3-x86_64.tar.gz` of the
 release, extracted (asked on the first run).
