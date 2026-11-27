@@ -13,7 +13,8 @@ programs react to events (sensor readings, radio messages, timers) and the compi
 every reaction ends and warns about nondeterminism. The VM is small enough for 8-bit
 micro-controllers with a few KB of RAM, and new programs are sent to the nodes over the radio.
 
-Terra was created by Adriano Branco at PUC-Rio. Contact: <img alt="afbranco at gmail.com" src="images/email.png">
+Terra was created by Adriano Branco at PUC-Rio, in his PhD: the research, the teaching with Terra and
+the publications are on the [research page](https://www.inf.puc-rio.br/~prjterra/). Contact: <img alt="afbranco at gmail.com" src="images/email.png">
 
 <div style="clear:both"></div>
 
