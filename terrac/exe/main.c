@@ -4,6 +4,7 @@
  *   terrac --cpp [opções] ...     o pré-processador (mcpp); é o que o terrac chama para o #include
  * Montado pelo release/build-terrac-exe.sh. */
 #include <limits.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -28,6 +29,14 @@ static int traceback(lua_State *L) {
 
 int main(int argc, char **argv) {
     if (argc > 1 && strcmp(argv[1], "--cpp") == 0) {
+        /* o mcpp lê a codificação do LC_ALL/LC_CTYPE/LANG (e não conhece "C.UTF-8" nem
+         * "pt_BR.UTF-8": avisa em todo programa) e pastas de include do C_INCLUDE_PATH: sem elas,
+         * a saída não depende da máquina, e é a que foi comparada com a do cpp */
+        unsetenv("LC_ALL");
+        unsetenv("LC_CTYPE");
+        unsetenv("LANG");
+        unsetenv("C_INCLUDE_PATH");
+        unsetenv("CPLUS_INCLUDE_PATH");
         argv[1] = "mcpp";
         return mcpp_lib_main(argc - 1, argv + 1);
     }

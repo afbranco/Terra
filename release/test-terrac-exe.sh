@@ -23,7 +23,8 @@ for v in /w/esp/*.vmx; do n=$(basename "$v" .vmx); /terrac "$n.terra" > /dev/nul
 /terrac --diag=json cppfalta.terra 2> cppfalta.json > /dev/null
 /terrac --version > /dev/null 2>&1; true
 EOS
-"$ENG" run --rm -v "$W:/w:Z" -v "$EXE:/terrac:ro,Z" "$FEDORA" bash /w/roda.sh | tee "$W/log"
+# com a língua do laboratório e um C_INCLUDE_PATH que não deve valer
+"$ENG" run --rm -e LANG=pt_BR.UTF-8 -e LC_ALL=C.UTF-8 -e C_INCLUDE_PATH=/nada -v "$W:/w:Z" -v "$EXE:/terrac:ro,Z" "$FEDORA" bash /w/roda.sh | tee "$W/log"
 fail=0
 grep -q instalado "$W/log" && { echo "test-terrac-exe: a imagem tem o que não devia"; fail=1; }
 n=0
@@ -34,6 +35,7 @@ done
 echo "test-terrac-exe: $n .vmx iguais aos commitados"
 grep -q '"code":"E3001".*"file":"incl.terra","line":2,.*"include":{"file":"inc_err.h","line":2' "$W/t/incl.json" ||
     { echo "test-terrac-exe: erro no #include fora da linha: $(cat "$W/t/incl.json")"; fail=1; }
+grep -q 'W6001' "$W/t/incl.json" && { echo "test-terrac-exe: aviso do pré-processador: $(cat "$W/t/incl.json")"; fail=1; }
 grep -q '"code":"E1004".*"file":"cppfalta.terra","line":2' "$W/t/cppfalta.json" ||
     { echo "test-terrac-exe: #include que falta sem E1004: $(cat "$W/t/cppfalta.json")"; fail=1; }
 rm -rf "$W"
