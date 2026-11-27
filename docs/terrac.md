@@ -11,7 +11,7 @@ Lua and comes in the release asset `terrac-<version>.tar.gz`, with the `.defs` o
 
 ## Installing and running
 
-It needs Lua 5.1, LPeg (0.10.2 or 1.x) and the C preprocessor. On Ubuntu or Debian:
+It needs Lua 5.1, LPeg 1.x and the C preprocessor. On Ubuntu or Debian:
 
 ```bash
 sudo apt-get install lua5.1 lua-lpeg cpp
