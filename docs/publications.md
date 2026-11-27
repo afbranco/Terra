@@ -86,4 +86,4 @@ More about Céu at [ceu-lang.org](http://www.ceu-lang.org/).
 2. Francisco Sant'Anna, Roberto Ierusalimschy, Noemi Rodriguez, Silvana Rossetto and Adriano
    Branco. *The design and implementation of the synchronous language Céu.* ACM Transactions on
    Embedded Computing Systems, 16(4):98:1-98:26, 2017.
-   [preprint](https://www.inf.puc-rio.br/~noemi/sr-19/ceu_tecs17_pre.pdf)
+   [doi:10.1145/3035544](https://doi.org/10.1145/3035544)
