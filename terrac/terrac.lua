@@ -138,30 +138,69 @@ end
 
 local cpp_file = 'precomp.terra'
 -- Pre-processor phase
---    local cpp = assert(io.popen('cpp -C '.._OPTS.input..' ' ..cpp_file, 'w'))
-    local cpp_err = _DIAG.json and os.tmpname()
-    local cpp = assert(io.popen('cpp -C '.._OPTS.input..' ' ..cpp_file .. _OPTS.includePath ..
-                                (cpp_err and (' 2>'..cpp_err) or ''), 'w'))
+-- No terrac executável (#95), o pré-processador é o mcpp de dentro dele (`terrac --cpp`), e não
+-- o cpp da máquina, que pode não estar instalado. -N: sem as macros predefinidas (linux, unix...);
+-- -I-: sem as pastas de include do sistema. As mensagens do mcpp vêm com a pasta corrente na
+-- frente do nome; um erro apaga a saída, como o erro fatal do cpp.
+local MCPP = _TERRAC_EXE ~= nil
+local function relpath (f)
+    if MCPP and _TERRAC_CWD and string.sub(f, 1, #_TERRAC_CWD+1) == _TERRAC_CWD..'/' then
+        return string.sub(f, #_TERRAC_CWD+2)
+    end
+    return f
+end
+do
+    local cpp_err = (_DIAG.json or MCPP) and os.tmpname()
+    local cmd
+    if MCPP then
+        cmd = "'"..string.gsub(_TERRAC_EXE, "'", "'\\''").."' --cpp -C -N -I-".._OPTS.includePath..
+              ' '.._OPTS.input..' '..cpp_file
+    else
+        cmd = 'cpp -C '.._OPTS.input..' ' ..cpp_file .. _OPTS.includePath
+    end
+    local cpp = assert(io.popen(cmd .. (cpp_err and (' 2>'..cpp_err) or ''), 'w'))
     cpp:close()
     if cpp_err then
         local f = io.open(cpp_err)
         local text = f and f:read('*a') or ''
         if f then f:close() end
         os.remove(cpp_err)
+        local errs = 0
         for l in string.gmatch(text, '[^\n]+') do
             -- arquivo:linha:coluna: ou, em alguns erros (ex.: #if sem #endif), arquivo:linha: (#28)
             local file, ln, col, kind, msg = string.match(l, '^(.-):(%d+):(%d+): (%a[%a ]-): (.*)$')
             if not file then
                 file, ln, kind, msg = string.match(l, '^(.-):(%d+): (%a[%a ]-): (.*)$')
             end
+            if file and MCPP then
+                file = relpath(file)
+                if kind == 'warning' and string.find(msg, '"/%*" within comment') then
+                    file = nil      -- o cpp não avisa (e o comentário do .defs tem "/**")
+                elseif kind == 'warning' and string.find(msg, '^End of input with unterminated comment') then
+                    kind = 'error'  -- no cpp é erro
+                end
+                -- #if sem #endif: o mcpp aponta o fim do arquivo e diz onde o #if começou
+                ln = string.match(msg, 'started at line (%d+)') or ln
+            end
             local loc = file and { line=tonumber(ln), col=col and tonumber(col) }
             if file and (kind == 'error' or kind == 'fatal error') then
-                _DIAG.emit('E1004', nil, { msg=kind..': '..msg }, { file=file, loc=loc })
-            elseif file and kind == 'warning' then
+                errs = errs + 1
+                if _DIAG.json then
+                    _DIAG.emit('E1004', nil, { msg=kind..': '..msg }, { file=file, loc=loc })
+                end
+            elseif file and kind == 'warning' and _DIAG.json then
                 _DIAG.emit('W6001', nil, { msg=kind..': '..msg }, { file=file, loc=loc })
             end
+            if file and not _DIAG.json then
+                io.stderr:write(file..':'..ln..': '..kind..': '..msg..'\n')
+            end
+        end
+        if MCPP and errs > 0 then
+            os.remove(cpp_file)
         end
     end
+end
+
 
 local test_file = io.open(cpp_file)
 if  test_file then
@@ -206,6 +245,19 @@ for line in io.lines(cpp_file) do
     srcLine = srcLine + 1
   else
     local n, f, flags = string.match(line, '^# (%d+) "(.-)"(.*)$')
+    if not n then
+      -- o mcpp marca com `#line N "arquivo"`, sem o 1 de entrada num #include
+      n, f = string.match(line, '^#line (%d+) "(.-)"')
+      if n then
+        f = relpath(f)
+        flags = ''
+        if srcFile == _OPTS.input and f ~= _OPTS.input then
+          -- entra num #include: o mcpp põe a linha da diretiva e mais uma em branco antes
+          flags = ' 1'
+          srcLine = math.max(srcLine - 2, 1)
+        end
+      end
+    end
     if n then
       if srcFile == _OPTS.input and string.match(flags, '^ 1') then
         mainLine = srcLine      -- entra num #include: vale a linha da diretiva

@@ -62,7 +62,22 @@ a primeira grava o firmware e a segunda é a de dados, usada pelo SerialForwarde
 
 ## terrac
 
-Requer Lua 5.1, o lpeg 1.x e o `cpp`. Em Ubuntu/Debian, o lpeg da distribuição serve:
+**Executável** (`terrac-<v>-linux-x86_64`, #95): Lua 5.1.5, lpeg 1.0.2 e o pré-processador mcpp
+2.7.2 (com os patches da Debian 5.3) ligados estaticamente, com o `terrac` dentro. Roda em qualquer
+Linux x86_64 sem instalar nada (testado no Ubuntu 24.04 e no Fedora 43, `release/test-terrac-exe.sh`).
+Montado por `release/build-terrac-exe.sh` (fontes baixados com sha256 conferido). O `terrac.lua`
+percebe que está no executável (`_TERRAC_EXE`) e chama o `mcpp` de dentro dele (`terrac --cpp`),
+com `-N` (sem as macros predefinidas, como `linux` e `unix`) e `-I-` (sem as pastas do sistema).
+
+Comparado com o script e o `cpp` do gcc nos 1.173 programas do corpus: os 506 `.vmx` iguais;
+diferem os textos do E1004, que vem sem coluna; string sem fechar é E1004 (no `cpp`, W6001 e depois
+um erro de sintaxe); o `#if` sem `#endif` aponta a linha do `#if`; e, numa linha com macro, a
+coluna pode sair 1 ou 2 caracteres depois, porque o `mcpp` põe espaços em volta da expansão.
+`tests/terrac/diag/json.mcpp.esperado` é o `json.esperado` com essas diferenças;
+`TERRAC_EXE=<exe> release/build-terrac.sh` roda todos os testes do `terrac` com o executável.
+
+**Script Lua** (`terrac-<v>.tar.gz`): requer Lua 5.1, o lpeg 1.x e o `cpp`. Em Ubuntu/Debian, o
+lpeg da distribuição serve:
 
 ```bash
 sudo apt-get install lua5.1 lua-lpeg cpp
