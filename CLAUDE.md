@@ -386,6 +386,12 @@ de lá.
     antes do mcpp (avisava "Unknown encoding"). Testes: `TERRAC_EXE=… build-terrac.sh`
     (`json.mcpp.esperado`) e `release/test-terrac-exe.sh` (Fedora 43 sem Lua nem cpp). O TerraSim
     segue com o script e o `cpp`.
+    PR #151 (#150): pacote `terra-<v>-linux-x86_64.tar.gz` (`release/build-bundle.sh`, job "Pacote
+    Linux"): `bin/terrac` (com `-I defs/`), `bin/terractl` (CPython 3.14.10 do python-build-standalone
+    20261110, enxugado, e `TERRA_HOME`: `sim --vm net|grp`, `flash net-bs`...), simuladores, firmware,
+    `.defs`, licenças (`terrac --licenses`). 29 MB. O `_TOSSIM.so` do Python 3.14.4 do Ubuntu roda
+    nele. `release/test-bundle.sh` no Fedora 43 sem Python/Lua/cpp, pasta com espaço (achou o `-I`
+    sem aspas no comando do mcpp).
   - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
     `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
