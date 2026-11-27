@@ -392,6 +392,10 @@ de lá.
     `.defs`, licenças (`terrac --licenses`). 29 MB. O `_TOSSIM.so` do Python 3.14.4 do Ubuntu roda
     nele. `release/test-bundle.sh` no Fedora 43 sem Python/Lua/cpp, pasta com espaço (achou o `-I`
     sem aspas no comando do mcpp).
+    PR #153 (#152): `terra-vscode-<v>-linux-x64.vsix` (30 MB) com o pacote em `bundle/`;
+    `vscode/src/bundle.ts` o descompacta no `globalStorage` (por versão), e compilar, carregar,
+    simular (`--vm`, sem contêiner) e gravar usam o pacote; configuração explícita vale por cima.
+    A integração no CI roda duas vezes: com o `terrac` falso e com o do pacote. A universal continua.
   - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
     `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
