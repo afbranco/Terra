@@ -33,10 +33,11 @@ import threading
 import time
 
 CPU_HZ = 7372800
-BLOCK_SIZE = 24
 PORTA_AVRORA = 2390
 PORTA_SF = 9002
 TINYOS_JAR = "/opt/tinyos-2.1.2/support/sdk/java/tinyos.jar"
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from vmtest import deploy, link, messages  # noqa: E402  (a carga do terractl, a mesma dos testes do TOSSIM)
 fw, pasta = os.path.abspath(sys.argv[1]), os.path.abspath(sys.argv[2])
 nome = os.path.basename(pasta)
 fonte = open(os.path.join(pasta, "test_%s.py" % nome)).read()
@@ -70,25 +71,6 @@ def com_id(exe, no):
 exes = [com_id(glob.glob(os.path.join(fw, "terra-*-%s-micaz-bs.exe" % VM))[0], 1)]
 nobs = glob.glob(os.path.join(fw, "terra-*-%s-micaz-nobs.exe" % VM))[0]
 exes += [com_id(nobs, n) for n in MOTES]
-
-
-def deploy(vmx, version_id=1):
-    """Os pacotes do TerraControl para um .vmx: (AM, payload). Igual aos testes do TOSSIM."""
-    with open(vmx) as f:
-        cab = [int(x) for x in f.readline().split()]
-        mem = {}
-        for linha in f:
-            try:
-                mem[int(linha[5:10])] = int(linha[0:2], 16)
-            except ValueError:
-                pass
-    start = cab[0] // BLOCK_SIZE
-    nblocos = max(mem) // BLOCK_SIZE + 1 - start
-    pacotes = [(0xA0, struct.pack('>12H', version_id, nblocos, start, *cab[:9]))]
-    for b in range(start, start + nblocos):
-        dados = bytes(mem.get(b * BLOCK_SIZE + j, 0) for j in range(BLOCK_SIZE))
-        pacotes.append((0xA1, struct.pack('>HH24s', version_id, b, dados)))
-    return pacotes
 
 
 cmd = ["java", "-jar", "/opt/avrora.jar", "-simulation=sensor-network", "-platform=micaz",
@@ -160,8 +142,9 @@ def le_sf():
             # Pedido de bloco de um mote (reqProgBlock: reqOper, versionId, blockId), que a BS
             # passa para a serial. O TerraControl responde com o bloco (ou com a versão, se o
             # versionId é 0); aqui também (ControlCore.messageReceived).
-            if len(p) >= 13 and p[0] == 0 and p[7] == 0xA2:
-                pedidos.append(struct.unpack(">BHH", p[8:13]))
+            am = link.parse_am(p)
+            if am and am[0] == messages.AM_REQPROGBLOCK and len(am[3]) >= 5:
+                pedidos.append(messages.parse_req_prog_block(am[3]))
 
 
 threading.Thread(target=le_sf, daemon=True).start()
@@ -172,7 +155,7 @@ trava = threading.Lock()
 
 def envia(am, payload):
     """Pacote AM da serial (despacho 0, destino 1, origem 0, tamanho, grupo 0x22, tipo)."""
-    pac = bytes([0]) + struct.pack(">HHBBB", 1, 0, len(payload), 0x22, am) + payload
+    pac = link.am_packet(am, payload)
     with trava:
         s.sendall(bytes([len(pac)]) + pac)
 

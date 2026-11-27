@@ -16,7 +16,6 @@ import struct
 import sys
 
 SEGUNDOS = 25
-BLOCK_SIZE = 24
 PORTA_SF = 9002
 AQUI = os.path.dirname(os.path.abspath(__file__))
 # O 0 do VM.reset e o 1 depois do SEND_DONE, nos três motes.
@@ -25,28 +24,9 @@ ESPERADO = {11: [0, 1], 12: [0, 1], 13: [0, 1]}
 SERIAL_USR = (145, 5, [0, 11, 12, 13])
 
 sys.path.insert(0, sys.argv[1])
+sys.path.insert(0, os.path.dirname(AQUI))
+from vmtest import deploy, messages  # noqa: E402
 from TOSSIM import SerialForwarder, Tossim  # noqa: E402
-
-def deploy(vmx, version_id=1):
-    """Os pacotes do TerraControl para um .vmx: (AM, payload)."""
-    with open(vmx) as f:
-        cab = [int(x) for x in f.readline().split()]
-        mem = {}
-        for linha in f:
-            try:
-                mem[int(linha[5:10])] = int(linha[0:2], 16)
-            except ValueError:
-                pass
-    start = cab[0] // BLOCK_SIZE
-    nblocos = max(mem) // BLOCK_SIZE + 1 - start
-    # newProgVersion: versionId, blockLen, blockStart, startProg, endProg, nTracks, wClocks,
-    # asyncs, wClock0, gate0, inEvts, async0 (big-endian, 12 x uint16)
-    pacotes = [(0xA0, struct.pack('>12H', version_id, nblocos, start, *cab[:9]))]
-    for b in range(start, start + nblocos):
-        dados = bytes(mem.get(b * BLOCK_SIZE + j, 0) for j in range(BLOCK_SIZE))
-        pacotes.append((0xA1, struct.pack('>HH24s', version_id, b, dados)))
-    return pacotes
-
 
 t = Tossim([])
 t.randomSeed(1)
@@ -116,8 +96,8 @@ def serial():
         buf = buf[2:]
     while buf and len(buf) > buf[0]:
         pac, buf = buf[1:1 + buf[0]], buf[1 + buf[0]:]
-        if len(pac) >= 13 and pac[0] == 0 and pac[7] == 0xA2:
-            oper, versao, bloco = struct.unpack(">BHH", pac[8:13])
+        if len(pac) >= 13 and pac[0] == 0 and pac[7] == messages.AM_REQPROGBLOCK:
+            oper, versao, bloco = messages.parse_req_prog_block(pac[8:13])
             if versao == 0:
                 entrega(*pacotes[0], t.time() + int(0.01 * tps))
             elif bloco in blocos:

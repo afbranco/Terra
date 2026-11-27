@@ -17,7 +17,6 @@ import struct
 import sys
 
 SEGUNDOS = 45
-BLOCK_SIZE = 24
 PORTA_SF = 9002
 AQUI = os.path.dirname(os.path.abspath(__file__))
 # Este teste é do Grp: o release/build-tinyos.sh o roda com o _TOSSIM.so e o firmware do Grp.
@@ -31,28 +30,9 @@ SERIAL_ESPERADO = (150, 11, bytes([90, 165]))
 SERIAL_EXTRA = [(0xA0, "0001000300010026004e0001000100000000000800010008", 13)]
 
 sys.path.insert(0, sys.argv[1])
+sys.path.insert(0, os.path.dirname(AQUI))
+from vmtest import deploy, messages  # noqa: E402
 from TOSSIM import SerialForwarder, Tossim  # noqa: E402
-
-def deploy(vmx, version_id=1):
-    """Os pacotes do TerraControl para um .vmx: (AM, payload)."""
-    with open(vmx) as f:
-        cab = [int(x) for x in f.readline().split()]
-        mem = {}
-        for linha in f:
-            try:
-                mem[int(linha[5:10])] = int(linha[0:2], 16)
-            except ValueError:
-                pass
-    start = cab[0] // BLOCK_SIZE
-    nblocos = max(mem) // BLOCK_SIZE + 1 - start
-    # newProgVersion: versionId, blockLen, blockStart, startProg, endProg, nTracks, wClocks,
-    # asyncs, wClock0, gate0, inEvts, async0 (big-endian, 12 x uint16)
-    pacotes = [(0xA0, struct.pack('>12H', version_id, nblocos, start, *cab[:9]))]
-    for b in range(start, start + nblocos):
-        dados = bytes(mem.get(b * BLOCK_SIZE + j, 0) for j in range(BLOCK_SIZE))
-        pacotes.append((0xA1, struct.pack('>HH24s', version_id, b, dados)))
-    return pacotes
-
 
 t = Tossim([])
 t.randomSeed(1)
@@ -129,8 +109,8 @@ def serial():
         if (len(pac) >= 10 and pac[0] == 0 and pac[7] == am
                 and struct.unpack(">H", pac[8:10])[0] == sender and dados in pac[8:]):
             mensagem = True
-        if len(pac) >= 13 and pac[0] == 0 and pac[7] == 0xA2:
-            oper, versao, bloco = struct.unpack(">BHH", pac[8:13])
+        if len(pac) >= 13 and pac[0] == 0 and pac[7] == messages.AM_REQPROGBLOCK:
+            oper, versao, bloco = messages.parse_req_prog_block(pac[8:13])
             if versao == 0:
                 entrega(*pacotes[0], t.time() + int(0.01 * tps))
             elif bloco in blocos:
