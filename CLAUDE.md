@@ -379,6 +379,13 @@ de lá.
     preso à versão do Python: o `.so` do 3.14 dá segfault no 3.12), e um `tar.gz` com o mesmo
     conteúdo para usar fora do VSCode. O suporte só configura a USB. PR #146 (#145): o `pyserial`
     vai dentro do `.pyz` (sdist 3.5, por causa da licença); teste `python3 -S test-terractl.py --pyz`.
+    PR #149 (#148): anexo `terrac-<v>-linux-x86_64`, executável estático (Lua 5.1.5, lpeg 1.0.2 e
+    mcpp 2.7.2 com os patches da Debian 5.3; `terrac --cpp` é o mcpp). No corpus, os 506 `.vmx`
+    iguais; mudam o texto do E1004, string sem fechar (E1004), `#if` sem `#endif` e colunas em linha
+    com macro (o mcpp põe espaços na expansão). O executável tira `LANG`/`LC_*` e `C_INCLUDE_PATH`
+    antes do mcpp (avisava "Unknown encoding"). Testes: `TERRAC_EXE=… build-terrac.sh`
+    (`json.mcpp.esperado`) e `release/test-terrac-exe.sh` (Fedora 43 sem Lua nem cpp). O TerraSim
+    segue com o script e o `cpp`.
   - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
     `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
