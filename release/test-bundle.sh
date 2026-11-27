@@ -13,6 +13,8 @@ W=$(mktemp -d)
 mkdir "$W/p"
 cp "$ROOT/terrac/samples/Count2Leds.terra" "$ROOT/tests/terractl/terractl.terra" \
    "$ROOT/tests/terractlgrp/terractlgrp.terra" "$W/p/"
+# (os logs da simulação vão para o /tmp do contêiner: com o docker, o que ele cria na pasta montada
+# é do root e o rm -rf do fim não apagaria)
 cat > "$W/roda.sh" <<'EOS'
 set -u
 for p in python3 python lua lua5.1 cpp gcc; do command -v $p > /dev/null && echo "fedora: $p instalado"; done
@@ -22,8 +24,8 @@ cd /w/p
 echo "== versão"; terractl --version
 echo "== compila"; terrac Count2Leds.terra | tail -1
 terrac terractl.terra > /dev/null; terrac terractlgrp.terra > /dev/null
-echo "== net"; terractl sim terractl.vmx --terra terractl.terra --grid 2x2 --time 15 2>&1 | grep -c "BS: node 11  leitura"
-echo "== grp"; terractl sim terractlgrp.vmx --vm grp --terra terractlgrp.terra --grid 2x2 --time 15 2>&1 | grep -c "dado"
+echo "== net"; terractl sim terractl.vmx --terra terractl.terra --grid 2x2 --time 15 --logdir /tmp/sim1 2>&1 | grep -c "BS: node 11  leitura"
+echo "== grp"; terractl sim terractlgrp.vmx --vm grp --terra terractlgrp.terra --grid 2x2 --time 15 --logdir /tmp/sim2 2>&1 | grep -c "dado"
 echo "== flash"; terractl flash net-nobs --node 5 -o no5.ihex
 EOS
 cp "$TGZ" "$W/pacote.tar.gz"
@@ -33,7 +35,7 @@ fail=0
 confere() { awk -v s="== $1" '$0 == s {p=1; next} /^== / {p=0} p' "$W/log" | grep -Eq "$2" ||
     { echo "test-bundle: $1 falhou"; fail=1; }; }
 grep -q instalado "$W/log" && { echo "test-bundle: a imagem tem o que não devia"; fail=1; }
-confere versão '^terractl [0-9]'
+confere versão '^terractl [0-9a-z]'
 confere compila 'Success'
 diff -b -q "$ROOT/terrac/samples/Count2Leds.vmx" "$W/p/Count2Leds.vmx" > /dev/null ||
     { echo "test-bundle: Count2Leds.vmx diferente do commitado"; fail=1; }
