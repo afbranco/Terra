@@ -2,6 +2,7 @@
  * gerado pelo pak.lua) dentro. Não precisa de nada instalado na máquina.
  *   terrac [opções] prog.terra   compila (o terrac de sempre)
  *   terrac --cpp [opções] ...     o pré-processador (mcpp); é o que o terrac chama para o #include
+ *   terrac --licenses             as licenças do Lua, do lpeg e do mcpp, que vão dentro
  * Montado pelo release/build-terrac-exe.sh. */
 #include <limits.h>
 #include <stdlib.h>
@@ -13,7 +14,7 @@
 #include "lua.h"
 #include "lualib.h"
 
-#include "terrac_lua.h" /* terrac_lua[], terrac_lua_len: gerado pelo build */
+#include "terrac_lua.h" /* terrac_lua[] e notices_txt[] (as licenças), gerados pelo build */
 
 int luaopen_lpeg(lua_State *L);
 int mcpp_lib_main(int argc, char **argv);
@@ -28,6 +29,10 @@ static int traceback(lua_State *L) {
 }
 
 int main(int argc, char **argv) {
+    if (argc > 1 && strcmp(argv[1], "--licenses") == 0) {
+        fwrite(notices_txt, 1, notices_txt_len, stdout);
+        return 0;
+    }
     if (argc > 1 && strcmp(argv[1], "--cpp") == 0) {
         /* o mcpp lê a codificação do LC_ALL/LC_CTYPE/LANG (e não conhece "C.UTF-8" nem
          * "pt_BR.UTF-8": avisa em todo programa) e pastas de include do C_INCLUDE_PATH: sem elas,

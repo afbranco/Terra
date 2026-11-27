@@ -17,6 +17,7 @@ _OPTS = {
     wweak     = false,
     types     = false,
     includePath="",
+    includeDirs={},     -- as pastas do -I, para o mcpp (com aspas no comando)
 
 }
 
@@ -52,6 +53,7 @@ do
 --print("terrac::param:",params[i])
     if p:sub(1,2) == '-I' then
         _OPTS.includePath = _OPTS.includePath .. " ".. p
+        _OPTS.includeDirs[#_OPTS.includeDirs+1] = string.sub(p, 3)
 
     elseif p == '-' then
         _OPTS.input = '-'
@@ -153,8 +155,11 @@ do
     local cpp_err = (_DIAG.json or MCPP) and os.tmpname()
     local cmd
     if MCPP then
-        cmd = "'"..string.gsub(_TERRAC_EXE, "'", "'\\''").."' --cpp -C -N -I-".._OPTS.includePath..
-              ' '.._OPTS.input..' '..cpp_file
+        -- tudo entre aspas: a pasta do pacote, a do programa ou a do -I podem ter espaço
+        local function q (x) return "'"..string.gsub(x, "'", "'\\''").."'" end
+        cmd = q(_TERRAC_EXE)..' --cpp -C -N -I-'
+        for _, d in ipairs(_OPTS.includeDirs) do cmd = cmd..' '..q('-I'..d) end
+        cmd = cmd..' '..q(_OPTS.input)..' '..cpp_file
     else
         cmd = 'cpp -C '.._OPTS.input..' ' ..cpp_file .. _OPTS.includePath
     end

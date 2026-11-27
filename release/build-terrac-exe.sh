@@ -33,18 +33,33 @@ gcc "${CF[@]}" -DLUA_USE_POSIX -o luahost $L/lua.c o/lua_*.o -lm      # para rod
 for c in lpeg-1.0.2/lp*.c; do gcc "${CF[@]}" -I$L -c "$c" -o "o/lpeg_$(basename "$c" .c).o"; done
 for c in main directive eval expand mbchar preproc support system; do
     gcc "${CF[@]}" -DHAVE_CONFIG_H -DMCPP_LIB=1 -Imcpp-2.7.2/src -Imcpp-2.7.2 -c mcpp-2.7.2/src/$c.c -o o/mcpp_$c.o; done
-# o terrac empacotado (pak.lua) como um vetor C
+# as licenças (terrac --licenses): o executável leva código do Lua e do lpeg (MIT) e do mcpp (BSD)
+{
+    echo "terrac: GPL-3.0-or-later (https://github.com/afbranco/Terra). This executable also contains:"
+    echo; echo "== Lua 5.1.5 (https://www.lua.org)"; cat lua-5.1.5/COPYRIGHT
+    echo; echo "== LPeg 1.0.2 (https://www.inf.puc-rio.br/~roberto/lpeg/)"
+    sed -n '/<a name="license">/,/id="content"/p' lpeg-1.0.2/lpeg.html | sed '1d;$d' |
+        sed -e 's/<[^>]*>//g' -e 's/&copy;/(c)/g' -e '/^[[:space:]]*$/d'
+    echo; echo "== mcpp 2.7.2 (https://mcpp.sourceforge.net), with the patches of Debian 2.7.2-5.3"
+    cat mcpp-2.7.2/LICENSE
+} > notices.txt
+# o terrac empacotado (pak.lua) e as licenças como vetores C
 cp -a "$ROOT/terrac" t && (cd t && LUA_PATH="$W/lpeg-1.0.2/?.lua;;" ../luahost pak.lua)
 ./luahost -e '
-local s = assert(io.open("t/terrac", "rb")):read("*a")
-local o = assert(io.open("terrac_lua.h", "w"))
-o:write("unsigned char terrac_lua[] = {\n")
-for i = 1, #s, 20 do
-  local t = {}
-  for j = i, math.min(i + 19, #s) do t[#t + 1] = string.byte(s, j) end
-  o:write(table.concat(t, ","), ",\n")
+local function vetor (arq, nome, o)
+  local s = assert(io.open(arq, "rb")):read("*a")
+  o:write("unsigned char ", nome, "[] = {\n")
+  for i = 1, #s, 20 do
+    local t = {}
+    for j = i, math.min(i + 19, #s) do t[#t + 1] = string.byte(s, j) end
+    o:write(table.concat(t, ","), ",\n")
+  end
+  o:write("0};\nunsigned int ", nome, "_len = ", #s, ";\n")
 end
-o:write("};\nunsigned int terrac_lua_len = ", #s, ";\n")'
+local o = assert(io.open("terrac_lua.h", "w"))
+vetor("t/terrac", "terrac_lua", o)
+vetor("notices.txt", "notices_txt", o)
+o:close()'
 gcc "${CF[@]}" -static -s -I$L -I. -o "$OUT" "$ROOT/terrac/exe/main.c" o/*.o -lm -Wl,--build-id=none
 rm -rf "$W"
 echo "build-terrac-exe: $OUT ($(stat -c %s "$OUT") bytes)"
