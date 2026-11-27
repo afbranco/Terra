@@ -235,9 +235,9 @@ def main(argv=None):
     s.add_argument("--vmdbg", metavar="FILE", help="write the VMDBG channel (every instruction of the VM) to this file")
     s.add_argument("--channel", action="append", default=[], metavar="CHANNEL",
                    help="also show this TOSSIM dbg channel (AM, Serial...); can repeat")
-    s.add_argument("--hide", default="serial", metavar="CMD,...",
+    s.add_argument("--hide", default="serial,radio", metavar="CMD,...",
                    help="TVIEW commands not shown (default: serial, since the messages to the BS are "
-                        "shown decoded; empty shows all)")
+                        "shown decoded, and radio, one line per packet; empty shows all)")
     s.add_argument("--logdir", default=".terractl-sim", help="folder of the channel files (.terractl-sim)")
     s.add_argument("--terra", metavar="PROG.terra", help="decode the messages to the BS by the pktypes (terrac --types)")
     s.add_argument("--types", metavar="FILE.json", help="the output of terrac --types, instead of --terra")

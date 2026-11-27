@@ -3,6 +3,9 @@ docs:
 - menu: Home
   url: index.html
 
+- menu: Getting started
+  url: getting-started.html
+
 - menu: Programming
   submenu:
 

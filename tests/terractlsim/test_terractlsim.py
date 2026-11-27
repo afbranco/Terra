@@ -42,7 +42,8 @@ msgs = [l.split("leitura  ", 1)[1] for l in linhas if "BS: node 11  leitura  " i
 leds = [int(m.group(1)) for m in (re.search(r"<<: leds 11 3 (\d+) :>>", l) for l in linhas) if m]
 tardios_ok = all(inicio.get(n, 0) > 8 for n in (31, 32, 33))
 ok = (rc == 0 and sorted(inicio) == MOTES and tardios_ok and msgs == [CAMPOS % i for i in range(3)]
-      and leds == [0, 1, 2, 3] and saida == saida2 and "serial" not in saida)
+      and leds == [0, 1, 2, 3] and saida == saida2 and "serial" not in saida
+      and "<<: radio" not in saida)      # o rádio também fica escondido por padrão (#95, tutorial)
 print("test_terractlsim: vmstart em %s (31-33 depois de 8 s: %s); %d mensagens decodificadas; LEDs do 11: "
       "%s; mesma saída com a mesma semente: %s: %s"
       % (sorted(inicio), tardios_ok, len(msgs), leds, saida == saida2, "OK" if ok else "FALHOU"))
