@@ -5,7 +5,8 @@ Carrega o await0.vmx (laço com `await (z)ms`, z = 0, que troca o LED0 a cada 10
 pela estação base (nó 1), como o TerraControl faz: a versão (AM 0xA0) e os blocos (AM 0xA1)
 entram como pacote serial no nó 1. Depois simula até SEGUNDOS, com um teto de eventos.
 
-Passa se o relógio chega a SEGUNDOS e o nó 11 trocou o LED (o programa rodou). Com o bug, o timer
+Passa se o relógio chega a SEGUNDOS e o nó 11 trocou o LED (o programa rodou: a linha de LED do
+VM.reset, na carga, não conta). Com o bug, o timer
 de 0 ms é reagendado no mesmo instante para sempre: o teto de eventos estoura com o relógio
 parado.
 
@@ -57,7 +58,8 @@ while t.time() < fim and eventos < TETO_DE_EVENTOS:
 log.close()
 
 leds = sum(1 for linha in open("tview.txt") if "<<: leds 11 " in linha)
-ok = t.time() >= fim and leds > 0
+# a primeira linha é a do VM.reset na carga: o programa rodou se houve mais alguma (#164)
+ok = t.time() >= fim and leds > 1
 print("test_wclock: %d eventos, t=%.3f s, LED do nó 11 trocado %d vezes: %s"
       % (eventos, t.time() / tps, leds, "OK" if ok else "FALHOU"))
 sys.exit(0 if ok else 1)
