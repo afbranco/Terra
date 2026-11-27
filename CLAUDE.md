@@ -371,7 +371,8 @@ de lá.
   - lpeg (decisão do Prof., 2026-11-26: manter o novo): PR #141, o anexo do `terrac` sai do job do lpeg
     1.x (conteúdo igual ao do 0.10.2). O 0.10.2 fica no CI só como teste, porque o TerraSim o compila
     da fonte (`container/Dockerfile.server`); avisado para trocar pelo `lua-lpeg`. Depois, #142 tira
-    o job.
+    o job. **Feito** (PR #147, 2026-11-27): o TerraSim pôs o `lua-lpeg` 1.0.2 em produção e o job
+    `terrac` ficou só com o lpeg da distribuição.
   - Instalação sem admin (#95; decisões do Prof., 2026-11-27): no lab não pode contêiner nem admin
     (Fedora em dual boot); só Linux por agora. Uma extensão `linux-x64` com tudo dentro (`terrac`
     executável com pré-processador embutido, `terractl`, um Python próprio para o simulador, que é
