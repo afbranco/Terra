@@ -19,7 +19,8 @@ workflow e no `BUILDINFO` de cada release.
 | `terrac-<v>.tar.gz` | Compilador `terrac`, `TerraNet.defs` e `TerraGrp.defs` (os do simulador) e `terra.lang` |
 | `terrac-errors-<v>.json` | Catálogo dos códigos de erro e aviso do `terrac` (o mesmo de `terrac --catalog`) |
 | `terra-docs-<v>.json` | Os símbolos dos `.defs` (eventos, funções, constantes, macros, registros) com descrição, para editores e documentação (ver abaixo) |
-| `terra-vscode-<v>.vsix` | Extensão do VSCode: destaque, hover pelo `terra-docs`, erros do `terrac`, comandos do `terractl` |
+| `terra-vscode-<v>-linux-x64.vsix` | Extensão do VSCode para Linux, com o pacote `terra-<v>-linux-x86_64` dentro (#95) |
+| `terra-vscode-<v>.vsix` | Extensão do VSCode (outros sistemas): destaque, hover pelo `terra-docs`, erros do `terrac`, comandos do `terractl` |
 | `terractl-<v>.pyz` | `terractl`: carga de programas, mensagens da BS e gravação com ID (Python 3) |
 | `TerraVMControl-<v>.jar` | TerraControl, com todas as bibliotecas dentro |
 | `BUILDINFO`, `SHA256SUMS`, `logs.tar.gz` | Commit, imagem e logs de compilação e de teste |
@@ -228,7 +229,12 @@ Os links em `bin/` funcionam de qualquer lugar (`readlink -f`), também num link
 ## Extensão do VSCode
 
 `code --install-extension terra-vscode-<v>.vsix` (ou "Install from VSIX..." no VSCode). Leva dentro
-o `terractl` e o `terra-docs.json` da mesma release (#93). Fonte em `vscode/` (TypeScript):
+o `terractl` e o `terra-docs.json` da mesma release (#93). A `terra-vscode-<v>-linux-x64.vsix` leva
+também o pacote `terra-<v>-linux-x86_64.tar.gz` em `bundle/` (#95): na ativação, o `src/bundle.ts`
+o descompacta no `globalStorage` da extensão (uma pasta por versão, as antigas apagadas; o `tar`
+guarda as permissões, o `.vsix` não), e o `terrac`, o `terractl` (com o Python do pacote), o
+simulador (`sim --vm` pela variante do `#include`, sem contêiner) e o firmware (`flash net-bs`...)
+passam a ser os do pacote. Uma configuração explícita vale por cima. Fonte em `vscode/` (TypeScript):
 
 - `syntaxes/terra.tmLanguage.json` (gramática), `snippets/terra.json`, `language-configuration.json`;
 - `src/diag.ts`: leitura do `--diag=json` (faixa pelo `col`/`col_end`, link do código no site);
@@ -240,7 +246,8 @@ o `terractl` e o `terra-docs.json` da mesma release (#93). Fonte em `vscode/` (T
 Testes (`release/build-vscode.sh`): `node --test` (diag, docs sobre o `terra-docs` da release,
 gramática com o `vscode-textmate`, `package.json` x código) e, com `xvfb-run` (no CI), a integração
 num VSCode 1.85.2 de verdade (idioma, Problems com um `terrac` falso, hover, complemento sem os
-símbolos da outra VM). Sem `xvfb-run` localmente, a integração é pulada. Marketplace e Open VSX
+símbolos da outra VM) e, de novo, com o pacote e o `terrac` de verdade de dentro dele. Sem
+`xvfb-run` localmente, a integração é pulada. Marketplace e Open VSX
 ficam para depois (conta de publicador do Prof.).
 
 ## TerraControl

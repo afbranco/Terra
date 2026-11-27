@@ -14,14 +14,23 @@ based on Céu. This extension:
   with `terractl` (serial port or SerialForwarder), then shows the messages that reach it, field by
   field by the `pktype` of the program;
 - **Terra: Show messages of the base station**;
-- **Terra: Simulate**: a grid of nodes in TOSSIM with the program, in a terminal (by default in the
-  `tinyos-toolchain` container image: the simulator module is for Python 3.14);
+- **Terra: Simulate**: a grid of nodes in TOSSIM with the program, in a terminal;
 - **Terra: Flash a micaz**: a firmware of the release with a node id, through `avrdude`.
 
-`terractl` comes inside the extension and needs only Python 3 (`pyserial` comes inside). The
-compiler (`terrac-<v>.tar.gz` of the release) needs Lua 5.1 and lpeg; set `terra.terracPath` if it
-is not in the PATH. The simulator needs the `terra-<v>-{net,grp}-tossim-py3-x86_64.tar.gz` of the
+**On Linux (x86_64)**, install `terra-vscode-<v>-linux-x64.vsix`: it brings everything inside (the
+compiler, `terractl` with its own Python, the TerraNet and TerraGrp simulators and the micaz
+firmware), unpacked on the first use into the extension's own folder. Nothing is installed on the
+machine and no administrator is needed; the Python, Lua and compilers of the machine are not used
+nor touched. Only the USB access of the MIB520 (serial port and `avrdude`) may need the
+administrator once (the `dialout` group or a udev rule).
+
+On other systems, `terra-vscode-<v>.vsix` has the editor features and `terractl` (it needs Python
+3); set `terra.terracPath` to a `terrac`, and simulate in the `tinyos-toolchain` container image
+(`terra.simulation.containerImage`) with the `terra-<v>-{net,grp}-tossim-py3-x86_64.tar.gz` of the
 release, extracted (asked on the first run).
+
+Any setting given explicitly (`terra.terracPath`, `terra.terractlPath`, the simulator folders)
+takes the place of what comes inside the extension.
 
 License: GPL v3 or later. Source: [afbranco/Terra](https://github.com/afbranco/Terra), folder
 `vscode/`.
