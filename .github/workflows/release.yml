@@ -65,6 +65,12 @@ jobs:
           sudo apt-get install -y -qq lua5.1 lua-lpeg
       - name: Build e testes
         run: release/build-terrac.sh "$VER" dist
+      - name: terrac executável (Lua, lpeg e mcpp dentro, #95)
+        run: |
+          release/build-terrac-exe.sh "dist/terrac-$VER-linux-x86_64"
+          # os mesmos testes, com o executável (a saída do build vai fora do dist)
+          TERRAC_EXE="dist/terrac-$VER-linux-x86_64" release/build-terrac.sh "$VER" "$RUNNER_TEMP/exe"
+          release/test-terrac-exe.sh "dist/terrac-$VER-linux-x86_64" docker
       - uses: actions/upload-artifact@v4
         with:
           name: terrac

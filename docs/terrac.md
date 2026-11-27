@@ -11,7 +11,21 @@ Lua and comes in the release asset `terrac-<version>.tar.gz`, with the `.defs` o
 
 ## Installing and running
 
-It needs Lua 5.1, LPeg 1.x and the C preprocessor. On Ubuntu or Debian:
+On Linux (x86_64), the release asset `terrac-<version>-linux-x86_64` is a single executable with
+Lua, LPeg and a C preprocessor (mcpp) inside: nothing to install, no administrator needed. It runs
+on any distribution (tested on Ubuntu 24.04 and Fedora 43):
+
+```bash
+chmod +x terrac-<version>-linux-x86_64
+./terrac-<version>-linux-x86_64 myProgram.terra   # writes myProgram.vmx next to the source
+```
+
+The `.vmx` is the same as with the Lua script below. The messages of the preprocessor (code E1004)
+are worded differently, and on a line with a macro the column of an error can be one or two
+characters off.
+
+The Lua script, in `terrac-<version>.tar.gz`, needs Lua 5.1, LPeg 1.x and the C preprocessor. On
+Ubuntu or Debian:
 
 ```bash
 sudo apt-get install lua5.1 lua-lpeg cpp

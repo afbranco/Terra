@@ -1,7 +1,9 @@
 #!/bin/bash
 # Empacota o terrac num script Lua único (terrac/pak.lua) e testa compilando os exemplos de
-# terrac/samples contra os .vmx commitados. Precisa de lua5.1, do lpeg (0.10 ou 1.x) e do cpp.
+# terrac/samples contra os .vmx commitados. Precisa de lua5.1, do lpeg 1.x e do cpp.
 #   release/build-terrac.sh <versão> <pasta de saída>
+# Com TERRAC_EXE=<executável> (release/build-terrac-exe.sh, #95), os mesmos testes rodam com ele, que
+# usa o mcpp de dentro: as mensagens do pré-processador são as do mcpp (json.mcpp.esperado).
 set -euo pipefail
 VER=${1:?versão}
 OUT=$(mkdir -p "${2:?pasta de saída}" && cd "$2" && pwd)
@@ -18,6 +20,12 @@ lua5.1 -e 'print("terrac: lpeg " .. require("lpeg").version())' | tee -a "$LOG"
 D="$W/terrac-$VER"
 mkdir -p "$D"
 install -m 755 "$W/terrac.out" "$D/terrac"
+if [ -n "${TERRAC_EXE:-}" ]; then
+    TC=("$(realpath "$TERRAC_EXE")"); JSON_ESPERADO=json.mcpp.esperado
+    echo "terrac: testes com o executável $TERRAC_EXE" | tee -a "$LOG"
+else
+    TC=(lua5.1 "$D/terrac"); JSON_ESPERADO=json.esperado
+fi
 cp "$ROOT/terrac/terra.lang" "$ROOT/terrac/samples/TerraNet.defs" "$ROOT/terrac/samples/TerraGrp.defs" "$D/"
 
 # Teste: cada exemplo com .vmx commitado deve compilar para o mesmo .vmx.
@@ -30,7 +38,7 @@ for vmx in "$ROOT"/terrac/samples/*.vmx "$ROOT"/tests/*/*.vmx; do
     [ -e "$vmx" ] || continue
     name=$(basename "$vmx" .vmx)
     echo "== terrac $name.terra" >> "$LOG"
-    (cd "$W/t" && rm -f "$name.vmx" && lua5.1 "$D/terrac" "$name.terra") >> "$LOG" 2>&1 || true
+    (cd "$W/t" && rm -f "$name.vmx" && "${TC[@]}" "$name.terra") >> "$LOG" 2>&1 || true
     if [ -f "$W/t/$name.vmx" ] && cmp -s "$vmx" "$W/t/$name.vmx"; then
         echo "terrac: $name.vmx idêntico" | tee -a "$LOG"
     elif [ -f "$W/t/$name.vmx" ] && diff -b -q "$vmx" "$W/t/$name.vmx" > /dev/null; then
@@ -47,7 +55,7 @@ done
 while IFS= read -r esperado; do
     case "$esperado" in ''|'#'*) continue;; esac
     name=${esperado%%: *}
-    obtido="$name: $(cd "$W/t" && lua5.1 "$D/terrac" "$name.terra" 2>&1 | head -1 |
+    obtido="$name: $(cd "$W/t" && "${TC[@]}" "$name.terra" 2>&1 | head -1 |
         sed -E 's/^ERR : //; s/[[:space:]]+$//' || true)"
     if [ "$obtido" = "$esperado" ]; then
         echo "terrac: $name: mensagem esperada" | tee -a "$LOG"
@@ -69,8 +77,8 @@ cp "$ROOT"/terrac/samples/*.defs "$ROOT"/tests/terrac/*.terra "$ROOT"/tests/terr
 : > "$W/json.obtido"
 for f in "$ROOT"/tests/terrac/*.terra "$ROOT"/tests/terrac/diag/*.terra; do
     name=$(basename "$f" .terra)
-    (cd "$W/d" && lua5.1 "$D/terrac" "$name.terra" > /dev/null 2> "$name.txt" || true)
-    (cd "$W/d" && lua5.1 "$D/terrac" --diag=json "$name.terra" > /dev/null 2> "$name.json" || true)
+    (cd "$W/d" && "${TC[@]}" "$name.terra" > /dev/null 2> "$name.txt" || true)
+    (cd "$W/d" && "${TC[@]}" --diag=json "$name.terra" > /dev/null 2> "$name.json" || true)
     { echo "== $name"; cat "$W/d/$name.json"; } >> "$W/json.obtido"
     if ! lua5.1 "$ROOT/tests/terrac/consistencia.lua" "$W/d/$name.txt" "$W/d/$name.json" 2>&1 | tee -a "$LOG"; then
         fail=1
@@ -79,14 +87,14 @@ for f in "$ROOT"/tests/terrac/*.terra "$ROOT"/tests/terrac/diag/*.terra; do
         echo "terrac: $name: JSON inválido" | tee -a "$LOG"; fail=1
     fi
 done
-if diff -u "$ROOT/tests/terrac/diag/json.esperado" "$W/json.obtido" | tee -a "$LOG"; then
+if diff -u "$ROOT/tests/terrac/diag/$JSON_ESPERADO" "$W/json.obtido" | tee -a "$LOG"; then
     echo "terrac: --diag=json: saída esperada" | tee -a "$LOG"
 else
     echo "terrac: --diag=json: saída DIFERENTE" | tee -a "$LOG"; fail=1
 fi
 mkdir -p "$W/e" && cp "$ROOT/terrac/samples/TerraNet.defs" "$ROOT/terrac/samples/Count2Leds.terra" "$W/e/"
 mkdir "$W/e/Count2Leds.vmx"     # o .vmx não pode ser gravado: o assert do terrac falha
-rc=0; (cd "$W/e" && lua5.1 "$D/terrac" --diag=json Count2Leds.terra > /dev/null 2> err) || rc=$?
+rc=0; (cd "$W/e" && "${TC[@]}" --diag=json Count2Leds.terra > /dev/null 2> err) || rc=$?
 if [ $rc = 1 ] && grep -q '^{"code":"E0001"' "$W/e/err" && tail -1 "$W/e/err" | grep -q '^{"summary":{"ok":false'; then
     echo "terrac: falha interna: E0001" | tee -a "$LOG"
 else
@@ -94,7 +102,7 @@ else
 fi
 # terrac --types (#92): o layout dos campos, para o terractl decodificar as mensagens; sem .vmx.
 mkdir -p "$W/ty" && cp "$ROOT/terrac/samples/TerraNet.defs" "$ROOT/tests/terrac/types/tipos.terra" "$W/ty/"
-if (cd "$W/ty" && lua5.1 "$D/terrac" --types tipos.terra > tipos.obtido) &&
+if (cd "$W/ty" && "${TC[@]}" --types tipos.terra > tipos.obtido) &&
    [ ! -e "$W/ty/tipos.vmx" ] && diff -u "$ROOT/tests/terrac/types/tipos.esperado" "$W/ty/tipos.obtido" | tee -a "$LOG"; then
     echo "terrac: --types: saída esperada" | tee -a "$LOG"
 else
@@ -104,14 +112,14 @@ fi
 for e in "$ROOT"/tests/*/*.types.json; do
     n=$(basename "$e" .types.json); d=$(dirname "$e")
     rm -rf "$W/tj" && mkdir -p "$W/tj" && cp "$ROOT"/terrac/samples/*.defs "$d/$n.terra" "$W/tj/"
-    if (cd "$W/tj" && lua5.1 "$D/terrac" --types "$n.terra") | cmp -s - "$e"; then
+    if (cd "$W/tj" && "${TC[@]}" --types "$n.terra") | cmp -s - "$e"; then
         echo "terrac: $n.types.json igual ao --types" | tee -a "$LOG"
     else
         echo "terrac: $n.types.json DIFERENTE do --types" | tee -a "$LOG"; fail=1
     fi
 done
 # O catálogo vai na release como anexo (com o sha256 no SHA256SUMS).
-lua5.1 "$D/terrac" --catalog > "$OUT/terrac-errors-$VER.json"
+"${TC[@]}" --catalog > "$OUT/terrac-errors-$VER.json"
 if command -v python3 > /dev/null && ! python3 -m json.tool "$OUT/terrac-errors-$VER.json" > /dev/null; then
     echo "terrac: catálogo JSON inválido" | tee -a "$LOG"; fail=1
 fi
@@ -127,7 +135,7 @@ elif [ -n "${CI:-}" ]; then
 else
     echo "terrac: sem python3, docs/_includes/generated/codes.md não conferido" | tee -a "$LOG"
 fi
-if lua5.1 "$ROOT/docs/_tools/checkexamples.lua" "$D/terrac" "$ROOT/terrac/samples" \
+if lua5.1 "$ROOT/docs/_tools/checkexamples.lua" "${TC[*]}" "$ROOT/terrac/samples" \
         "$ROOT"/docs/*.md "$ROOT"/docs/_includes/generated/*.md 2>&1 | tee -a "$LOG" | tail -1 | grep -q ': OK$'; then :; else fail=1; fi
 
 tar -C "$W" -czf "$OUT/terrac-$VER.tar.gz" "terrac-$VER"

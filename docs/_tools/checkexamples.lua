@@ -28,7 +28,12 @@ local function compila(code, grp)
     local f = assert(io.open(tmp .. '/ex.terra', 'w'))
     f:write('#include "', grp and 'TerraGrp.defs' or 'TerraNet.defs', '"\n', code)
     f:close()
-    local cmd = string.format('cd %q && lua5.1 %q --diag=json ex.terra 2> ex.err > /dev/null', tmp, terrac)
+    -- <terrac> é o script (roda com o lua5.1) ou o comando: "lua5.1 /x/terrac" ou o executável (#95)
+    local tc = string.find(terrac, ' ') and terrac or ('lua5.1 ' .. string.format('%q', terrac))
+    if not string.find(terrac, ' ') and io.open(terrac) and io.open(terrac):read(2) == '\127E' then
+        tc = string.format('%q', terrac)
+    end
+    local cmd = string.format('cd %q && %s --diag=json ex.terra 2> ex.err > /dev/null', tmp, tc)
     os.execute(cmd)
     local codes, txt = {}, ''
     for l in io.lines(tmp .. '/ex.err') do
