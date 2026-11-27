@@ -76,23 +76,31 @@ the release, but `terractl` replaces it.
 
 The `_TOSSIM.so` of the release is a TOSSIM module for Python 3.14 (x86_64), with the Terra VM of
 every node. `terractl sim` builds a grid of nodes, loads the program through the base station, as in
-the real network, and prints the log of the nodes (LEDs, radio, VM start and errors) and the
-messages that reach the base station, with the simulated time:
+the real network, and prints the log of the nodes (LEDs, VM start and errors, radio with `--hide
+serial`) and the messages that reach the base station, with the simulated time. With the package
+`terra-<v>-linux-x86_64` (or the Linux extension), which has the simulators and their Python
+([Getting started](getting-started.html)):
 
 ```bash
-tar xzf terra-<v>-net-tossim-py3-x86_64.tar.gz
-podman run --rm -v "$PWD:/w:Z" -w /w ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-0dded15 \
-  python3 terractl-<v>.pyz sim prog.vmx --tossim terra-<v>-net-tossim-py3-x86_64 --grid 3x3 --time 60
+terractl sim prog.vmx --terra prog.terra --grid 3x3 --time 60      # --vm grp for TerraGrp
 ```
 
 ```
     3.615  <<: vmstart 22 0 0 :>>
     4.672  <<: leds 11 3 1 :>>
-    4.759  BS: node 11  type=7 target=1 data=001234fffefffe...
+    4.759  BS: node 11  reading  type=1 source=11 target=1 count=1 temp=500
 ```
 
-The image of the toolchain has the Python of the module; on a machine with Python 3.14, run it
-directly. The nodes are column×10 + line (11, 12, ... 21, 22, ...), up to 9×9; each one hears its
+With the assets one by one, `--tossim` gives the folder of the module, and the Python has to be
+3.14: on another machine, run it in the image of the toolchain:
+
+```bash
+tar xzf terra-<v>-net-tossim-py3-x86_64.tar.gz
+podman run --rm -v "$PWD:/w:Z" -w /w ghcr.io/afbranco/tinyos-toolchain:2.1.2-resolute-py3-0dded15 \
+  python3 terractl-<v>.pyz sim prog.vmx --tossim terra-<v>-net-tossim-py3-x86_64 --types prog.json
+```
+
+The nodes are column×10 + line (11, 12, ... 21, 22, ...), up to 9×9; each one hears its
 8 neighbors, and node 1, the base station, hears node 11. Some options:
 
 | Option | What it does |
@@ -103,7 +111,7 @@ directly. The nodes are column×10 + line (11, 12, ... 21, 22, ...), up to 9×9;
 | `--late N --late-at S` | the last N columns boot at second S (30) |
 | `--vmdbg file` | writes the `VMDBG` channel (every instruction of the VM) |
 | `--channel NAME` | also shows a TOSSIM debug channel (`AM`, `Serial`...) |
-| `--hide CMD,...` | log commands not shown (`serial`; empty shows all) |
+| `--hide CMD,...` | log commands not shown (`serial,radio`; empty shows all) |
 | `--realtime` | runs at the pace of the clock, for `terractl load --sf localhost:9002` from outside |
 
 Run it in a folder where it can write: the VM creates a `sensors.bin` file there, and the channels

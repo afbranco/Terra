@@ -19,6 +19,8 @@ Terra was created by Adriano Branco at PUC-Rio. Contact: <img alt="afbranco at g
 
 ## Documentation
 
+- [Getting started](getting-started.html): install, write, compile and simulate a program, then
+  run it on micaz motes.
 - [The Terra language](language.html): types, flow control, events, timers, patterns.
 - [TerraNet](terranet.html): the VM with radio messages to the nodes in range.
 - [TerraGrp](terragrp.html): the VM with groups, leader election and aggregation.
@@ -30,8 +32,12 @@ This site documents the latest release. Older versions are in the repository his
 
 ## Getting Terra
 
+On Linux, the extension for VS Code `terra-vscode-<version>-linux-x64.vsix`, or the package
+`terra-<version>-linux-x86_64.tar.gz` for the terminal, has everything inside: nothing to install,
+no administrator needed ([Getting started](getting-started.html)).
+
 The [releases](https://github.com/afbranco/Terra/releases) of the
-[repository](https://github.com/afbranco/Terra) have everything ready to use: the compiler
+[repository](https://github.com/afbranco/Terra) have also the pieces one by one: the compiler
 (`terrac`), the TOSSIM simulator modules (Python 3), the micaz firmware and its `.defs`,
 `terractl` (loads programs, shows the messages of the network, flashes the micaz and runs a local
 simulation), an extension for VS Code (`terra-vscode-<version>.vsix`: highlighting, the documentation
