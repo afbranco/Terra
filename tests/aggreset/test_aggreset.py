@@ -18,7 +18,6 @@ import struct
 import sys
 
 SEGUNDOS = 20
-BLOCK_SIZE = 24
 PORTA_SF = 9002
 AQUI = os.path.dirname(os.path.abspath(__file__))
 AVRORA = False
@@ -29,28 +28,9 @@ T2 = 6.0
 # Último LED do 11: 4 + o agId do primeiro AGGREG_DONE da versão 2.
 ESPERADO_FIM = {11: 6}
 sys.path.insert(0, sys.argv[1])
+sys.path.insert(0, os.path.dirname(AQUI))
+from vmtest import deploy, messages  # noqa: E402
 from TOSSIM import SerialForwarder, Tossim  # noqa: E402
-def deploy(vmx, version_id=1):
-    """Os pacotes do TerraControl para um .vmx: (AM, payload)."""
-    with open(vmx) as f:
-        cab = [int(x) for x in f.readline().split()]
-        mem = {}
-        for linha in f:
-            try:
-                mem[int(linha[5:10])] = int(linha[0:2], 16)
-            except ValueError:
-                pass
-    start = cab[0] // BLOCK_SIZE
-    nblocos = max(mem) // BLOCK_SIZE + 1 - start
-    # newProgVersion: versionId, blockLen, blockStart, startProg, endProg, nTracks, wClocks,
-    # asyncs, wClock0, gate0, inEvts, async0 (big-endian, 12 x uint16)
-    pacotes = [(0xA0, struct.pack('>12H', version_id, nblocos, start, *cab[:9]))]
-    for b in range(start, start + nblocos):
-        dados = bytes(mem.get(b * BLOCK_SIZE + j, 0) for j in range(BLOCK_SIZE))
-        pacotes.append((0xA1, struct.pack('>HH24s', version_id, b, dados)))
-    return pacotes
-
-
 t = Tossim([])
 t.randomSeed(1)
 log = open("tview.txt", "w")
@@ -109,7 +89,6 @@ buf = b""
 pedidos = 0
 
 
-
 def serial():
     """Processa o SerialForwarder e responde aos pedidos que chegaram."""
     global buf, pedidos
@@ -122,8 +101,8 @@ def serial():
         buf = buf[2:]
     while buf and len(buf) > buf[0]:
         pac, buf = buf[1:1 + buf[0]], buf[1 + buf[0]:]
-        if len(pac) >= 13 and pac[0] == 0 and pac[7] == 0xA2:
-            oper, versao, bloco = struct.unpack(">BHH", pac[8:13])
+        if len(pac) >= 13 and pac[0] == 0 and pac[7] == messages.AM_REQPROGBLOCK:
+            oper, versao, bloco = messages.parse_req_prog_block(pac[8:13])
             if versao == 0:
                 entrega(*VER[2 if t.time() > T2 * tps else 1][0][0], t.time() + int(0.01 * tps))
             elif versao in VER and bloco in VER[versao][1]:
