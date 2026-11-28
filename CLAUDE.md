@@ -438,6 +438,14 @@ de lá.
     manual, e com o `new_prog_block` estragado `floatset`/`reqblock` reprovam. Achado nisso: o
     `tests/wclock` passava sem o programa rodar (a linha de LED do `VM.reset`); PR #165 (#164) exige
     mais de uma. A #92 fica aberta só pelo micaz (#16).
+  - #110 reescrita como especificação (2026-11-27, com o Prof.; revisão de um agente independente,
+    achados conferidos), **não implementar ainda**: lista de requisitos no `.vmx` (números com
+    assinatura, versão da VM, memória com pilha), conferida nas ferramentas; `default` com `ERROR` na
+    VM. Decisões: família = padrão das mensagens do programa, protocolo de carga com versão própria;
+    tipo corrigido mantém o número (a assinatura vai na lista); TerraControl em Java aposentado (sai
+    da release depois da #16); VCN (`VCN_DAT`/`VCN_DET`) fica fora (aplicação específica do
+    doutorado). Sem publicar a extensão no Marketplace (usuários específicos; Reativos usa o
+    TerraSim).
   - Tempos da agregação/eleição em 16 bits (#83): não reproduzido; os `*_DELTA_TIMEOUT` estão no
     `enum` do `ELCT_RENEW_TIMEOUT` (300000), que o gcc faz com 32 bits.
   - Lotes locais completos (terrac, TOSSIM e Avrora): cerca de 40 min; o Avrora leva ~1 min por
